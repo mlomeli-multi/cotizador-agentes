@@ -805,6 +805,49 @@
             .tabs-container { overflow-x: auto; }
             .tab-btn { padding: 0.75rem 1rem; font-size: 0.8rem; white-space: nowrap; }
         }
+        /* ===== ADMIN MODE ===== */
+        .admin-only { display: none; }
+        body.admin-mode .admin-only { display: block; }
+        body.admin-mode .admin-only-flex { display: flex; }
+        .admin-only-flex { display: none; }
+        .btn-admin {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 0.4rem 0.75rem;
+            border-radius: 8px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: all 0.2s;
+        }
+        .btn-admin:hover { background: rgba(255,255,255,0.2); }
+        body.admin-mode .btn-admin {
+            background: var(--green);
+            border-color: var(--green);
+        }
+        .admin-badge {
+            font-size: 0.6rem;
+            background: var(--green);
+            color: white;
+            padding: 0.1rem 0.35rem;
+            border-radius: 4px;
+            font-weight: 700;
+            display: none;
+        }
+        body.admin-mode .admin-badge { display: inline; }
+
+        /* ===== EXPORT/IMPORT ===== */
+        .data-actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.75rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid var(--gray-100);
+        }
+
     </style>
 </head>
 <body>
@@ -817,6 +860,10 @@
             <h1>Cotizador de Transporte</h1>
             <div class="header-subtitle">Tarifas terrestres para importación</div>
         </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span class="admin-badge" id="admin-badge">ADMIN</span>
+        <button class="btn-admin" id="btn-admin">&#x1F512; Administrar</button>
     </div>
 </header>
 
@@ -944,8 +991,8 @@
             </div>
         </div>
 
-        <!-- Card: Proveedores / Tarifas -->
-        <div class="card">
+        <!-- Card: Proveedores / Tarifas (ADMIN ONLY) -->
+        <div class="card admin-only">
             <div class="card-header">
                 <div class="card-icon green">&#x1F4C4;</div>
                 <h2>Tarifas de Proveedores</h2>
@@ -957,10 +1004,15 @@
                 <input type="file" id="file-input" accept=".xlsx,.xls,.pdf" style="display:none">
             </div>
             <div class="providers-list" id="providers-list"></div>
+            <div class="data-actions">
+                <button class="btn btn-secondary btn-sm" id="btn-export-data">&#x1F4BE; Exportar datos</button>
+                <button class="btn btn-secondary btn-sm" id="btn-import-data">&#x1F4C2; Importar datos</button>
+                <input type="file" id="import-file" accept=".json" style="display:none">
+            </div>
         </div>
 
-        <!-- Card: Conceptos Fijos -->
-        <div class="card">
+        <!-- Card: Conceptos Fijos (ADMIN ONLY) -->
+        <div class="card admin-only">
             <div class="card-header">
                 <div class="card-icon red">&#x1F4CB;</div>
                 <h2>Conceptos Fijos por Aeropuerto</h2>
@@ -2291,6 +2343,88 @@ acList.addEventListener('click', (e) => {
     document.getElementById(id).addEventListener('input', updateRouteStats);
 });
 document.getElementById('estibable').addEventListener('change', updateRouteStats);
+
+// ===== ADMIN MODE =====
+const ADMIN_PIN = '2026'; // PIN para acceso admin — cámbialo a lo que quieras
+
+function isAdmin() {
+    return sessionStorage.getItem('adminMode') === 'true';
+}
+
+function setAdminMode(active) {
+    if (active) {
+        sessionStorage.setItem('adminMode', 'true');
+        document.body.classList.add('admin-mode');
+        document.getElementById('btn-admin').innerHTML = '&#x1F513; Admin activo';
+    } else {
+        sessionStorage.removeItem('adminMode');
+        document.body.classList.remove('admin-mode');
+        document.getElementById('btn-admin').innerHTML = '&#x1F512; Administrar';
+    }
+}
+
+document.getElementById('btn-admin').addEventListener('click', () => {
+    if (isAdmin()) {
+        setAdminMode(false);
+        return;
+    }
+    const pin = prompt('Ingresa el PIN de administrador:');
+    if (pin === ADMIN_PIN) {
+        setAdminMode(true);
+    } else if (pin !== null) {
+        alert('PIN incorrecto.');
+    }
+});
+
+// Restaurar admin mode si la sesión sigue activa
+if (isAdmin()) setAdminMode(true);
+
+// ===== EXPORTAR / IMPORTAR DATOS =====
+document.getElementById('btn-export-data').addEventListener('click', () => {
+    const data = {
+        proveedores: JSON.parse(localStorage.getItem('proveedores') || '[]'),
+        conceptosFijos: JSON.parse(localStorage.getItem('conceptosFijos') || '{}'),
+        exportDate: new Date().toISOString(),
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `cotizador-datos-${new Date().toISOString().slice(0,10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+});
+
+document.getElementById('btn-import-data').addEventListener('click', () => {
+    document.getElementById('import-file').click();
+});
+
+document.getElementById('import-file').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+        try {
+            const data = JSON.parse(ev.target.result);
+            if (!data.proveedores && !data.conceptosFijos) {
+                alert('Archivo no válido. No contiene datos de proveedores ni conceptos.');
+                return;
+            }
+            const msg = `Se importarán:\n• ${(data.proveedores || []).length} proveedores\n• ${Object.keys(data.conceptosFijos || {}).length} aeropuertos con conceptos fijos\n\n¿Reemplazar datos actuales?`;
+            if (!confirm(msg)) return;
+            if (data.proveedores) localStorage.setItem('proveedores', JSON.stringify(data.proveedores));
+            if (data.conceptosFijos) localStorage.setItem('conceptosFijos', JSON.stringify(data.conceptosFijos));
+            renderProvidersList();
+            updateCotizarBtn();
+            renderConceptosTable();
+            alert('Datos importados correctamente.');
+        } catch (err) {
+            alert('Error al leer el archivo: ' + err.message);
+        }
+    };
+    reader.readAsText(file);
+    e.target.value = '';
+});
 
 // ===== INIT =====
 renderProvidersList();
