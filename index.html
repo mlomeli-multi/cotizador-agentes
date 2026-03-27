@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador de Transporte | Agentes</title>
+    <style>
+        /* ===== RESET & BASE ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f1f5f9;
+            color: #1e293b;
+            line-height: 1.5;
+            min-height: 100vh;
+        }
+
+        /* ===== PALETA ===== */
+        :root {
+            --navy: #1e3a5f;
+            --navy-light: #2a4a73;
+            --blue: #2563eb;
+            --blue-light: #3b82f6;
+            --green: #10b981;
+            --green-light: #34d399;
+            --amber: #f59e0b;
+            --red: #ef4444;
+            --gray-50: #f8fafc;
+            --gray-100: #f1f5f9;
+            --gray-200: #e2e8f0;
+            --gray-300: #cbd5e1;
+            --gray-400: #94a3b8;
+            --gray-500: #64748b;
+            --gray-600: #475569;
+            --gray-700: #334155;
+            --gray-800: #1e293b;
+            --radius: 12px;
+            --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+            --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.06);
+            --shadow-lg: 0 10px 15px rgba(0,0,0,0.1), 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, var(--navy) 0%, var(--navy-light) 100%);
+            color: white;
+            padding: 1rem 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-title {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .header-title h1 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+        }
+        .header-logo {
+            width: 36px;
+            height: 36px;
+            background: rgba(255,255,255,0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+        .header-subtitle {
+            font-size: 0.8rem;
+            opacity: 0.7;
+            font-weight: 400;
+        }
+
+        /* ===== TABS ===== */
+        .tabs-container {
+            background: white;
+            border-bottom: 1px solid var(--gray-200);
+            padding: 0 1.5rem;
+            display: flex;
+            gap: 0;
+        }
+        .tab-btn {
+            padding: 0.875rem 1.5rem;
+            border: none;
+            background: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .tab-btn:hover {
+            color: var(--gray-700);
+            background: var(--gray-50);
+        }
+        .tab-btn.active {
+            color: var(--blue);
+            border-bottom-color: var(--blue);
+            font-weight: 600;
+        }
+        .tab-btn.disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+        .tab-icon {
+            font-size: 1.1rem;
+        }
+        .tab-badge {
+            font-size: 0.65rem;
+            background: var(--gray-200);
+            color: var(--gray-500);
+            padding: 0.1rem 0.4rem;
+            border-radius: 4px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        /* ===== MAIN CONTENT ===== */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 1.5rem;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        /* ===== CARDS ===== */
+        .card {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.25rem;
+        }
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 0.625rem;
+            margin-bottom: 1.25rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--gray-800);
+        }
+        .card-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .card-icon.blue { background: #dbeafe; color: var(--blue); }
+        .card-icon.green { background: #d1fae5; color: var(--green); }
+        .card-icon.amber { background: #fef3c7; color: var(--amber); }
+        .card-icon.red { background: #fee2e2; color: var(--red); }
+        .card-icon.navy { background: #e0e7ef; color: var(--navy); }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.375rem;
+        }
+        .form-group label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--gray-600);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .form-group input,
+        .form-group select {
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 8px;
+            font-size: 0.9rem;
+            color: var(--gray-800);
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--blue);
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+        .form-group input::placeholder {
+            color: var(--gray-400);
+        }
+        .form-hint {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        /* ===== TOGGLE (estibable) ===== */
+        .toggle-group {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding-top: 0.25rem;
+        }
+        .toggle {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            cursor: pointer;
+        }
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: var(--gray-300);
+            border-radius: 12px;
+            transition: background 0.2s;
+        }
+        .toggle-slider::before {
+            content: '';
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            left: 3px;
+            top: 3px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.2s;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+        }
+        .toggle input:checked + .toggle-slider {
+            background: var(--green);
+        }
+        .toggle input:checked + .toggle-slider::before {
+            transform: translateX(20px);
+        }
+        .toggle-label {
+            font-size: 0.85rem;
+            color: var(--gray-600);
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn {
+            padding: 0.625rem 1.25rem;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .btn-primary {
+            background: var(--blue);
+            color: white;
+        }
+        .btn-primary:hover {
+            background: var(--blue-light);
+            box-shadow: var(--shadow-md);
+        }
+        .btn-secondary {
+            background: var(--gray-100);
+            color: var(--gray-700);
+            border: 1px solid var(--gray-200);
+        }
+        .btn-secondary:hover {
+            background: var(--gray-200);
+        }
+        .btn-success {
+            background: var(--green);
+            color: white;
+        }
+        .btn-success:hover {
+            background: var(--green-light);
+        }
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ===== RESULTADO / UNIDAD SELECCIONADA ===== */
+        .unit-result {
+            display: none;
+            margin-top: 1rem;
+            padding: 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+        .unit-result.show { display: block; }
+        .unit-result .unit-name {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .unit-result .unit-detail {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-top: 0.25rem;
+        }
+        .unit-result.error {
+            background: #fef2f2;
+            border-color: #fecaca;
+        }
+        .unit-result.error .unit-name {
+            color: var(--red);
+        }
+
+        /* ===== SECTION: TARIFAS ===== */
+        .upload-zone {
+            border: 2px dashed var(--gray-300);
+            border-radius: var(--radius);
+            padding: 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .upload-zone:hover {
+            border-color: var(--blue);
+            background: #f0f7ff;
+        }
+        .upload-zone .upload-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+        .upload-zone .upload-text {
+            font-size: 0.9rem;
+            color: var(--gray-600);
+        }
+        .upload-zone .upload-hint {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-top: 0.25rem;
+        }
+
+        /* ===== PROVEEDORES LIST ===== */
+        .providers-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        .provider-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            border: 1px solid var(--gray-200);
+        }
+        .provider-item .provider-name {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+        .provider-item .provider-meta {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        .provider-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+        .btn-sm {
+            padding: 0.3rem 0.6rem;
+            font-size: 0.75rem;
+            border-radius: 6px;
+        }
+
+        /* ===== COTIZACIÓN RESULTADO ===== */
+        .quote-results {
+            display: none;
+        }
+        .quote-results.show { display: block; }
+        .quote-card {
+            border: 1px solid var(--gray-200);
+            border-radius: var(--radius);
+            padding: 1.25rem;
+            margin-bottom: 1rem;
+            background: var(--gray-50);
+        }
+        .quote-card.best {
+            border-color: var(--green);
+            background: #f0fdf9;
+        }
+        .quote-rank {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--gray-400);
+            margin-bottom: 0.25rem;
+        }
+        .quote-card.best .quote-rank {
+            color: var(--green);
+        }
+        .quote-provider {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .quote-price {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--blue);
+            margin-top: 0.5rem;
+        }
+        .quote-breakdown {
+            margin-top: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--gray-500);
+        }
+        .quote-breakdown table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .quote-breakdown td {
+            padding: 0.25rem 0;
+        }
+        .quote-breakdown td:last-child {
+            text-align: right;
+            font-weight: 500;
+            color: var(--gray-700);
+        }
+        .quote-breakdown .total-row td {
+            border-top: 1px solid var(--gray-200);
+            padding-top: 0.5rem;
+            font-weight: 700;
+            color: var(--gray-800);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 3rem 1rem;
+            color: var(--gray-400);
+        }
+        .empty-state .empty-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .empty-state p {
+            font-size: 0.9rem;
+        }
+
+        /* ===== MAP CONTAINER ===== */
+        .map-container {
+            height: 250px;
+            border-radius: var(--radius);
+            overflow: hidden;
+            border: 1px solid var(--gray-200);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .main { padding: 1rem; }
+            .form-grid { grid-template-columns: 1fr; }
+            .header { padding: 0.75rem 1rem; }
+            .header-title h1 { font-size: 1.05rem; }
+            .tabs-container { overflow-x: auto; }
+            .tab-btn { padding: 0.75rem 1rem; font-size: 0.8rem; white-space: nowrap; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<header class="header">
+    <div class="header-title">
+        <div class="header-logo">&#x1F69A;</div>
+        <div>
+            <h1>Cotizador de Transporte</h1>
+            <div class="header-subtitle">Tarifas terrestres para importación</div>
+        </div>
+    </div>
+</header>
+
+<!-- ===== TABS ===== -->
+<nav class="tabs-container">
+    <button class="tab-btn active" data-tab="aereo">
+        <span class="tab-icon">&#9992;</span>
+        Aéreo Importación (DAP)
+    </button>
+    <button class="tab-btn disabled" data-tab="maritimo">
+        <span class="tab-icon">&#x1F6A2;</span>
+        Marítimo Importación (DAP)
+        <span class="tab-badge">Próximamente</span>
+    </button>
+</nav>
+
+<!-- ===== CONTENIDO PRINCIPAL ===== -->
+<main class="main">
+
+    <!-- TAB: AÉREO -->
+    <section class="tab-content active" id="tab-aereo">
+
+        <!-- Card: Ruta -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon blue">&#x1F4CD;</div>
+                <h2>Ruta</h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Aeropuerto destino en México</label>
+                    <select id="aeropuerto">
+                        <option value="">Seleccionar aeropuerto...</option>
+                        <option value="NLU">NLU — Nuevo Laredo</option>
+                        <option value="MEX">MEX — Ciudad de México</option>
+                        <option value="MTY">MTY — Monterrey</option>
+                        <option value="GDL">GDL — Guadalajara</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Ciudad destino final</label>
+                    <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno, Jalisco">
+                </div>
+            </div>
+        </div>
+
+        <!-- Card: Datos de carga -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon amber">&#x1F4E6;</div>
+                <h2>Datos de Carga</h2>
+            </div>
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Cantidad de pallets</label>
+                    <input type="number" id="pallets" min="1" placeholder="Ej: 2">
+                </div>
+                <div class="form-group">
+                    <label>Peso total (kg)</label>
+                    <input type="number" id="peso" min="1" placeholder="Ej: 1500">
+                    <span class="form-hint">Peso total de todos los pallets</span>
+                </div>
+                <div class="form-group">
+                    <label>Largo (cm)</label>
+                    <input type="number" id="largo" min="1" placeholder="120">
+                </div>
+                <div class="form-group">
+                    <label>Ancho (cm)</label>
+                    <input type="number" id="ancho" min="1" placeholder="100">
+                </div>
+                <div class="form-group">
+                    <label>Alto (cm)</label>
+                    <input type="number" id="alto" min="1" placeholder="150">
+                    <span class="form-hint">Alto de un pallet</span>
+                </div>
+                <div class="form-group">
+                    <label>¿Es estibable?</label>
+                    <div class="toggle-group">
+                        <label class="toggle">
+                            <input type="checkbox" id="estibable">
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="toggle-label" id="estibable-label">No</span>
+                    </div>
+                    <span class="form-hint">Si se pueden apilar pallets uno encima de otro</span>
+                </div>
+            </div>
+
+            <div style="margin-top: 1.25rem; display: flex; gap: 0.75rem; align-items: center;">
+                <button class="btn btn-primary" id="btn-calcular-unidad">
+                    &#x1F4CA; Calcular unidad necesaria
+                </button>
+            </div>
+
+            <div class="unit-result" id="unit-result">
+                <div class="unit-name" id="unit-name"></div>
+                <div class="unit-detail" id="unit-detail"></div>
+            </div>
+        </div>
+
+        <!-- Card: Proveedores / Tarifas -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon green">&#x1F4C4;</div>
+                <h2>Tarifas de Proveedores</h2>
+            </div>
+            <div class="upload-zone" id="upload-zone">
+                <div class="upload-icon">&#x1F4C2;</div>
+                <div class="upload-text">Arrastra un archivo Excel aquí o haz clic para subir</div>
+                <div class="upload-hint">Formatos soportados: .xlsx, .xls</div>
+                <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none">
+            </div>
+            <div class="providers-list" id="providers-list"></div>
+        </div>
+
+        <!-- Card: Cotizar -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon navy">&#x1F4B0;</div>
+                <h2>Cotización</h2>
+            </div>
+            <button class="btn btn-success" id="btn-cotizar" disabled>
+                &#x1F50D; Buscar mejores tarifas
+            </button>
+            <div class="quote-results" id="quote-results">
+                <!-- Se llena dinámicamente -->
+            </div>
+            <div class="empty-state" id="empty-cotizacion">
+                <div class="empty-icon">&#x1F4CB;</div>
+                <p>Completa la ruta, datos de carga y sube tarifas para cotizar</p>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- TAB: MARÍTIMO (placeholder) -->
+    <section class="tab-content" id="tab-maritimo">
+        <div class="card">
+            <div class="empty-state">
+                <div class="empty-icon">&#x1F6A2;</div>
+                <p>Marítimo Importación estará disponible próximamente</p>
+            </div>
+        </div>
+    </section>
+
+</main>
+
+<script>
+/* ===================================================================
+   COTIZADOR DE TRANSPORTE — JS
+   =================================================================== */
+
+// ===== TABS =====
+document.querySelectorAll('.tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if (btn.classList.contains('disabled')) return;
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+    });
+});
+
+// ===== TOGGLE ESTIBABLE LABEL =====
+document.getElementById('estibable').addEventListener('change', function() {
+    document.getElementById('estibable-label').textContent = this.checked ? 'Sí' : 'No';
+});
+
+// ===== TIPOS DE UNIDAD DE TRANSPORTE =====
+const UNIDADES = [
+    { nombre: '1 Tonelada',     payload: 900,   largo: 190,  ancho: 150, alto: 150 },
+    { nombre: '3.5 Toneladas',  payload: 3200,  largo: 315,  ancho: 225, alto: 180 },
+    { nombre: 'Rabón (5 Ton)',  payload: 5900,  largo: 600,  ancho: 240, alto: 215 },
+    { nombre: 'Tortón (10 Ton)',payload: 9900,  largo: 700,  ancho: 250, alto: 245 },
+    { nombre: 'Caja Seca 53\'', payload: 19500, largo: 1585, ancho: 238, alto: 238 },
+];
+
+// ===== MOTOR DE CÁLCULO DE UNIDAD =====
+function calcularUnidad(pallets, pesoTotal, largo, ancho, altoPallet, estibable) {
+    // Validaciones
+    if (!pallets || !pesoTotal || !largo || !ancho || !altoPallet) {
+        return { error: 'Completa todos los campos de carga' };
+    }
+    if (pallets < 1 || pesoTotal < 1) {
+        return { error: 'Los valores deben ser mayores a 0' };
+    }
+
+    // Para cada unidad, verificar si la carga cabe
+    for (const unidad of UNIDADES) {
+        // 1. Verificar peso
+        if (pesoTotal > unidad.payload) continue;
+
+        // 2. Verificar que un pallet cabe en ancho y largo de la unidad
+        //    Un pallet individual debe caber en la sección transversal
+        if (largo > unidad.largo || ancho > unidad.ancho) {
+            // Intentar rotado (intercambiar largo/ancho del pallet)
+            if (ancho > unidad.largo || largo > unidad.ancho) continue;
+        }
+
+        // 3. Verificar alto
+        if (altoPallet > unidad.alto) continue;
+
+        // 4. Calcular cuántos pallets caben
+        //    Pallets a lo largo de la unidad
+        const palletsLargo = Math.floor(unidad.largo / largo);
+        const palletsAncho = Math.floor(unidad.ancho / ancho);
+        // También probar rotados
+        const palletsLargoRot = Math.floor(unidad.largo / ancho);
+        const palletsAnchoRot = Math.floor(unidad.ancho / largo);
+
+        const porPiso = Math.max(
+            palletsLargo * palletsAncho,
+            palletsLargoRot * palletsAnchoRot
+        );
+
+        // Pisos (niveles de estiba)
+        let pisos = 1;
+        if (estibable) {
+            pisos = Math.floor(unidad.alto / altoPallet);
+            if (pisos < 1) pisos = 1;
+        }
+
+        const capacidadTotal = porPiso * pisos;
+
+        if (capacidadTotal >= pallets) {
+            return {
+                unidad: unidad.nombre,
+                detalle: `Capacidad: ${capacidadTotal} pallets (${porPiso} por piso × ${pisos} piso${pisos > 1 ? 's' : ''}). Payload máx: ${unidad.payload.toLocaleString()} kg.`
+            };
+        }
+    }
+
+    return { error: 'La carga no cabe en ninguna unidad disponible. Considera dividir el envío.' };
+}
+
+// ===== BOTÓN CALCULAR UNIDAD =====
+document.getElementById('btn-calcular-unidad').addEventListener('click', () => {
+    const pallets = parseInt(document.getElementById('pallets').value);
+    const peso = parseFloat(document.getElementById('peso').value);
+    const largo = parseFloat(document.getElementById('largo').value);
+    const ancho = parseFloat(document.getElementById('ancho').value);
+    const alto = parseFloat(document.getElementById('alto').value);
+    const estibable = document.getElementById('estibable').checked;
+
+    const result = calcularUnidad(pallets, peso, largo, ancho, alto, estibable);
+    const el = document.getElementById('unit-result');
+    const nameEl = document.getElementById('unit-name');
+    const detailEl = document.getElementById('unit-detail');
+
+    el.classList.add('show');
+
+    if (result.error) {
+        el.classList.add('error');
+        nameEl.textContent = result.error;
+        detailEl.textContent = '';
+    } else {
+        el.classList.remove('error');
+        nameEl.textContent = '&#x2705; Unidad recomendada: ' + result.unidad;
+        nameEl.innerHTML = '&#x2705; Unidad recomendada: ' + result.unidad;
+        detailEl.textContent = result.detalle;
+    }
+});
+
+// ===== UPLOAD ZONE =====
+const uploadZone = document.getElementById('upload-zone');
+const fileInput = document.getElementById('file-input');
+
+uploadZone.addEventListener('click', () => fileInput.click());
+uploadZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = 'var(--blue)';
+    uploadZone.style.background = '#f0f7ff';
+});
+uploadZone.addEventListener('dragleave', () => {
+    uploadZone.style.borderColor = '';
+    uploadZone.style.background = '';
+});
+uploadZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    uploadZone.style.borderColor = '';
+    uploadZone.style.background = '';
+    if (e.dataTransfer.files.length) {
+        handleFile(e.dataTransfer.files[0]);
+    }
+});
+fileInput.addEventListener('change', () => {
+    if (fileInput.files.length) {
+        handleFile(fileInput.files[0]);
+    }
+});
+
+function handleFile(file) {
+    // Placeholder — se implementa en Fase 3 con XLSX.js
+    alert('Carga de archivos Excel se habilitará en la siguiente fase.\nArchivo: ' + file.name);
+}
+
+// ===== PLACEHOLDER: COTIZAR =====
+document.getElementById('btn-cotizar').addEventListener('click', () => {
+    alert('La función de cotización se habilitará cuando se carguen tarifas de proveedores.');
+});
+
+</script>
+</body>
+</html>
