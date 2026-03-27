@@ -593,6 +593,67 @@
             border-color: var(--blue);
         }
 
+        /* ===== CONCEPTOS FIJOS TABLE ===== */
+        .conceptos-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+        .conceptos-table th {
+            text-align: left;
+            padding: 0.5rem 0.5rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .conceptos-table td {
+            padding: 0.35rem 0.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .conceptos-table input {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.85rem;
+            background: var(--gray-50);
+        }
+        .conceptos-table input:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: white;
+        }
+        .conceptos-table .col-nombre { width: 55%; }
+        .conceptos-table .col-monto { width: 30%; }
+        .conceptos-table .col-acciones { width: 15%; text-align: center; }
+        .btn-delete-row {
+            background: none;
+            border: none;
+            color: var(--red);
+            cursor: pointer;
+            font-size: 1rem;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            transition: background 0.15s;
+        }
+        .btn-delete-row:hover {
+            background: #fee2e2;
+        }
+        .conceptos-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            background: var(--gray-50);
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--navy);
+        }
+
         /* ===== AUTOCOMPLETE ===== */
         .autocomplete-wrap {
             position: relative;
@@ -775,6 +836,33 @@
                 <input type="file" id="file-input" accept=".xlsx,.xls,.pdf" style="display:none">
             </div>
             <div class="providers-list" id="providers-list"></div>
+        </div>
+
+        <!-- Card: Conceptos Fijos -->
+        <div class="card">
+            <div class="card-header">
+                <div class="card-icon red">&#x1F4CB;</div>
+                <h2>Conceptos Fijos por Aeropuerto</h2>
+            </div>
+            <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:1rem;">Costos de operación que siempre se cobran (maniobras, almacenaje, etc). Se suman al flete.</p>
+
+            <div class="form-group" style="margin-bottom:1rem;max-width:250px;">
+                <label>Aeropuerto</label>
+                <select id="conceptos-airport">
+                    <option value="NLU">NLU — Nuevo Laredo (AIFA)</option>
+                    <option value="MEX">MEX — Ciudad de México (AICM)</option>
+                    <option value="MTY">MTY — Monterrey</option>
+                    <option value="GDL">GDL — Guadalajara</option>
+                </select>
+            </div>
+
+            <div id="conceptos-table-wrap">
+                <!-- Se llena dinámicamente -->
+            </div>
+
+            <div style="margin-top:0.75rem;display:flex;gap:0.5rem;">
+                <button class="btn btn-secondary btn-sm" id="btn-add-concepto">+ Agregar concepto</button>
+            </div>
         </div>
 
         <!-- Card: Cotizar -->
@@ -1529,6 +1617,101 @@ function updateCotizarBtn() {
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
     document.getElementById('btn-cotizar').disabled = proveedores.length === 0;
 }
+
+// ===== CONCEPTOS FIJOS POR AEROPUERTO =====
+function getConceptosFijos() {
+    return JSON.parse(localStorage.getItem('conceptosFijos') || '{}');
+}
+
+function saveConceptosFijos(data) {
+    localStorage.setItem('conceptosFijos', JSON.stringify(data));
+}
+
+function renderConceptosTable() {
+    const airport = document.getElementById('conceptos-airport').value;
+    const wrap = document.getElementById('conceptos-table-wrap');
+    const allConceptos = getConceptosFijos();
+    const conceptos = allConceptos[airport] || [];
+
+    if (conceptos.length === 0) {
+        wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);padding:0.5rem 0;">No hay conceptos fijos para este aeropuerto. Agrega uno.</p>';
+        return;
+    }
+
+    let html = `<table class="conceptos-table">
+        <thead><tr>
+            <th class="col-nombre">Concepto</th>
+            <th class="col-monto">Monto (MXN)</th>
+            <th class="col-acciones"></th>
+        </tr></thead><tbody>`;
+
+    conceptos.forEach((c, i) => {
+        html += `<tr>
+            <td><input type="text" value="${escapeHtml(c.nombre)}" data-idx="${i}" data-field="nombre" class="concepto-input"></td>
+            <td><input type="number" value="${c.monto}" data-idx="${i}" data-field="monto" class="concepto-input" min="0" step="0.01"></td>
+            <td class="col-acciones"><button class="btn-delete-row" data-idx="${i}" title="Eliminar">&#x2716;</button></td>
+        </tr>`;
+    });
+
+    html += '</tbody></table>';
+
+    // Total
+    const total = conceptos.reduce((s, c) => s + (parseFloat(c.monto) || 0), 0);
+    html += `<div class="conceptos-total">
+        <span>Total conceptos fijos (${airport})</span>
+        <span>$${total.toLocaleString('es-MX', { minimumFractionDigits: 2 })} MXN</span>
+    </div>`;
+
+    wrap.innerHTML = html;
+
+    // Event listeners para edición en vivo
+    wrap.querySelectorAll('.concepto-input').forEach(input => {
+        input.addEventListener('change', () => {
+            const idx = parseInt(input.dataset.idx);
+            const field = input.dataset.field;
+            const allC = getConceptosFijos();
+            if (!allC[airport]) return;
+            if (field === 'monto') {
+                allC[airport][idx].monto = parseFloat(input.value) || 0;
+            } else {
+                allC[airport][idx].nombre = input.value;
+            }
+            saveConceptosFijos(allC);
+            renderConceptosTable(); // re-render para actualizar total
+        });
+    });
+
+    // Delete buttons
+    wrap.querySelectorAll('.btn-delete-row').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const idx = parseInt(btn.dataset.idx);
+            const allC = getConceptosFijos();
+            if (!allC[airport]) return;
+            allC[airport].splice(idx, 1);
+            saveConceptosFijos(allC);
+            renderConceptosTable();
+        });
+    });
+}
+
+document.getElementById('conceptos-airport').addEventListener('change', renderConceptosTable);
+
+document.getElementById('btn-add-concepto').addEventListener('click', () => {
+    const airport = document.getElementById('conceptos-airport').value;
+    const allC = getConceptosFijos();
+    if (!allC[airport]) allC[airport] = [];
+    allC[airport].push({ nombre: '', monto: 0 });
+    saveConceptosFijos(allC);
+    renderConceptosTable();
+    // Focus en el último input de nombre
+    setTimeout(() => {
+        const inputs = document.querySelectorAll('.concepto-input[data-field="nombre"]');
+        if (inputs.length) inputs[inputs.length - 1].focus();
+    }, 50);
+});
+
+// Render inicial
+renderConceptosTable();
 
 // ===== AUTOCOMPLETE CIUDAD DESTINO =====
 const ciudadInput = document.getElementById('ciudad-destino');
