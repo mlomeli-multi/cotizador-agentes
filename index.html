@@ -2126,7 +2126,9 @@ setTimeout(() => map.invalidateSize(), 200);
 // ===== RUTA EN MAPA: GEOCODING + LÍNEA + DISTANCIA =====
 let routeLine = null;
 let destMarker = null;
-let geocodeTimeout = null;
+let routeDebounce = null;
+let lastGeoCache = { city: '', result: null }; // cache para no re-geocodear
+let currentRouteKm = 0; // km guardados para recalcular solo tiempo
 
 // Velocidades promedio por tipo de unidad (km/h en carretera mexicana)
 const VELOCIDADES = {
@@ -2153,7 +2155,19 @@ function formatTime(hours) {
     return `${h}h ${m}m`;
 }
 
+function getUnidadCalculada() {
+    const unitText = document.getElementById('unit-name').textContent || '';
+    for (const u of UNIDADES) {
+        if (unitText.includes(u.nombre)) return u.nombre;
+    }
+    return '';
+}
+
 async function geocodeCity(cityName) {
+    // Cache: si es la misma ciudad, devolver resultado anterior
+    if (lastGeoCache.city === cityName && lastGeoCache.result) {
+        return lastGeoCache.result;
+    }
     const query = encodeURIComponent(cityName + ', Mexico');
     try {
         const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=mx`, {
@@ -2161,7 +2175,9 @@ async function geocodeCity(cityName) {
         });
         const data = await resp.json();
         if (data && data.length > 0) {
-            return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), display: data[0].display_name };
+            const result = { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon) };
+            lastGeoCache = { city: cityName, result };
+            return result;
         }
     } catch (e) { /* silenciar errores de red */ }
     return null;
@@ -2171,8 +2187,21 @@ function clearRoute() {
     if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
     if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
     document.getElementById('route-info').classList.remove('show');
+    currentRouteKm = 0;
 }
 
+// Actualizar solo los stats de tiempo (sin tocar el mapa)
+function updateRouteStats() {
+    if (currentRouteKm <= 0) return;
+    const tipoUnidad = getUnidadCalculada();
+    const vel = VELOCIDADES[tipoUnidad] || 70;
+    const hours = currentRouteKm / vel;
+    document.getElementById('route-time').textContent = formatTime(hours);
+    document.getElementById('route-time-label').textContent = tipoUnidad ? `Tránsito (${tipoUnidad})` : 'Tiempo tránsito';
+    document.getElementById('route-unit-type').textContent = tipoUnidad || 'Sin calcular';
+}
+
+// Actualizar ruta completa (geocoding + mapa + stats)
 async function updateRoute() {
     const apCode = document.getElementById('aeropuerto').value;
     const ciudad = document.getElementById('ciudad-destino').value.trim();
@@ -2186,7 +2215,7 @@ async function updateRoute() {
     if (!ap) { clearRoute(); return; }
 
     const geo = await geocodeCity(ciudad);
-    if (!geo) { clearRoute(); return; }
+    if (!geo) return; // No borrar ruta si falla geocoding, mantener la anterior
 
     // Limpiar ruta anterior
     if (routeLine) map.removeLayer(routeLine);
@@ -2208,16 +2237,14 @@ async function updateRoute() {
         className: 'airport-tooltip',
     });
 
-    // Línea de ruta (curva)
+    // Línea de ruta (curva bezier)
     const midLat = (ap.lat + geo.lat) / 2;
     const midLng = (ap.lng + geo.lng) / 2;
-    // Offset para hacer la curva
     const dx = geo.lng - ap.lng;
     const dy = geo.lat - ap.lat;
     const curveLat = midLat + dx * 0.1;
     const curveLng = midLng - dy * 0.1;
 
-    // Generar puntos de la curva bezier
     const points = [];
     for (let t = 0; t <= 1; t += 0.05) {
         const lat = (1-t)**2 * ap.lat + 2*(1-t)*t * curveLat + t**2 * geo.lat;
@@ -2232,60 +2259,38 @@ async function updateRoute() {
         dashArray: '8, 6',
     }).addTo(map);
 
-    // Ajustar vista para mostrar ambos puntos
+    // Ajustar vista
     const bounds = L.latLngBounds([[ap.lat, ap.lng], [geo.lat, geo.lng]]);
     map.fitBounds(bounds, { padding: [30, 30] });
 
-    // Calcular distancia (línea recta * 1.35 factor carreteras México)
+    // Calcular distancia
     const straightKm = haversineKm(ap.lat, ap.lng, geo.lat, geo.lng);
-    const roadKm = Math.round(straightKm * 1.35);
+    currentRouteKm = Math.round(straightKm * 1.35);
 
-    // Obtener tipo de unidad calculada
-    const unitNameEl = document.getElementById('unit-name');
-    const unitText = unitNameEl ? unitNameEl.textContent : '';
-    let tipoUnidad = '';
-    for (const u of UNIDADES) {
-        if (unitText.includes(u.nombre)) {
-            tipoUnidad = u.nombre;
-            break;
-        }
-    }
-
-    const vel = VELOCIDADES[tipoUnidad] || 70;
-    const hours = roadKm / vel;
-
-    // Mostrar info
-    document.getElementById('route-km').textContent = roadKm.toLocaleString() + ' km';
-    document.getElementById('route-time').textContent = formatTime(hours);
-    document.getElementById('route-time-label').textContent = tipoUnidad ? `Tránsito (${tipoUnidad})` : 'Tiempo tránsito';
-    document.getElementById('route-unit-type').textContent = tipoUnidad || 'Sin calcular';
+    document.getElementById('route-km').textContent = currentRouteKm.toLocaleString() + ' km';
     document.getElementById('route-info').classList.add('show');
+    updateRouteStats();
 }
 
-// Actualizar ruta cuando cambie la ciudad (con debounce)
-document.getElementById('ciudad-destino').addEventListener('change', () => {
-    clearTimeout(geocodeTimeout);
-    geocodeTimeout = setTimeout(updateRoute, 300);
-});
+// Debounce compartido para updateRoute
+function scheduleRouteUpdate() {
+    clearTimeout(routeDebounce);
+    routeDebounce = setTimeout(updateRoute, 400);
+}
 
-// También actualizar al seleccionar del autocompletado
-const origAcClick = acList.addEventListener;
+// Geocoding solo cuando cambie aeropuerto o ciudad
+document.getElementById('ciudad-destino').addEventListener('change', scheduleRouteUpdate);
 acList.addEventListener('click', (e) => {
-    const item = e.target.closest('.autocomplete-item[data-value]');
-    if (item) {
+    if (e.target.closest('.autocomplete-item[data-value]')) {
         setTimeout(updateRoute, 100);
     }
 });
 
-// Recalcular tiempo cuando cambie la unidad
+// Campos de carga: solo recalcular stats (NO re-geocodear)
 ['pallets', 'peso', 'largo', 'ancho', 'alto'].forEach(id => {
-    document.getElementById(id).addEventListener('input', () => {
-        setTimeout(updateRoute, 200);
-    });
+    document.getElementById(id).addEventListener('input', updateRouteStats);
 });
-document.getElementById('estibable').addEventListener('change', () => {
-    setTimeout(updateRoute, 200);
-});
+document.getElementById('estibable').addEventListener('change', updateRouteStats);
 
 // ===== INIT =====
 renderProvidersList();
