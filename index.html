@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador de Transporte | Agentes</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <style>
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -769,9 +770,9 @@
             </div>
             <div class="upload-zone" id="upload-zone">
                 <div class="upload-icon">&#x1F4C2;</div>
-                <div class="upload-text">Arrastra un archivo Excel aquí o haz clic para subir</div>
-                <div class="upload-hint">Formatos soportados: .xlsx, .xls</div>
-                <input type="file" id="file-input" accept=".xlsx,.xls" style="display:none">
+                <div class="upload-text">Arrastra un archivo Excel o PDF aquí o haz clic para subir</div>
+                <div class="upload-hint">Formatos soportados: .xlsx, .xls, .pdf</div>
+                <input type="file" id="file-input" accept=".xlsx,.xls,.pdf" style="display:none">
             </div>
             <div class="providers-list" id="providers-list"></div>
         </div>
@@ -1026,8 +1027,13 @@ let sheetsTemp = [];      // nombres de hojas
 
 function handleFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
-    if (!['xlsx', 'xls'].includes(ext)) {
-        alert('Solo se aceptan archivos .xlsx o .xls');
+    if (!['xlsx', 'xls', 'pdf'].includes(ext)) {
+        alert('Solo se aceptan archivos .xlsx, .xls o .pdf');
+        return;
+    }
+
+    if (ext === 'pdf') {
+        handlePDF(file);
         return;
     }
 
@@ -1040,32 +1046,132 @@ function handleFile(file) {
                 alert('El archivo no contiene hojas.');
                 return;
             }
-            // Abrir modal
-            document.getElementById('provider-name').value = file.name.replace(/\.[^.]+$/, '');
-            document.getElementById('provider-airport').value = '';
-            document.getElementById('airport-hint').textContent = '';
-            renderSheetTabs(0);
-
-            // Si no se detectó aeropuerto por pestaña, revisar si hay columna ORIGEN (Oslu)
-            if (!document.getElementById('provider-airport').value && sheetDataTemp) {
-                const headers = sheetDataTemp[0];
-                const hasOrigen = headers && headers.some(h =>
-                    String(h).toLowerCase().trim() === 'origen'
-                );
-                if (hasOrigen) {
-                    document.getElementById('provider-airport').value = 'AUTO';
-                    document.getElementById('airport-hint').textContent = 'Detectado: columna ORIGEN en los datos. Se separará por aeropuerto automáticamente.';
-                }
-            }
-
-            document.getElementById('modal-mapping').classList.add('show');
+            openMappingModal(file.name);
         } catch (err) {
             alert('Error al leer el archivo: ' + err.message);
         }
     };
     reader.readAsArrayBuffer(file);
-    // Resetear input para poder subir el mismo archivo de nuevo
     fileInput.value = '';
+}
+
+function openMappingModal(fileName) {
+    document.getElementById('provider-name').value = fileName.replace(/\.[^.]+$/, '');
+    document.getElementById('provider-airport').value = '';
+    document.getElementById('airport-hint').textContent = '';
+    renderSheetTabs(0);
+
+    // Si no se detectó aeropuerto por pestaña, revisar si hay columna ORIGEN
+    if (!document.getElementById('provider-airport').value && sheetDataTemp) {
+        const headers = sheetDataTemp[0];
+        const hasOrigen = headers && headers.some(h =>
+            String(h).toLowerCase().trim() === 'origen'
+        );
+        if (hasOrigen) {
+            document.getElementById('provider-airport').value = 'AUTO';
+            document.getElementById('airport-hint').textContent = 'Detectado: columna ORIGEN en los datos. Se separará por aeropuerto automáticamente.';
+        }
+    }
+
+    document.getElementById('modal-mapping').classList.add('show');
+}
+
+// ===== PDF PARSING =====
+async function handlePDF(file) {
+    try {
+        const arrayBuffer = await file.arrayBuffer();
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+
+        const allRows = [];
+        for (let p = 1; p <= pdf.numPages; p++) {
+            const page = await pdf.getPage(p);
+            const textContent = await page.getTextContent();
+            const pageRows = extractTableFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+            allRows.push(...pageRows);
+        }
+
+        if (allRows.length === 0) {
+            alert('No se pudieron extraer datos tabulares del PDF.');
+            return;
+        }
+
+        // Convertir a formato de sheetData (como si fuera un Excel)
+        // Detectar header: fila con más columnas o con keywords
+        sheetDataTemp = allRows;
+        sheetsTemp = ['PDF'];
+        workbookTemp = { Sheets: { 'PDF': null }, SheetNames: ['PDF'] };
+        // Flag para que loadSheetPreview no re-procese
+        workbookTemp._isPDF = true;
+
+        fileInput.value = '';
+        openMappingModal(file.name);
+    } catch (err) {
+        alert('Error al leer el PDF: ' + err.message);
+        fileInput.value = '';
+    }
+}
+
+function extractTableFromPDFPage(textContent, viewport) {
+    // Extraer items con posiciones
+    const items = textContent.items
+        .filter(item => item.str.trim() !== '')
+        .map(item => ({
+            text: item.str.trim(),
+            x: Math.round(item.transform[4]),
+            y: Math.round(viewport.height - item.transform[5]),  // invertir Y
+            width: item.width,
+        }));
+
+    if (items.length === 0) return [];
+
+    // Agrupar por filas (items con Y similar, tolerancia de 5px)
+    items.sort((a, b) => a.y - b.y || a.x - b.x);
+    const rows = [];
+    let currentRow = [items[0]];
+    let currentY = items[0].y;
+
+    for (let i = 1; i < items.length; i++) {
+        if (Math.abs(items[i].y - currentY) <= 5) {
+            currentRow.push(items[i]);
+        } else {
+            rows.push(currentRow);
+            currentRow = [items[i]];
+            currentY = items[i].y;
+        }
+    }
+    rows.push(currentRow);
+
+    // Detectar columnas: encontrar las posiciones X más comunes
+    // Usar la fila con más elementos como referencia para las columnas
+    const refRow = rows.reduce((best, r) => r.length > best.length ? r : best, []);
+    const colPositions = refRow.map(item => item.x).sort((a, b) => a - b);
+
+    // Convertir cada fila a array de celdas alineadas por columna
+    const tableRows = [];
+    for (const row of rows) {
+        if (row.length < 2) continue; // saltar filas con 1 solo elemento (títulos)
+        row.sort((a, b) => a.x - b.x);
+
+        const cells = new Array(colPositions.length).fill('');
+        for (const item of row) {
+            // Encontrar la columna más cercana
+            let bestCol = 0;
+            let bestDist = Math.abs(item.x - colPositions[0]);
+            for (let c = 1; c < colPositions.length; c++) {
+                const dist = Math.abs(item.x - colPositions[c]);
+                if (dist < bestDist) {
+                    bestDist = dist;
+                    bestCol = c;
+                }
+            }
+            // Si ya hay texto en esa celda, concatenar (puede haber textos partidos)
+            cells[bestCol] = cells[bestCol] ? cells[bestCol] + ' ' + item.text : item.text;
+        }
+        tableRows.push(cells);
+    }
+
+    return tableRows;
 }
 
 // ===== MODAL: HOJAS =====
@@ -1105,35 +1211,49 @@ function renderSheetTabs(activeIdx) {
 }
 
 function loadSheetPreview(sheetName) {
+    // Si es PDF, sheetDataTemp ya está poblado
+    if (workbookTemp && workbookTemp._isPDF) {
+        // sheetDataTemp ya fue asignado en handlePDF, solo autodetectar header
+        autodetectHeader();
+        renderPreviewTable();
+        renderMappingSelects();
+        return;
+    }
+
     const ws = workbookTemp.Sheets[sheetName];
     const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
     // Filtrar filas completamente vacías
     const nonEmpty = raw.filter(row => row.some(cell => cell !== ''));
 
-    // Autodetectar fila de header: buscar la fila que tenga "DESTINO" y columnas de tarifas
-    // Esto maneja Excels con logos/títulos en las primeras filas (ej: Barajas)
-    // También busca la tabla de FORANEOS si existe (tiene más rutas)
-    const headerKeywords = ['destino', 'nissan', 'rabon', 'torton', 'camioneta', '1 ton', '3.5 ton', 'trailer'];
+    sheetDataTemp = nonEmpty;
+    autodetectHeader();
+    renderPreviewTable();
+    renderMappingSelects();
+}
+
+function autodetectHeader() {
+    if (!sheetDataTemp || sheetDataTemp.length === 0) return;
+    // Buscar la fila que tenga "DESTINO" y columnas de tarifas
+    // Maneja Excels con logos/títulos y PDFs con metadatos arriba
+    // Prefiere tabla de FORANEOS sobre LOCALES (más rutas)
+    const headerKeywords = ['destino', 'nissan', 'rabon', 'torton', 'camioneta', '1 ton', '3.5 ton', '5.5 ton', '8 ton', 'trailer', 'caja 53'];
     let bestHeaderIdx = 0;
     let bestScore = 0;
 
-    for (let i = 0; i < Math.min(nonEmpty.length, 20); i++) {
-        const row = nonEmpty[i];
+    for (let i = 0; i < Math.min(sheetDataTemp.length, 20); i++) {
+        const row = sheetDataTemp[i];
         const rowText = row.map(c => String(c).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')).join(' ');
         let score = 0;
         for (const kw of headerKeywords) {
             if (rowText.includes(kw)) score++;
         }
-        // Preferir filas más abajo si tienen buen score (tabla de foráneos)
         if (score >= bestScore && score >= 2) {
             bestScore = score;
             bestHeaderIdx = i;
         }
     }
 
-    sheetDataTemp = nonEmpty.slice(bestHeaderIdx);
-    renderPreviewTable();
-    renderMappingSelects();
+    sheetDataTemp = sheetDataTemp.slice(bestHeaderIdx);
 }
 
 function renderPreviewTable() {
