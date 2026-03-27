@@ -823,11 +823,13 @@
             <label>Aeropuerto origen</label>
             <select id="provider-airport">
                 <option value="">Seleccionar aeropuerto...</option>
-                <option value="NLU">NLU — Nuevo Laredo</option>
-                <option value="MEX">MEX — Ciudad de México</option>
+                <option value="NLU">NLU — Nuevo Laredo (AIFA)</option>
+                <option value="MEX">MEX — Ciudad de México (AICM)</option>
                 <option value="MTY">MTY — Monterrey</option>
                 <option value="GDL">GDL — Guadalajara</option>
+                <option value="AUTO">Detectar automáticamente desde columna ORIGEN</option>
             </select>
+            <span class="form-hint" id="airport-hint"></span>
         </div>
 
         <label style="font-size:0.75rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.03em;">Hoja del Excel</label>
@@ -1192,6 +1194,27 @@ document.getElementById('btn-cancel-mapping').addEventListener('click', () => {
     sheetDataTemp = null;
 });
 
+// Mapa de valores de ORIGEN en Excel -> código de aeropuerto
+const ORIGEN_TO_AIRPORT = {
+    'aicm': 'MEX', 'cdmx': 'MEX', 'cdmx (aicm)': 'MEX', 'ciudad de mexico': 'MEX',
+    'ciudad de mexico (aicm)': 'MEX', 'mexico': 'MEX', 'mex': 'MEX',
+    'aifa': 'NLU', 'nlu': 'NLU', 'nuevo laredo': 'NLU',
+    'aifa, estado de mexico': 'NLU', 'aifa estado de mexico': 'NLU',
+    'mty': 'MTY', 'monterrey': 'MTY',
+    'gdl': 'GDL', 'guadalajara': 'GDL',
+};
+
+function detectAirportFromOrigen(origenValue) {
+    const lower = String(origenValue).toLowerCase().trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    // Buscar coincidencia exacta primero
+    if (ORIGEN_TO_AIRPORT[lower]) return ORIGEN_TO_AIRPORT[lower];
+    // Buscar parcial
+    for (const [key, code] of Object.entries(ORIGEN_TO_AIRPORT)) {
+        if (lower.includes(key) || key.includes(lower)) return code;
+    }
+    return null;
+}
+
 document.getElementById('btn-save-mapping').addEventListener('click', () => {
     const nombre = document.getElementById('provider-name').value.trim();
     const aeropuerto = document.getElementById('provider-airport').value;
@@ -1215,12 +1238,35 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
         return;
     }
 
-    // Extraer tarifas
-    const tarifas = [];
-    const dataRows = sheetDataTemp.slice(1); // sin header
+    // Detectar columna ORIGEN si modo AUTO
+    let colOrigen = -1;
+    if (aeropuerto === 'AUTO') {
+        const headers = sheetDataTemp[0];
+        colOrigen = headers.findIndex(h => {
+            const lower = String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return lower === 'origen' || lower === 'origin';
+        });
+        if (colOrigen < 0) {
+            alert('No se encontró una columna "ORIGEN" en los datos. Selecciona el aeropuerto manualmente.');
+            return;
+        }
+    }
+
+    // Extraer tarifas (agrupadas por aeropuerto si AUTO)
+    const tarifasPorAeropuerto = {}; // { 'MEX': [...], 'NLU': [...] }
+    const dataRows = sheetDataTemp.slice(1);
+
     for (const row of dataRows) {
         const ciudad = String(row[parseInt(colCiudad)] || '').trim();
         if (!ciudad) continue;
+
+        // Determinar aeropuerto para esta fila
+        let apCode = aeropuerto;
+        if (aeropuerto === 'AUTO') {
+            const origenVal = row[colOrigen];
+            apCode = detectAirportFromOrigen(origenVal);
+            if (!apCode) continue; // No se pudo detectar, saltar fila
+        }
 
         const entry = { ciudad };
         for (const [tipoUnidad, colIdx] of asignadas) {
@@ -1230,29 +1276,45 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
                 entry[tipoUnidad] = precio;
             }
         }
-        // Solo guardar si tiene al menos un precio
         if (Object.keys(entry).length > 1) {
-            tarifas.push(entry);
+            if (!tarifasPorAeropuerto[apCode]) tarifasPorAeropuerto[apCode] = [];
+            tarifasPorAeropuerto[apCode].push(entry);
         }
     }
 
-    if (tarifas.length === 0) {
+    // Verificar que hay tarifas
+    const totalTarifas = Object.values(tarifasPorAeropuerto).reduce((s, t) => s + t.length, 0);
+    if (totalTarifas === 0) {
         alert('No se encontraron tarifas válidas. Revisa el mapeo de columnas.');
         return;
     }
 
-    // Guardar en localStorage
+    // Guardar en localStorage (un registro por aeropuerto)
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
-    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
-    proveedores.push({
-        id,
-        nombre,
-        aeropuerto,
-        tarifas,
-        totalRutas: tarifas.length,
-        fechaCarga: new Date().toLocaleDateString('es-MX'),
-    });
+    const fecha = new Date().toLocaleDateString('es-MX');
+
+    for (const [apCode, tarifas] of Object.entries(tarifasPorAeropuerto)) {
+        const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+        const displayNombre = Object.keys(tarifasPorAeropuerto).length > 1
+            ? `${nombre} (${apCode})`
+            : nombre;
+        proveedores.push({
+            id,
+            nombre: displayNombre,
+            aeropuerto: apCode,
+            tarifas,
+            totalRutas: tarifas.length,
+            fechaCarga: fecha,
+        });
+    }
+
     localStorage.setItem('proveedores', JSON.stringify(proveedores));
+
+    // Mensaje de confirmación
+    const airports = Object.keys(tarifasPorAeropuerto);
+    if (airports.length > 1) {
+        alert(`Se crearon ${airports.length} proveedores automáticamente:\n${airports.map(a => `• ${nombre} (${a}): ${tarifasPorAeropuerto[a].length} rutas`).join('\n')}`);
+    }
 
     // Cerrar modal y actualizar lista
     document.getElementById('modal-mapping').classList.remove('show');
