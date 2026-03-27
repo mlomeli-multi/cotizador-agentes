@@ -6,6 +6,8 @@
     <title>Cotizador de Transporte | Agentes</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -700,6 +702,21 @@
             font-size: 0.85rem;
         }
 
+        /* ===== MAP TOOLTIPS ===== */
+        .airport-tooltip {
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 0.2rem 0.5rem;
+            font-size: 0.7rem;
+            font-weight: 600;
+            box-shadow: var(--shadow);
+        }
+        .airport-tooltip::before {
+            border-top-color: var(--navy);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main { padding: 1rem; }
@@ -767,6 +784,7 @@
                     <span class="form-hint">Escribe para buscar entre las ciudades de los proveedores cargados</span>
                 </div>
             </div>
+            <div class="map-container" id="map" style="margin-top:1rem;"></div>
         </div>
 
         <!-- Card: Datos de carga -->
@@ -1915,6 +1933,70 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     `;
     resultsEl.classList.add('show');
 });
+
+// ===== MAPA LEAFLET =====
+const AIRPORTS = {
+    NLU: { name: 'NLU — Nuevo Laredo (AIFA)', lat: 19.7418, lng: -98.9844, label: 'AIFA / NLU' },
+    MEX: { name: 'MEX — Ciudad de México (AICM)', lat: 19.4361, lng: -99.0719, label: 'AICM / MEX' },
+    MTY: { name: 'MTY — Monterrey', lat: 25.7785, lng: -100.1069, label: 'MTY' },
+    GDL: { name: 'GDL — Guadalajara', lat: 20.5218, lng: -103.3111, label: 'GDL' },
+};
+
+const map = L.map('map', {
+    center: [23.5, -102],
+    zoom: 5,
+    scrollWheelZoom: false,
+    zoomControl: true,
+});
+
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '&copy; OpenStreetMap',
+    maxZoom: 18,
+}).addTo(map);
+
+const markers = {};
+const airportSelect = document.getElementById('aeropuerto');
+
+Object.entries(AIRPORTS).forEach(([code, ap]) => {
+    const isActive = airportSelect.value === code;
+    const marker = L.circleMarker([ap.lat, ap.lng], {
+        radius: 8,
+        fillColor: isActive ? '#2563eb' : '#1e3a5f',
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.9,
+    }).addTo(map);
+
+    marker.bindTooltip(ap.label, {
+        permanent: true,
+        direction: 'top',
+        offset: [0, -10],
+        className: 'airport-tooltip',
+    });
+
+    marker.on('click', () => {
+        airportSelect.value = code;
+        airportSelect.dispatchEvent(new Event('change'));
+        updateMapMarkers();
+    });
+
+    markers[code] = marker;
+});
+
+function updateMapMarkers() {
+    const selected = airportSelect.value;
+    Object.entries(markers).forEach(([code, marker]) => {
+        marker.setStyle({
+            fillColor: code === selected ? '#2563eb' : '#1e3a5f',
+            radius: code === selected ? 10 : 8,
+        });
+    });
+}
+
+airportSelect.addEventListener('change', updateMapMarkers);
+
+// Fix mapa que no renderiza bien al cargar (contenedor oculto)
+setTimeout(() => map.invalidateSize(), 200);
 
 // ===== INIT =====
 renderProvidersList();
