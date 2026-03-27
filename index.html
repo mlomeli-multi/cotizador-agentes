@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cotizador de Transporte | Agentes</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <style>
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -481,6 +482,116 @@
             border: 1px solid var(--gray-200);
         }
 
+        /* ===== MODAL ===== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-lg);
+            width: 100%;
+            max-width: 700px;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+        .modal h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.25rem;
+        }
+        .modal .modal-sub {
+            font-size: 0.8rem;
+            color: var(--gray-500);
+            margin-bottom: 1.25rem;
+        }
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: flex-end;
+            margin-top: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--gray-200);
+        }
+
+        /* ===== PREVIEW TABLE ===== */
+        .preview-table-wrap {
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+        }
+        .preview-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+        .preview-table th {
+            background: var(--gray-100);
+            padding: 0.5rem 0.625rem;
+            text-align: left;
+            font-weight: 600;
+            color: var(--gray-600);
+            white-space: nowrap;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .preview-table td {
+            padding: 0.375rem 0.625rem;
+            border-bottom: 1px solid var(--gray-100);
+            white-space: nowrap;
+            max-width: 200px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .preview-table tr:last-child td { border-bottom: none; }
+
+        /* ===== COLUMN MAPPING ===== */
+        .mapping-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .mapping-grid .form-group select {
+            font-size: 0.8rem;
+        }
+        .mapping-grid label {
+            font-size: 0.75rem;
+        }
+
+        /* ===== SHEET SELECTOR ===== */
+        .sheet-tabs {
+            display: flex;
+            gap: 0.25rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .sheet-tab {
+            padding: 0.35rem 0.75rem;
+            border: 1px solid var(--gray-300);
+            border-radius: 6px;
+            background: white;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .sheet-tab:hover { background: var(--gray-100); }
+        .sheet-tab.active {
+            background: var(--blue);
+            color: white;
+            border-color: var(--blue);
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main { padding: 1rem; }
@@ -649,6 +760,71 @@
 
 </main>
 
+<!-- ===== MODAL: MAPEO DE COLUMNAS ===== -->
+<div class="modal-overlay" id="modal-mapping">
+    <div class="modal">
+        <h3 id="modal-title">Configurar proveedor</h3>
+        <p class="modal-sub" id="modal-sub">Selecciona la hoja y asigna las columnas correspondientes.</p>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+            <label>Nombre del proveedor</label>
+            <input type="text" id="provider-name" placeholder="Ej: Transportes García">
+        </div>
+
+        <div class="form-group" style="margin-bottom:1rem;">
+            <label>Aeropuerto origen</label>
+            <select id="provider-airport">
+                <option value="">Seleccionar aeropuerto...</option>
+                <option value="NLU">NLU — Nuevo Laredo</option>
+                <option value="MEX">MEX — Ciudad de México</option>
+                <option value="MTY">MTY — Monterrey</option>
+                <option value="GDL">GDL — Guadalajara</option>
+            </select>
+        </div>
+
+        <label style="font-size:0.75rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.03em;">Hoja del Excel</label>
+        <div class="sheet-tabs" id="sheet-tabs"></div>
+
+        <label style="font-size:0.75rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.03em;">Vista previa (primeras 5 filas)</label>
+        <div class="preview-table-wrap">
+            <table class="preview-table" id="preview-table"></table>
+        </div>
+
+        <label style="font-size:0.75rem;font-weight:600;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.03em;display:block;margin-bottom:0.5rem;">Mapeo de columnas</label>
+        <div class="mapping-grid" id="mapping-grid">
+            <div class="form-group">
+                <label>Ciudad destino</label>
+                <select id="map-ciudad"></select>
+            </div>
+            <div class="form-group">
+                <label>1 Tonelada ($)</label>
+                <select id="map-1ton"></select>
+            </div>
+            <div class="form-group">
+                <label>3.5 Toneladas ($)</label>
+                <select id="map-3-5ton"></select>
+            </div>
+            <div class="form-group">
+                <label>Rabón 5 Ton ($)</label>
+                <select id="map-rabon"></select>
+            </div>
+            <div class="form-group">
+                <label>Tortón 10 Ton ($)</label>
+                <select id="map-torton"></select>
+            </div>
+            <div class="form-group">
+                <label>Caja Seca 53' ($)</label>
+                <select id="map-caja53"></select>
+            </div>
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-secondary" id="btn-cancel-mapping">Cancelar</button>
+            <button class="btn btn-primary" id="btn-save-mapping">Guardar proveedor</button>
+        </div>
+    </div>
+</div>
+
 <script>
 /* ===================================================================
    COTIZADOR DE TRANSPORTE — JS
@@ -793,15 +969,268 @@ fileInput.addEventListener('change', () => {
     }
 });
 
+// ===== XLSX: ESTADO TEMPORAL =====
+let workbookTemp = null;  // workbook actual leído
+let sheetDataTemp = null; // datos de la hoja seleccionada (array de arrays)
+let sheetsTemp = [];      // nombres de hojas
+
 function handleFile(file) {
-    // Placeholder — se implementa en Fase 3 con XLSX.js
-    alert('Carga de archivos Excel se habilitará en la siguiente fase.\nArchivo: ' + file.name);
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['xlsx', 'xls'].includes(ext)) {
+        alert('Solo se aceptan archivos .xlsx o .xls');
+        return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        try {
+            workbookTemp = XLSX.read(e.target.result, { type: 'array' });
+            sheetsTemp = workbookTemp.SheetNames;
+            if (sheetsTemp.length === 0) {
+                alert('El archivo no contiene hojas.');
+                return;
+            }
+            // Abrir modal
+            document.getElementById('provider-name').value = file.name.replace(/\.[^.]+$/, '');
+            document.getElementById('provider-airport').value = '';
+            renderSheetTabs(0);
+            document.getElementById('modal-mapping').classList.add('show');
+        } catch (err) {
+            alert('Error al leer el archivo: ' + err.message);
+        }
+    };
+    reader.readAsArrayBuffer(file);
+    // Resetear input para poder subir el mismo archivo de nuevo
+    fileInput.value = '';
+}
+
+// ===== MODAL: HOJAS =====
+function renderSheetTabs(activeIdx) {
+    const container = document.getElementById('sheet-tabs');
+    container.innerHTML = '';
+    sheetsTemp.forEach((name, i) => {
+        const btn = document.createElement('button');
+        btn.className = 'sheet-tab' + (i === activeIdx ? ' active' : '');
+        btn.textContent = name;
+        btn.addEventListener('click', () => {
+            renderSheetTabs(i);
+        });
+        container.appendChild(btn);
+    });
+    loadSheetPreview(sheetsTemp[activeIdx]);
+}
+
+function loadSheetPreview(sheetName) {
+    const ws = workbookTemp.Sheets[sheetName];
+    const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+    // Filtrar filas completamente vacías
+    sheetDataTemp = raw.filter(row => row.some(cell => cell !== ''));
+    renderPreviewTable();
+    renderMappingSelects();
+}
+
+function renderPreviewTable() {
+    const table = document.getElementById('preview-table');
+    if (!sheetDataTemp || sheetDataTemp.length === 0) {
+        table.innerHTML = '<tr><td>Sin datos</td></tr>';
+        return;
+    }
+    const maxCols = Math.max(...sheetDataTemp.slice(0, 10).map(r => r.length));
+    const headerRow = sheetDataTemp[0];
+    let html = '<thead><tr>';
+    for (let c = 0; c < maxCols; c++) {
+        const val = headerRow[c] !== undefined ? headerRow[c] : '';
+        html += `<th>${escapeHtml(String(val))}</th>`;
+    }
+    html += '</tr></thead><tbody>';
+    const previewRows = sheetDataTemp.slice(1, 6);
+    for (const row of previewRows) {
+        html += '<tr>';
+        for (let c = 0; c < maxCols; c++) {
+            const val = row[c] !== undefined ? row[c] : '';
+            html += `<td>${escapeHtml(String(val))}</td>`;
+        }
+        html += '</tr>';
+    }
+    html += '</tbody>';
+    table.innerHTML = html;
+}
+
+function renderMappingSelects() {
+    if (!sheetDataTemp || sheetDataTemp.length === 0) return;
+    const headers = sheetDataTemp[0];
+    const selectIds = ['map-ciudad', 'map-1ton', 'map-3-5ton', 'map-rabon', 'map-torton', 'map-caja53'];
+    const keywords = [
+        ['ciudad', 'destino', 'localidad', 'municipio', 'poblacion', 'origen'],
+        ['1 ton', '1ton', '1 t ', 'una ton'],
+        ['3.5', '3½', 'tres y media'],
+        ['rabon', 'rabón', '5 ton', '5ton'],
+        ['torton', 'tortón', '10 ton', '10ton'],
+        ['caja seca', '53', 'caja 53', 'trailer', 'full']
+    ];
+
+    selectIds.forEach((id, idx) => {
+        const sel = document.getElementById(id);
+        sel.innerHTML = '<option value="">— No asignar —</option>';
+        headers.forEach((h, ci) => {
+            const opt = document.createElement('option');
+            opt.value = ci;
+            opt.textContent = String(h) || `Columna ${ci + 1}`;
+            sel.appendChild(opt);
+        });
+        // Autodetectar
+        const kw = keywords[idx];
+        const match = headers.findIndex(h => {
+            const lower = String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+            return kw.some(k => lower.includes(k));
+        });
+        if (match >= 0) sel.value = match;
+    });
+}
+
+function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+}
+
+// ===== MODAL: CANCELAR / GUARDAR =====
+document.getElementById('btn-cancel-mapping').addEventListener('click', () => {
+    document.getElementById('modal-mapping').classList.remove('show');
+    workbookTemp = null;
+    sheetDataTemp = null;
+});
+
+document.getElementById('btn-save-mapping').addEventListener('click', () => {
+    const nombre = document.getElementById('provider-name').value.trim();
+    const aeropuerto = document.getElementById('provider-airport').value;
+    const colCiudad = document.getElementById('map-ciudad').value;
+
+    if (!nombre) { alert('Ingresa el nombre del proveedor.'); return; }
+    if (!aeropuerto) { alert('Selecciona el aeropuerto origen.'); return; }
+    if (colCiudad === '') { alert('Debes asignar la columna de Ciudad destino.'); return; }
+
+    // Verificar que al menos una columna de tarifa esté asignada
+    const tarifaCols = {
+        '1 Tonelada': document.getElementById('map-1ton').value,
+        '3.5 Toneladas': document.getElementById('map-3-5ton').value,
+        'Rabón (5 Ton)': document.getElementById('map-rabon').value,
+        'Tortón (10 Ton)': document.getElementById('map-torton').value,
+        'Caja Seca 53\'': document.getElementById('map-caja53').value,
+    };
+    const asignadas = Object.entries(tarifaCols).filter(([, v]) => v !== '');
+    if (asignadas.length === 0) {
+        alert('Asigna al menos una columna de tarifa (tipo de unidad).');
+        return;
+    }
+
+    // Extraer tarifas
+    const tarifas = [];
+    const dataRows = sheetDataTemp.slice(1); // sin header
+    for (const row of dataRows) {
+        const ciudad = String(row[parseInt(colCiudad)] || '').trim();
+        if (!ciudad) continue;
+
+        const entry = { ciudad };
+        for (const [tipoUnidad, colIdx] of asignadas) {
+            const raw = row[parseInt(colIdx)];
+            const precio = parseFloat(String(raw).replace(/[$,\s]/g, ''));
+            if (!isNaN(precio) && precio > 0) {
+                entry[tipoUnidad] = precio;
+            }
+        }
+        // Solo guardar si tiene al menos un precio
+        if (Object.keys(entry).length > 1) {
+            tarifas.push(entry);
+        }
+    }
+
+    if (tarifas.length === 0) {
+        alert('No se encontraron tarifas válidas. Revisa el mapeo de columnas.');
+        return;
+    }
+
+    // Guardar en localStorage
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const id = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+    proveedores.push({
+        id,
+        nombre,
+        aeropuerto,
+        tarifas,
+        totalRutas: tarifas.length,
+        fechaCarga: new Date().toLocaleDateString('es-MX'),
+    });
+    localStorage.setItem('proveedores', JSON.stringify(proveedores));
+
+    // Cerrar modal y actualizar lista
+    document.getElementById('modal-mapping').classList.remove('show');
+    workbookTemp = null;
+    sheetDataTemp = null;
+    renderProvidersList();
+    updateCotizarBtn();
+});
+
+// ===== LISTA DE PROVEEDORES =====
+function renderProvidersList() {
+    const container = document.getElementById('providers-list');
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+
+    if (proveedores.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = proveedores.map(p => `
+        <div class="provider-item">
+            <div>
+                <div class="provider-name">${escapeHtml(p.nombre)}</div>
+                <div class="provider-meta">${p.aeropuerto} · ${p.totalRutas} rutas · Cargado: ${p.fechaCarga}</div>
+            </div>
+            <div class="provider-actions">
+                <button class="btn btn-secondary btn-sm" onclick="viewProvider('${p.id}')">Ver</button>
+                <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="deleteProvider('${p.id}')">Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function deleteProvider(id) {
+    if (!confirm('¿Eliminar este proveedor y sus tarifas?')) return;
+    let proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    proveedores = proveedores.filter(p => p.id !== id);
+    localStorage.setItem('proveedores', JSON.stringify(proveedores));
+    renderProvidersList();
+    updateCotizarBtn();
+}
+
+function viewProvider(id) {
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const p = proveedores.find(x => x.id === id);
+    if (!p) return;
+    let msg = `Proveedor: ${p.nombre}\nAeropuerto: ${p.aeropuerto}\nRutas: ${p.totalRutas}\n\nPrimeras 10 rutas:\n`;
+    p.tarifas.slice(0, 10).forEach(t => {
+        const precios = Object.entries(t).filter(([k]) => k !== 'ciudad').map(([k, v]) => `${k}: $${v.toLocaleString()}`).join(', ');
+        msg += `• ${t.ciudad}: ${precios}\n`;
+    });
+    if (p.tarifas.length > 10) msg += `\n... y ${p.tarifas.length - 10} rutas más.`;
+    alert(msg);
+}
+
+// ===== HABILITAR BOTÓN COTIZAR =====
+function updateCotizarBtn() {
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    document.getElementById('btn-cotizar').disabled = proveedores.length === 0;
 }
 
 // ===== PLACEHOLDER: COTIZAR =====
 document.getElementById('btn-cotizar').addEventListener('click', () => {
-    alert('La función de cotización se habilitará cuando se carguen tarifas de proveedores.');
+    alert('La función de búsqueda y cotización se implementará en la Fase 4.');
 });
+
+// ===== INIT =====
+renderProvidersList();
+updateCotizarBtn();
 
 </script>
 </body>
