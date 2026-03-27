@@ -592,6 +592,52 @@
             border-color: var(--blue);
         }
 
+        /* ===== AUTOCOMPLETE ===== */
+        .autocomplete-wrap {
+            position: relative;
+        }
+        .autocomplete-list {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid var(--gray-300);
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 50;
+            box-shadow: var(--shadow-md);
+        }
+        .autocomplete-list.show { display: block; }
+        .autocomplete-item {
+            padding: 0.5rem 0.75rem;
+            font-size: 0.85rem;
+            cursor: pointer;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .autocomplete-item:hover,
+        .autocomplete-item.selected {
+            background: var(--gray-100);
+            color: var(--blue);
+        }
+        .autocomplete-item:last-child { border-bottom: none; }
+        .autocomplete-item .ac-airport {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            margin-left: 0.5rem;
+        }
+
+        /* ===== NO RESULTS ===== */
+        .no-results {
+            text-align: center;
+            padding: 1.5rem;
+            color: var(--gray-400);
+            font-size: 0.85rem;
+        }
+
         /* ===== RESPONSIVE ===== */
         @media (max-width: 768px) {
             .main { padding: 1rem; }
@@ -652,9 +698,11 @@
                         <option value="GDL">GDL — Guadalajara</option>
                     </select>
                 </div>
-                <div class="form-group">
+                <div class="form-group autocomplete-wrap">
                     <label>Ciudad destino final</label>
-                    <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno, Jalisco">
+                    <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno, Jalisco" autocomplete="off">
+                    <div class="autocomplete-list" id="autocomplete-list"></div>
+                    <span class="form-hint">Escribe para buscar entre las ciudades de los proveedores cargados</span>
                 </div>
             </div>
         </div>
@@ -1223,9 +1271,196 @@ function updateCotizarBtn() {
     document.getElementById('btn-cotizar').disabled = proveedores.length === 0;
 }
 
-// ===== PLACEHOLDER: COTIZAR =====
+// ===== AUTOCOMPLETE CIUDAD DESTINO =====
+const ciudadInput = document.getElementById('ciudad-destino');
+const acList = document.getElementById('autocomplete-list');
+let acIndex = -1;
+
+function getCiudadesDisponibles(aeropuerto) {
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const ciudades = new Map(); // ciudad -> [proveedores que la tienen]
+    for (const p of proveedores) {
+        if (aeropuerto && p.aeropuerto !== aeropuerto) continue;
+        for (const t of p.tarifas) {
+            const key = t.ciudad.toLowerCase().trim();
+            if (!ciudades.has(key)) {
+                ciudades.set(key, { display: t.ciudad, airports: new Set() });
+            }
+            ciudades.get(key).airports.add(p.aeropuerto);
+        }
+    }
+    return ciudades;
+}
+
+function normalizarTexto(str) {
+    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+ciudadInput.addEventListener('input', () => {
+    const query = normalizarTexto(ciudadInput.value);
+    if (query.length < 2) {
+        acList.classList.remove('show');
+        return;
+    }
+
+    const aeropuerto = document.getElementById('aeropuerto').value;
+    const ciudades = getCiudadesDisponibles(aeropuerto);
+    const matches = [];
+
+    for (const [key, data] of ciudades) {
+        const normalized = normalizarTexto(key);
+        if (normalized.includes(query)) {
+            matches.push(data);
+        }
+    }
+
+    // Ordenar: primero las que empiezan con el query, luego el resto
+    matches.sort((a, b) => {
+        const aN = normalizarTexto(a.display);
+        const bN = normalizarTexto(b.display);
+        const aStarts = aN.startsWith(query) ? 0 : 1;
+        const bStarts = bN.startsWith(query) ? 0 : 1;
+        if (aStarts !== bStarts) return aStarts - bStarts;
+        return aN.localeCompare(bN);
+    });
+
+    if (matches.length === 0) {
+        acList.classList.remove('show');
+        return;
+    }
+
+    acIndex = -1;
+    acList.innerHTML = matches.slice(0, 15).map((m, i) => {
+        const airportTags = [...m.airports].join(', ');
+        return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}">${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span></div>`;
+    }).join('');
+    acList.classList.add('show');
+
+    acList.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('click', () => {
+            ciudadInput.value = item.dataset.value;
+            acList.classList.remove('show');
+        });
+    });
+});
+
+ciudadInput.addEventListener('keydown', (e) => {
+    const items = acList.querySelectorAll('.autocomplete-item');
+    if (!items.length || !acList.classList.contains('show')) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        acIndex = Math.min(acIndex + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('selected', i === acIndex));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        acIndex = Math.max(acIndex - 1, 0);
+        items.forEach((it, i) => it.classList.toggle('selected', i === acIndex));
+    } else if (e.key === 'Enter' && acIndex >= 0) {
+        e.preventDefault();
+        ciudadInput.value = items[acIndex].dataset.value;
+        acList.classList.remove('show');
+    } else if (e.key === 'Escape') {
+        acList.classList.remove('show');
+    }
+});
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.autocomplete-wrap')) {
+        acList.classList.remove('show');
+    }
+});
+
+// ===== COTIZAR: BUSCAR MEJORES TARIFAS =====
 document.getElementById('btn-cotizar').addEventListener('click', () => {
-    alert('La función de búsqueda y cotización se implementará en la Fase 4.');
+    const aeropuerto = document.getElementById('aeropuerto').value;
+    const ciudad = ciudadInput.value.trim();
+    const resultsEl = document.getElementById('quote-results');
+    const emptyEl = document.getElementById('empty-cotizacion');
+
+    // Validaciones
+    if (!aeropuerto) { alert('Selecciona un aeropuerto.'); return; }
+    if (!ciudad) { alert('Ingresa la ciudad destino.'); return; }
+
+    // Obtener unidad calculada
+    const unitEl = document.getElementById('unit-name');
+    const unitText = unitEl ? unitEl.textContent : '';
+    let tipoUnidad = '';
+    for (const u of UNIDADES) {
+        if (unitText.includes(u.nombre)) {
+            tipoUnidad = u.nombre;
+            break;
+        }
+    }
+    if (!tipoUnidad) {
+        alert('Primero calcula la unidad de transporte necesaria en la sección "Datos de Carga".');
+        return;
+    }
+
+    // Buscar entre proveedores
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const ciudadNorm = normalizarTexto(ciudad);
+    const resultados = [];
+
+    for (const p of proveedores) {
+        if (p.aeropuerto !== aeropuerto) continue;
+
+        for (const t of p.tarifas) {
+            if (normalizarTexto(t.ciudad) !== ciudadNorm) continue;
+
+            const precio = t[tipoUnidad];
+            if (precio && precio > 0) {
+                resultados.push({
+                    proveedor: p.nombre,
+                    aeropuerto: p.aeropuerto,
+                    ciudad: t.ciudad,
+                    tipoUnidad,
+                    tarifaFlete: precio,
+                });
+            }
+        }
+    }
+
+    // Ordenar por precio
+    resultados.sort((a, b) => a.tarifaFlete - b.tarifaFlete);
+
+    if (resultados.length === 0) {
+        emptyEl.style.display = 'block';
+        emptyEl.innerHTML = `
+            <div class="empty-icon">&#x1F50D;</div>
+            <p>No se encontraron tarifas para <strong>${escapeHtml(ciudad)}</strong> desde <strong>${aeropuerto}</strong> en unidad <strong>${tipoUnidad}</strong>.</p>
+            <p style="margin-top:0.5rem;font-size:0.8rem;">Verifica que hayas cargado proveedores para este aeropuerto y que tengan tarifas para esa ruta y tipo de unidad.</p>
+        `;
+        resultsEl.classList.remove('show');
+        return;
+    }
+
+    // Mostrar TOP 2
+    const top = resultados.slice(0, 2);
+    emptyEl.style.display = 'none';
+
+    resultsEl.innerHTML = `
+        <div style="margin-top:1rem;margin-bottom:0.75rem;">
+            <div style="font-size:0.8rem;color:var(--gray-500);">
+                Ruta: <strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong> · Unidad: <strong>${tipoUnidad}</strong> · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''} encontrado${resultados.length > 1 ? 's' : ''}
+            </div>
+        </div>
+        ${top.map((r, i) => `
+            <div class="quote-card ${i === 0 ? 'best' : ''}">
+                <div class="quote-rank">${i === 0 ? '&#x1F947; Mejor precio' : '&#x1F948; Segunda opción'}</div>
+                <div class="quote-provider">${escapeHtml(r.proveedor)}</div>
+                <div class="quote-price">$${r.tarifaFlete.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</div>
+                <div class="quote-breakdown">
+                    <table>
+                        <tr><td>Flete terrestre (${r.tipoUnidad})</td><td>$${r.tarifaFlete.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td></tr>
+                        <tr><td>Conceptos fijos aeropuerto</td><td style="color:var(--gray-400);">Pendiente Fase 5</td></tr>
+                        <tr class="total-row"><td>Total estimado</td><td>$${r.tarifaFlete.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td></tr>
+                    </table>
+                </div>
+            </div>
+        `).join('')}
+    `;
+    resultsEl.classList.add('show');
 });
 
 // ===== INIT =====
