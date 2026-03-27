@@ -351,6 +351,36 @@
             justify-content: center;
         }
 
+        /* ===== ROUTE INFO ===== */
+        .route-info {
+            display: none;
+            margin-top: 0.75rem;
+            padding: 0.625rem 0.75rem;
+            background: linear-gradient(135deg, #f0f7ff 0%, #f0fdf9 100%);
+            border-radius: 8px;
+            border: 1px solid #bfdbfe;
+        }
+        .route-info.show { display: block; }
+        .route-info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .route-stat {
+            text-align: center;
+        }
+        .route-stat .stat-value {
+            font-size: 1rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+        .route-stat .stat-label {
+            font-size: 0.65rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+
         /* ===== EMPTY STATE MINI ===== */
         .empty-state-mini {
             text-align: center;
@@ -878,6 +908,24 @@
                     <div class="unit-result" id="unit-result">
                         <div class="unit-name" id="unit-name"></div>
                         <div class="unit-detail" id="unit-detail"></div>
+                    </div>
+
+                    <!-- Info de ruta: km y tiempo -->
+                    <div class="route-info" id="route-info">
+                        <div class="route-info-grid">
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-km">—</div>
+                                <div class="stat-label">Kilómetros aprox.</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-time">—</div>
+                                <div class="stat-label" id="route-time-label">Tiempo tránsito</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-unit-type">—</div>
+                                <div class="stat-label">Tipo unidad</div>
+                            </div>
+                        </div>
                     </div>
 
                     <!-- Botón cotizar -->
@@ -2067,10 +2115,177 @@ function updateMapMarkers() {
     });
 }
 
-airportSelect.addEventListener('change', updateMapMarkers);
+airportSelect.addEventListener('change', () => {
+    updateMapMarkers();
+    updateRoute();
+});
 
 // Fix mapa que no renderiza bien al cargar (contenedor oculto)
 setTimeout(() => map.invalidateSize(), 200);
+
+// ===== RUTA EN MAPA: GEOCODING + LÍNEA + DISTANCIA =====
+let routeLine = null;
+let destMarker = null;
+let geocodeTimeout = null;
+
+// Velocidades promedio por tipo de unidad (km/h en carretera mexicana)
+const VELOCIDADES = {
+    '1 Tonelada': 80,
+    '3.5 Toneladas': 75,
+    'Rabón (5 Ton)': 65,
+    'Tortón (10 Ton)': 60,
+    'Caja Seca 53\'': 55,
+};
+
+function haversineKm(lat1, lng1, lat2, lng2) {
+    const R = 6371;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLng = (lng2 - lng1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) * Math.sin(dLng/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function formatTime(hours) {
+    const h = Math.floor(hours);
+    const m = Math.round((hours - h) * 60);
+    if (h === 0) return `${m} min`;
+    if (m === 0) return `${h} hr`;
+    return `${h}h ${m}m`;
+}
+
+async function geocodeCity(cityName) {
+    const query = encodeURIComponent(cityName + ', Mexico');
+    try {
+        const resp = await fetch(`https://nominatim.openstreetmap.org/search?q=${query}&format=json&limit=1&countrycodes=mx`, {
+            headers: { 'Accept-Language': 'es' }
+        });
+        const data = await resp.json();
+        if (data && data.length > 0) {
+            return { lat: parseFloat(data[0].lat), lng: parseFloat(data[0].lon), display: data[0].display_name };
+        }
+    } catch (e) { /* silenciar errores de red */ }
+    return null;
+}
+
+function clearRoute() {
+    if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+    if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
+    document.getElementById('route-info').classList.remove('show');
+}
+
+async function updateRoute() {
+    const apCode = document.getElementById('aeropuerto').value;
+    const ciudad = document.getElementById('ciudad-destino').value.trim();
+
+    if (!apCode || !ciudad || ciudad.length < 3) {
+        clearRoute();
+        return;
+    }
+
+    const ap = AIRPORTS[apCode];
+    if (!ap) { clearRoute(); return; }
+
+    const geo = await geocodeCity(ciudad);
+    if (!geo) { clearRoute(); return; }
+
+    // Limpiar ruta anterior
+    if (routeLine) map.removeLayer(routeLine);
+    if (destMarker) map.removeLayer(destMarker);
+
+    // Marcador destino
+    destMarker = L.circleMarker([geo.lat, geo.lng], {
+        radius: 7,
+        fillColor: '#ef4444',
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.9,
+    }).addTo(map);
+
+    destMarker.bindTooltip(ciudad, {
+        permanent: true,
+        direction: 'bottom',
+        offset: [0, 10],
+        className: 'airport-tooltip',
+    });
+
+    // Línea de ruta (curva)
+    const midLat = (ap.lat + geo.lat) / 2;
+    const midLng = (ap.lng + geo.lng) / 2;
+    // Offset para hacer la curva
+    const dx = geo.lng - ap.lng;
+    const dy = geo.lat - ap.lat;
+    const curveLat = midLat + dx * 0.1;
+    const curveLng = midLng - dy * 0.1;
+
+    // Generar puntos de la curva bezier
+    const points = [];
+    for (let t = 0; t <= 1; t += 0.05) {
+        const lat = (1-t)**2 * ap.lat + 2*(1-t)*t * curveLat + t**2 * geo.lat;
+        const lng = (1-t)**2 * ap.lng + 2*(1-t)*t * curveLng + t**2 * geo.lng;
+        points.push([lat, lng]);
+    }
+
+    routeLine = L.polyline(points, {
+        color: '#2563eb',
+        weight: 3,
+        opacity: 0.7,
+        dashArray: '8, 6',
+    }).addTo(map);
+
+    // Ajustar vista para mostrar ambos puntos
+    const bounds = L.latLngBounds([[ap.lat, ap.lng], [geo.lat, geo.lng]]);
+    map.fitBounds(bounds, { padding: [30, 30] });
+
+    // Calcular distancia (línea recta * 1.35 factor carreteras México)
+    const straightKm = haversineKm(ap.lat, ap.lng, geo.lat, geo.lng);
+    const roadKm = Math.round(straightKm * 1.35);
+
+    // Obtener tipo de unidad calculada
+    const unitNameEl = document.getElementById('unit-name');
+    const unitText = unitNameEl ? unitNameEl.textContent : '';
+    let tipoUnidad = '';
+    for (const u of UNIDADES) {
+        if (unitText.includes(u.nombre)) {
+            tipoUnidad = u.nombre;
+            break;
+        }
+    }
+
+    const vel = VELOCIDADES[tipoUnidad] || 70;
+    const hours = roadKm / vel;
+
+    // Mostrar info
+    document.getElementById('route-km').textContent = roadKm.toLocaleString() + ' km';
+    document.getElementById('route-time').textContent = formatTime(hours);
+    document.getElementById('route-time-label').textContent = tipoUnidad ? `Tránsito (${tipoUnidad})` : 'Tiempo tránsito';
+    document.getElementById('route-unit-type').textContent = tipoUnidad || 'Sin calcular';
+    document.getElementById('route-info').classList.add('show');
+}
+
+// Actualizar ruta cuando cambie la ciudad (con debounce)
+document.getElementById('ciudad-destino').addEventListener('change', () => {
+    clearTimeout(geocodeTimeout);
+    geocodeTimeout = setTimeout(updateRoute, 300);
+});
+
+// También actualizar al seleccionar del autocompletado
+const origAcClick = acList.addEventListener;
+acList.addEventListener('click', (e) => {
+    const item = e.target.closest('.autocomplete-item[data-value]');
+    if (item) {
+        setTimeout(updateRoute, 100);
+    }
+});
+
+// Recalcular tiempo cuando cambie la unidad
+['pallets', 'peso', 'largo', 'ancho', 'alto'].forEach(id => {
+    document.getElementById(id).addEventListener('input', () => {
+        setTimeout(updateRoute, 200);
+    });
+});
+document.getElementById('estibable').addEventListener('change', () => {
+    setTimeout(updateRoute, 200);
+});
 
 // ===== INIT =====
 renderProvidersList();
