@@ -1072,7 +1072,30 @@ function loadSheetPreview(sheetName) {
     const ws = workbookTemp.Sheets[sheetName];
     const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
     // Filtrar filas completamente vacías
-    sheetDataTemp = raw.filter(row => row.some(cell => cell !== ''));
+    const nonEmpty = raw.filter(row => row.some(cell => cell !== ''));
+
+    // Autodetectar fila de header: buscar la fila que tenga "DESTINO" y columnas de tarifas
+    // Esto maneja Excels con logos/títulos en las primeras filas (ej: Barajas)
+    // También busca la tabla de FORANEOS si existe (tiene más rutas)
+    const headerKeywords = ['destino', 'nissan', 'rabon', 'torton', 'camioneta', '1 ton', '3.5 ton', 'trailer'];
+    let bestHeaderIdx = 0;
+    let bestScore = 0;
+
+    for (let i = 0; i < Math.min(nonEmpty.length, 20); i++) {
+        const row = nonEmpty[i];
+        const rowText = row.map(c => String(c).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')).join(' ');
+        let score = 0;
+        for (const kw of headerKeywords) {
+            if (rowText.includes(kw)) score++;
+        }
+        // Preferir filas más abajo si tienen buen score (tabla de foráneos)
+        if (score >= bestScore && score >= 2) {
+            bestScore = score;
+            bestHeaderIdx = i;
+        }
+    }
+
+    sheetDataTemp = nonEmpty.slice(bestHeaderIdx);
     renderPreviewTable();
     renderMappingSelects();
 }
@@ -1108,13 +1131,22 @@ function renderMappingSelects() {
     if (!sheetDataTemp || sheetDataTemp.length === 0) return;
     const headers = sheetDataTemp[0];
     const selectIds = ['map-ciudad', 'map-1ton', 'map-3-5ton', 'map-rabon', 'map-torton', 'map-caja53'];
-    const keywords = [
-        ['ciudad', 'destino', 'localidad', 'municipio', 'poblacion', 'origen'],
-        ['1 ton', '1ton', '1 t ', 'una ton'],
-        ['3.5', '3½', 'tres y media'],
-        ['rabon', 'rabón', '5 ton', '5ton'],
-        ['torton', 'tortón', '10 ton', '10ton'],
-        ['caja seca', '53', 'caja 53', 'trailer', 'full']
+
+    // Cada regla: { match: [...], exclude: [...] }
+    // match = al menos uno debe coincidir, exclude = si coincide alguno se descarta
+    const rules = [
+        // Ciudad destino
+        { match: ['destino', 'ciudad', 'localidad', 'municipio', 'poblacion'], exclude: [] },
+        // 1 Tonelada: Barajas="NISSAN", Oslu="NISSAN", Trapol="1 TON"
+        { match: ['nissan', '1 ton'], exclude: ['0.7', '3.5', '5.5', '8 ton', '10 ton'] },
+        // 3.5 Toneladas: Barajas="CAMIONETA 3 1/2", Oslu="CAMIONETA 3.5", Trapol="3.5 TON"
+        { match: ['3.5', '3 1/2', 'camioneta'], exclude: [] },
+        // Rabón (5 Ton): Barajas="RABON", Oslu="RABON", Trapol="5.5 TON"
+        { match: ['rabon', '5.5 ton', '5 ton'], exclude: ['3.5', '53'] },
+        // Tortón (10 Ton): Barajas="TORTON", Trapol="8 TON"
+        { match: ['torton', '8 ton'], exclude: [] },
+        // Caja Seca 53': Barajas="TRAILER", Oslu="CAJA 53'", Trapol="trailer"
+        { match: ['caja 53', "53'", 'trailer'], exclude: [] },
     ];
 
     selectIds.forEach((id, idx) => {
@@ -1126,13 +1158,24 @@ function renderMappingSelects() {
             opt.textContent = String(h) || `Columna ${ci + 1}`;
             sel.appendChild(opt);
         });
-        // Autodetectar
-        const kw = keywords[idx];
-        const match = headers.findIndex(h => {
+    });
+
+    // Autodetectar con reglas (asignar en orden, marcar columnas usadas)
+    const usedCols = new Set();
+    selectIds.forEach((id, idx) => {
+        const rule = rules[idx];
+        const match = headers.findIndex((h, ci) => {
+            if (usedCols.has(ci)) return false;
             const lower = String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-            return kw.some(k => lower.includes(k));
+            const hasMatch = rule.match.some(k => lower.includes(k));
+            if (!hasMatch) return false;
+            const hasExclude = rule.exclude.length > 0 && rule.exclude.some(k => lower.includes(k));
+            return !hasExclude;
         });
-        if (match >= 0) sel.value = match;
+        if (match >= 0) {
+            document.getElementById(id).value = match;
+            usedCols.add(match);
+        }
     });
 }
 
