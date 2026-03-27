@@ -1877,9 +1877,16 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         return;
     }
 
+    // Obtener conceptos fijos del aeropuerto
+    const allConceptos = getConceptosFijos();
+    const conceptos = allConceptos[aeropuerto] || [];
+    const totalConceptos = conceptos.reduce((s, c) => s + (parseFloat(c.monto) || 0), 0);
+
     // Mostrar TOP 2
     const top = resultados.slice(0, 2);
     emptyEl.style.display = 'none';
+
+    const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
     resultsEl.innerHTML = `
         <div style="margin-top:1rem;margin-bottom:0.75rem;">
@@ -1887,20 +1894,24 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                 Ruta: <strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong> · Unidad: <strong>${tipoUnidad}</strong> · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''} encontrado${resultados.length > 1 ? 's' : ''}
             </div>
         </div>
-        ${top.map((r, i) => `
+        ${top.map((r, i) => {
+            const total = r.tarifaFlete + totalConceptos;
+            return `
             <div class="quote-card ${i === 0 ? 'best' : ''}">
                 <div class="quote-rank">${i === 0 ? '&#x1F947; Mejor precio' : '&#x1F948; Segunda opción'}</div>
                 <div class="quote-provider">${escapeHtml(r.proveedor)}</div>
-                <div class="quote-price">$${r.tarifaFlete.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN</div>
+                <div class="quote-price">$${fmt(total)} MXN</div>
                 <div class="quote-breakdown">
                     <table>
-                        <tr><td>Flete terrestre (${r.tipoUnidad})</td><td>$${r.tarifaFlete.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td></tr>
-                        <tr><td>Conceptos fijos aeropuerto</td><td style="color:var(--gray-400);">Pendiente Fase 5</td></tr>
-                        <tr class="total-row"><td>Total estimado</td><td>$${r.tarifaFlete.toLocaleString('es-MX', { minimumFractionDigits: 2 })}</td></tr>
+                        <tr><td>Flete terrestre (${r.tipoUnidad})</td><td>$${fmt(r.tarifaFlete)}</td></tr>
+                        ${conceptos.length > 0 ? conceptos.map(c =>
+                            `<tr><td>${escapeHtml(c.nombre)}</td><td>$${fmt(parseFloat(c.monto) || 0)}</td></tr>`
+                        ).join('') : '<tr><td>Conceptos fijos</td><td style="color:var(--gray-400);">Sin conceptos configurados</td></tr>'}
+                        <tr class="total-row"><td>Total cotización</td><td>$${fmt(total)}</td></tr>
                     </table>
                 </div>
-            </div>
-        `).join('')}
+            </div>`;
+        }).join('')}
     `;
     resultsEl.classList.add('show');
 });
