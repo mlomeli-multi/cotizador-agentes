@@ -1738,11 +1738,13 @@ let acIndex = -1;
 
 function getCiudadesDisponibles(aeropuerto) {
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
-    const ciudades = new Map(); // ciudad -> [proveedores que la tienen]
+    const ciudades = new Map();
     for (const p of proveedores) {
+        // Si hay aeropuerto seleccionado, filtrar; si no, mostrar todas
         if (aeropuerto && p.aeropuerto !== aeropuerto) continue;
         for (const t of p.tarifas) {
-            const key = t.ciudad.toLowerCase().trim();
+            const key = normalizarTexto(t.ciudad);
+            if (!key) continue;
             if (!ciudades.has(key)) {
                 ciudades.set(key, { display: t.ciudad, airports: new Set() });
             }
@@ -1754,6 +1756,28 @@ function getCiudadesDisponibles(aeropuerto) {
 
 function normalizarTexto(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+// Búsqueda fuzzy: cada palabra del query debe estar en el texto
+function fuzzyMatch(texto, query) {
+    const palabras = query.split(/\s+/).filter(p => p.length > 0);
+    if (palabras.length === 0) return false;
+    return palabras.every(p => texto.includes(p));
+}
+
+// Score de relevancia para ordenar resultados
+function matchScore(texto, query) {
+    const palabras = query.split(/\s+/).filter(p => p.length > 0);
+    let score = 0;
+    // Bonus si empieza con la primera palabra
+    if (texto.startsWith(palabras[0])) score += 10;
+    // Bonus si contiene el query exacto
+    if (texto.includes(query)) score += 5;
+    // Bonus por cada palabra que aparece
+    for (const p of palabras) {
+        if (texto.includes(p)) score += 1;
+    }
+    return score;
 }
 
 ciudadInput.addEventListener('input', () => {
@@ -1769,34 +1793,31 @@ ciudadInput.addEventListener('input', () => {
 
     for (const [key, data] of ciudades) {
         const normalized = normalizarTexto(key);
-        if (normalized.includes(query)) {
-            matches.push(data);
+        if (fuzzyMatch(normalized, query)) {
+            matches.push({ ...data, score: matchScore(normalized, query) });
         }
     }
 
-    // Ordenar: primero las que empiezan con el query, luego el resto
+    // Ordenar por score (mayor primero), luego alfabético
     matches.sort((a, b) => {
-        const aN = normalizarTexto(a.display);
-        const bN = normalizarTexto(b.display);
-        const aStarts = aN.startsWith(query) ? 0 : 1;
-        const bStarts = bN.startsWith(query) ? 0 : 1;
-        if (aStarts !== bStarts) return aStarts - bStarts;
-        return aN.localeCompare(bN);
+        if (b.score !== a.score) return b.score - a.score;
+        return normalizarTexto(a.display).localeCompare(normalizarTexto(b.display));
     });
 
     if (matches.length === 0) {
-        acList.classList.remove('show');
+        acList.innerHTML = '<div class="autocomplete-item" style="color:var(--gray-400);cursor:default;">No se encontraron ciudades</div>';
+        acList.classList.add('show');
         return;
     }
 
     acIndex = -1;
-    acList.innerHTML = matches.slice(0, 15).map((m, i) => {
+    acList.innerHTML = matches.slice(0, 20).map((m, i) => {
         const airportTags = [...m.airports].join(', ');
         return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}">${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span></div>`;
     }).join('');
     acList.classList.add('show');
 
-    acList.querySelectorAll('.autocomplete-item').forEach(item => {
+    acList.querySelectorAll('.autocomplete-item[data-value]').forEach(item => {
         item.addEventListener('click', () => {
             ciudadInput.value = item.dataset.value;
             acList.classList.remove('show');
@@ -1857,7 +1878,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         return;
     }
 
-    // Buscar entre proveedores
+    // Buscar entre proveedores (fuzzy match en ciudad)
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
     const ciudadNorm = normalizarTexto(ciudad);
     const resultados = [];
@@ -1866,7 +1887,12 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         if (p.aeropuerto !== aeropuerto) continue;
 
         for (const t of p.tarifas) {
-            if (normalizarTexto(t.ciudad) !== ciudadNorm) continue;
+            const tNorm = normalizarTexto(t.ciudad);
+            // Match exacto, o fuzzy (todas las palabras del query están en el destino o viceversa)
+            const esMatch = tNorm === ciudadNorm
+                || fuzzyMatch(tNorm, ciudadNorm)
+                || fuzzyMatch(ciudadNorm, tNorm);
+            if (!esMatch) continue;
 
             const precio = t[tipoUnidad];
             if (precio && precio > 0) {
