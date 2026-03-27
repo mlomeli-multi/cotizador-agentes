@@ -355,10 +355,11 @@
         .route-info {
             display: none;
             margin-top: 0.75rem;
-            padding: 0.625rem 0.75rem;
+            padding: 0.75rem;
             background: linear-gradient(135deg, #f0f7ff 0%, #f0fdf9 100%);
-            border-radius: 8px;
+            border-radius: 0 0 var(--radius) var(--radius);
             border: 1px solid #bfdbfe;
+            border-top: none;
         }
         .route-info.show { display: block; }
         .route-info-grid {
@@ -845,9 +846,26 @@
                 <h2>Cotizador de Flete Terrestre</h2>
             </div>
             <div class="layout-split">
-                <!-- Izquierda: Mapa -->
+                <!-- Izquierda: Mapa + Info ruta -->
                 <div class="layout-left">
                     <div class="map-container" id="map"></div>
+                    <!-- Info de ruta: km y tiempo (debajo del mapa) -->
+                    <div class="route-info" id="route-info">
+                        <div class="route-info-grid">
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-km">—</div>
+                                <div class="stat-label">Kilómetros aprox.</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-time">—</div>
+                                <div class="stat-label" id="route-time-label">Tiempo tránsito</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-unit-type">—</div>
+                                <div class="stat-label">Tipo unidad</div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <!-- Derecha: Formularios + Resultado -->
                 <div class="layout-right">
@@ -908,24 +926,6 @@
                     <div class="unit-result" id="unit-result">
                         <div class="unit-name" id="unit-name"></div>
                         <div class="unit-detail" id="unit-detail"></div>
-                    </div>
-
-                    <!-- Info de ruta: km y tiempo -->
-                    <div class="route-info" id="route-info">
-                        <div class="route-info-grid">
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-km">—</div>
-                                <div class="stat-label">Kilómetros aprox.</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-time">—</div>
-                                <div class="stat-label" id="route-time-label">Tiempo tránsito</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-unit-type">—</div>
-                                <div class="stat-label">Tipo unidad</div>
-                            </div>
-                        </div>
                     </div>
 
                     <!-- Botón cotizar -->
