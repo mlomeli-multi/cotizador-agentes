@@ -1043,7 +1043,21 @@ function handleFile(file) {
             // Abrir modal
             document.getElementById('provider-name').value = file.name.replace(/\.[^.]+$/, '');
             document.getElementById('provider-airport').value = '';
+            document.getElementById('airport-hint').textContent = '';
             renderSheetTabs(0);
+
+            // Si no se detectó aeropuerto por pestaña, revisar si hay columna ORIGEN (Oslu)
+            if (!document.getElementById('provider-airport').value && sheetDataTemp) {
+                const headers = sheetDataTemp[0];
+                const hasOrigen = headers && headers.some(h =>
+                    String(h).toLowerCase().trim() === 'origen'
+                );
+                if (hasOrigen) {
+                    document.getElementById('provider-airport').value = 'AUTO';
+                    document.getElementById('airport-hint').textContent = 'Detectado: columna ORIGEN en los datos. Se separará por aeropuerto automáticamente.';
+                }
+            }
+
             document.getElementById('modal-mapping').classList.add('show');
         } catch (err) {
             alert('Error al leer el archivo: ' + err.message);
@@ -1055,6 +1069,15 @@ function handleFile(file) {
 }
 
 // ===== MODAL: HOJAS =====
+function detectAirportFromSheetName(name) {
+    const lower = String(name).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (lower.includes('aifa') || lower.includes('nlu') || lower.includes('nuevo laredo')) return 'NLU';
+    if (lower.includes('cdmx') || lower.includes('aicm') || lower.includes('mexico')) return 'MEX';
+    if (lower.includes('mty') || lower.includes('monterrey')) return 'MTY';
+    if (lower.includes('gdl') || lower.includes('guadalajara')) return 'GDL';
+    return '';
+}
+
 function renderSheetTabs(activeIdx) {
     const container = document.getElementById('sheet-tabs');
     container.innerHTML = '';
@@ -1068,6 +1091,17 @@ function renderSheetTabs(activeIdx) {
         container.appendChild(btn);
     });
     loadSheetPreview(sheetsTemp[activeIdx]);
+
+    // Autodetectar aeropuerto desde nombre de pestaña
+    const detectedAP = detectAirportFromSheetName(sheetsTemp[activeIdx]);
+    const airportSel = document.getElementById('provider-airport');
+    const airportHint = document.getElementById('airport-hint');
+    if (detectedAP) {
+        airportSel.value = detectedAP;
+        airportHint.textContent = 'Detectado desde nombre de hoja: ' + sheetsTemp[activeIdx];
+    } else {
+        airportHint.textContent = '';
+    }
 }
 
 function loadSheetPreview(sheetName) {
