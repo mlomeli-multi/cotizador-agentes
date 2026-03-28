@@ -767,6 +767,12 @@
             color: var(--gray-400);
             margin-left: 0.5rem;
         }
+        .autocomplete-item .ac-variants {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            margin-top: 2px;
+        }
 
         /* ===== NO RESULTS ===== */
         .no-results {
@@ -1884,44 +1890,57 @@ const ciudadInput = document.getElementById('ciudad-destino');
 const acList = document.getElementById('autocomplete-list');
 let acIndex = -1;
 
+// Extraer nombre base de ciudad (sin estado): "MONTERREY, NUEVO LEON" → "monterrey"
+function ciudadBase(str) {
+    const norm = normalizarTexto(str);
+    // Quitar todo después de la primera coma (estado)
+    const sinEstado = norm.split(',')[0].trim();
+    // Quitar prefijos comunes
+    return sinEstado.replace(/^(ciudad de |cd\. |cd |ciudad del )/i, '').trim();
+}
+
 function getCiudadesDisponibles(aeropuerto) {
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
-    const ciudades = new Map();
+    // Agrupar por nombre base: { "monterrey" => { variantes: Set["MONTERREY", "MONTERREY, NUEVO LEON"], airports: Set, proveedores: Map } }
+    const grupos = new Map();
+
     for (const p of proveedores) {
-        // Si hay aeropuerto seleccionado, filtrar; si no, mostrar todas
         if (aeropuerto && p.aeropuerto !== aeropuerto) continue;
         for (const t of p.tarifas) {
-            const key = normalizarTexto(t.ciudad);
-            if (!key) continue;
-            if (!ciudades.has(key)) {
-                ciudades.set(key, { display: t.ciudad, airports: new Set() });
+            if (!t.ciudad || !t.ciudad.trim()) continue;
+            const base = ciudadBase(t.ciudad);
+            if (!base) continue;
+
+            if (!grupos.has(base)) {
+                grupos.set(base, { variantes: new Set(), airports: new Set(), provMap: new Map() });
             }
-            ciudades.get(key).airports.add(p.aeropuerto);
+            const g = grupos.get(base);
+            g.variantes.add(t.ciudad.trim());
+            g.airports.add(p.aeropuerto);
+            // Guardar qué proveedor usa qué nombre exacto
+            if (!g.provMap.has(p.nombre)) g.provMap.set(p.nombre, new Set());
+            g.provMap.get(p.nombre).add(t.ciudad.trim());
         }
     }
-    return ciudades;
+
+    return grupos;
 }
 
 function normalizarTexto(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
-// Búsqueda fuzzy: cada palabra del query debe estar en el texto
 function fuzzyMatch(texto, query) {
     const palabras = query.split(/\s+/).filter(p => p.length > 0);
     if (palabras.length === 0) return false;
     return palabras.every(p => texto.includes(p));
 }
 
-// Score de relevancia para ordenar resultados
 function matchScore(texto, query) {
     const palabras = query.split(/\s+/).filter(p => p.length > 0);
     let score = 0;
-    // Bonus si empieza con la primera palabra
     if (texto.startsWith(palabras[0])) score += 10;
-    // Bonus si contiene el query exacto
     if (texto.includes(query)) score += 5;
-    // Bonus por cada palabra que aparece
     for (const p of palabras) {
         if (texto.includes(p)) score += 1;
     }
@@ -1936,20 +1955,30 @@ ciudadInput.addEventListener('input', () => {
     }
 
     const aeropuerto = document.getElementById('aeropuerto').value;
-    const ciudades = getCiudadesDisponibles(aeropuerto);
+    const grupos = getCiudadesDisponibles(aeropuerto);
     const matches = [];
 
-    for (const [key, data] of ciudades) {
-        const normalized = normalizarTexto(key);
-        if (fuzzyMatch(normalized, query)) {
-            matches.push({ ...data, score: matchScore(normalized, query) });
+    for (const [base, data] of grupos) {
+        // Buscar en el nombre base Y en todas las variantes
+        const allTexts = [base, ...[...data.variantes].map(v => normalizarTexto(v))];
+        const found = allTexts.some(t => fuzzyMatch(t, query));
+        if (found) {
+            // Display: la variante más larga (más completa)
+            const variantes = [...data.variantes];
+            const display = variantes.reduce((a, b) => a.length >= b.length ? a : b);
+            matches.push({
+                base,
+                display,
+                variantes,
+                airports: data.airports,
+                score: matchScore(base, query),
+            });
         }
     }
 
-    // Ordenar por score (mayor primero), luego alfabético
     matches.sort((a, b) => {
         if (b.score !== a.score) return b.score - a.score;
-        return normalizarTexto(a.display).localeCompare(normalizarTexto(b.display));
+        return a.base.localeCompare(b.base);
     });
 
     if (matches.length === 0) {
@@ -1961,13 +1990,24 @@ ciudadInput.addEventListener('input', () => {
     acIndex = -1;
     acList.innerHTML = matches.slice(0, 20).map((m, i) => {
         const airportTags = [...m.airports].join(', ');
-        return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}">${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span></div>`;
+        // Mostrar variantes si hay más de 1
+        const variantesStr = m.variantes.length > 1
+            ? `<span class="ac-variants">${m.variantes.map(v => escapeHtml(v)).join(' · ')}</span>`
+            : '';
+        // data-variantes guarda todas las variantes para la búsqueda
+        const variantesData = encodeURIComponent(JSON.stringify(m.variantes));
+        return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}" data-variantes="${variantesData}">
+            ${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span>
+            ${variantesStr}
+        </div>`;
     }).join('');
     acList.classList.add('show');
 
     acList.querySelectorAll('.autocomplete-item[data-value]').forEach(item => {
         item.addEventListener('click', () => {
             ciudadInput.value = item.dataset.value;
+            // Guardar variantes seleccionadas para la cotización
+            ciudadInput.dataset.variantes = item.dataset.variantes || '';
             acList.classList.remove('show');
         });
     });
@@ -1988,6 +2028,7 @@ ciudadInput.addEventListener('keydown', (e) => {
     } else if (e.key === 'Enter' && acIndex >= 0) {
         e.preventDefault();
         ciudadInput.value = items[acIndex].dataset.value;
+        ciudadInput.dataset.variantes = items[acIndex].dataset.variantes || '';
         acList.classList.remove('show');
     } else if (e.key === 'Escape') {
         acList.classList.remove('show');
@@ -2026,8 +2067,17 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         return;
     }
 
-    // Buscar entre proveedores (fuzzy match en ciudad)
+    // Buscar entre proveedores usando variantes agrupadas
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    // Obtener variantes guardadas del autocomplete (todas las formas de escribir la ciudad)
+    const variantesRaw = ciudadInput.dataset.variantes || '';
+    let variantes = [normalizarTexto(ciudad)];
+    try {
+        const parsed = JSON.parse(decodeURIComponent(variantesRaw));
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            variantes = parsed.map(v => normalizarTexto(v));
+        }
+    } catch(e) {}
     const ciudadNorm = normalizarTexto(ciudad);
     const resultados = [];
 
@@ -2036,8 +2086,9 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 
         for (const t of p.tarifas) {
             const tNorm = normalizarTexto(t.ciudad);
-            // Match exacto, o fuzzy (todas las palabras del query están en el destino o viceversa)
-            const esMatch = tNorm === ciudadNorm
+            // Match contra cualquiera de las variantes agrupadas
+            const esMatch = variantes.some(v => tNorm === v || fuzzyMatch(tNorm, v) || fuzzyMatch(v, tNorm))
+                || tNorm === ciudadNorm
                 || fuzzyMatch(tNorm, ciudadNorm)
                 || fuzzyMatch(ciudadNorm, tNorm);
             if (!esMatch) continue;
