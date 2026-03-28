@@ -1169,7 +1169,7 @@ const CIUDADES_MX = {
     // Coahuila
     'saltillo': 'COAH', 'torreon': 'COAH', 'monclova': 'COAH', 'piedras negras': 'COAH', 'acuna': 'COAH',
     'ciudad acuna': 'COAH', 'sabinas': 'COAH', 'ramos arizpe': 'COAH', 'frontera': 'COAH', 'nueva rosita': 'COAH',
-    'muzquiz': 'COAH', 'allende': 'COAH', 'san pedro': 'COAH',
+    'muzquiz': 'COAH', 'allende': 'COAH', 'san pedro coahuila': 'COAH',
     // Colima
     'colima': 'COL', 'manzanillo': 'COL', 'tecoman': 'COL', 'villa de alvarez': 'COL', 'armeria': 'COL',
     // CDMX
@@ -2170,6 +2170,7 @@ function fuzzyMatch(texto, query) {
 
 function matchScore(texto, query) {
     const palabras = query.split(/\s+/).filter(p => p.length > 0);
+    if (palabras.length === 0) return 0;
     let score = 0;
     if (texto.startsWith(palabras[0])) score += 10;
     if (texto.includes(query)) score += 5;
@@ -2180,6 +2181,9 @@ function matchScore(texto, query) {
 }
 
 ciudadInput.addEventListener('input', () => {
+    // Limpiar variantes previas cuando el usuario escribe manualmente
+    delete ciudadInput.dataset.variantes;
+
     const query = normalizarTexto(ciudadInput.value);
     if (query.length < 2) {
         acList.classList.remove('show');
