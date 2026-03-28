@@ -767,6 +767,11 @@
             color: var(--gray-400);
             margin-left: 0.5rem;
         }
+        .autocomplete-item .ac-estado {
+            font-size: 0.75rem;
+            color: var(--green);
+            font-weight: 600;
+        }
         .autocomplete-item .ac-variants {
             display: block;
             font-size: 0.7rem;
@@ -1143,6 +1148,237 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 document.getElementById('estibable').addEventListener('change', function() {
     document.getElementById('estibable-label').textContent = this.checked ? 'Sí' : 'No';
 });
+
+// ===== CATÁLOGO DE CIUDADES MEXICANAS (ciudad → estado) =====
+// Sirve para normalizar nombres de ciudades sin importar cómo las escriba cada proveedor
+const CIUDADES_MX = {
+    // Aguascalientes
+    'aguascalientes': 'AGS',
+    // Baja California
+    'tijuana': 'BC', 'mexicali': 'BC', 'ensenada': 'BC', 'rosarito': 'BC', 'tecate': 'BC', 'san quintin': 'BC',
+    // Baja California Sur
+    'la paz': 'BCS', 'los cabos': 'BCS', 'cabo san lucas': 'BCS', 'san jose del cabo': 'BCS', 'loreto': 'BCS', 'ciudad constitucion': 'BCS',
+    // Campeche
+    'campeche': 'CAMP', 'ciudad del carmen': 'CAMP', 'carmen': 'CAMP', 'escarcega': 'CAMP', 'champoton': 'CAMP',
+    // Chiapas
+    'tuxtla gutierrez': 'CHIS', 'tuxtla': 'CHIS', 'san cristobal de las casas': 'CHIS', 'san cristobal': 'CHIS',
+    'tapachula': 'CHIS', 'comitan': 'CHIS', 'palenque': 'CHIS', 'chiapa de corzo': 'CHIS', 'tonala': 'CHIS',
+    // Chihuahua
+    'chihuahua': 'CHIH', 'ciudad juarez': 'CHIH', 'juarez': 'CHIH', 'delicias': 'CHIH', 'cuauhtemoc': 'CHIH',
+    'parral': 'CHIH', 'hidalgo del parral': 'CHIH', 'nuevo casas grandes': 'CHIH', 'camargo': 'CHIH', 'jimenez': 'CHIH',
+    // Coahuila
+    'saltillo': 'COAH', 'torreon': 'COAH', 'monclova': 'COAH', 'piedras negras': 'COAH', 'acuna': 'COAH',
+    'ciudad acuna': 'COAH', 'sabinas': 'COAH', 'ramos arizpe': 'COAH', 'frontera': 'COAH', 'nueva rosita': 'COAH',
+    'muzquiz': 'COAH', 'allende': 'COAH', 'san pedro': 'COAH',
+    // Colima
+    'colima': 'COL', 'manzanillo': 'COL', 'tecoman': 'COL', 'villa de alvarez': 'COL', 'armeria': 'COL',
+    // CDMX
+    'cdmx': 'CDMX', 'ciudad de mexico': 'CDMX', 'mexico df': 'CDMX', 'df': 'CDMX',
+    // Durango
+    'durango': 'DGO', 'gomez palacio': 'DGO', 'lerdo': 'DGO', 'santiago papasquiaro': 'DGO', 'el salto': 'DGO',
+    // Estado de México
+    'toluca': 'MEX', 'naucalpan': 'MEX', 'ecatepec': 'MEX', 'tlalnepantla': 'MEX', 'nezahualcoyotl': 'MEX',
+    'atizapan': 'MEX', 'cuautitlan': 'MEX', 'cuautitlan izcalli': 'MEX', 'texcoco': 'MEX', 'tultitlan': 'MEX',
+    'ixtapaluca': 'MEX', 'chalco': 'MEX', 'coacalco': 'MEX', 'metepec': 'MEX', 'zinacantepec': 'MEX',
+    'valle de bravo': 'MEX', 'atlacomulco': 'MEX', 'zumpango': 'MEX', 'huehuetoca': 'MEX', 'tepotzotlan': 'MEX',
+    // Guanajuato
+    'leon': 'GTO', 'irapuato': 'GTO', 'celaya': 'GTO', 'salamanca': 'GTO', 'guanajuato': 'GTO',
+    'silao': 'GTO', 'san miguel de allende': 'GTO', 'san miguel allende': 'GTO', 'dolores hidalgo': 'GTO',
+    'san francisco del rincon': 'GTO', 'valle de santiago': 'GTO', 'acambaro': 'GTO', 'penjamo': 'GTO',
+    'san jose iturbide': 'GTO', 'moroleon': 'GTO', 'uriangato': 'GTO', 'cortazar': 'GTO', 'san felipe': 'GTO',
+    // Guerrero
+    'acapulco': 'GRO', 'chilpancingo': 'GRO', 'iguala': 'GRO', 'taxco': 'GRO', 'zihuatanejo': 'GRO',
+    'ixtapa': 'GRO', 'ciudad altamirano': 'GRO',
+    // Hidalgo
+    'pachuca': 'HGO', 'tulancingo': 'HGO', 'tula': 'HGO', 'tula de allende': 'HGO', 'tizayuca': 'HGO',
+    'actopan': 'HGO', 'ixmiquilpan': 'HGO', 'huejutla': 'HGO', 'tepeji del rio': 'HGO', 'apan': 'HGO',
+    // Jalisco
+    'guadalajara': 'JAL', 'zapopan': 'JAL', 'tlaquepaque': 'JAL', 'tonala jalisco': 'JAL',
+    'puerto vallarta': 'JAL', 'vallarta': 'JAL', 'tlajomulco': 'JAL', 'lagos de moreno': 'JAL',
+    'tepatitlan': 'JAL', 'ocotlan': 'JAL', 'ciudad guzman': 'JAL', 'autlan': 'JAL', 'arandas': 'JAL',
+    'la barca': 'JAL', 'chapala': 'JAL', 'tequila': 'JAL', 'el salto jalisco': 'JAL', 'ameca': 'JAL',
+    // Michoacán
+    'morelia': 'MICH', 'uruapan': 'MICH', 'zamora': 'MICH', 'lazaro cardenas': 'MICH',
+    'apatzingan': 'MICH', 'zitacuaro': 'MICH', 'patzcuaro': 'MICH', 'la piedad': 'MICH',
+    'sahuayo': 'MICH', 'hidalgo michoacan': 'MICH', 'maravatio': 'MICH', 'jiquilpan': 'MICH',
+    // Morelos
+    'cuernavaca': 'MOR', 'cuautla': 'MOR', 'jiutepec': 'MOR', 'temixco': 'MOR', 'yautepec': 'MOR',
+    'jojutla': 'MOR', 'xochitepec': 'MOR',
+    // Nayarit
+    'tepic': 'NAY', 'bahia de banderas': 'NAY', 'nuevo vallarta': 'NAY', 'compostela': 'NAY', 'santiago ixcuintla': 'NAY',
+    // Nuevo León
+    'monterrey': 'NL', 'san pedro garza garcia': 'NL', 'san pedro': 'NL', 'san nicolas de los garza': 'NL',
+    'san nicolas': 'NL', 'apodaca': 'NL', 'guadalupe': 'NL', 'santa catarina': 'NL',
+    'escobedo': 'NL', 'general escobedo': 'NL', 'garcia': 'NL', 'juarez nl': 'NL',
+    'cadereyta': 'NL', 'cadereyta jimenez': 'NL', 'linares': 'NL', 'montemorelos': 'NL',
+    'santiago': 'NL', 'cienega de flores': 'NL', 'pesqueria': 'NL', 'zuazua': 'NL', 'salinas victoria': 'NL',
+    // Oaxaca
+    'oaxaca': 'OAX', 'oaxaca de juarez': 'OAX', 'juchitan': 'OAX', 'salina cruz': 'OAX',
+    'huatulco': 'OAX', 'puerto escondido': 'OAX', 'tuxtepec': 'OAX', 'san juan bautista tuxtepec': 'OAX',
+    'tehuantepec': 'OAX', 'miahuatlan': 'OAX',
+    // Puebla
+    'puebla': 'PUE', 'tehuacan': 'PUE', 'san martin texmelucan': 'PUE', 'atlixco': 'PUE',
+    'cholula': 'PUE', 'san andres cholula': 'PUE', 'san pedro cholula': 'PUE', 'izucar de matamoros': 'PUE',
+    'huauchinango': 'PUE', 'teziutlan': 'PUE', 'xicotepec': 'PUE', 'zacatlan': 'PUE', 'amozoc': 'PUE',
+    // Querétaro
+    'queretaro': 'QRO', 'san juan del rio': 'QRO', 'corregidora': 'QRO', 'el marques': 'QRO',
+    'pedro escobedo': 'QRO', 'tequisquiapan': 'QRO', 'ezequiel montes': 'QRO', 'cadereyta queretaro': 'QRO',
+    // Quintana Roo
+    'cancun': 'QROO', 'playa del carmen': 'QROO', 'chetumal': 'QROO', 'cozumel': 'QROO',
+    'tulum': 'QROO', 'felipe carrillo puerto': 'QROO', 'isla mujeres': 'QROO', 'solidaridad': 'QROO',
+    // San Luis Potosí
+    'san luis potosi': 'SLP', 'slp': 'SLP', 'ciudad valles': 'SLP', 'valles': 'SLP',
+    'matehuala': 'SLP', 'rioverde': 'SLP', 'soledad de graciano sanchez': 'SLP', 'soledad': 'SLP',
+    'tamazunchale': 'SLP', 'ebano': 'SLP', 'cerritos': 'SLP',
+    // Sinaloa
+    'culiacan': 'SIN', 'mazatlan': 'SIN', 'los mochis': 'SIN', 'guasave': 'SIN',
+    'guamuchil': 'SIN', 'navolato': 'SIN', 'el fuerte': 'SIN', 'escuinapa': 'SIN', 'concordia': 'SIN',
+    // Sonora
+    'hermosillo': 'SON', 'ciudad obregon': 'SON', 'obregon': 'SON', 'nogales': 'SON',
+    'guaymas': 'SON', 'navojoa': 'SON', 'san luis rio colorado': 'SON', 'caborca': 'SON',
+    'agua prieta': 'SON', 'empalme': 'SON', 'puerto penasco': 'SON', 'huatabampo': 'SON', 'magdalena': 'SON',
+    // Tabasco
+    'villahermosa': 'TAB', 'cardenas': 'TAB', 'cardenas tabasco': 'TAB', 'comalcalco': 'TAB',
+    'paraiso': 'TAB', 'tenosique': 'TAB', 'macuspana': 'TAB', 'huimanguillo': 'TAB', 'cunduacan': 'TAB',
+    // Tamaulipas
+    'tampico': 'TAMPS', 'reynosa': 'TAMPS', 'matamoros': 'TAMPS', 'nuevo laredo': 'TAMPS',
+    'ciudad victoria': 'TAMPS', 'victoria': 'TAMPS', 'altamira': 'TAMPS', 'ciudad mante': 'TAMPS',
+    'mante': 'TAMPS', 'rio bravo': 'TAMPS', 'valle hermoso': 'TAMPS', 'el mante': 'TAMPS',
+    // Tlaxcala
+    'tlaxcala': 'TLAX', 'apizaco': 'TLAX', 'huamantla': 'TLAX', 'calpulalpan': 'TLAX', 'chiautempan': 'TLAX',
+    // Veracruz
+    'veracruz': 'VER', 'xalapa': 'VER', 'jalapa': 'VER', 'coatzacoalcos': 'VER', 'poza rica': 'VER',
+    'orizaba': 'VER', 'cordoba': 'VER', 'boca del rio': 'VER', 'minatitlan': 'VER', 'tuxpan': 'VER',
+    'martinez de la torre': 'VER', 'papantla': 'VER', 'san andres tuxtla': 'VER', 'tierra blanca': 'VER',
+    'cosamaloapan': 'VER', 'perote': 'VER', 'fortin': 'VER', 'fortin de las flores': 'VER',
+    'acayucan': 'VER', 'coatepec': 'VER', 'las choapas': 'VER',
+    // Yucatán
+    'merida': 'YUC', 'valladolid': 'YUC', 'progreso': 'YUC', 'tizimin': 'YUC',
+    'motul': 'YUC', 'uman': 'YUC', 'kanasin': 'YUC', 'tekax': 'YUC',
+    // Zacatecas
+    'zacatecas': 'ZAC', 'fresnillo': 'ZAC', 'guadalupe zacatecas': 'ZAC', 'rio grande': 'ZAC',
+    'jerez': 'ZAC', 'sombrerete': 'ZAC', 'loreto zacatecas': 'ZAC', 'calera': 'ZAC', 'ojocaliente': 'ZAC',
+};
+
+// Alias de nombres de estados → abreviatura
+const ESTADOS_MX = {
+    'aguascalientes': 'AGS', 'ags': 'AGS',
+    'baja california': 'BC', 'bc': 'BC', 'baja california norte': 'BC',
+    'baja california sur': 'BCS', 'bcs': 'BCS',
+    'campeche': 'CAMP', 'camp': 'CAMP',
+    'chiapas': 'CHIS', 'chis': 'CHIS',
+    'chihuahua': 'CHIH', 'chih': 'CHIH',
+    'coahuila': 'COAH', 'coah': 'COAH', 'coahuila de zaragoza': 'COAH',
+    'colima': 'COL', 'col': 'COL',
+    'ciudad de mexico': 'CDMX', 'cdmx': 'CDMX', 'distrito federal': 'CDMX', 'df': 'CDMX',
+    'durango': 'DGO', 'dgo': 'DGO',
+    'estado de mexico': 'MEX', 'mexico': 'MEX', 'edomex': 'MEX', 'edo mex': 'MEX', 'edo. mex': 'MEX', 'edo de mexico': 'MEX',
+    'guanajuato': 'GTO', 'gto': 'GTO',
+    'guerrero': 'GRO', 'gro': 'GRO',
+    'hidalgo': 'HGO', 'hgo': 'HGO',
+    'jalisco': 'JAL', 'jal': 'JAL',
+    'michoacan': 'MICH', 'mich': 'MICH', 'michoacan de ocampo': 'MICH',
+    'morelos': 'MOR', 'mor': 'MOR',
+    'nayarit': 'NAY', 'nay': 'NAY',
+    'nuevo leon': 'NL', 'nl': 'NL', 'n.l.': 'NL', 'n.l': 'NL', 'nvo leon': 'NL',
+    'oaxaca': 'OAX', 'oax': 'OAX',
+    'puebla': 'PUE', 'pue': 'PUE',
+    'queretaro': 'QRO', 'qro': 'QRO', 'queretaro de arteaga': 'QRO',
+    'quintana roo': 'QROO', 'qroo': 'QROO', 'q. roo': 'QROO', 'q.roo': 'QROO',
+    'san luis potosi': 'SLP', 'slp': 'SLP', 's.l.p.': 'SLP', 's.l.p': 'SLP',
+    'sinaloa': 'SIN', 'sin': 'SIN',
+    'sonora': 'SON', 'son': 'SON',
+    'tabasco': 'TAB', 'tab': 'TAB',
+    'tamaulipas': 'TAMPS', 'tamps': 'TAMPS', 'tam': 'TAMPS',
+    'tlaxcala': 'TLAX', 'tlax': 'TLAX',
+    'veracruz': 'VER', 'ver': 'VER', 'veracruz de ignacio de la llave': 'VER',
+    'yucatan': 'YUC', 'yuc': 'YUC',
+    'zacatecas': 'ZAC', 'zac': 'ZAC',
+};
+
+// Alias/abreviaturas de ciudades → nombre canónico
+// Para que "SLP" y "SAN LUIS POTOSI" se agrupen igual
+const CIUDAD_ALIAS = {
+    'slp': 'san luis potosi',
+    'mty': 'monterrey',
+    'gdl': 'guadalajara',
+    'qro': 'queretaro',
+    'cdmx': 'ciudad de mexico',
+    'df': 'ciudad de mexico',
+    'mexico df': 'ciudad de mexico',
+    'cuu': 'chihuahua',
+    'cjs': 'ciudad juarez',
+    'tij': 'tijuana',
+    'mxl': 'mexicali',
+    'pue': 'puebla',
+    'ver': 'veracruz',
+    'ags': 'aguascalientes',
+    'hmo': 'hermosillo',
+    'cun': 'cancun',
+    'mzt': 'mazatlan',
+    'pvr': 'puerto vallarta',
+    'trc': 'torreon',
+    'tam': 'tampico',
+    'tpic': 'tepic',
+    'cul': 'culiacan',
+    'mid': 'merida',
+    'vsa': 'villahermosa',
+    'oax': 'oaxaca',
+    'pch': 'pachuca',
+};
+
+// Normaliza el nombre de una ciudad del proveedor a clave única: "ciudad|ESTADO"
+// Ej: "MONTERREY, NUEVO LEON" → "monterrey|NL"
+//     "LEON" → "leon|GTO"
+//     "SAN LUIS POTOSI" → "san luis potosi|SLP"
+//     "SLP" → "san luis potosi|SLP"
+function normalizarCiudadMX(str) {
+    const norm = normalizarTexto(str);
+
+    // Separar por coma: "monterrey, nuevo leon" → ["monterrey", "nuevo leon"]
+    const partes = norm.split(',').map(p => p.trim()).filter(Boolean);
+
+    let ciudad = partes[0] || '';
+    let estadoPart = partes[1] || '';
+
+    // Quitar prefijos comunes de ciudad
+    ciudad = ciudad.replace(/^(ciudad de |cd\.\s*|cd |ciudad del )/i, '').trim();
+
+    // Resolver alias: "SLP" → "san luis potosi"
+    if (CIUDAD_ALIAS[ciudad]) {
+        ciudad = CIUDAD_ALIAS[ciudad];
+    }
+
+    // Intentar resolver estado de la parte después de la coma
+    let estadoCode = null;
+    if (estadoPart) {
+        estadoCode = ESTADOS_MX[estadoPart] || null;
+    }
+
+    // Si no hay estado por coma, ver si la ciudad está en el catálogo
+    if (!estadoCode && CIUDADES_MX[ciudad]) {
+        estadoCode = CIUDADES_MX[ciudad];
+    }
+
+    // Caso especial: el texto completo sin coma podría ser una ciudad conocida
+    // Ej: "SAN LUIS POTOSI" (sin coma, pero es tanto ciudad como estado)
+    if (!estadoCode) {
+        const fullNorm = partes.join(' ');
+        const fullResolved = CIUDAD_ALIAS[fullNorm] || fullNorm;
+        if (CIUDADES_MX[fullResolved]) {
+            ciudad = fullResolved;
+            estadoCode = CIUDADES_MX[fullResolved];
+        }
+    }
+
+    // Si encontramos estado, retornar "ciudad|ESTADO" para agrupar correctamente
+    if (estadoCode) {
+        return ciudad + '|' + estadoCode;
+    }
+
+    // Fallback: solo nombre de ciudad (sin estado conocido)
+    return ciudad;
+}
 
 // ===== TIPOS DE UNIDAD DE TRANSPORTE =====
 const UNIDADES = [
@@ -1892,11 +2128,7 @@ let acIndex = -1;
 
 // Extraer nombre base de ciudad (sin estado): "MONTERREY, NUEVO LEON" → "monterrey"
 function ciudadBase(str) {
-    const norm = normalizarTexto(str);
-    // Quitar todo después de la primera coma (estado)
-    const sinEstado = norm.split(',')[0].trim();
-    // Quitar prefijos comunes
-    return sinEstado.replace(/^(ciudad de |cd\. |cd |ciudad del )/i, '').trim();
+    return normalizarCiudadMX(str);
 }
 
 function getCiudadesDisponibles(aeropuerto) {
@@ -1959,8 +2191,10 @@ ciudadInput.addEventListener('input', () => {
     const matches = [];
 
     for (const [base, data] of grupos) {
-        // Buscar en el nombre base Y en todas las variantes
-        const allTexts = [base, ...[...data.variantes].map(v => normalizarTexto(v))];
+        // Extraer solo la parte de ciudad del base (sin |ESTADO)
+        const baseCiudad = base.includes('|') ? base.split('|')[0] : base;
+        // Buscar en el nombre base (ciudad) Y en todas las variantes del proveedor
+        const allTexts = [baseCiudad, ...[...data.variantes].map(v => normalizarTexto(v))];
         const found = allTexts.some(t => fuzzyMatch(t, query));
         if (found) {
             // Display: la variante más larga (más completa)
@@ -1968,10 +2202,11 @@ ciudadInput.addEventListener('input', () => {
             const display = variantes.reduce((a, b) => a.length >= b.length ? a : b);
             matches.push({
                 base,
+                baseCiudad,
                 display,
                 variantes,
                 airports: data.airports,
-                score: matchScore(base, query),
+                score: matchScore(baseCiudad, query),
             });
         }
     }
@@ -1990,6 +2225,8 @@ ciudadInput.addEventListener('input', () => {
     acIndex = -1;
     acList.innerHTML = matches.slice(0, 20).map((m, i) => {
         const airportTags = [...m.airports].join(', ');
+        // Mostrar estado si se identificó
+        const estadoTag = m.base.includes('|') ? ` <span class="ac-estado">(${m.base.split('|')[1]})</span>` : '';
         // Mostrar variantes si hay más de 1
         const variantesStr = m.variantes.length > 1
             ? `<span class="ac-variants">${m.variantes.map(v => escapeHtml(v)).join(' · ')}</span>`
@@ -1997,7 +2234,7 @@ ciudadInput.addEventListener('input', () => {
         // data-variantes guarda todas las variantes para la búsqueda
         const variantesData = encodeURIComponent(JSON.stringify(m.variantes));
         return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}" data-variantes="${variantesData}">
-            ${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span>
+            ${escapeHtml(m.display)}${estadoTag}<span class="ac-airport">${airportTags}</span>
             ${variantesStr}
         </div>`;
     }).join('');
