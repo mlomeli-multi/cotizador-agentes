@@ -1549,7 +1549,6 @@ const UNIDADES = [
 
 // ===== MOTOR DE CÁLCULO DE UNIDAD =====
 function calcularUnidad(pallets, pesoTotal, largo, ancho, altoPallet, estibable) {
-    // Validaciones
     if (!pallets || !pesoTotal || !largo || !ancho || !altoPallet) {
         return { error: 'Completa todos los campos de carga' };
     }
@@ -1557,33 +1556,19 @@ function calcularUnidad(pallets, pesoTotal, largo, ancho, altoPallet, estibable)
         return { error: 'Los valores deben ser mayores a 0' };
     }
 
-    // Para cada unidad, verificar si la carga cabe
+    // Orientaciones posibles del pallet (largo x ancho, rotado no cambia alto)
+    const orientaciones = [
+        { l: largo, a: ancho, label: 'normal' },
+        { l: ancho, a: largo, label: 'rotado' }
+    ];
+
     for (const unidad of UNIDADES) {
-        // 1. Verificar peso
         if (pesoTotal > unidad.payload) continue;
-
-        // 2. Verificar que un pallet cabe en ancho y largo de la unidad
-        //    Un pallet individual debe caber en la sección transversal
-        if (largo > unidad.largo || ancho > unidad.ancho) {
-            // Intentar rotado (intercambiar largo/ancho del pallet)
-            if (ancho > unidad.largo || largo > unidad.ancho) continue;
-        }
-
-        // 3. Verificar alto
         if (altoPallet > unidad.alto) continue;
 
-        // 4. Calcular cuántos pallets caben
-        //    Pallets a lo largo de la unidad
-        const palletsLargo = Math.floor(unidad.largo / largo);
-        const palletsAncho = Math.floor(unidad.ancho / ancho);
-        // También probar rotados
-        const palletsLargoRot = Math.floor(unidad.largo / ancho);
-        const palletsAnchoRot = Math.floor(unidad.ancho / largo);
-
-        const porPiso = Math.max(
-            palletsLargo * palletsAncho,
-            palletsLargoRot * palletsAnchoRot
-        );
+        // Verificar que al menos una orientación cabe físicamente
+        const oriValidas = orientaciones.filter(o => o.l <= unidad.largo && o.a <= unidad.ancho);
+        if (oriValidas.length === 0) continue;
 
         // Pisos (niveles de estiba)
         let pisos = 1;
@@ -1592,12 +1577,57 @@ function calcularUnidad(pallets, pesoTotal, largo, ancho, altoPallet, estibable)
             if (pisos < 1) pisos = 1;
         }
 
-        const capacidadTotal = porPiso * pisos;
+        // Estrategia: probar filas con orientación A, luego llenar sobrante con orientación B
+        let mejorPorPiso = 0;
+        let mejorDetalle = '';
+
+        for (const oriA of oriValidas) {
+            // Cuántas filas de orientación A caben a lo largo
+            const filasA_max = Math.floor(unidad.largo / oriA.l);
+            const porFilaA = Math.floor(unidad.ancho / oriA.a);
+            if (porFilaA === 0) continue;
+
+            // Probar de 0 a filasA_max filas con orientación A
+            for (let filasA = filasA_max; filasA >= 0; filasA--) {
+                const palletsA = filasA * porFilaA;
+                const largoUsadoA = filasA * oriA.l;
+                const largoSobrante = unidad.largo - largoUsadoA;
+
+                // En el sobrante, probar con la otra orientación
+                let palletsB = 0;
+                let labelB = '';
+                for (const oriB of oriValidas) {
+                    const filasB = Math.floor(largoSobrante / oriB.l);
+                    const porFilaB = Math.floor(unidad.ancho / oriB.a);
+                    const totalB = filasB * porFilaB;
+                    if (totalB > palletsB) {
+                        palletsB = totalB;
+                        labelB = oriB.label;
+                    }
+                }
+
+                const totalPiso = palletsA + palletsB;
+                if (totalPiso > mejorPorPiso) {
+                    mejorPorPiso = totalPiso;
+                    if (palletsA > 0 && palletsB > 0) {
+                        mejorDetalle = `${palletsA} ${oriA.label === 'normal' ? '→' : '↻'} + ${palletsB} ${labelB === 'normal' ? '→' : '↻'}`;
+                    } else {
+                        const ori = palletsA > 0 ? oriA.label : labelB;
+                        mejorDetalle = ori === 'rotado' ? 'rotados ↻' : 'normales →';
+                    }
+                }
+            }
+        }
+
+        if (mejorPorPiso === 0) continue;
+
+        const capacidadTotal = mejorPorPiso * pisos;
 
         if (capacidadTotal >= pallets) {
+            const detalleEstiba = pisos > 1 ? ` × ${pisos} pisos` : '';
             return {
                 unidad: unidad.nombre,
-                detalle: `Capacidad: ${capacidadTotal} pallets (${porPiso} por piso × ${pisos} piso${pisos > 1 ? 's' : ''}). Payload máx: ${unidad.payload.toLocaleString()} kg.`
+                detalle: `Capacidad: ${capacidadTotal} pallets (${mejorPorPiso}/piso [${mejorDetalle}]${detalleEstiba}). Payload máx: ${unidad.payload.toLocaleString()} kg.`
             };
         }
     }
