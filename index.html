@@ -524,6 +524,121 @@
             font-weight: 700;
             color: var(--gray-800);
         }
+        .quote-card .btn-venta {
+            margin-top: 0.5rem;
+            width: 100%;
+            padding: 0.4rem;
+            font-size: 0.7rem;
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.15s;
+        }
+        .quote-card .btn-venta:hover { background: var(--navy-light); }
+
+        /* ===== CALCULADORA MUB ===== */
+        .mub-panel {
+            margin-top: 0.75rem;
+            background: white;
+            border: 1px solid var(--blue);
+            border-radius: var(--radius);
+            padding: 1rem;
+        }
+        .mub-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .mub-panel-header h3 {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .mub-panel-close {
+            background: none;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            color: var(--gray-400);
+            padding: 0.2rem;
+        }
+        .mub-panel-close:hover { color: var(--gray-700); }
+        .mub-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+        .mub-table th {
+            text-align: left;
+            padding: 0.4rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .mub-table th:not(:first-child) { text-align: right; }
+        .mub-table td {
+            padding: 0.35rem 0.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .mub-table td:not(:first-child) { text-align: right; }
+        .mub-table .mub-input {
+            width: 60px;
+            padding: 0.3rem 0.4rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 6px;
+            font-size: 0.78rem;
+            text-align: right;
+            background: var(--gray-50);
+        }
+        .mub-table .mub-input:focus {
+            outline: none;
+            border-color: var(--blue);
+            background: white;
+        }
+        .mub-table .total-row td {
+            border-top: 2px solid var(--gray-300);
+            border-bottom: none;
+            padding-top: 0.5rem;
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 0.85rem;
+        }
+        .mub-table .utilidad-col { color: var(--green); font-weight: 600; }
+        .mub-table .venta-col { color: var(--blue); font-weight: 700; }
+        .mub-resumen {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.75rem;
+            margin-top: 0.75rem;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, #f0f7ff 0%, #f0fdf9 100%);
+            border-radius: 8px;
+        }
+        .mub-resumen-item {
+            text-align: center;
+        }
+        .mub-resumen-item .resumen-value {
+            font-size: 1.1rem;
+            font-weight: 800;
+        }
+        .mub-resumen-item .resumen-label {
+            font-size: 0.65rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .mub-resumen-item.costo .resumen-value { color: var(--gray-700); }
+        .mub-resumen-item.venta .resumen-value { color: var(--blue); }
+        .mub-resumen-item.utilidad .resumen-value { color: var(--green); }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
@@ -2388,6 +2503,13 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         <div class="quote-grid">
         ${top.map((r, i) => {
             const total = r.tarifaFlete + totalConceptos;
+            // Guardar datos en data attributes para la calculadora MUB
+            const mubData = encodeURIComponent(JSON.stringify({
+                proveedor: r.proveedor,
+                tarifaFlete: r.tarifaFlete,
+                tipoUnidad: r.tipoUnidad,
+                conceptos: conceptos.map(c => ({ nombre: c.nombre, monto: parseFloat(c.monto) || 0 })),
+            }));
             return `
             <div class="quote-card ${i === 0 ? 'best' : ''}">
                 <div class="quote-rank">${rankLabels[i]}</div>
@@ -2402,12 +2524,129 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                         <tr class="total-row"><td>Total</td><td>$${fmt(total)}</td></tr>
                     </table>
                 </div>
+                <button class="btn-venta" data-mub="${mubData}">&#x1F4B0; Calcular Venta</button>
             </div>`;
         }).join('')}
         </div>
+        <div id="mub-panel-container"></div>
     `;
     resultsEl.classList.add('show');
+
+    // Agregar listeners a botones de venta
+    resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const data = JSON.parse(decodeURIComponent(btn.dataset.mub));
+            openMubPanel(data);
+        });
+    });
 });
+
+// ===== CALCULADORA MUB (Margen de Utilidad Bruta) =====
+// Fórmula: Venta = Costo / (1 - MUB%)
+function openMubPanel(data) {
+    const container = document.getElementById('mub-panel-container');
+    const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+    // Construir líneas: flete + cada concepto
+    const lineas = [
+        { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, mub: 15 },
+    ];
+    for (const c of data.conceptos) {
+        if (c.monto > 0) {
+            lineas.push({ nombre: c.nombre, costo: c.monto, mub: 15 });
+        }
+    }
+
+    function render() {
+        let totalCosto = 0;
+        let totalVenta = 0;
+
+        const rowsHtml = lineas.map((l, i) => {
+            const venta = l.mub >= 100 ? 0 : l.costo / (1 - l.mub / 100);
+            const utilidad = venta - l.costo;
+            totalCosto += l.costo;
+            totalVenta += venta;
+            return `<tr>
+                <td>${escapeHtml(l.nombre)}</td>
+                <td>$${fmt(l.costo)}</td>
+                <td><input type="number" class="mub-input" data-idx="${i}" value="${l.mub}" min="0" max="99" step="1">%</td>
+                <td class="venta-col">$${fmt(venta)}</td>
+                <td class="utilidad-col">$${fmt(utilidad)}</td>
+            </tr>`;
+        }).join('');
+
+        const totalUtilidad = totalVenta - totalCosto;
+        const mubTotal = totalVenta > 0 ? ((totalUtilidad / totalVenta) * 100) : 0;
+
+        container.innerHTML = `
+        <div class="mub-panel">
+            <div class="mub-panel-header">
+                <h3>&#x1F4B0; Calculadora de Venta — ${escapeHtml(data.proveedor)}</h3>
+                <button class="mub-panel-close" id="mub-close">&#x2716;</button>
+            </div>
+            <table class="mub-table">
+                <thead><tr>
+                    <th>Concepto</th>
+                    <th>Costo</th>
+                    <th>MUB %</th>
+                    <th>Venta</th>
+                    <th>Utilidad</th>
+                </tr></thead>
+                <tbody>
+                    ${rowsHtml}
+                    <tr class="total-row">
+                        <td>TOTAL</td>
+                        <td>$${fmt(totalCosto)}</td>
+                        <td style="font-size:0.75rem;color:var(--green);font-weight:700;">${fmt(mubTotal)}%</td>
+                        <td class="venta-col">$${fmt(totalVenta)}</td>
+                        <td class="utilidad-col">$${fmt(totalUtilidad)}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="mub-resumen">
+                <div class="mub-resumen-item costo">
+                    <div class="resumen-value">$${fmt(totalCosto)}</div>
+                    <div class="resumen-label">Costo total</div>
+                </div>
+                <div class="mub-resumen-item venta">
+                    <div class="resumen-value">$${fmt(totalVenta)}</div>
+                    <div class="resumen-label">Precio de venta</div>
+                </div>
+                <div class="mub-resumen-item utilidad">
+                    <div class="resumen-value">$${fmt(totalUtilidad)}</div>
+                    <div class="resumen-label">Utilidad (MUB ${fmt(mubTotal)}%)</div>
+                </div>
+            </div>
+        </div>`;
+
+        // Listeners para inputs MUB
+        container.querySelectorAll('.mub-input').forEach(input => {
+            input.addEventListener('input', () => {
+                const idx = parseInt(input.dataset.idx);
+                let val = parseFloat(input.value) || 0;
+                if (val < 0) val = 0;
+                if (val >= 100) val = 99;
+                lineas[idx].mub = val;
+                render();
+                // Re-focus y posicionar cursor al final del input que cambió
+                const newInput = container.querySelector(`.mub-input[data-idx="${idx}"]`);
+                if (newInput) {
+                    newInput.focus();
+                    newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+                }
+            });
+        });
+
+        // Cerrar panel
+        document.getElementById('mub-close').addEventListener('click', () => {
+            container.innerHTML = '';
+        });
+    }
+
+    render();
+    // Scroll al panel
+    setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
+}
 
 // ===== MAPA LEAFLET =====
 const AIRPORTS = {
