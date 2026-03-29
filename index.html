@@ -458,19 +458,25 @@
         }
         .quote-results.show { display: block; }
         .quote-results { margin-top: 0.75rem; }
+        .quote-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+        }
         .quote-card {
             border: 1px solid var(--gray-200);
             border-radius: var(--radius);
-            padding: 1rem;
-            margin-bottom: 0.75rem;
+            padding: 0.75rem;
             background: var(--gray-50);
+            display: flex;
+            flex-direction: column;
         }
         .quote-card.best {
             border-color: var(--green);
             background: #f0fdf9;
         }
         .quote-rank {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.05em;
@@ -481,27 +487,31 @@
             color: var(--green);
         }
         .quote-provider {
-            font-size: 0.95rem;
+            font-size: 0.8rem;
             font-weight: 700;
             color: var(--navy);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
         .quote-price {
-            font-size: 1.25rem;
+            font-size: 1.05rem;
             font-weight: 800;
             color: var(--blue);
             margin-top: 0.25rem;
         }
         .quote-breakdown {
-            margin-top: 0.75rem;
-            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            font-size: 0.7rem;
             color: var(--gray-500);
+            flex: 1;
         }
         .quote-breakdown table {
             width: 100%;
             border-collapse: collapse;
         }
         .quote-breakdown td {
-            padding: 0.25rem 0;
+            padding: 0.15rem 0;
         }
         .quote-breakdown td:last-child {
             text-align: right;
@@ -510,7 +520,7 @@
         }
         .quote-breakdown .total-row td {
             border-top: 1px solid var(--gray-200);
-            padding-top: 0.5rem;
+            padding-top: 0.35rem;
             font-weight: 700;
             color: var(--gray-800);
         }
@@ -806,6 +816,7 @@
         @media (max-width: 768px) {
             .main { padding: 1rem; }
             .form-grid { grid-template-columns: 1fr !important; }
+            .quote-grid { grid-template-columns: 1fr; }
             .header { padding: 0.75rem 1rem; }
             .header-title h1 { font-size: 1.05rem; }
             .tabs-container { overflow-x: auto; }
@@ -928,7 +939,7 @@
                             <label>Aeropuerto en México</label>
                             <select id="aeropuerto">
                                 <option value="">Seleccionar...</option>
-                                <option value="NLU">NLU — Nuevo Laredo</option>
+                                <option value="NLU">NLU — AIFA</option>
                                 <option value="MEX">MEX — Ciudad de México</option>
                                 <option value="MTY">MTY — Monterrey</option>
                                 <option value="GDL">GDL — Guadalajara</option>
@@ -1028,7 +1039,7 @@
             <div class="form-group" style="margin-bottom:1rem;max-width:250px;">
                 <label>Aeropuerto</label>
                 <select id="conceptos-airport">
-                    <option value="NLU">NLU — Nuevo Laredo (AIFA)</option>
+                    <option value="NLU">NLU — AIFA</option>
                     <option value="MEX">MEX — Ciudad de México (AICM)</option>
                     <option value="MTY">MTY — Monterrey</option>
                     <option value="GDL">GDL — Guadalajara</option>
@@ -1071,7 +1082,7 @@
             <label>Aeropuerto origen</label>
             <select id="provider-airport">
                 <option value="">Seleccionar aeropuerto...</option>
-                <option value="NLU">NLU — Nuevo Laredo (AIFA)</option>
+                <option value="NLU">NLU — AIFA</option>
                 <option value="MEX">MEX — Ciudad de México (AICM)</option>
                 <option value="MTY">MTY — Monterrey</option>
                 <option value="GDL">GDL — Guadalajara</option>
@@ -2357,43 +2368,46 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     const conceptos = allConceptos[aeropuerto] || [];
     const totalConceptos = conceptos.reduce((s, c) => s + (parseFloat(c.monto) || 0), 0);
 
-    // Mostrar TOP 2
-    const top = resultados.slice(0, 2);
+    // Mostrar TOP 3
+    const top = resultados.slice(0, 3);
     emptyEl.style.display = 'none';
 
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opción', '&#x1F949; 3ra opción'];
 
     resultsEl.innerHTML = `
-        <div style="margin-top:1rem;margin-bottom:0.75rem;">
-            <div style="font-size:0.8rem;color:var(--gray-500);">
-                Ruta: <strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong> · Unidad: <strong>${tipoUnidad}</strong> · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''} encontrado${resultados.length > 1 ? 's' : ''}
+        <div style="margin-top:0.75rem;margin-bottom:0.5rem;">
+            <div style="font-size:0.75rem;color:var(--gray-500);">
+                <strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong> · ${tipoUnidad} · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''}
             </div>
         </div>
+        <div class="quote-grid">
         ${top.map((r, i) => {
             const total = r.tarifaFlete + totalConceptos;
             return `
             <div class="quote-card ${i === 0 ? 'best' : ''}">
-                <div class="quote-rank">${i === 0 ? '&#x1F947; Mejor precio' : '&#x1F948; Segunda opción'}</div>
-                <div class="quote-provider">${escapeHtml(r.proveedor)}</div>
-                <div class="quote-price">$${fmt(total)} MXN</div>
+                <div class="quote-rank">${rankLabels[i]}</div>
+                <div class="quote-provider" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
+                <div class="quote-price">$${fmt(total)}</div>
                 <div class="quote-breakdown">
                     <table>
-                        <tr><td>Flete terrestre (${r.tipoUnidad})</td><td>$${fmt(r.tarifaFlete)}</td></tr>
+                        <tr><td>Flete</td><td>$${fmt(r.tarifaFlete)}</td></tr>
                         ${conceptos.length > 0 ? conceptos.map(c =>
                             `<tr><td>${escapeHtml(c.nombre)}</td><td>$${fmt(parseFloat(c.monto) || 0)}</td></tr>`
-                        ).join('') : '<tr><td>Conceptos fijos</td><td style="color:var(--gray-400);">Sin conceptos configurados</td></tr>'}
-                        <tr class="total-row"><td>Total cotización</td><td>$${fmt(total)}</td></tr>
+                        ).join('') : '<tr><td>Conceptos</td><td style="color:var(--gray-400);">—</td></tr>'}
+                        <tr class="total-row"><td>Total</td><td>$${fmt(total)}</td></tr>
                     </table>
                 </div>
             </div>`;
         }).join('')}
+        </div>
     `;
     resultsEl.classList.add('show');
 });
 
 // ===== MAPA LEAFLET =====
 const AIRPORTS = {
-    NLU: { name: 'NLU — Nuevo Laredo (AIFA)', lat: 19.7418, lng: -98.9844, label: 'AIFA / NLU' },
+    NLU: { name: 'NLU — AIFA', lat: 19.7418, lng: -98.9844, label: 'NLU' },
     MEX: { name: 'MEX — Ciudad de México (AICM)', lat: 19.4361, lng: -99.0719, label: 'AICM / MEX' },
     MTY: { name: 'MTY — Monterrey', lat: 25.7785, lng: -100.1069, label: 'MTY' },
     GDL: { name: 'GDL — Guadalajara', lat: 20.5218, lng: -103.3111, label: 'GDL' },
