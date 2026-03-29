@@ -1179,6 +1179,28 @@
             </div>
         </div>
 
+        <!-- Card: Tipo de Cambio (ADMIN ONLY) -->
+        <div class="card admin-only">
+            <div class="card-header">
+                <div class="card-icon amber">&#x1F4B1;</div>
+                <h2>Tipo de Cambio USD/MXN</h2>
+            </div>
+            <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.75rem;">Se usa en la calculadora de venta para convertir costos MXN a precio de venta en USD.</p>
+            <div class="form-grid" style="grid-template-columns: 200px 1fr;align-items:end;">
+                <div class="form-group">
+                    <label>1 USD =</label>
+                    <div style="display:flex;align-items:center;gap:0.5rem;">
+                        <input type="number" id="tipo-cambio" min="1" step="0.01" placeholder="17.50" style="width:120px;">
+                        <span style="font-size:0.85rem;color:var(--gray-500);font-weight:600;">MXN</span>
+                    </div>
+                </div>
+                <div>
+                    <button class="btn btn-primary btn-sm" id="btn-save-tc">Guardar</button>
+                    <span id="tc-saved-msg" style="font-size:0.75rem;color:var(--green);margin-left:0.5rem;display:none;">Guardado</span>
+                </div>
+            </div>
+        </div>
+
     </section>
 
     <!-- TAB: MARÍTIMO (placeholder) -->
@@ -2253,6 +2275,25 @@ document.getElementById('btn-add-concepto').addEventListener('click', () => {
 // Render inicial
 renderConceptosTable();
 
+// ===== TIPO DE CAMBIO USD/MXN =====
+function getTipoCambio() {
+    return parseFloat(localStorage.getItem('tipoCambio')) || 0;
+}
+
+// Cargar valor guardado
+const tcInput = document.getElementById('tipo-cambio');
+const tcSaved = getTipoCambio();
+if (tcSaved > 0) tcInput.value = tcSaved;
+
+document.getElementById('btn-save-tc').addEventListener('click', () => {
+    const val = parseFloat(tcInput.value);
+    if (!val || val <= 0) { alert('Ingresa un tipo de cambio válido.'); return; }
+    localStorage.setItem('tipoCambio', val.toString());
+    const msg = document.getElementById('tc-saved-msg');
+    msg.style.display = 'inline';
+    setTimeout(() => { msg.style.display = 'none'; }, 2000);
+});
+
 // ===== AUTOCOMPLETE CIUDAD DESTINO =====
 const ciudadInput = document.getElementById('ciudad-destino');
 const acList = document.getElementById('autocomplete-list');
@@ -2563,8 +2604,12 @@ function openMubPanel(data) {
     const container = document.getElementById('mub-panel-container');
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const fmtShort = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
+    const tc = getTipoCambio();
+    const hayTC = tc > 0;
+    const toUSD = (mxn) => hayTC ? mxn / tc : mxn;
+    const moneda = hayTC ? 'USD' : 'MXN';
+    const simbolo = hayTC ? 'US$' : '$';
 
-    // esFlete: true = aplica impuestos 12%, false = ya incluye IVA
     const lineas = [
         { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, esFlete: true, mub: 15, venta: 0, editando: 'mub' },
     ];
@@ -2574,57 +2619,85 @@ function openMubPanel(data) {
         }
     }
 
-    // costoBase = costo con impuestos (para flete) o costo directo (conceptos)
-    function costoBase(l) {
+    // costoBase MXN = costo con impuestos (flete) o directo (conceptos)
+    function costoBaseMXN(l) {
         return l.esFlete ? l.costo * (1 + IMPUESTO_FLETE) : l.costo;
+    }
+    // costoBase en moneda de venta (USD si hay TC, MXN si no)
+    function costoBaseVenta(l) {
+        return toUSD(costoBaseMXN(l));
     }
 
     // Calcular ventas iniciales desde MUB
-    lineas.forEach(l => { l.venta = costoBase(l) / (1 - l.mub / 100); });
+    lineas.forEach(l => { l.venta = costoBaseVenta(l) / (1 - l.mub / 100); });
 
-    // Render inicial del HTML (solo una vez)
-    let totalCostoBase = 0;
+    // Render inicial
+    let totalCostoBaseMXN = 0;
+    let totalCostoBaseVenta = 0;
     let totalVenta = 0;
+
     const rowsHtml = lineas.map((l, i) => {
-        const cb = costoBase(l);
-        const utilidad = l.venta - cb;
-        totalCostoBase += cb;
+        const cbMXN = costoBaseMXN(l);
+        const cbVenta = costoBaseVenta(l);
+        const utilidad = l.venta - cbVenta;
+        totalCostoBaseMXN += cbMXN;
+        totalCostoBaseVenta += cbVenta;
         totalVenta += l.venta;
+
         const impCol = l.esFlete
-            ? `<td id="mub-imp-${i}">$${fmt(l.costo * IMPUESTO_FLETE)}</td>`
-            : `<td style="font-size:0.65rem;color:var(--gray-400);text-align:center;">IVA incl.</td>`;
+            ? `<td>$${fmt(l.costo * IMPUESTO_FLETE)}</td>`
+            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl.</td>`;
+
+        const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
+
+        // Columna de conversión USD (solo si hay TC)
+        const usdCell = hayTC
+            ? `<td class="mub-usd-cell" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</td>`
+            : '';
+
         return `<tr>
             <td>${escapeHtml(l.nombre)}</td>
             <td>$${fmt(l.costo)}</td>
             ${impCol}
-            <td id="mub-costobase-${i}">$${fmt(cb)}</td>
+            ${costoImpCell}
+            ${usdCell}
             <td><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${Math.round(l.mub * 10) / 10}" min="0" max="99" step="0.1">%</td>
-            <td>$<input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1"></td>
-            <td class="utilidad-col" id="mub-util-${i}">$${fmt(utilidad)}</td>
+            <td>${simbolo}<input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1"></td>
+            <td class="utilidad-col" id="mub-util-${i}">${simbolo}${fmt(utilidad)}</td>
         </tr>`;
     }).join('');
 
-    const totalUtilidad = totalVenta - totalCostoBase;
+    const totalUtilidad = totalVenta - totalCostoBaseVenta;
     const mubTotal = totalVenta > 0 ? ((totalUtilidad / totalVenta) * 100) : 0;
     const totalCostoSinImp = lineas.reduce((s, l) => s + l.costo, 0);
-    const totalImpuestos = totalCostoBase - totalCostoSinImp;
+    const totalImpuestos = totalCostoBaseMXN - totalCostoSinImp;
+
+    // Header de conversión
+    const tcBadge = hayTC
+        ? `<span style="display:inline-block;background:var(--amber);color:white;font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;">TC: $${fmt(tc)} MXN/USD</span>`
+        : `<span style="display:inline-block;background:var(--gray-300);color:white;font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;">Sin TC — venta en MXN</span>`;
+
+    const usdTh = hayTC ? `<th>Costo ${moneda}</th>` : '';
 
     container.innerHTML = `
     <div class="mub-panel">
         <div class="mub-panel-header">
-            <h3>&#x1F4B0; Calculadora de Venta — ${escapeHtml(data.proveedor)}</h3>
+            <h3>&#x1F4B0; Calculadora de Venta ${tcBadge}</h3>
             <button class="mub-panel-close" id="mub-close">&#x2716;</button>
         </div>
-        <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">Flete lleva +12% (IVA−RET). Conceptos ya incluyen IVA. Edita MUB% o Venta por línea.</p>
+        <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">
+            ${escapeHtml(data.proveedor)} · Flete +12% (IVA−RET)${hayTC ? ' · MXN ÷ ' + fmt(tc) + ' = USD' : ''} · Edita MUB% o Venta
+        </p>
         <table class="mub-table">
             <thead><tr>
                 <th>Concepto</th>
-                <th>Costo</th>
+                <th>Costo MXN</th>
                 <th>Impuestos</th>
                 <th>Costo c/imp</th>
+                ${usdTh}
                 <th>MUB %</th>
-                <th>Venta</th>
-                <th>Utilidad</th>
+                <th>Venta ${moneda}</th>
+                <th>Utilidad ${moneda}</th>
             </tr></thead>
             <tbody>
                 ${rowsHtml}
@@ -2632,24 +2705,25 @@ function openMubPanel(data) {
                     <td>TOTAL</td>
                     <td>$${fmt(totalCostoSinImp)}</td>
                     <td id="mub-total-imp">$${fmt(totalImpuestos)}</td>
-                    <td id="mub-total-costobase">$${fmt(totalCostoBase)}</td>
+                    <td>$${fmt(totalCostoBaseMXN)}</td>
+                    ${hayTC ? `<td class="mub-usd-cell" id="mub-total-usd">${simbolo}${fmt(totalCostoBaseVenta)}</td>` : ''}
                     <td style="font-size:0.75rem;color:var(--green);font-weight:700;" id="mub-total-pct">${fmtShort(mubTotal)}%</td>
-                    <td class="venta-col" id="mub-total-venta">$${fmt(totalVenta)}</td>
-                    <td class="utilidad-col" id="mub-total-util">$${fmt(totalUtilidad)}</td>
+                    <td class="venta-col" id="mub-total-venta">${simbolo}${fmt(totalVenta)}</td>
+                    <td class="utilidad-col" id="mub-total-util">${simbolo}${fmt(totalUtilidad)}</td>
                 </tr>
             </tbody>
         </table>
         <div class="mub-resumen">
             <div class="mub-resumen-item costo">
-                <div class="resumen-value" id="mub-res-costo">$${fmt(totalCostoBase)}</div>
-                <div class="resumen-label">Costo c/impuestos</div>
+                <div class="resumen-value" id="mub-res-costo">${hayTC ? simbolo + fmt(totalCostoBaseVenta) : '$' + fmt(totalCostoBaseMXN)}</div>
+                <div class="resumen-label">Costo ${hayTC ? 'USD' : 'c/impuestos'}</div>
             </div>
             <div class="mub-resumen-item venta">
-                <div class="resumen-value" id="mub-res-venta">$${fmt(totalVenta)}</div>
-                <div class="resumen-label">Precio de venta</div>
+                <div class="resumen-value" id="mub-res-venta">${simbolo}${fmt(totalVenta)}</div>
+                <div class="resumen-label">Venta ${moneda}</div>
             </div>
             <div class="mub-resumen-item utilidad">
-                <div class="resumen-value" id="mub-res-util">$${fmt(totalUtilidad)}</div>
+                <div class="resumen-value" id="mub-res-util">${simbolo}${fmt(totalUtilidad)}</div>
                 <div class="resumen-label" id="mub-res-label">Utilidad (MUB ${fmtShort(mubTotal)}%)</div>
             </div>
         </div>
@@ -2657,25 +2731,26 @@ function openMubPanel(data) {
 
     // Actualizar solo valores calculados sin tocar los inputs
     function updateValues() {
-        let tCostoBase = 0, tVenta = 0, tCostoSinImp = 0;
+        let tCostoBaseVenta = 0, tVenta = 0, tCostoSinImp = 0, tCostoBaseMXN = 0;
         lineas.forEach((l, i) => {
-            const cb = costoBase(l);
+            const cbVenta = costoBaseVenta(l);
             if (l.editando === 'mub') {
                 const mub = Math.min(Math.max(l.mub, 0), 99.9);
                 l.mub = mub;
-                l.venta = cb / (1 - mub / 100);
+                l.venta = cbVenta / (1 - mub / 100);
             } else {
-                l.mub = l.venta > cb ? (1 - cb / l.venta) * 100 : 0;
+                l.mub = l.venta > cbVenta ? (1 - cbVenta / l.venta) * 100 : 0;
             }
-            const utilidad = l.venta - cb;
+            const utilidad = l.venta - cbVenta;
             tCostoSinImp += l.costo;
-            tCostoBase += cb;
+            tCostoBaseMXN += costoBaseMXN(l);
+            tCostoBaseVenta += cbVenta;
             tVenta += l.venta;
 
-            // Actualizar el campo que NO se está editando
             const mubInput = container.querySelector(`.mub-field[data-idx="${i}"]`);
             const ventaInput = container.querySelector(`.venta-field[data-idx="${i}"]`);
             const utilEl = document.getElementById(`mub-util-${i}`);
+            const usdEl = document.getElementById(`mub-usd-${i}`);
 
             if (l.editando === 'mub' && ventaInput && document.activeElement !== ventaInput) {
                 ventaInput.value = Math.round(l.venta * 100) / 100;
@@ -2688,34 +2763,32 @@ function openMubPanel(data) {
                 ventaInput.classList.toggle('active-input', l.editando === 'venta');
             }
 
-            if (utilEl) utilEl.textContent = '$' + fmt(utilidad);
+            if (utilEl) utilEl.textContent = simbolo + fmt(utilidad);
+            if (usdEl) usdEl.textContent = simbolo + fmt(cbVenta);
         });
 
-        const tUtil = tVenta - tCostoBase;
+        const tUtil = tVenta - tCostoBaseVenta;
         const tMub = tVenta > 0 ? (tUtil / tVenta) * 100 : 0;
-        const tImp = tCostoBase - tCostoSinImp;
+        const tImp = tCostoBaseMXN - tCostoSinImp;
 
         const el = (id) => document.getElementById(id);
         if (el('mub-total-imp')) el('mub-total-imp').textContent = '$' + fmt(tImp);
-        if (el('mub-total-costobase')) el('mub-total-costobase').textContent = '$' + fmt(tCostoBase);
+        if (el('mub-total-usd')) el('mub-total-usd').textContent = simbolo + fmt(tCostoBaseVenta);
         if (el('mub-total-pct')) el('mub-total-pct').textContent = fmtShort(tMub) + '%';
-        if (el('mub-total-venta')) el('mub-total-venta').textContent = '$' + fmt(tVenta);
-        if (el('mub-total-util')) el('mub-total-util').textContent = '$' + fmt(tUtil);
-        if (el('mub-res-costo')) el('mub-res-costo').textContent = '$' + fmt(tCostoBase);
-        if (el('mub-res-venta')) el('mub-res-venta').textContent = '$' + fmt(tVenta);
-        if (el('mub-res-util')) el('mub-res-util').textContent = '$' + fmt(tUtil);
+        if (el('mub-total-venta')) el('mub-total-venta').textContent = simbolo + fmt(tVenta);
+        if (el('mub-total-util')) el('mub-total-util').textContent = simbolo + fmt(tUtil);
+        if (el('mub-res-costo')) el('mub-res-costo').textContent = hayTC ? simbolo + fmt(tCostoBaseVenta) : '$' + fmt(tCostoBaseMXN);
+        if (el('mub-res-venta')) el('mub-res-venta').textContent = simbolo + fmt(tVenta);
+        if (el('mub-res-util')) el('mub-res-util').textContent = simbolo + fmt(tUtil);
         if (el('mub-res-label')) el('mub-res-label').textContent = `Utilidad (MUB ${fmtShort(tMub)}%)`;
     }
 
-    // Listeners: focus cambia modo, input actualiza valores
     container.querySelectorAll('.mub-input').forEach(input => {
         input.addEventListener('focus', () => {
             const idx = parseInt(input.dataset.idx);
-            const field = input.dataset.field;
-            lineas[idx].editando = field;
+            lineas[idx].editando = input.dataset.field;
             updateValues();
         });
-
         input.addEventListener('input', () => {
             const idx = parseInt(input.dataset.idx);
             const field = input.dataset.field;
@@ -2731,7 +2804,6 @@ function openMubPanel(data) {
         });
     });
 
-    // Cerrar panel
     document.getElementById('mub-close').addEventListener('click', () => {
         container.innerHTML = '';
     });
