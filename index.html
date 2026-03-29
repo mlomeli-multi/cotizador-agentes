@@ -767,11 +767,6 @@
             color: var(--gray-400);
             margin-left: 0.5rem;
         }
-        .autocomplete-item .ac-estado {
-            font-size: 0.75rem;
-            color: var(--green);
-            font-weight: 600;
-        }
         .autocomplete-item .ac-variants {
             display: block;
             font-size: 0.7rem;
@@ -2197,17 +2192,17 @@ ciudadInput.addEventListener('input', () => {
     for (const [base, data] of grupos) {
         // Extraer solo la parte de ciudad del base (sin |ESTADO)
         const baseCiudad = base.includes('|') ? base.split('|')[0] : base;
-        // Buscar en el nombre base (ciudad) Y en todas las variantes del proveedor
-        const allTexts = [baseCiudad, ...[...data.variantes].map(v => normalizarTexto(v))];
-        const found = allTexts.some(t => fuzzyMatch(t, query));
+        // SOLO buscar contra el nombre base de la ciudad, NO contra variantes completas
+        // Esto evita que "leon" matchee con "MONTERREY, NUEVO LEON"
+        const found = fuzzyMatch(baseCiudad, query);
         if (found) {
-            // Display: la variante más larga (más completa)
             const variantes = [...data.variantes];
-            const display = variantes.reduce((a, b) => a.length >= b.length ? a : b);
+            // Display: solo el nombre de la ciudad (capitalizado), sin estado
+            const displayCity = baseCiudad.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
             matches.push({
                 base,
                 baseCiudad,
-                display,
+                display: displayCity,
                 variantes,
                 airports: data.airports,
                 score: matchScore(baseCiudad, query),
@@ -2229,17 +2224,13 @@ ciudadInput.addEventListener('input', () => {
     acIndex = -1;
     acList.innerHTML = matches.slice(0, 20).map((m, i) => {
         const airportTags = [...m.airports].join(', ');
-        // Mostrar estado si se identificó
-        const estadoTag = m.base.includes('|') ? ` <span class="ac-estado">(${m.base.split('|')[1]})</span>` : '';
-        // Mostrar variantes si hay más de 1
-        const variantesStr = m.variantes.length > 1
-            ? `<span class="ac-variants">${m.variantes.map(v => escapeHtml(v)).join(' · ')}</span>`
-            : '';
-        // data-variantes guarda todas las variantes para la búsqueda
+        // Mostrar variantes originales del proveedor (con estado si lo traen)
+        const variantesStr = m.variantes.map(v => escapeHtml(v)).join(' · ');
+        // data-variantes guarda todas las variantes para la cotización
         const variantesData = encodeURIComponent(JSON.stringify(m.variantes));
         return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}" data-variantes="${variantesData}">
-            ${escapeHtml(m.display)}${estadoTag}<span class="ac-airport">${airportTags}</span>
-            ${variantesStr}
+            ${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span>
+            <span class="ac-variants">${variantesStr}</span>
         </div>`;
     }).join('');
     acList.classList.add('show');
