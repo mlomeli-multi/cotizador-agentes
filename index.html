@@ -591,18 +591,29 @@
         }
         .mub-table td:not(:first-child) { text-align: right; }
         .mub-table .mub-input {
-            width: 60px;
+            width: 70px;
             padding: 0.3rem 0.4rem;
             border: 1px solid var(--gray-200);
             border-radius: 6px;
             font-size: 0.78rem;
             text-align: right;
             background: var(--gray-50);
+            transition: all 0.15s;
         }
         .mub-table .mub-input:focus {
             outline: none;
             border-color: var(--blue);
             background: white;
+        }
+        .mub-table .mub-input.active-input {
+            background: white;
+            border-color: var(--blue);
+            color: var(--gray-800);
+        }
+        .mub-table .mub-input:not(.active-input) {
+            background: var(--gray-100);
+            color: var(--gray-400);
+            border-color: var(--gray-100);
         }
         .mub-table .total-row td {
             border-top: 2px solid var(--gray-300);
@@ -2543,34 +2554,60 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 
 // ===== CALCULADORA MUB (Margen de Utilidad Bruta) =====
 // Fórmula: Venta = Costo / (1 - MUB%)
+// Inversa: MUB% = (1 - Costo / Venta) * 100
 function openMubPanel(data) {
     const container = document.getElementById('mub-panel-container');
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const fmtShort = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     // Construir líneas: flete + cada concepto
+    // editando: 'mub' o 'venta' — cuál fue el último que editó el usuario
     const lineas = [
-        { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, mub: 15 },
+        { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, mub: 15, venta: 0, editando: 'mub' },
     ];
     for (const c of data.conceptos) {
         if (c.monto > 0) {
-            lineas.push({ nombre: c.nombre, costo: c.monto, mub: 15 });
+            lineas.push({ nombre: c.nombre, costo: c.monto, mub: 15, venta: 0, editando: 'mub' });
         }
+    }
+    // Calcular ventas iniciales desde MUB
+    lineas.forEach(l => { l.venta = l.costo / (1 - l.mub / 100); });
+
+    // focusInfo: qué input re-enfocar después del render
+    let focusInfo = null;
+
+    function recalc() {
+        lineas.forEach(l => {
+            if (l.editando === 'mub') {
+                const mub = Math.min(Math.max(l.mub, 0), 99.9);
+                l.mub = mub;
+                l.venta = l.costo / (1 - mub / 100);
+            } else {
+                // editando venta → calcular MUB inverso
+                if (l.venta <= l.costo) {
+                    l.mub = 0;
+                } else {
+                    l.mub = (1 - l.costo / l.venta) * 100;
+                }
+            }
+        });
     }
 
     function render() {
+        recalc();
         let totalCosto = 0;
         let totalVenta = 0;
 
         const rowsHtml = lineas.map((l, i) => {
-            const venta = l.mub >= 100 ? 0 : l.costo / (1 - l.mub / 100);
-            const utilidad = venta - l.costo;
+            const utilidad = l.venta - l.costo;
             totalCosto += l.costo;
-            totalVenta += venta;
+            totalVenta += l.venta;
+            const mubActive = l.editando === 'mub';
             return `<tr>
                 <td>${escapeHtml(l.nombre)}</td>
                 <td>$${fmt(l.costo)}</td>
-                <td><input type="number" class="mub-input" data-idx="${i}" value="${l.mub}" min="0" max="99" step="1">%</td>
-                <td class="venta-col">$${fmt(venta)}</td>
+                <td><input type="number" class="mub-input mub-field ${mubActive ? 'active-input' : ''}" data-idx="${i}" data-field="mub" value="${fmtShort(l.mub).replace(/,/g, '')}" min="0" max="99" step="0.1" ${!mubActive ? 'tabindex="-1"' : ''}>%</td>
+                <td>$<input type="number" class="mub-input venta-field ${!mubActive ? 'active-input' : ''}" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1" ${mubActive ? 'tabindex="-1"' : ''}></td>
                 <td class="utilidad-col">$${fmt(utilidad)}</td>
             </tr>`;
         }).join('');
@@ -2584,6 +2621,7 @@ function openMubPanel(data) {
                 <h3>&#x1F4B0; Calculadora de Venta — ${escapeHtml(data.proveedor)}</h3>
                 <button class="mub-panel-close" id="mub-close">&#x2716;</button>
             </div>
+            <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">Edita el MUB% o el precio de venta en cada línea. El otro se calcula automáticamente.</p>
             <table class="mub-table">
                 <thead><tr>
                     <th>Concepto</th>
@@ -2597,7 +2635,7 @@ function openMubPanel(data) {
                     <tr class="total-row">
                         <td>TOTAL</td>
                         <td>$${fmt(totalCosto)}</td>
-                        <td style="font-size:0.75rem;color:var(--green);font-weight:700;">${fmt(mubTotal)}%</td>
+                        <td style="font-size:0.75rem;color:var(--green);font-weight:700;">${fmtShort(mubTotal)}%</td>
                         <td class="venta-col">$${fmt(totalVenta)}</td>
                         <td class="utilidad-col">$${fmt(totalUtilidad)}</td>
                     </tr>
@@ -2614,28 +2652,52 @@ function openMubPanel(data) {
                 </div>
                 <div class="mub-resumen-item utilidad">
                     <div class="resumen-value">$${fmt(totalUtilidad)}</div>
-                    <div class="resumen-label">Utilidad (MUB ${fmt(mubTotal)}%)</div>
+                    <div class="resumen-label">Utilidad (MUB ${fmtShort(mubTotal)}%)</div>
                 </div>
             </div>
         </div>`;
 
-        // Listeners para inputs MUB
+        // Listeners para inputs
         container.querySelectorAll('.mub-input').forEach(input => {
-            input.addEventListener('input', () => {
+            // Al hacer focus, marcar este campo como el activo
+            input.addEventListener('focus', () => {
                 const idx = parseInt(input.dataset.idx);
-                let val = parseFloat(input.value) || 0;
-                if (val < 0) val = 0;
-                if (val >= 100) val = 99;
-                lineas[idx].mub = val;
-                render();
-                // Re-focus y posicionar cursor al final del input que cambió
-                const newInput = container.querySelector(`.mub-input[data-idx="${idx}"]`);
-                if (newInput) {
-                    newInput.focus();
-                    newInput.setSelectionRange(newInput.value.length, newInput.value.length);
+                const field = input.dataset.field;
+                if (lineas[idx].editando !== field) {
+                    lineas[idx].editando = field;
+                    focusInfo = { idx, field };
+                    render();
                 }
             });
+
+            input.addEventListener('input', () => {
+                const idx = parseInt(input.dataset.idx);
+                const field = input.dataset.field;
+                const val = parseFloat(input.value) || 0;
+
+                if (field === 'mub') {
+                    lineas[idx].mub = val;
+                    lineas[idx].editando = 'mub';
+                } else {
+                    lineas[idx].venta = val;
+                    lineas[idx].editando = 'venta';
+                }
+
+                focusInfo = { idx, field };
+                render();
+            });
         });
+
+        // Re-focus después del render
+        if (focusInfo) {
+            const sel = `.mub-input[data-idx="${focusInfo.idx}"][data-field="${focusInfo.field}"]`;
+            const el = container.querySelector(sel);
+            if (el) {
+                el.focus();
+                el.setSelectionRange(el.value.length, el.value.length);
+            }
+            focusInfo = null;
+        }
 
         // Cerrar panel
         document.getElementById('mub-close').addEventListener('click', () => {
@@ -2644,7 +2706,6 @@ function openMubPanel(data) {
     }
 
     render();
-    // Scroll al panel
     setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
 }
 
