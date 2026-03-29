@@ -2561,7 +2561,6 @@ function openMubPanel(data) {
     const fmtShort = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
 
     // Construir líneas: flete + cada concepto
-    // editando: 'mub' o 'venta' — cuál fue el último que editó el usuario
     const lineas = [
         { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, mub: 15, venta: 0, editando: 'mub' },
     ];
@@ -2573,139 +2572,144 @@ function openMubPanel(data) {
     // Calcular ventas iniciales desde MUB
     lineas.forEach(l => { l.venta = l.costo / (1 - l.mub / 100); });
 
-    // focusInfo: qué input re-enfocar después del render
-    let focusInfo = null;
+    // Render inicial del HTML (solo una vez)
+    let totalCosto = 0;
+    let totalVenta = 0;
+    const rowsHtml = lineas.map((l, i) => {
+        const utilidad = l.venta - l.costo;
+        totalCosto += l.costo;
+        totalVenta += l.venta;
+        return `<tr>
+            <td>${escapeHtml(l.nombre)}</td>
+            <td>$${fmt(l.costo)}</td>
+            <td><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${Math.round(l.mub * 10) / 10}" min="0" max="99" step="0.1">%</td>
+            <td>$<input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1"></td>
+            <td class="utilidad-col" id="mub-util-${i}">$${fmt(utilidad)}</td>
+        </tr>`;
+    }).join('');
 
-    function recalc() {
-        lineas.forEach(l => {
+    const totalUtilidad = totalVenta - totalCosto;
+    const mubTotal = totalVenta > 0 ? ((totalUtilidad / totalVenta) * 100) : 0;
+
+    container.innerHTML = `
+    <div class="mub-panel">
+        <div class="mub-panel-header">
+            <h3>&#x1F4B0; Calculadora de Venta — ${escapeHtml(data.proveedor)}</h3>
+            <button class="mub-panel-close" id="mub-close">&#x2716;</button>
+        </div>
+        <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">Edita el MUB% o el precio de venta en cada línea. El otro se calcula automáticamente.</p>
+        <table class="mub-table">
+            <thead><tr>
+                <th>Concepto</th>
+                <th>Costo</th>
+                <th>MUB %</th>
+                <th>Venta</th>
+                <th>Utilidad</th>
+            </tr></thead>
+            <tbody>
+                ${rowsHtml}
+                <tr class="total-row">
+                    <td>TOTAL</td>
+                    <td>$${fmt(totalCosto)}</td>
+                    <td style="font-size:0.75rem;color:var(--green);font-weight:700;" id="mub-total-pct">${fmtShort(mubTotal)}%</td>
+                    <td class="venta-col" id="mub-total-venta">$${fmt(totalVenta)}</td>
+                    <td class="utilidad-col" id="mub-total-util">$${fmt(totalUtilidad)}</td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="mub-resumen">
+            <div class="mub-resumen-item costo">
+                <div class="resumen-value">$${fmt(totalCosto)}</div>
+                <div class="resumen-label">Costo total</div>
+            </div>
+            <div class="mub-resumen-item venta">
+                <div class="resumen-value" id="mub-res-venta">$${fmt(totalVenta)}</div>
+                <div class="resumen-label">Precio de venta</div>
+            </div>
+            <div class="mub-resumen-item utilidad">
+                <div class="resumen-value" id="mub-res-util">$${fmt(totalUtilidad)}</div>
+                <div class="resumen-label" id="mub-res-label">Utilidad (MUB ${fmtShort(mubTotal)}%)</div>
+            </div>
+        </div>
+    </div>`;
+
+    // Actualizar solo valores calculados sin tocar los inputs
+    function updateValues() {
+        let tCosto = 0, tVenta = 0;
+        lineas.forEach((l, i) => {
             if (l.editando === 'mub') {
                 const mub = Math.min(Math.max(l.mub, 0), 99.9);
                 l.mub = mub;
                 l.venta = l.costo / (1 - mub / 100);
             } else {
-                // editando venta → calcular MUB inverso
-                if (l.venta <= l.costo) {
-                    l.mub = 0;
-                } else {
-                    l.mub = (1 - l.costo / l.venta) * 100;
-                }
+                l.mub = l.venta > l.costo ? (1 - l.costo / l.venta) * 100 : 0;
             }
-        });
-    }
-
-    function render() {
-        recalc();
-        let totalCosto = 0;
-        let totalVenta = 0;
-
-        const rowsHtml = lineas.map((l, i) => {
             const utilidad = l.venta - l.costo;
-            totalCosto += l.costo;
-            totalVenta += l.venta;
-            const mubActive = l.editando === 'mub';
-            return `<tr>
-                <td>${escapeHtml(l.nombre)}</td>
-                <td>$${fmt(l.costo)}</td>
-                <td><input type="number" class="mub-input mub-field ${mubActive ? 'active-input' : ''}" data-idx="${i}" data-field="mub" value="${fmtShort(l.mub).replace(/,/g, '')}" min="0" max="99" step="0.1" ${!mubActive ? 'tabindex="-1"' : ''}>%</td>
-                <td>$<input type="number" class="mub-input venta-field ${!mubActive ? 'active-input' : ''}" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1" ${mubActive ? 'tabindex="-1"' : ''}></td>
-                <td class="utilidad-col">$${fmt(utilidad)}</td>
-            </tr>`;
-        }).join('');
+            tCosto += l.costo;
+            tVenta += l.venta;
 
-        const totalUtilidad = totalVenta - totalCosto;
-        const mubTotal = totalVenta > 0 ? ((totalUtilidad / totalVenta) * 100) : 0;
+            // Actualizar el campo que NO se está editando (sin tocar el que tiene focus)
+            const mubInput = container.querySelector(`.mub-field[data-idx="${i}"]`);
+            const ventaInput = container.querySelector(`.venta-field[data-idx="${i}"]`);
+            const utilEl = document.getElementById(`mub-util-${i}`);
 
-        container.innerHTML = `
-        <div class="mub-panel">
-            <div class="mub-panel-header">
-                <h3>&#x1F4B0; Calculadora de Venta — ${escapeHtml(data.proveedor)}</h3>
-                <button class="mub-panel-close" id="mub-close">&#x2716;</button>
-            </div>
-            <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">Edita el MUB% o el precio de venta en cada línea. El otro se calcula automáticamente.</p>
-            <table class="mub-table">
-                <thead><tr>
-                    <th>Concepto</th>
-                    <th>Costo</th>
-                    <th>MUB %</th>
-                    <th>Venta</th>
-                    <th>Utilidad</th>
-                </tr></thead>
-                <tbody>
-                    ${rowsHtml}
-                    <tr class="total-row">
-                        <td>TOTAL</td>
-                        <td>$${fmt(totalCosto)}</td>
-                        <td style="font-size:0.75rem;color:var(--green);font-weight:700;">${fmtShort(mubTotal)}%</td>
-                        <td class="venta-col">$${fmt(totalVenta)}</td>
-                        <td class="utilidad-col">$${fmt(totalUtilidad)}</td>
-                    </tr>
-                </tbody>
-            </table>
-            <div class="mub-resumen">
-                <div class="mub-resumen-item costo">
-                    <div class="resumen-value">$${fmt(totalCosto)}</div>
-                    <div class="resumen-label">Costo total</div>
-                </div>
-                <div class="mub-resumen-item venta">
-                    <div class="resumen-value">$${fmt(totalVenta)}</div>
-                    <div class="resumen-label">Precio de venta</div>
-                </div>
-                <div class="mub-resumen-item utilidad">
-                    <div class="resumen-value">$${fmt(totalUtilidad)}</div>
-                    <div class="resumen-label">Utilidad (MUB ${fmtShort(mubTotal)}%)</div>
-                </div>
-            </div>
-        </div>`;
-
-        // Listeners para inputs
-        container.querySelectorAll('.mub-input').forEach(input => {
-            // Al hacer focus, marcar este campo como el activo
-            input.addEventListener('focus', () => {
-                const idx = parseInt(input.dataset.idx);
-                const field = input.dataset.field;
-                if (lineas[idx].editando !== field) {
-                    lineas[idx].editando = field;
-                    focusInfo = { idx, field };
-                    render();
-                }
-            });
-
-            input.addEventListener('input', () => {
-                const idx = parseInt(input.dataset.idx);
-                const field = input.dataset.field;
-                const val = parseFloat(input.value) || 0;
-
-                if (field === 'mub') {
-                    lineas[idx].mub = val;
-                    lineas[idx].editando = 'mub';
-                } else {
-                    lineas[idx].venta = val;
-                    lineas[idx].editando = 'venta';
-                }
-
-                focusInfo = { idx, field };
-                render();
-            });
-        });
-
-        // Re-focus después del render
-        if (focusInfo) {
-            const sel = `.mub-input[data-idx="${focusInfo.idx}"][data-field="${focusInfo.field}"]`;
-            const el = container.querySelector(sel);
-            if (el) {
-                el.focus();
-                el.setSelectionRange(el.value.length, el.value.length);
+            if (l.editando === 'mub' && ventaInput && document.activeElement !== ventaInput) {
+                ventaInput.value = Math.round(l.venta * 100) / 100;
+            } else if (l.editando === 'venta' && mubInput && document.activeElement !== mubInput) {
+                mubInput.value = Math.round(l.mub * 10) / 10;
             }
-            focusInfo = null;
-        }
 
-        // Cerrar panel
-        document.getElementById('mub-close').addEventListener('click', () => {
-            container.innerHTML = '';
+            // Actualizar estilos activo/inactivo
+            if (mubInput && ventaInput) {
+                mubInput.classList.toggle('active-input', l.editando === 'mub');
+                ventaInput.classList.toggle('active-input', l.editando === 'venta');
+            }
+
+            if (utilEl) utilEl.textContent = '$' + fmt(utilidad);
         });
+
+        const tUtil = tVenta - tCosto;
+        const tMub = tVenta > 0 ? (tUtil / tVenta) * 100 : 0;
+
+        // Actualizar totales y resumen
+        const el = (id) => document.getElementById(id);
+        if (el('mub-total-pct')) el('mub-total-pct').textContent = fmtShort(tMub) + '%';
+        if (el('mub-total-venta')) el('mub-total-venta').textContent = '$' + fmt(tVenta);
+        if (el('mub-total-util')) el('mub-total-util').textContent = '$' + fmt(tUtil);
+        if (el('mub-res-venta')) el('mub-res-venta').textContent = '$' + fmt(tVenta);
+        if (el('mub-res-util')) el('mub-res-util').textContent = '$' + fmt(tUtil);
+        if (el('mub-res-label')) el('mub-res-label').textContent = `Utilidad (MUB ${fmtShort(tMub)}%)`;
     }
 
-    render();
+    // Listeners: focus cambia modo, input actualiza valores
+    container.querySelectorAll('.mub-input').forEach(input => {
+        input.addEventListener('focus', () => {
+            const idx = parseInt(input.dataset.idx);
+            const field = input.dataset.field;
+            lineas[idx].editando = field;
+            updateValues();
+        });
+
+        input.addEventListener('input', () => {
+            const idx = parseInt(input.dataset.idx);
+            const field = input.dataset.field;
+            const val = parseFloat(input.value) || 0;
+            if (field === 'mub') {
+                lineas[idx].mub = val;
+                lineas[idx].editando = 'mub';
+            } else {
+                lineas[idx].venta = val;
+                lineas[idx].editando = 'venta';
+            }
+            updateValues();
+        });
+    });
+
+    // Cerrar panel
+    document.getElementById('mub-close').addEventListener('click', () => {
+        container.innerHTML = '';
+    });
+
     setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
 }
 
