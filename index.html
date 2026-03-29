@@ -546,6 +546,7 @@
             border: 1px solid var(--blue);
             border-radius: var(--radius);
             padding: 1rem;
+            overflow-x: auto;
         }
         .mub-panel-header {
             display: flex;
@@ -573,6 +574,7 @@
             width: 100%;
             border-collapse: collapse;
             font-size: 0.78rem;
+            min-width: 750px;
         }
         .mub-table th {
             text-align: left;
@@ -583,19 +585,21 @@
             text-transform: uppercase;
             letter-spacing: 0.03em;
             border-bottom: 1px solid var(--gray-200);
+            white-space: nowrap;
         }
         .mub-table th:not(:first-child) { text-align: right; }
         .mub-table td {
             padding: 0.35rem 0.5rem;
             border-bottom: 1px solid var(--gray-100);
+            white-space: nowrap;
         }
         .mub-table td:not(:first-child) { text-align: right; }
         .mub-table .mub-input {
-            width: 70px;
-            padding: 0.3rem 0.4rem;
+            width: 80px;
+            padding: 0.35rem 0.5rem;
             border: 1px solid var(--gray-200);
             border-radius: 6px;
-            font-size: 0.78rem;
+            font-size: 0.8rem;
             text-align: right;
             background: var(--gray-50);
             transition: all 0.15s;
@@ -2661,8 +2665,8 @@ function openMubPanel(data) {
             ${impCol}
             ${costoImpCell}
             ${usdCell}
-            <td><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${Math.round(l.mub * 10) / 10}" min="0" max="99" step="0.1">%</td>
-            <td>${simbolo}<input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1"></td>
+            <td style="white-space:nowrap;"><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${Math.round(l.mub * 10) / 10}" min="0" max="99" step="0.1"> %</td>
+            <td style="white-space:nowrap;">${simbolo} <input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1"></td>
             <td class="utilidad-col" id="mub-util-${i}">${simbolo}${fmt(utilidad)}</td>
         </tr>`;
     }).join('');
