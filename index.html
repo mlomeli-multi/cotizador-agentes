@@ -340,6 +340,78 @@
             color: var(--red);
         }
 
+        /* ===== CARGA MULTI-PALLET ===== */
+        .carga-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 1rem;
+            margin-bottom: 0.5rem;
+        }
+        .carga-header .form-section-title { margin: 0; }
+        .carga-global {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            margin-bottom: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .carga-global .form-group { margin-bottom: 0; }
+        .pallet-lines { display: flex; flex-direction: column; gap: 0.5rem; }
+        .pallet-line {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.65rem;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+        }
+        .pallet-line .pl-num {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gray-400);
+            min-width: 18px;
+        }
+        .pallet-line .form-group {
+            margin-bottom: 0;
+            flex: 1;
+            min-width: 0;
+        }
+        .pallet-line label {
+            font-size: 0.6rem;
+            margin-bottom: 0.15rem;
+        }
+        .pallet-line input {
+            padding: 0.35rem 0.5rem;
+            font-size: 0.8rem;
+        }
+        .pallet-line .btn-remove-line {
+            background: none;
+            border: none;
+            color: var(--gray-300);
+            font-size: 1rem;
+            cursor: pointer;
+            padding: 0.2rem;
+            line-height: 1;
+        }
+        .pallet-line .btn-remove-line:hover { color: var(--red); }
+        .btn-add-pallet {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            background: none;
+            border: 1px dashed var(--gray-300);
+            border-radius: 8px;
+            padding: 0.4rem 0.75rem;
+            color: var(--blue);
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 0.25rem;
+        }
+        .btn-add-pallet:hover { border-color: var(--blue); background: #f0f7ff; }
+
         /* ===== COTIZAR ACTIONS ===== */
         .cotizar-actions {
             margin-top: 0.75rem;
@@ -1082,39 +1154,27 @@
                         </div>
                     </div>
 
-                    <div class="form-section-title" style="margin-top:1rem;">&#x1F4E6; Carga</div>
-                    <div class="form-grid" style="grid-template-columns: repeat(3, 1fr);">
-                        <div class="form-group">
-                            <label>Pallets</label>
-                            <input type="number" id="pallets" min="1" placeholder="2">
-                        </div>
-                        <div class="form-group">
-                            <label>Peso total (kg)</label>
-                            <input type="number" id="peso" min="1" placeholder="1500">
-                        </div>
-                        <div class="form-group">
-                            <label>¿Estibable?</label>
-                            <div class="toggle-group">
-                                <label class="toggle">
-                                    <input type="checkbox" id="estibable">
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="toggle-label" id="estibable-label">No</span>
+                    <div class="carga-header">
+                        <div class="form-section-title">&#x1F4E6; Carga</div>
+                        <div class="carga-global" style="gap:1rem;">
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>Peso total (kg)</label>
+                                <input type="number" id="peso" min="1" placeholder="1500" style="width:120px;">
+                            </div>
+                            <div class="form-group" style="margin-bottom:0;">
+                                <label>¿Estibable?</label>
+                                <div class="toggle-group">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="estibable">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label" id="estibable-label">No</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="form-group">
-                            <label>Largo (cm)</label>
-                            <input type="number" id="largo" min="1" placeholder="120">
-                        </div>
-                        <div class="form-group">
-                            <label>Ancho (cm)</label>
-                            <input type="number" id="ancho" min="1" placeholder="100">
-                        </div>
-                        <div class="form-group">
-                            <label>Alto pallet (cm)</label>
-                            <input type="number" id="alto" min="1" placeholder="150">
-                        </div>
                     </div>
+                    <div class="pallet-lines" id="pallet-lines"></div>
+                    <button class="btn-add-pallet" id="btn-add-pallet" type="button">+ Agregar pallet</button>
 
                     <!-- Resultado unidad (se muestra automáticamente) -->
                     <div class="unit-result" id="unit-result">
@@ -1548,114 +1608,178 @@ const UNIDADES = [
 ];
 
 // ===== MOTOR DE CÁLCULO DE UNIDAD =====
-function calcularUnidad(pallets, pesoTotal, largo, ancho, altoPallet, estibable) {
-    if (!pallets || !pesoTotal || !largo || !ancho || !altoPallet) {
+// ===== MULTI-PALLET SYSTEM =====
+let palletLineas = [];
+let palletLineCounter = 0;
+
+function addPalletLine(qty, largo, ancho, alto) {
+    palletLineCounter++;
+    const id = palletLineCounter;
+    palletLineas.push({ id, qty: qty || '', largo: largo || '', ancho: ancho || '', alto: alto || '' });
+    renderPalletLines();
+    autoCalcUnidad();
+}
+
+function removePalletLine(id) {
+    palletLineas = palletLineas.filter(l => l.id !== id);
+    renderPalletLines();
+    autoCalcUnidad();
+}
+
+function renderPalletLines() {
+    const container = document.getElementById('pallet-lines');
+    container.innerHTML = palletLineas.map((l, idx) => `
+        <div class="pallet-line" data-line-id="${l.id}">
+            <span class="pl-num">#${idx + 1}</span>
+            <div class="form-group">
+                <label>Pallets</label>
+                <input type="number" class="pl-qty" data-id="${l.id}" min="1" placeholder="2" value="${l.qty}">
+            </div>
+            <div class="form-group">
+                <label>Largo (cm)</label>
+                <input type="number" class="pl-largo" data-id="${l.id}" min="1" placeholder="120" value="${l.largo}">
+            </div>
+            <div class="form-group">
+                <label>Ancho (cm)</label>
+                <input type="number" class="pl-ancho" data-id="${l.id}" min="1" placeholder="100" value="${l.ancho}">
+            </div>
+            <div class="form-group">
+                <label>Alto (cm)</label>
+                <input type="number" class="pl-alto" data-id="${l.id}" min="1" placeholder="150" value="${l.alto}">
+            </div>
+            ${palletLineas.length > 1 ? `<button class="btn-remove-line" data-id="${l.id}" title="Eliminar">&#x2715;</button>` : '<span style="width:22px;"></span>'}
+        </div>
+    `).join('');
+
+    // Event listeners
+    container.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => {
+            const id = parseInt(inp.dataset.id);
+            const linea = palletLineas.find(l => l.id === id);
+            if (!linea) return;
+            if (inp.classList.contains('pl-qty')) linea.qty = inp.value;
+            if (inp.classList.contains('pl-largo')) linea.largo = inp.value;
+            if (inp.classList.contains('pl-ancho')) linea.ancho = inp.value;
+            if (inp.classList.contains('pl-alto')) linea.alto = inp.value;
+            autoCalcUnidad();
+        });
+    });
+    container.querySelectorAll('.btn-remove-line').forEach(btn => {
+        btn.addEventListener('click', () => removePalletLine(parseInt(btn.dataset.id)));
+    });
+}
+
+function getPalletLines() {
+    return palletLineas.map(l => ({
+        qty: parseInt(l.qty) || 0,
+        largo: parseFloat(l.largo) || 0,
+        ancho: parseFloat(l.ancho) || 0,
+        alto: parseFloat(l.alto) || 0
+    })).filter(l => l.qty > 0 && l.largo > 0 && l.ancho > 0 && l.alto > 0);
+}
+
+// Calcular mejor capacidad de UN tipo de pallet en la unidad (con rotación + combinación de filas)
+function capacidadPalletEnUnidad(largo, ancho, alto, unidad, estibable) {
+    if (alto > unidad.alto) return 0;
+
+    const orientaciones = [
+        { l: largo, a: ancho },
+        { l: ancho, a: largo }
+    ];
+    const oriValidas = orientaciones.filter(o => o.l <= unidad.largo && o.a <= unidad.ancho);
+    if (oriValidas.length === 0) return 0;
+
+    let pisos = 1;
+    if (estibable) {
+        pisos = Math.floor(unidad.alto / alto);
+        if (pisos < 1) pisos = 1;
+    }
+
+    let mejorPorPiso = 0;
+    for (const oriA of oriValidas) {
+        const filasA_max = Math.floor(unidad.largo / oriA.l);
+        const porFilaA = Math.floor(unidad.ancho / oriA.a);
+        if (porFilaA === 0) continue;
+        for (let filasA = filasA_max; filasA >= 0; filasA--) {
+            const palletsA = filasA * porFilaA;
+            const largoSobrante = unidad.largo - filasA * oriA.l;
+            let palletsB = 0;
+            for (const oriB of oriValidas) {
+                const filasB = Math.floor(largoSobrante / oriB.l);
+                const porFilaB = Math.floor(unidad.ancho / oriB.a);
+                palletsB = Math.max(palletsB, filasB * porFilaB);
+            }
+            mejorPorPiso = Math.max(mejorPorPiso, palletsA + palletsB);
+        }
+    }
+    return mejorPorPiso * pisos;
+}
+
+function calcularUnidadMulti(lineas, pesoTotal, estibable) {
+    if (lineas.length === 0 || !pesoTotal) {
         return { error: 'Completa todos los campos de carga' };
     }
-    if (pallets < 1 || pesoTotal < 1) {
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    if (totalPallets < 1 || pesoTotal < 1) {
         return { error: 'Los valores deben ser mayores a 0' };
     }
 
-    // Orientaciones posibles del pallet (largo x ancho, rotado no cambia alto)
-    const orientaciones = [
-        { l: largo, a: ancho, label: 'normal' },
-        { l: ancho, a: largo, label: 'rotado' }
-    ];
-
     for (const unidad of UNIDADES) {
         if (pesoTotal > unidad.payload) continue;
-        if (altoPallet > unidad.alto) continue;
 
-        // Verificar que al menos una orientación cabe físicamente
-        const oriValidas = orientaciones.filter(o => o.l <= unidad.largo && o.a <= unidad.ancho);
-        if (oriValidas.length === 0) continue;
+        // Para cada tipo de pallet, calcular capacidad individual
+        let cabenTodos = true;
+        let detalles = [];
+        let capacidadTotalMin = Infinity;
 
-        // Pisos (niveles de estiba)
-        let pisos = 1;
-        if (estibable) {
-            pisos = Math.floor(unidad.alto / altoPallet);
-            if (pisos < 1) pisos = 1;
-        }
-
-        // Estrategia: probar filas con orientación A, luego llenar sobrante con orientación B
-        let mejorPorPiso = 0;
-        let mejorDetalle = '';
-
-        for (const oriA of oriValidas) {
-            // Cuántas filas de orientación A caben a lo largo
-            const filasA_max = Math.floor(unidad.largo / oriA.l);
-            const porFilaA = Math.floor(unidad.ancho / oriA.a);
-            if (porFilaA === 0) continue;
-
-            // Probar de 0 a filasA_max filas con orientación A
-            for (let filasA = filasA_max; filasA >= 0; filasA--) {
-                const palletsA = filasA * porFilaA;
-                const largoUsadoA = filasA * oriA.l;
-                const largoSobrante = unidad.largo - largoUsadoA;
-
-                // En el sobrante, probar con la otra orientación
-                let palletsB = 0;
-                let labelB = '';
-                for (const oriB of oriValidas) {
-                    const filasB = Math.floor(largoSobrante / oriB.l);
-                    const porFilaB = Math.floor(unidad.ancho / oriB.a);
-                    const totalB = filasB * porFilaB;
-                    if (totalB > palletsB) {
-                        palletsB = totalB;
-                        labelB = oriB.label;
-                    }
-                }
-
-                const totalPiso = palletsA + palletsB;
-                if (totalPiso > mejorPorPiso) {
-                    mejorPorPiso = totalPiso;
-                    if (palletsA > 0 && palletsB > 0) {
-                        mejorDetalle = `${palletsA} ${oriA.label === 'normal' ? '→' : '↻'} + ${palletsB} ${labelB === 'normal' ? '→' : '↻'}`;
-                    } else {
-                        const ori = palletsA > 0 ? oriA.label : labelB;
-                        mejorDetalle = ori === 'rotado' ? 'rotados ↻' : 'normales →';
-                    }
-                }
+        for (const l of lineas) {
+            const cap = capacidadPalletEnUnidad(l.largo, l.ancho, l.alto, unidad, estibable);
+            if (cap < l.qty) {
+                cabenTodos = false;
+                break;
             }
+            detalles.push(`${l.qty}×(${l.largo}×${l.ancho}×${l.alto})`);
         }
 
-        if (mejorPorPiso === 0) continue;
+        // Verificación adicional: la suma total no debe exceder la capacidad del más restrictivo
+        // Usamos heurística conservadora: si cada tipo cabe individualmente y hay espacio mixto
+        if (!cabenTodos) continue;
 
-        const capacidadTotal = mejorPorPiso * pisos;
-
-        if (capacidadTotal >= pallets) {
-            const detalleEstiba = pisos > 1 ? ` × ${pisos} pisos` : '';
-            return {
-                unidad: unidad.nombre,
-                detalle: `Capacidad: ${capacidadTotal} pallets (${mejorPorPiso}/piso [${mejorDetalle}]${detalleEstiba}). Payload máx: ${unidad.payload.toLocaleString()} kg.`
-            };
+        // Para múltiples tipos, verificar que la suma total cabe
+        // Heurística: calcular con el pallet más grande como referencia
+        if (lineas.length > 1) {
+            const maxAlto = Math.max(...lineas.map(l => l.alto));
+            const maxLargo = Math.max(...lineas.map(l => l.largo));
+            const maxAncho = Math.max(...lineas.map(l => l.ancho));
+            const capConservadora = capacidadPalletEnUnidad(maxLargo, maxAncho, maxAlto, unidad, estibable);
+            if (capConservadora < totalPallets) continue;
         }
+
+        return {
+            unidad: unidad.nombre,
+            detalle: `${totalPallets} pallets (${detalles.join(' + ')}). Payload máx: ${unidad.payload.toLocaleString()} kg.`
+        };
     }
 
     return { error: 'La carga no cabe en ninguna unidad disponible. Considera dividir el envío.' };
 }
 
-// ===== BOTÓN CALCULAR UNIDAD =====
 // ===== AUTO-CÁLCULO DE UNIDAD =====
 function autoCalcUnidad() {
-    const pallets = parseInt(document.getElementById('pallets').value);
     const peso = parseFloat(document.getElementById('peso').value);
-    const largo = parseFloat(document.getElementById('largo').value);
-    const ancho = parseFloat(document.getElementById('ancho').value);
-    const alto = parseFloat(document.getElementById('alto').value);
     const estibable = document.getElementById('estibable').checked;
+    const lineas = getPalletLines();
 
     const el = document.getElementById('unit-result');
     const nameEl = document.getElementById('unit-name');
     const detailEl = document.getElementById('unit-detail');
 
-    // Solo calcular si todos los campos tienen valor
-    if (!pallets || !peso || !largo || !ancho || !alto) {
+    if (!peso || lineas.length === 0) {
         el.classList.remove('show');
         return;
     }
 
-    const result = calcularUnidad(pallets, peso, largo, ancho, alto, estibable);
+    const result = calcularUnidadMulti(lineas, peso, estibable);
     el.classList.add('show');
 
     if (result.error) {
@@ -1670,11 +1794,11 @@ function autoCalcUnidad() {
     }
 }
 
-// Escuchar cambios en todos los campos de carga
-['pallets', 'peso', 'largo', 'ancho', 'alto'].forEach(id => {
-    document.getElementById(id).addEventListener('input', autoCalcUnidad);
-});
+// Init: una línea por defecto + listeners
+document.getElementById('btn-add-pallet').addEventListener('click', () => addPalletLine());
+document.getElementById('peso').addEventListener('input', autoCalcUnidad);
 document.getElementById('estibable').addEventListener('change', autoCalcUnidad);
+addPalletLine(); // línea inicial
 
 // ===== UPLOAD ZONE =====
 const uploadZone = document.getElementById('upload-zone');
@@ -3075,10 +3199,8 @@ acList.addEventListener('click', (e) => {
     }
 });
 
-// Campos de carga: solo recalcular stats (NO re-geocodear)
-['pallets', 'peso', 'largo', 'ancho', 'alto'].forEach(id => {
-    document.getElementById(id).addEventListener('input', updateRouteStats);
-});
+// Campos de carga: peso y estibable ya tienen listeners en autoCalcUnidad
+document.getElementById('peso').addEventListener('input', updateRouteStats);
 document.getElementById('estibable').addEventListener('change', updateRouteStats);
 
 // ===== ADMIN MODE =====
