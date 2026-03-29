@@ -2310,31 +2310,35 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         return;
     }
 
-    // Buscar entre proveedores usando variantes agrupadas
+    // Buscar entre proveedores usando normalización de ciudades
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
-    // Obtener variantes guardadas del autocomplete (todas las formas de escribir la ciudad)
+    // Obtener variantes guardadas del autocomplete (nombres exactos del proveedor)
     const variantesRaw = ciudadInput.dataset.variantes || '';
-    let variantes = [normalizarTexto(ciudad)];
+    let variantesOriginales = [];
     try {
         const parsed = JSON.parse(decodeURIComponent(variantesRaw));
         if (Array.isArray(parsed) && parsed.length > 0) {
-            variantes = parsed.map(v => normalizarTexto(v));
+            variantesOriginales = parsed;
         }
     } catch(e) {}
-    const ciudadNorm = normalizarTexto(ciudad);
+
+    // Clave normalizada de la ciudad seleccionada (ej: "leon|GTO", "monterrey|NL")
+    const ciudadKey = normalizarCiudadMX(ciudad);
     const resultados = [];
 
     for (const p of proveedores) {
         if (p.aeropuerto !== aeropuerto) continue;
 
         for (const t of p.tarifas) {
-            const tNorm = normalizarTexto(t.ciudad);
-            // Match contra cualquiera de las variantes agrupadas
-            const esMatch = variantes.some(v => tNorm === v || fuzzyMatch(tNorm, v) || fuzzyMatch(v, tNorm))
-                || tNorm === ciudadNorm
-                || fuzzyMatch(tNorm, ciudadNorm)
-                || fuzzyMatch(ciudadNorm, tNorm);
-            if (!esMatch) continue;
+            // Comparar por clave normalizada: ambas deben resolver al mismo "ciudad|ESTADO"
+            const tarifaKey = normalizarCiudadMX(t.ciudad);
+            const matchPorKey = tarifaKey === ciudadKey;
+
+            // Fallback: match exacto contra variantes originales del autocomplete
+            const matchPorVariante = variantesOriginales.length > 0
+                && variantesOriginales.some(v => normalizarTexto(v) === normalizarTexto(t.ciudad));
+
+            if (!matchPorKey && !matchPorVariante) continue;
 
             const precio = t[tipoUnidad];
             if (precio && precio > 0) {
