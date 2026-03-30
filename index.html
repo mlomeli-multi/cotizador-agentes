@@ -1029,6 +1029,131 @@
         body.admin-mode .admin-only { display: block; }
         body.admin-mode .admin-only-flex { display: flex; }
         .admin-only-flex { display: none; }
+
+        /* ===== LOGIN OVERLAY ===== */
+        .login-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 9999;
+            background: linear-gradient(135deg, var(--navy) 0%, #0f2744 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-overlay.hidden { display: none; }
+        .login-card {
+            background: white;
+            border-radius: var(--radius);
+            padding: 2rem;
+            width: 340px;
+            box-shadow: var(--shadow-lg);
+            text-align: center;
+        }
+        .login-card h2 {
+            font-size: 1.2rem;
+            color: var(--navy);
+            margin-bottom: 0.25rem;
+        }
+        .login-card .login-sub {
+            font-size: 0.75rem;
+            color: var(--gray-400);
+            margin-bottom: 1.5rem;
+        }
+        .login-card .form-group { margin-bottom: 1rem; text-align: left; }
+        .login-card select, .login-card input {
+            width: 100%;
+            padding: 0.6rem 0.75rem;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+        .login-card .btn { width: 100%; margin-top: 0.5rem; }
+        .login-error {
+            font-size: 0.75rem;
+            color: var(--red);
+            margin-top: 0.5rem;
+            min-height: 1.2rem;
+        }
+        .login-loading {
+            font-size: 0.75rem;
+            color: var(--blue);
+            margin-top: 0.5rem;
+        }
+
+        /* ===== USER BADGE IN HEADER ===== */
+        .user-badge {
+            font-size: 0.7rem;
+            background: rgba(255,255,255,0.15);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .btn-logout {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            font-size: 0.65rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-logout:hover { background: rgba(255,255,255,0.1); }
+
+        /* ===== HISTORIAL TABLE ===== */
+        .historial-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.78rem;
+        }
+        .historial-table th {
+            text-align: left;
+            padding: 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            border-bottom: 2px solid var(--gray-200);
+        }
+        .historial-table td {
+            padding: 0.45rem 0.5rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .historial-table tr:hover { background: var(--gray-50); }
+        .historial-filters {
+            display: flex;
+            gap: 0.75rem;
+            align-items: end;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+        .historial-empty {
+            text-align: center;
+            color: var(--gray-400);
+            font-size: 0.85rem;
+            padding: 2rem;
+        }
+
+        /* ===== USERS ADMIN TABLE ===== */
+        .users-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            margin-bottom: 0.75rem;
+        }
+        .users-table th {
+            text-align: left;
+            padding: 0.4rem 0.5rem;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--gray-200);
+        }
+        .users-table td { padding: 0.4rem 0.5rem; border-bottom: 1px solid var(--gray-100); }
+        .users-table .badge-admin { background: var(--amber); color: white; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; }
+        .users-table .badge-user { background: var(--blue); color: white; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; }
+        .users-table .badge-inactive { background: var(--gray-300); color: white; font-size: 0.6rem; padding: 0.1rem 0.4rem; border-radius: 3px; font-weight: 700; }
         .btn-admin {
             background: rgba(255,255,255,0.1);
             border: 1px solid rgba(255,255,255,0.2);
@@ -1071,6 +1196,26 @@
 </head>
 <body>
 
+<!-- ===== LOGIN OVERLAY ===== -->
+<div class="login-overlay" id="login-overlay">
+    <div class="login-card">
+        <h2>Cotizador de Transporte</h2>
+        <p class="login-sub">Inicia sesión para cotizar</p>
+        <div class="form-group">
+            <label>Usuario</label>
+            <select id="login-user">
+                <option value="">Cargando usuarios...</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>PIN</label>
+            <input type="password" id="login-pin" maxlength="6" placeholder="Ingresa tu PIN">
+        </div>
+        <button class="btn btn-primary" id="btn-login">Entrar</button>
+        <div class="login-error" id="login-error"></div>
+    </div>
+</div>
+
 <!-- ===== HEADER ===== -->
 <header class="header">
     <div class="header-title">
@@ -1081,6 +1226,8 @@
         </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
+        <span class="user-badge" id="user-badge"></span>
+        <button class="btn-logout" id="btn-logout">Salir</button>
         <span class="admin-badge" id="admin-badge">ADMIN</span>
         <button class="btn-admin" id="btn-admin">&#x1F512; Administrar</button>
     </div>
@@ -1262,6 +1409,55 @@
                     <button class="btn btn-primary btn-sm" id="btn-save-tc">Guardar</button>
                     <span id="tc-saved-msg" style="font-size:0.75rem;color:var(--green);margin-left:0.5rem;display:none;">Guardado</span>
                 </div>
+            </div>
+        </div>
+
+        <!-- Card: Gestión de Usuarios (ADMIN ONLY) -->
+        <div class="card admin-only">
+            <div class="card-header">
+                <div class="card-icon blue">&#x1F465;</div>
+                <h2>Gestión de Usuarios</h2>
+            </div>
+            <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.75rem;">Usuarios que pueden acceder al cotizador. Cada uno con su PIN.</p>
+            <div id="users-table-wrap"></div>
+            <div style="margin-top:0.75rem;display:flex;gap:0.5rem;flex-wrap:wrap;align-items:end;">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Nombre</label>
+                    <input type="text" id="new-user-name" placeholder="Ej: Rodrigo" style="width:140px;">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>PIN</label>
+                    <input type="text" id="new-user-pin" maxlength="6" placeholder="1234" style="width:80px;">
+                </div>
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Rol</label>
+                    <select id="new-user-rol" style="width:110px;">
+                        <option value="usuario">Usuario</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <button class="btn btn-primary btn-sm" id="btn-add-user">+ Agregar</button>
+                <span id="user-msg" style="font-size:0.75rem;margin-left:0.5rem;min-height:1rem;"></span>
+            </div>
+        </div>
+
+        <!-- Card: Historial de Cotizaciones (ADMIN ONLY) -->
+        <div class="card admin-only">
+            <div class="card-header">
+                <div class="card-icon green">&#x1F4CA;</div>
+                <h2>Historial de Cotizaciones</h2>
+            </div>
+            <div class="historial-filters">
+                <div class="form-group" style="margin-bottom:0;">
+                    <label>Usuario</label>
+                    <select id="hist-filter-user" style="width:150px;">
+                        <option value="">Todos</option>
+                    </select>
+                </div>
+                <button class="btn btn-secondary btn-sm" id="btn-load-historial">Cargar historial</button>
+            </div>
+            <div id="historial-wrap">
+                <div class="historial-empty">Haz clic en "Cargar historial" para ver las cotizaciones.</div>
             </div>
         </div>
 
@@ -2773,6 +2969,12 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     `;
     resultsEl.classList.add('show');
 
+    // Registrar cotización en Google Sheets
+    registrarCotizacion(aeropuerto, ciudad, tipoUnidad, top.map(r => ({
+        proveedor: r.proveedor,
+        tarifa: r.tarifaFlete + totalConceptos
+    })));
+
     // Agregar listeners a botones de venta
     resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
         btn.addEventListener('click', () => {
@@ -3234,11 +3436,49 @@ acList.addEventListener('click', (e) => {
 document.getElementById('peso').addEventListener('input', updateRouteStats);
 document.getElementById('estibable').addEventListener('change', updateRouteStats);
 
-// ===== ADMIN MODE =====
-const ADMIN_PIN = '2026'; // PIN para acceso admin — cámbialo a lo que quieras
+// ===== GOOGLE SHEETS API =====
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbycVFtdZe2RKfbyoiQbF2mWN8ln8GjlDFLZg_jgO8haosn8bduxUvk3fhWWZtkrIlGbgA/exec';
+
+async function sheetsAPI(action, data = {}) {
+    try {
+        const res = await fetch(SHEETS_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain' },
+            body: JSON.stringify({ action, ...data })
+        });
+        return await res.json();
+    } catch (err) {
+        return { ok: false, error: 'Error de conexión: ' + err.message };
+    }
+}
+
+async function sheetsGET(action, params = {}) {
+    const qs = new URLSearchParams({ action, ...params }).toString();
+    try {
+        const res = await fetch(SHEETS_API_URL + '?' + qs);
+        return await res.json();
+    } catch (err) {
+        return { ok: false, error: 'Error de conexión: ' + err.message };
+    }
+}
+
+// ===== SESIÓN DE USUARIO =====
+function getCurrentUser() {
+    const raw = sessionStorage.getItem('currentUser');
+    return raw ? JSON.parse(raw) : null;
+}
+
+function setCurrentUser(user) {
+    if (user) {
+        sessionStorage.setItem('currentUser', JSON.stringify(user));
+    } else {
+        sessionStorage.removeItem('currentUser');
+    }
+}
 
 function isAdmin() {
-    return sessionStorage.getItem('adminMode') === 'true';
+    const user = getCurrentUser();
+    return user && user.rol === 'admin';
 }
 
 function setAdminMode(active) {
@@ -3253,21 +3493,239 @@ function setAdminMode(active) {
     }
 }
 
-document.getElementById('btn-admin').addEventListener('click', () => {
-    if (isAdmin()) {
-        setAdminMode(false);
-        return;
+function updateHeaderUser() {
+    const user = getCurrentUser();
+    const badge = document.getElementById('user-badge');
+    const logoutBtn = document.getElementById('btn-logout');
+    const adminBtn = document.getElementById('btn-admin');
+    if (user) {
+        badge.textContent = user.nombre;
+        badge.style.display = '';
+        logoutBtn.style.display = '';
+        adminBtn.style.display = user.rol === 'admin' ? '' : 'none';
+        if (user.rol === 'admin') {
+            setAdminMode(true);
+        }
+    } else {
+        badge.style.display = 'none';
+        logoutBtn.style.display = 'none';
     }
-    const pin = prompt('Ingresa el PIN de administrador:');
-    if (pin === ADMIN_PIN) {
-        setAdminMode(true);
-    } else if (pin !== null) {
-        alert('PIN incorrecto.');
+}
+
+// ===== LOGIN =====
+async function loadLoginUsers() {
+    const select = document.getElementById('login-user');
+    select.innerHTML = '<option value="">Cargando...</option>';
+    const res = await sheetsGET('getUsuarios');
+    if (res.ok && res.usuarios) {
+        const activos = res.usuarios.filter(u => u.activo);
+        if (activos.length === 0) {
+            select.innerHTML = '<option value="">No hay usuarios — crea uno en Google Sheets</option>';
+            return;
+        }
+        select.innerHTML = '<option value="">Selecciona tu nombre</option>' +
+            activos.map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
+    } else {
+        select.innerHTML = '<option value="">Error al cargar usuarios</option>';
+    }
+}
+
+function showLogin() {
+    document.getElementById('login-overlay').classList.remove('hidden');
+    loadLoginUsers();
+}
+
+function hideLogin() {
+    document.getElementById('login-overlay').classList.add('hidden');
+}
+
+document.getElementById('btn-login').addEventListener('click', async () => {
+    const nombre = document.getElementById('login-user').value;
+    const pin = document.getElementById('login-pin').value;
+    const errorEl = document.getElementById('login-error');
+
+    if (!nombre) { errorEl.textContent = 'Selecciona tu nombre'; return; }
+    if (!pin) { errorEl.textContent = 'Ingresa tu PIN'; return; }
+
+    errorEl.textContent = '';
+    const btn = document.getElementById('btn-login');
+    btn.disabled = true;
+    btn.textContent = 'Verificando...';
+
+    const res = await sheetsAPI('login', { nombre, pin });
+
+    btn.disabled = false;
+    btn.textContent = 'Entrar';
+
+    if (res.ok) {
+        setCurrentUser(res.usuario);
+        hideLogin();
+        updateHeaderUser();
+        document.getElementById('login-pin').value = '';
+    } else {
+        errorEl.textContent = res.error || 'Error al iniciar sesión';
     }
 });
 
-// Restaurar admin mode si la sesión sigue activa
-if (isAdmin()) setAdminMode(true);
+document.getElementById('login-pin').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') document.getElementById('btn-login').click();
+});
+
+// Logout
+document.getElementById('btn-logout').addEventListener('click', () => {
+    setCurrentUser(null);
+    setAdminMode(false);
+    showLogin();
+});
+
+// Admin toggle (solo para admins ya logueados)
+document.getElementById('btn-admin').addEventListener('click', () => {
+    if (!isAdmin()) return;
+    if (sessionStorage.getItem('adminMode') === 'true') {
+        setAdminMode(false);
+    } else {
+        setAdminMode(true);
+    }
+});
+
+// ===== GESTIÓN DE USUARIOS (ADMIN) =====
+async function renderUsersTable() {
+    const wrap = document.getElementById('users-table-wrap');
+    wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">Cargando usuarios...</p>';
+    const res = await sheetsGET('getUsuarios');
+    if (!res.ok) {
+        wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--red);">Error: ' + (res.error || '') + '</p>';
+        return;
+    }
+    if (res.usuarios.length === 0) {
+        wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">No hay usuarios registrados.</p>';
+        return;
+    }
+    wrap.innerHTML = `
+        <table class="users-table">
+            <thead><tr><th>Nombre</th><th>PIN</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+                ${res.usuarios.map(u => `<tr>
+                    <td>${escapeHtml(u.nombre)}</td>
+                    <td>${u.pin}</td>
+                    <td><span class="${u.rol === 'admin' ? 'badge-admin' : 'badge-user'}">${u.rol}</span></td>
+                    <td><span class="${u.activo ? 'badge-user' : 'badge-inactive'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>${u.activo ? `<button class="btn btn-sm" style="font-size:0.65rem;padding:0.15rem 0.4rem;background:var(--red);color:white;border:none;border-radius:4px;cursor:pointer;" onclick="desactivarUsuario('${escapeHtml(u.nombre)}')">Desactivar</button>` : `<button class="btn btn-sm" style="font-size:0.65rem;padding:0.15rem 0.4rem;background:var(--green);color:white;border:none;border-radius:4px;cursor:pointer;" onclick="reactivarUsuario('${escapeHtml(u.nombre)}')">Reactivar</button>`}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+
+    // También actualizar el filtro de historial
+    const filterSelect = document.getElementById('hist-filter-user');
+    filterSelect.innerHTML = '<option value="">Todos</option>' +
+        res.usuarios.filter(u => u.activo).map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
+}
+
+document.getElementById('btn-add-user').addEventListener('click', async () => {
+    const nombre = document.getElementById('new-user-name').value.trim();
+    const pin = document.getElementById('new-user-pin').value.trim();
+    const rol = document.getElementById('new-user-rol').value;
+    const msgEl = document.getElementById('user-msg');
+
+    if (!nombre || !pin) { msgEl.style.color = 'var(--red)'; msgEl.textContent = 'Nombre y PIN requeridos'; return; }
+
+    msgEl.style.color = 'var(--blue)'; msgEl.textContent = 'Creando...';
+    const res = await sheetsAPI('crearUsuario', { nombre, pin, rol });
+    if (res.ok) {
+        msgEl.style.color = 'var(--green)'; msgEl.textContent = 'Usuario creado';
+        document.getElementById('new-user-name').value = '';
+        document.getElementById('new-user-pin').value = '';
+        renderUsersTable();
+        setTimeout(() => msgEl.textContent = '', 3000);
+    } else {
+        msgEl.style.color = 'var(--red)'; msgEl.textContent = res.error || 'Error';
+    }
+});
+
+async function desactivarUsuario(nombre) {
+    if (!confirm('¿Desactivar a ' + nombre + '?')) return;
+    await sheetsAPI('eliminarUsuario', { nombre });
+    renderUsersTable();
+}
+
+async function reactivarUsuario(nombre) {
+    await sheetsAPI('editarUsuario', { nombreOriginal: nombre, activo: true });
+    renderUsersTable();
+}
+
+// ===== REGISTRAR COTIZACIÓN EN GOOGLE SHEETS =====
+async function registrarCotizacion(aeropuerto, destino, unidad, resultados) {
+    const user = getCurrentUser();
+    if (!user) return;
+
+    const detalles = resultados.map(r => `${r.proveedor}: $${r.tarifa}`).join(' | ');
+    const mejorProveedor = resultados.length > 0 ? resultados[0].proveedor : '';
+    const mejorTarifa = resultados.length > 0 ? resultados[0].tarifa : 0;
+
+    await sheetsAPI('guardarCotizacion', {
+        usuario: user.nombre,
+        aeropuerto,
+        destino,
+        unidad,
+        proveedor: mejorProveedor,
+        tarifa: mejorTarifa,
+        detalles
+    });
+}
+
+// ===== HISTORIAL DE COTIZACIONES =====
+document.getElementById('btn-load-historial').addEventListener('click', async () => {
+    const wrap = document.getElementById('historial-wrap');
+    const usuario = document.getElementById('hist-filter-user').value;
+    wrap.innerHTML = '<div class="historial-empty">Cargando...</div>';
+
+    const res = await sheetsGET('getCotizaciones', {
+        usuario: usuario,
+        todas: isAdmin() && !usuario ? 'true' : 'false'
+    });
+
+    if (!res.ok) {
+        wrap.innerHTML = `<div class="historial-empty" style="color:var(--red);">Error: ${res.error || 'desconocido'}</div>`;
+        return;
+    }
+
+    if (res.cotizaciones.length === 0) {
+        wrap.innerHTML = '<div class="historial-empty">No hay cotizaciones registradas.</div>';
+        return;
+    }
+
+    wrap.innerHTML = `
+        <div style="overflow-x:auto;">
+        <table class="historial-table">
+            <thead><tr>
+                <th>Fecha</th>
+                <th>Usuario</th>
+                <th>Origen</th>
+                <th>Destino</th>
+                <th>Unidad</th>
+                <th>Mejor proveedor</th>
+                <th>Tarifa</th>
+                <th>Detalles</th>
+            </tr></thead>
+            <tbody>
+                ${res.cotizaciones.map(c => `<tr>
+                    <td style="white-space:nowrap;">${escapeHtml(String(c.fecha || c.timestamp || ''))}</td>
+                    <td><strong>${escapeHtml(String(c.usuario || ''))}</strong></td>
+                    <td>${escapeHtml(String(c.aeropuerto || ''))}</td>
+                    <td>${escapeHtml(String(c.destino || ''))}</td>
+                    <td>${escapeHtml(String(c.unidad || ''))}</td>
+                    <td>${escapeHtml(String(c.proveedor || ''))}</td>
+                    <td>$${escapeHtml(String(c.tarifa || '0'))}</td>
+                    <td style="font-size:0.7rem;color:var(--gray-500);max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${escapeHtml(String(c.detalles || ''))}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>
+        </div>
+        <p style="font-size:0.7rem;color:var(--gray-400);margin-top:0.5rem;">${res.cotizaciones.length} cotizaciones</p>`;
+});
+
+// ===== ADMIN MODE =====
+// Admin toggle preserved for admin users
 
 // ===== EXPORTAR / IMPORTAR DATOS =====
 document.getElementById('btn-export-data').addEventListener('click', () => {
@@ -3319,6 +3777,17 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 // ===== INIT =====
 renderProvidersList();
 updateCotizarBtn();
+
+// Check session — show login or restore user
+(function initSession() {
+    const user = getCurrentUser();
+    if (user) {
+        hideLogin();
+        updateHeaderUser();
+    } else {
+        showLogin();
+    }
+})();
 
 </script>
 </body>
