@@ -3452,16 +3452,6 @@ async function sheetsAPI(action, data = {}) {
     }
 }
 
-async function sheetsGET(action, params = {}) {
-    const qs = new URLSearchParams({ action, ...params }).toString();
-    try {
-        const res = await fetch(SHEETS_API_URL + '?' + qs);
-        return await res.json();
-    } catch (err) {
-        return { ok: false, error: 'Error de conexión: ' + err.message };
-    }
-}
-
 // ===== SESIÓN DE USUARIO =====
 function getCurrentUser() {
     const raw = sessionStorage.getItem('currentUser');
@@ -3516,7 +3506,7 @@ function updateHeaderUser() {
 async function loadLoginUsers() {
     const select = document.getElementById('login-user');
     select.innerHTML = '<option value="">Cargando...</option>';
-    const res = await sheetsGET('getUsuarios');
+    const res = await sheetsAPI('getUsuarios');
     if (res.ok && res.usuarios) {
         const activos = res.usuarios.filter(u => u.activo);
         if (activos.length === 0) {
@@ -3592,7 +3582,7 @@ document.getElementById('btn-admin').addEventListener('click', () => {
 async function renderUsersTable() {
     const wrap = document.getElementById('users-table-wrap');
     wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">Cargando usuarios...</p>';
-    const res = await sheetsGET('getUsuarios');
+    const res = await sheetsAPI('getUsuarios');
     if (!res.ok) {
         wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--red);">Error: ' + (res.error || '') + '</p>';
         return;
@@ -3679,9 +3669,9 @@ document.getElementById('btn-load-historial').addEventListener('click', async ()
     const usuario = document.getElementById('hist-filter-user').value;
     wrap.innerHTML = '<div class="historial-empty">Cargando...</div>';
 
-    const res = await sheetsGET('getCotizaciones', {
+    const res = await sheetsAPI('getCotizaciones', {
         usuario: usuario,
-        todas: isAdmin() && !usuario ? 'true' : 'false'
+        todas: isAdmin() && !usuario
     });
 
     if (!res.ok) {
