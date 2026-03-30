@@ -3441,13 +3441,21 @@ const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbycVFtdZe2RKfbyo
 
 async function sheetsAPI(action, data = {}) {
     try {
+        const formData = new URLSearchParams();
+        formData.append('payload', JSON.stringify({ action, ...data }));
         const res = await fetch(SHEETS_API_URL, {
             method: 'POST',
-            headers: { 'Content-Type': 'text/plain' },
-            body: JSON.stringify({ action, ...data })
+            body: formData
         });
-        return await res.json();
+        const text = await res.text();
+        try {
+            return JSON.parse(text);
+        } catch (e) {
+            console.error('Sheets API respuesta:', text.substring(0, 500));
+            return { ok: false, error: 'Respuesta no válida del servidor' };
+        }
     } catch (err) {
+        console.error('Sheets API error:', err);
         return { ok: false, error: 'Error de conexión: ' + err.message };
     }
 }
