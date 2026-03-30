@@ -16,8 +16,26 @@ function handleRequest(e) {
   try {
     const params = e.parameter || {};
     let data = {};
-    if (e.postData && e.postData.contents) {
-      data = JSON.parse(e.postData.contents);
+
+    // Intentar leer payload de form data (URLSearchParams)
+    if (params.payload) {
+      data = JSON.parse(params.payload);
+    }
+    // Fallback: leer body directo (POST JSON)
+    else if (e.postData && e.postData.contents) {
+      try {
+        data = JSON.parse(e.postData.contents);
+      } catch (pe) {
+        // Si el body es form-encoded, parsear manualmente
+        var pairs = e.postData.contents.split('&');
+        for (var i = 0; i < pairs.length; i++) {
+          var kv = pairs[i].split('=');
+          if (kv[0] === 'payload') {
+            data = JSON.parse(decodeURIComponent(kv[1]));
+            break;
+          }
+        }
+      }
     }
     const action = params.action || data.action;
 
