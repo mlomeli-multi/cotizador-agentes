@@ -1727,38 +1727,69 @@ function calcularUnidadMulti(lineas, pesoTotal, estibable) {
     for (const unidad of UNIDADES) {
         if (pesoTotal > unidad.payload) continue;
 
-        // Para cada tipo de pallet, calcular capacidad individual
-        let cabenTodos = true;
-        let detalles = [];
-        let capacidadTotalMin = Infinity;
+        // Verificar alto de todos los tipos
+        if (lineas.some(l => l.alto > unidad.alto)) continue;
 
-        for (const l of lineas) {
-            const cap = capacidadPalletEnUnidad(l.largo, l.ancho, l.alto, unidad, estibable);
-            if (cap < l.qty) {
-                cabenTodos = false;
+        // Pisos
+        let pisos = 1;
+        if (estibable) {
+            const maxAlto = Math.max(...lineas.map(l => l.alto));
+            pisos = Math.floor(unidad.alto / maxAlto);
+            if (pisos < 1) pisos = 1;
+        }
+
+        // Para cada tipo de pallet, generar orientaciones válidas
+        const tiposOri = lineas.map(l => {
+            const oris = [];
+            if (l.largo <= unidad.largo && l.ancho <= unidad.ancho) oris.push({ l: l.largo, a: l.ancho });
+            if (l.ancho <= unidad.largo && l.largo <= unidad.ancho) oris.push({ l: l.ancho, a: l.largo });
+            return { qty: l.qty, oris, dims: `${l.largo}×${l.ancho}×${l.alto}` };
+        });
+
+        // Si algún tipo no tiene orientación válida, esta unidad no sirve
+        if (tiposOri.some(t => t.oris.length === 0)) continue;
+
+        // Probar todas las combinaciones de orientaciones (2^N max)
+        // Para cada combo, asignar franjas (filas) a lo largo del camión
+        const numTipos = tiposOri.length;
+        const totalCombos = tiposOri.reduce((acc, t) => acc * t.oris.length, 1);
+        let cabe = false;
+
+        for (let combo = 0; combo < totalCombos; combo++) {
+            // Decodificar combo → orientación elegida para cada tipo
+            let c = combo;
+            const oriElegida = tiposOri.map(t => {
+                const idx = c % t.oris.length;
+                c = Math.floor(c / t.oris.length);
+                return t.oris[idx];
+            });
+
+            // Para cada tipo, calcular filas necesarias
+            let largoTotal = 0;
+            let valido = true;
+
+            for (let i = 0; i < numTipos; i++) {
+                const ori = oriElegida[i];
+                const porFila = Math.floor(unidad.ancho / ori.a);
+                if (porFila === 0) { valido = false; break; }
+                const filasNecesarias = Math.ceil(tiposOri[i].qty / (porFila * pisos));
+                largoTotal += filasNecesarias * ori.l;
+            }
+
+            if (valido && largoTotal <= unidad.largo) {
+                cabe = true;
                 break;
             }
-            detalles.push(`${l.qty}×(${l.largo}×${l.ancho}×${l.alto})`);
         }
 
-        // Verificación adicional: la suma total no debe exceder la capacidad del más restrictivo
-        // Usamos heurística conservadora: si cada tipo cabe individualmente y hay espacio mixto
-        if (!cabenTodos) continue;
-
-        // Para múltiples tipos, verificar que la suma total cabe
-        // Heurística: calcular con el pallet más grande como referencia
-        if (lineas.length > 1) {
-            const maxAlto = Math.max(...lineas.map(l => l.alto));
-            const maxLargo = Math.max(...lineas.map(l => l.largo));
-            const maxAncho = Math.max(...lineas.map(l => l.ancho));
-            const capConservadora = capacidadPalletEnUnidad(maxLargo, maxAncho, maxAlto, unidad, estibable);
-            if (capConservadora < totalPallets) continue;
+        if (cabe) {
+            const detalles = lineas.map(l => `${l.qty}×(${l.largo}×${l.ancho}×${l.alto})`);
+            const detalleEstiba = pisos > 1 ? ` · ${pisos} pisos estiba` : '';
+            return {
+                unidad: unidad.nombre,
+                detalle: `${totalPallets} pallets (${detalles.join(' + ')})${detalleEstiba}. Payload máx: ${unidad.payload.toLocaleString()} kg.`
+            };
         }
-
-        return {
-            unidad: unidad.nombre,
-            detalle: `${totalPallets} pallets (${detalles.join(' + ')}). Payload máx: ${unidad.payload.toLocaleString()} kg.`
-        };
     }
 
     return { error: 'La carga no cabe en ninguna unidad disponible. Considera dividir el envío.' };
