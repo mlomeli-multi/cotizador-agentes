@@ -2370,6 +2370,7 @@ let workbookTemp = null;  // workbook actual leído
 let sheetDataTemp = null; // datos de la hoja seleccionada (array de arrays)
 let sheetsTemp = [];      // nombres de hojas
 let importFileNameTemp = '';
+let pdfImportStrategyTemp = '';
 
 function handleFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
@@ -2433,7 +2434,28 @@ async function handlePDF(file) {
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
 
+        const lowerName = String(importFileNameTemp).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        let specializedRows = null;
+        if (lowerName.includes('hh') && lowerName.includes('transport')) {
+            specializedRows = await extractHHPDFRows(pdf);
+            if (specializedRows && specializedRows.length > 1) pdfImportStrategyTemp = 'hh-specific';
+        } else if (lowerName.includes('romex')) {
+            specializedRows = await extractRomexPDFRows(pdf);
+            if (specializedRows && specializedRows.length > 1) pdfImportStrategyTemp = 'romex-specific';
+        }
+
+        if (specializedRows && specializedRows.length > 1) {
+            sheetDataTemp = specializedRows;
+            sheetsTemp = ['PDF'];
+            workbookTemp = { Sheets: { 'PDF': null }, SheetNames: ['PDF'] };
+            workbookTemp._isPDF = true;
+            fileInput.value = '';
+            openMappingModal(file.name);
+            return;
+        }
+
         const allRows = [];
+        pdfImportStrategyTemp = 'generic';
         for (let p = 1; p <= pdf.numPages; p++) {
             const page = await pdf.getPage(p);
             const textContent = await page.getTextContent();
@@ -2461,6 +2483,138 @@ async function handlePDF(file) {
         alert('Error al leer el PDF: ' + err.message);
         fileInput.value = '';
     }
+}
+
+function normalizePdfToken(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function isPdfMoneyToken(value) {
+    const text = String(value || '').trim();
+    return /^\$?\d{1,3}(,\d{3})*(\.\d{2})?$/.test(text) || /^\$?\d{4,}(\.\d{2})?$/.test(text);
+}
+
+function isPdfMoneyOrNA(value) {
+    const text = normalizeWhitespace(value);
+    return isPdfMoneyToken(text) || /^n\/a$/i.test(text);
+}
+
+function extractRowTextsFromPDFPage(textContent, viewport, tolerance = 5) {
+    const items = textContent.items
+        .filter(item => item.str && item.str.trim() !== '')
+        .map(item => ({
+            text: item.str.trim(),
+            x: Math.round(item.transform[4]),
+            y: Math.round(viewport.height - item.transform[5]),
+        }));
+
+    if (items.length === 0) return [];
+
+    items.sort((a, b) => a.y - b.y || a.x - b.x);
+    const rows = [];
+    let current = [items[0]];
+    let currentY = items[0].y;
+
+    for (let i = 1; i < items.length; i++) {
+        if (Math.abs(items[i].y - currentY) <= tolerance) {
+            current.push(items[i]);
+        } else {
+            rows.push(current);
+            current = [items[i]];
+            currentY = items[i].y;
+        }
+    }
+    rows.push(current);
+
+    return rows.map(row => row.sort((a, b) => a.x - b.x).map(item => item.text).filter(Boolean));
+}
+
+async function extractHHPDFRows(pdf) {
+    const output = [['ORIGEN', 'ESTADO ORIGEN', 'DESTINO', 'ESTADO DESTINO', '1 TON', '3.5 TON', 'RABON', 'TORTON', "CAJA 53'"]];
+    const seen = new Set();
+
+    for (let p = 1; p <= Math.min(pdf.numPages, 2); p++) {
+        const page = await pdf.getPage(p);
+        const textContent = await page.getTextContent();
+        const rows = extractRowTextsFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+
+        rows.forEach(tokens => {
+            const normalized = tokens.map(normalizePdfToken);
+            const originIdx = normalized.findIndex(t => t === 'aicm' || t === 'aifa');
+            if (originIdx < 0) return;
+
+            const firstMoneyIdx = tokens.findIndex((token, idx) => idx > originIdx && isPdfMoneyToken(token));
+            if (firstMoneyIdx < 0) return;
+
+            const rateTokens = tokens.slice(firstMoneyIdx).filter(isPdfMoneyToken);
+            if (rateTokens.length < 5) return;
+
+            const estadoDestino = normalizeWhitespace(tokens[firstMoneyIdx - 1]);
+            const destino = normalizeWhitespace(tokens.slice(originIdx + 2, firstMoneyIdx - 1).join(' '));
+            if (!destino || !estadoDestino) return;
+
+            const origen = normalizeWhitespace(tokens[originIdx]);
+            const estadoOrigen = normalizeWhitespace(tokens[originIdx + 1] || '');
+            const rowKey = [origen, destino, estadoDestino].join('|').toLowerCase();
+            if (seen.has(rowKey)) return;
+            seen.add(rowKey);
+
+            output.push([
+                origen,
+                estadoOrigen,
+                destino,
+                estadoDestino,
+                rateTokens[0],
+                rateTokens[1],
+                rateTokens[2],
+                rateTokens[3],
+                rateTokens[4],
+            ]);
+        });
+    }
+
+    return output;
+}
+
+async function extractRomexPDFRows(pdf) {
+    const output = [['DESTINO', '1 TON', '3.5 TON', 'RABON', 'TORTON', "CAJA 53'"]];
+    const seen = new Set();
+
+    for (let p = 1; p <= Math.min(pdf.numPages, 2); p++) {
+        const page = await pdf.getPage(p);
+        const textContent = await page.getTextContent();
+        const rows = extractRowTextsFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+
+        rows.forEach(tokens => {
+            const normalized = tokens.map(normalizePdfToken);
+            const mtyIdx = normalized.findIndex(t => t === 'mty');
+            if (mtyIdx < 0) return;
+
+            const firstRateIdx = tokens.findIndex((token, idx) => idx > mtyIdx && isPdfMoneyOrNA(token));
+            if (firstRateIdx < 0) return;
+
+            const allRates = tokens.slice(firstRateIdx).filter(isPdfMoneyOrNA);
+            if (allRates.length < 7) return;
+
+            const destino = normalizeWhitespace(tokens.slice(mtyIdx + 1, firstRateIdx).join(' '));
+            if (!destino) return;
+
+            const rowKey = destino.toLowerCase();
+            if (seen.has(rowKey)) return;
+            seen.add(rowKey);
+
+            output.push([
+                destino,
+                allRates[2],
+                allRates[3],
+                allRates[4],
+                allRates[5],
+                /^n\/a$/i.test(allRates[6]) ? '' : allRates[6],
+            ]);
+        });
+    }
+
+    return output;
 }
 
 function isLikelyPDFTablePage(rows) {
@@ -2577,14 +2731,14 @@ function getImportPreset(fileName = '') {
         return { providerName: 'HH Transportes', airport: 'AUTO', hint: 'Se detectó HH con columna ORIGEN; se separará por aeropuerto automáticamente.' };
     }
     if (lower.includes('romex')) {
-        return { providerName: 'ROMEX', airport: 'MTY', hint: 'Se detectó tarifario ROMEX para aeropuerto MTY.' };
+        return { providerName: 'Romex', airport: 'MTY', hint: 'Se detectó tarifario ROMEX para aeropuerto MTY.' };
     }
     return null;
 }
 
 function shouldUseRomexMergedHeader() {
     const lower = String(importFileNameTemp || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-    return lower.includes('romex');
+    return lower.includes('romex') && pdfImportStrategyTemp !== 'romex-specific';
 }
 
 function getSheetHeaderMeta() {
@@ -2793,6 +2947,7 @@ document.getElementById('btn-cancel-mapping').addEventListener('click', () => {
     document.getElementById('modal-mapping').classList.remove('show');
     workbookTemp = null;
     sheetDataTemp = null;
+    pdfImportStrategyTemp = '';
 });
 
 // Mapa de valores de ORIGEN en Excel -> código de aeropuerto
