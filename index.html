@@ -2156,6 +2156,11 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.classList.add('active');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'aereo') {
+            if (JSON.parse(localStorage.getItem('proveedores') || '[]').length > 0) {
+                updateCotizarBtn();
+            }
+            autoCalcUnidad();
+            scheduleRouteUpdate();
             setTimeout(() => map.invalidateSize(), 120);
         }
         if (btn.dataset.tab === 'maritimo' && maritimeMap) {
