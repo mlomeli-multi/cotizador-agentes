@@ -1266,7 +1266,7 @@
         <span class="tab-icon">&#9992;</span>
         Aéreo Importación (DAP)
     </button>
-    <button class="tab-btn disabled" data-tab="maritimo">
+    <button class="tab-btn" data-tab="maritimo">
         <span class="tab-icon">&#x1F6A2;</span>
         Marítimo Importación (DAP)
         <span class="tab-badge">Próximamente</span>
@@ -1492,6 +1492,88 @@
 
     <!-- TAB: MARÍTIMO (placeholder) -->
     <section class="tab-content" id="tab-maritimo">
+        <div class="card maritime-ready">
+            <div class="card-header">
+                <div class="card-icon blue">&#x1F6A2;</div>
+                <h2>Cotizador DAP Maritimo</h2>
+            </div>
+            <div class="layout-split">
+                <div class="layout-left">
+                    <div class="map-container" id="map-maritimo"></div>
+                    <div class="route-info" id="route-info-maritimo">
+                        <div class="route-info-grid">
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-km-maritimo">—</div>
+                                <div class="stat-label">Kilómetros aprox.</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-time-maritimo">—</div>
+                                <div class="stat-label">Tiempo tránsito</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-unit-type-maritimo">Portacontenedor</div>
+                                <div class="stat-label">Equipo</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layout-right">
+                    <div class="form-section-title">&#x1F6A2; Ruta</div>
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr 220px;align-items:end;">
+                        <div class="form-group">
+                            <label>Puerto origen</label>
+                            <select id="maritimo-puerto">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ciudad destino final</label>
+                            <select id="maritimo-ciudad">
+                                <option value="">Seleccionar...</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Ordenar por</label>
+                            <select id="maritimo-modalidad">
+                                <option value="single">Single</option>
+                                <option value="full">Full</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p style="font-size:0.78rem;color:var(--gray-500);margin-top:0.25rem;">
+                        Siempre verás ambas tarifas cuando el proveedor las tenga. La selección solo define el orden principal del Top 3.
+                    </p>
+                    <div class="cotizar-actions">
+                        <button class="btn btn-success btn-lg" id="btn-cotizar-maritimo" disabled>
+                            &#x1F50D; Buscar mejores tarifas
+                        </button>
+                    </div>
+                    <div class="quote-results" id="quote-results-maritimo"></div>
+                    <div class="empty-state-mini" id="empty-cotizacion-maritimo">
+                        Importa el tarifario maritimo para empezar a cotizar
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card admin-only maritime-ready">
+            <div class="card-header">
+                <div class="card-icon green">&#x1F4C4;</div>
+                <h2>Tarifario Maritimo</h2>
+            </div>
+            <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:1rem;">
+                Importa un solo archivo CSV o Excel. El sistema tomara solo rutas <strong>Portacontenedor</strong>,
+                normalizara puertos, destinos y proveedores, y consolidara duplicados automaticamente.
+            </p>
+            <div class="upload-zone" id="upload-zone-maritimo">
+                <div class="upload-icon">&#x1F4C2;</div>
+                <div class="upload-text">Arrastra el tarifario maritimo aqui o haz clic para subir</div>
+                <div class="upload-hint">Formatos soportados: .csv, .xlsx, .xls</div>
+                <input type="file" id="file-input-maritimo" accept=".csv,.xlsx,.xls" style="display:none">
+            </div>
+            <div id="maritimo-import-summary" style="font-size:0.78rem;color:var(--gray-500);margin-top:0.85rem;"></div>
+            <div class="providers-list" id="providers-list-maritimo"></div>
+        </div>
         <div class="card">
             <div class="empty-state">
                 <div class="empty-icon">&#x1F6A2;</div>
@@ -1582,6 +1664,13 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         btn.classList.add('active');
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
+        if (btn.dataset.tab === 'aereo') {
+            setTimeout(() => map.invalidateSize(), 120);
+        }
+        if (btn.dataset.tab === 'maritimo' && maritimeMap) {
+            setTimeout(() => maritimeMap.invalidateSize(), 120);
+            setTimeout(updateMaritimeRoute, 150);
+        }
     });
 });
 
@@ -2081,6 +2170,35 @@ fileInput.addEventListener('change', () => {
         handleFile(fileInput.files[0]);
     }
 });
+
+const uploadZoneMaritimo = document.getElementById('upload-zone-maritimo');
+const fileInputMaritimo = document.getElementById('file-input-maritimo');
+
+if (uploadZoneMaritimo && fileInputMaritimo) {
+    uploadZoneMaritimo.addEventListener('click', () => fileInputMaritimo.click());
+    uploadZoneMaritimo.addEventListener('dragover', (e) => {
+        e.preventDefault();
+        uploadZoneMaritimo.style.borderColor = 'var(--blue)';
+        uploadZoneMaritimo.style.background = '#f0f7ff';
+    });
+    uploadZoneMaritimo.addEventListener('dragleave', () => {
+        uploadZoneMaritimo.style.borderColor = '';
+        uploadZoneMaritimo.style.background = '';
+    });
+    uploadZoneMaritimo.addEventListener('drop', (e) => {
+        e.preventDefault();
+        uploadZoneMaritimo.style.borderColor = '';
+        uploadZoneMaritimo.style.background = '';
+        if (e.dataTransfer.files.length) {
+            handleMaritimeFile(e.dataTransfer.files[0]);
+        }
+    });
+    fileInputMaritimo.addEventListener('change', () => {
+        if (fileInputMaritimo.files.length) {
+            handleMaritimeFile(fileInputMaritimo.files[0]);
+        }
+    });
+}
 
 // ===== XLSX: ESTADO TEMPORAL =====
 let workbookTemp = null;  // workbook actual leído
@@ -2747,6 +2865,426 @@ function normalizarTexto(str) {
     return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
+const MARITIME_STORAGE_KEY = 'proveedoresMaritimos';
+const MARITIME_PORT_ALIASES = {
+    altamira: 'Altamira',
+    ensenada: 'Ensenada',
+    manzanillo: 'Manzanillo',
+    'lazaro cardenas': 'Lazaro Cardenas',
+    veracruz: 'Veracruz',
+    veraruz: 'Veracruz',
+    vercruz: 'Veracruz',
+};
+const MARITIME_PORTS = {
+    Altamira: { name: 'Altamira', lat: 22.3928, lng: -97.9381, label: 'Altamira' },
+    Ensenada: { name: 'Ensenada', lat: 31.8529, lng: -116.6051, label: 'Ensenada' },
+    'Lazaro Cardenas': { name: 'Lazaro Cardenas', lat: 17.9583, lng: -102.1944, label: 'Lazaro Cardenas' },
+    Manzanillo: { name: 'Manzanillo', lat: 19.0501, lng: -104.3188, label: 'Manzanillo' },
+    Veracruz: { name: 'Veracruz', lat: 19.2000, lng: -96.1342, label: 'Veracruz' },
+};
+
+function normalizeWhitespace(value) {
+    return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function normalizeHeader(value) {
+    return normalizarTexto(value).replace(/[^a-z0-9]+/g, ' ').trim();
+}
+
+function parseCurrencyValue(value) {
+    const cleaned = String(value || '').replace(/[^0-9.-]/g, '');
+    const parsed = parseFloat(cleaned);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
+}
+
+function parseDateDisplay(value) {
+    const raw = normalizeWhitespace(value);
+    if (!raw) return { label: '', ts: 0 };
+    const parsed = new Date(raw);
+    if (Number.isNaN(parsed.getTime())) return { label: raw, ts: 0 };
+    return {
+        label: parsed.toLocaleDateString('es-MX'),
+        ts: parsed.getTime(),
+    };
+}
+
+function normalizeMaritimePort(value) {
+    const cleaned = normalizeWhitespace(value);
+    const key = normalizarTexto(cleaned);
+    return MARITIME_PORT_ALIASES[key] || cleaned;
+}
+
+function normalizeProviderKey(value) {
+    return normalizarTexto(normalizeWhitespace(value)).replace(/\s+/g, ' ');
+}
+
+function createMaritimeRouteKey(entry) {
+    return [
+        normalizeProviderKey(entry.proveedor),
+        normalizarTexto(entry.puerto),
+        entry.ciudadKey || normalizarTexto(entry.ciudad),
+    ].join('__');
+}
+
+function maritimeRateCompleteness(entry) {
+    let count = 0;
+    if (entry.single > 0) count++;
+    if (entry.full > 0) count++;
+    return count;
+}
+
+function maritimeBestComparablePrice(entry) {
+    const values = [entry.single, entry.full].filter(v => v > 0);
+    return values.length ? Math.min(...values) : Number.POSITIVE_INFINITY;
+}
+
+function shouldReplaceMaritimeEntry(current, candidate) {
+    if ((candidate.vigenciaTs || 0) !== (current.vigenciaTs || 0)) {
+        return (candidate.vigenciaTs || 0) > (current.vigenciaTs || 0);
+    }
+    if (maritimeRateCompleteness(candidate) !== maritimeRateCompleteness(current)) {
+        return maritimeRateCompleteness(candidate) > maritimeRateCompleteness(current);
+    }
+    const candidatePrice = maritimeBestComparablePrice(candidate);
+    const currentPrice = maritimeBestComparablePrice(current);
+    if (candidatePrice !== currentPrice) {
+        return candidatePrice < currentPrice;
+    }
+    return false;
+}
+
+function mergeMaritimeEntries(current, candidate) {
+    const candidateWins = shouldReplaceMaritimeEntry(current, candidate);
+    const winner = candidateWins ? { ...candidate } : { ...current };
+    const loser = candidateWins ? current : candidate;
+
+    if (!winner.single && loser.single) winner.single = loser.single;
+    if (!winner.full && loser.full) winner.full = loser.full;
+    if (!winner.vigencia && loser.vigencia) winner.vigencia = loser.vigencia;
+    if (!winner.vigenciaTs && loser.vigenciaTs) winner.vigenciaTs = loser.vigenciaTs;
+    if (!winner.horasLibres && loser.horasLibres) winner.horasLibres = loser.horasLibres;
+    if (!winner.comentarios && loser.comentarios) winner.comentarios = loser.comentarios;
+    if (!winner.moneda && loser.moneda) winner.moneda = loser.moneda;
+    return winner;
+}
+
+function getMaritimeProviders() {
+    return JSON.parse(localStorage.getItem(MARITIME_STORAGE_KEY) || '[]');
+}
+
+function saveMaritimeProviders(data) {
+    localStorage.setItem(MARITIME_STORAGE_KEY, JSON.stringify(data));
+}
+
+function findMaritimeHeaderIndex(rows) {
+    let bestIdx = -1;
+    let bestScore = -1;
+    rows.slice(0, 12).forEach((row, idx) => {
+        const headers = row.map(normalizeHeader);
+        let score = 0;
+        if (headers.includes('proveedor')) score++;
+        if (headers.includes('puerto')) score++;
+        if (headers.includes('ciudad')) score++;
+        if (headers.includes('unidad equipo')) score++;
+        if (headers.includes('tarifa single')) score++;
+        if (headers.includes('tarifa full')) score++;
+        if (score > bestScore) {
+            bestScore = score;
+            bestIdx = idx;
+        }
+    });
+    return bestScore >= 4 ? bestIdx : -1;
+}
+
+function parseMaritimeSheetRows(rawRows, sourceName) {
+    const headerIndex = findMaritimeHeaderIndex(rawRows);
+    if (headerIndex < 0) {
+        throw new Error(`No se reconocieron las columnas del tarifario en ${sourceName}.`);
+    }
+
+    const headers = rawRows[headerIndex].map(normalizeHeader);
+    const colIndex = (name) => headers.indexOf(name);
+
+    const cols = {
+        proveedor: colIndex('proveedor'),
+        puerto: colIndex('puerto'),
+        ciudad: colIndex('ciudad'),
+        unidad: colIndex('unidad equipo'),
+        tarifaSingle: colIndex('tarifa single'),
+        tarifaFull: colIndex('tarifa full'),
+        moneda: colIndex('moneda'),
+        fechaVigencia: colIndex('fecha vigencia'),
+        horasLibres: colIndex('horas libres'),
+        comentarios: colIndex('comentarios'),
+    };
+
+    if ([cols.proveedor, cols.puerto, cols.ciudad, cols.unidad, cols.tarifaSingle].some(idx => idx < 0)) {
+        throw new Error(`Faltan columnas clave en ${sourceName}.`);
+    }
+
+    const deduped = new Map();
+    const summary = {
+        totalRows: 0,
+        skippedNonPortacontenedor: 0,
+        skippedIncomplete: 0,
+        consolidatedDuplicates: 0,
+    };
+
+    rawRows.slice(headerIndex + 1).forEach((row) => {
+        const rowHasData = row.some(cell => normalizeWhitespace(cell));
+        if (!rowHasData) return;
+        summary.totalRows++;
+
+        const unidad = normalizeHeader(row[cols.unidad]);
+        if (unidad !== 'portacontenedor') {
+            summary.skippedNonPortacontenedor++;
+            return;
+        }
+
+        const proveedor = normalizeWhitespace(row[cols.proveedor]);
+        const puerto = normalizeMaritimePort(row[cols.puerto]);
+        const ciudad = normalizeWhitespace(row[cols.ciudad]);
+        const single = parseCurrencyValue(row[cols.tarifaSingle]);
+        const full = cols.tarifaFull >= 0 ? parseCurrencyValue(row[cols.tarifaFull]) : 0;
+
+        if (!proveedor || !puerto || !ciudad || (!single && !full)) {
+            summary.skippedIncomplete++;
+            return;
+        }
+
+        const vigencia = parseDateDisplay(cols.fechaVigencia >= 0 ? row[cols.fechaVigencia] : '');
+        const entry = {
+            proveedor,
+            puerto,
+            ciudad,
+            ciudadKey: normalizarCiudadMX(ciudad),
+            unidad: 'Portacontenedor',
+            single,
+            full,
+            moneda: cols.moneda >= 0 ? normalizeWhitespace(row[cols.moneda]) : 'Pesos Mexicanos',
+            vigencia: vigencia.label,
+            vigenciaTs: vigencia.ts,
+            horasLibres: cols.horasLibres >= 0 ? normalizeWhitespace(row[cols.horasLibres]) : '',
+            comentarios: cols.comentarios >= 0 ? normalizeWhitespace(row[cols.comentarios]) : '',
+        };
+
+        const key = createMaritimeRouteKey(entry);
+        if (deduped.has(key)) {
+            summary.consolidatedDuplicates++;
+            deduped.set(key, mergeMaritimeEntries(deduped.get(key), entry));
+        } else {
+            deduped.set(key, entry);
+        }
+    });
+
+    return { entries: [...deduped.values()], summary };
+}
+
+function buildMaritimeProviders(entries) {
+    const groups = new Map();
+    entries.forEach((entry) => {
+        const groupKey = `${normalizeProviderKey(entry.proveedor)}__${normalizarTexto(entry.puerto)}`;
+        if (!groups.has(groupKey)) {
+            groups.set(groupKey, {
+                id: groupKey,
+                nombre: entry.proveedor,
+                puerto: entry.puerto,
+                tarifas: [],
+                totalRutas: 0,
+                fechaCarga: new Date().toLocaleDateString('es-MX'),
+            });
+        }
+        groups.get(groupKey).tarifas.push({
+            ciudad: entry.ciudad,
+            ciudadKey: entry.ciudadKey,
+            unidad: entry.unidad,
+            single: entry.single,
+            full: entry.full,
+            moneda: entry.moneda,
+            vigencia: entry.vigencia,
+            vigenciaTs: entry.vigenciaTs,
+            horasLibres: entry.horasLibres,
+            comentarios: entry.comentarios,
+        });
+    });
+
+    return [...groups.values()]
+        .map((provider) => {
+            provider.tarifas.sort((a, b) => a.ciudad.localeCompare(b.ciudad, 'es-MX'));
+            provider.totalRutas = provider.tarifas.length;
+            return provider;
+        })
+        .sort((a, b) => a.puerto.localeCompare(b.puerto, 'es-MX') || a.nombre.localeCompare(b.nombre, 'es-MX'));
+}
+
+function renderMaritimeProvidersList() {
+    const container = document.getElementById('providers-list-maritimo');
+    if (!container) return;
+    const providers = getMaritimeProviders();
+    if (providers.length === 0) {
+        container.innerHTML = '';
+        return;
+    }
+
+    container.innerHTML = providers.map(p => `
+        <div class="provider-item">
+            <div>
+                <div class="provider-name">${escapeHtml(p.nombre)}</div>
+                <div class="provider-meta">${escapeHtml(p.puerto)} · ${p.totalRutas} rutas · Cargado: ${escapeHtml(p.fechaCarga)}</div>
+            </div>
+            <div class="provider-actions">
+                <button class="btn btn-secondary btn-sm" onclick="viewMaritimeProvider('${p.id}')">Ver</button>
+                <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="deleteMaritimeProvider('${p.id}')">Eliminar</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function deleteMaritimeProvider(id) {
+    if (!confirm('¿Eliminar este proveedor marítimo y sus tarifas?')) return;
+    const updated = getMaritimeProviders().filter(p => p.id !== id);
+    saveMaritimeProviders(updated);
+    renderMaritimeProvidersList();
+    renderMaritimePortOptions();
+    updateMaritimeCotizarBtn();
+}
+
+function viewMaritimeProvider(id) {
+    const provider = getMaritimeProviders().find(item => item.id === id);
+    if (!provider) return;
+    const preview = provider.tarifas.slice(0, 10).map(t => {
+        const single = t.single ? `Single $${t.single.toLocaleString('es-MX')}` : 'Single —';
+        const full = t.full ? `Full $${t.full.toLocaleString('es-MX')}` : 'Full —';
+        return `• ${t.ciudad}: ${single} | ${full}`;
+    }).join('\n');
+    alert(`Proveedor: ${provider.nombre}\nPuerto: ${provider.puerto}\nRutas: ${provider.totalRutas}\n\nPrimeras rutas:\n${preview}`);
+}
+
+function renderMaritimePortOptions() {
+    const puertoSelect = document.getElementById('maritimo-puerto');
+    if (!puertoSelect) return;
+    const ports = [...new Set(getMaritimeProviders().map(p => p.puerto))].sort((a, b) => a.localeCompare(b, 'es-MX'));
+    const current = puertoSelect.value;
+    puertoSelect.innerHTML = '<option value="">Seleccionar...</option>' + ports.map(port => `<option value="${escapeHtml(port)}">${escapeHtml(port)}</option>`).join('');
+    if (ports.includes(current)) puertoSelect.value = current;
+    renderMaritimeCityOptions();
+}
+
+function renderMaritimeCityOptions() {
+    const puerto = document.getElementById('maritimo-puerto')?.value || '';
+    const citySelect = document.getElementById('maritimo-ciudad');
+    if (!citySelect) return;
+
+    const cityMap = new Map();
+    getMaritimeProviders().forEach((provider) => {
+        if (!puerto || provider.puerto !== puerto) return;
+        provider.tarifas.forEach((tarifa) => {
+            if (!cityMap.has(tarifa.ciudadKey)) {
+                cityMap.set(tarifa.ciudadKey, tarifa.ciudad);
+            }
+        });
+    });
+
+    const cities = [...cityMap.values()].sort((a, b) => a.localeCompare(b, 'es-MX'));
+    const current = citySelect.value;
+    citySelect.innerHTML = '<option value="">Seleccionar...</option>' + cities.map(city => `<option value="${escapeHtml(city)}">${escapeHtml(city)}</option>`).join('');
+    if (cities.includes(current)) citySelect.value = current;
+}
+
+function updateMaritimeCotizarBtn() {
+    const btn = document.getElementById('btn-cotizar-maritimo');
+    if (!btn) return;
+    btn.disabled = getMaritimeProviders().length === 0;
+}
+
+function setMaritimeImportSummary(summary, providerCount, routeCount) {
+    const summaryEl = document.getElementById('maritimo-import-summary');
+    if (!summaryEl) return;
+    summaryEl.textContent = `Importadas ${routeCount} rutas consolidadas en ${providerCount} proveedor(es). Filas leídas: ${summary.totalRows}. Ignoradas por unidad: ${summary.skippedNonPortacontenedor}. Duplicados consolidados: ${summary.consolidatedDuplicates}.`;
+}
+
+function hideMaritimePlaceholderCard() {
+    document.querySelectorAll('#tab-maritimo .card').forEach((card) => {
+        if (!card.classList.contains('maritime-ready') && card.querySelector('.empty-state')) {
+            card.style.display = 'none';
+        }
+    });
+}
+
+function loadMaritimeWorkbookFromFile(file) {
+    return new Promise((resolve, reject) => {
+        const ext = file.name.split('.').pop().toLowerCase();
+        const reader = new FileReader();
+
+        reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+        reader.onload = (e) => {
+            try {
+                const workbook = ext === 'csv'
+                    ? XLSX.read(e.target.result, { type: 'string' })
+                    : XLSX.read(e.target.result, { type: 'array' });
+                resolve(workbook);
+            } catch (err) {
+                reject(err);
+            }
+        };
+
+        if (ext === 'csv') {
+            reader.readAsText(file, 'utf-8');
+        } else {
+            reader.readAsArrayBuffer(file);
+        }
+    });
+}
+
+async function handleMaritimeFile(file) {
+    const ext = file.name.split('.').pop().toLowerCase();
+    if (!['csv', 'xlsx', 'xls'].includes(ext)) {
+        alert('Solo se aceptan archivos .csv, .xlsx o .xls para marítimo.');
+        return;
+    }
+
+    try {
+        const workbook = await loadMaritimeWorkbookFromFile(file);
+        const allEntries = [];
+        const combinedSummary = {
+            totalRows: 0,
+            skippedNonPortacontenedor: 0,
+            skippedIncomplete: 0,
+            consolidatedDuplicates: 0,
+        };
+
+        workbook.SheetNames.forEach((sheetName) => {
+            const sheet = workbook.Sheets[sheetName];
+            const rawRows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '' });
+            const parsed = parseMaritimeSheetRows(rawRows, sheetName);
+            allEntries.push(...parsed.entries);
+            combinedSummary.totalRows += parsed.summary.totalRows;
+            combinedSummary.skippedNonPortacontenedor += parsed.summary.skippedNonPortacontenedor;
+            combinedSummary.skippedIncomplete += parsed.summary.skippedIncomplete;
+            combinedSummary.consolidatedDuplicates += parsed.summary.consolidatedDuplicates;
+        });
+
+        if (allEntries.length === 0) {
+            alert('No se encontraron rutas marítimas válidas en el archivo.');
+            return;
+        }
+
+        const providers = buildMaritimeProviders(allEntries);
+        saveMaritimeProviders(providers);
+        renderMaritimeProvidersList();
+        renderMaritimePortOptions();
+        updateMaritimeCotizarBtn();
+        setMaritimeImportSummary(combinedSummary, providers.length, allEntries.length);
+        hideMaritimePlaceholderCard();
+        scheduleMaritimeRouteUpdate();
+        alert(`Tarifario marítimo importado.\n\nProveedores: ${providers.length}\nRutas consolidadas: ${allEntries.length}\nDuplicados consolidados: ${combinedSummary.consolidatedDuplicates}\nFilas ignoradas por no ser Portacontenedor: ${combinedSummary.skippedNonPortacontenedor}`);
+    } catch (err) {
+        alert('Error al importar tarifario marítimo: ' + err.message);
+    } finally {
+        if (fileInputMaritimo) fileInputMaritimo.value = '';
+    }
+}
+
 function fuzzyMatch(texto, query) {
     const palabras = query.split(/\s+/).filter(p => p.length > 0);
     if (palabras.length === 0) return false;
@@ -3011,6 +3549,145 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     });
 });
 
+const maritimoPuertoEl = document.getElementById('maritimo-puerto');
+const maritimoCiudadEl = document.getElementById('maritimo-ciudad');
+const maritimoModalidadEl = document.getElementById('maritimo-modalidad');
+
+if (maritimoPuertoEl && maritimoCiudadEl && maritimoModalidadEl) {
+    maritimoPuertoEl.addEventListener('change', () => {
+        renderMaritimeCityOptions();
+        scheduleMaritimeRouteUpdate();
+    });
+    maritimoModalidadEl.addEventListener('change', () => {
+        scheduleMaritimeQuoteRefresh();
+    });
+    maritimoCiudadEl.addEventListener('change', () => {
+        scheduleMaritimeRouteUpdate();
+    });
+}
+
+document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () => {
+    const puerto = document.getElementById('maritimo-puerto').value;
+    const ciudad = document.getElementById('maritimo-ciudad').value;
+    const modalidad = document.getElementById('maritimo-modalidad').value;
+    const resultsEl = document.getElementById('quote-results-maritimo');
+    const emptyEl = document.getElementById('empty-cotizacion-maritimo');
+
+    if (!puerto) { alert('Selecciona un puerto.'); return; }
+    if (!ciudad) { alert('Selecciona una ciudad destino.'); return; }
+
+    const ciudadKey = normalizarCiudadMX(ciudad);
+    const results = [];
+
+    getMaritimeProviders().forEach((provider) => {
+        if (provider.puerto !== puerto) return;
+        provider.tarifas.forEach((tarifa) => {
+            if ((tarifa.ciudadKey || normalizarCiudadMX(tarifa.ciudad)) !== ciudadKey) return;
+            const primaryRate = modalidad === 'full' ? tarifa.full : tarifa.single;
+            const fallbackRate = modalidad === 'full' ? tarifa.single : tarifa.full;
+            const sortRate = primaryRate > 0 ? primaryRate : (fallbackRate > 0 ? fallbackRate : 0);
+            if (!(sortRate > 0)) return;
+            results.push({
+                proveedor: provider.nombre,
+                puerto,
+                ciudad: tarifa.ciudad,
+                modalidad,
+                tarifaPrincipal: sortRate,
+                tarifaSeleccionada: primaryRate,
+                tarifaSingle: tarifa.single,
+                tarifaFull: tarifa.full,
+                vigencia: tarifa.vigencia,
+                horasLibres: tarifa.horasLibres,
+                comentarios: tarifa.comentarios,
+                moneda: tarifa.moneda || 'Pesos Mexicanos',
+            });
+        });
+    });
+
+    results.sort((a, b) => a.tarifaPrincipal - b.tarifaPrincipal);
+
+    if (results.length === 0) {
+        emptyEl.style.display = 'block';
+        emptyEl.innerHTML = `
+            <div class="empty-icon">&#x1F50D;</div>
+            <p>No se encontraron tarifas <strong>${escapeHtml(modalidad)}</strong> para <strong>${escapeHtml(ciudad)}</strong> desde <strong>${escapeHtml(puerto)}</strong>.</p>
+            <p style="margin-top:0.5rem;font-size:0.8rem;">Prueba otra modalidad o revisa que el tarifario incluya esa ruta.</p>
+        `;
+        resultsEl.classList.remove('show');
+        return;
+    }
+
+    const top = results.slice(0, 3);
+    const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opcion', '&#x1F949; 3ra opcion'];
+
+    emptyEl.style.display = 'none';
+    resultsEl.innerHTML = `
+        <div style="margin-top:0.75rem;margin-bottom:0.5rem;">
+            <div style="font-size:0.75rem;color:var(--gray-500);">
+                <strong>${escapeHtml(puerto)}</strong> -> <strong>${escapeHtml(ciudad)}</strong> | Orden principal <strong>${escapeHtml(modalidad)}</strong> | ${results.length} proveedor${results.length > 1 ? 'es' : ''}
+            </div>
+        </div>
+        <div class="quote-grid">
+        ${top.map((r, i) => {
+            const lineas = [];
+            if (r.tarifaSingle > 0) lineas.push({ nombre: 'Flete maritimo Single', costo: r.tarifaSingle, esFlete: true, mub: 15 });
+            if (r.tarifaFull > 0) lineas.push({ nombre: 'Flete maritimo Full', costo: r.tarifaFull, esFlete: true, mub: 15 });
+            const calcData = encodeURIComponent(JSON.stringify({
+                proveedor: r.proveedor,
+                lineas,
+                metaInfo: [r.vigencia ? `Vigencia: ${r.vigencia}` : '', r.horasLibres ? `Horas libres: ${r.horasLibres}` : '', r.comentarios ? `Comentarios: ${r.comentarios}` : ''].filter(Boolean).join(' | ')
+            }));
+
+            return `
+            <div class="quote-card ${i === 0 ? 'best' : ''}">
+                <div class="quote-rank">${rankLabels[i]}</div>
+                <div class="quote-provider" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
+                <div class="quote-price">$${fmt(r.tarifaPrincipal)}</div>
+                <div class="quote-breakdown">
+                    <table>
+                        <tr><td>Base ranking ${modalidad === 'full' ? 'Full' : 'Single'}</td><td>${r.tarifaSeleccionada > 0 ? '$' + fmt(r.tarifaSeleccionada) : '<span style="color:var(--gray-400);">Sin tarifa</span>'}</td></tr>
+                        <tr><td>Single</td><td>${r.tarifaSingle > 0 ? '$' + fmt(r.tarifaSingle) : '<span style="color:var(--gray-400);">â€”</span>'}</td></tr>
+                        <tr><td>Full</td><td>${r.tarifaFull > 0 ? '$' + fmt(r.tarifaFull) : '<span style="color:var(--gray-400);">â€”</span>'}</td></tr>
+                        <tr><td>Vigencia</td><td>${escapeHtml(r.vigencia || 'â€”')}</td></tr>
+                        <tr><td>Horas libres</td><td>${escapeHtml(r.horasLibres || 'â€”')}</td></tr>
+                    </table>
+                </div>
+                ${r.comentarios ? `<p style="font-size:0.72rem;color:var(--gray-500);margin:0.75rem 0 0;">${escapeHtml(r.comentarios)}</p>` : ''}
+                <button class="btn-venta" data-mub="${calcData}">&#x1F4B0; Calcular Venta</button>
+            </div>`;
+        }).join('')}
+        </div>
+        <div id="mub-panel-container-maritimo"></div>
+    `;
+    resultsEl.classList.add('show');
+    scheduleMaritimeRouteUpdate();
+
+    registrarCotizacion(puerto, ciudad, 'Portacontenedor', top.map(r => ({
+        proveedor: r.proveedor,
+        tarifa: r.tarifaPrincipal,
+    })));
+
+    resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const data = JSON.parse(decodeURIComponent(btn.dataset.mub));
+            openMubPanel(data, 'mub-panel-container-maritimo');
+            if (data.metaInfo) {
+                const panel = document.querySelector('#mub-panel-container-maritimo .mub-panel');
+                const header = panel?.querySelector('.mub-panel-header');
+                if (panel && header) {
+                    const meta = document.createElement('p');
+                    meta.style.fontSize = '0.72rem';
+                    meta.style.color = 'var(--gray-500)';
+                    meta.style.margin = '0 0 0.75rem';
+                    meta.textContent = data.metaInfo;
+                    header.insertAdjacentElement('afterend', meta);
+                }
+            }
+        });
+    });
+});
+
 // ===== CALCULADORA MUB (Margen de Utilidad Bruta) =====
 // Flete: Costo + 12% (IVA - RET) = Costo c/impuestos → MUB% → Venta
 // Conceptos: ya incluyen IVA → MUB% se aplica directo
@@ -3018,8 +3695,9 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 // Inversa: MUB% = (1 - CostoBase / Venta) * 100
 const IMPUESTO_FLETE = 0.12; // IVA 16% - Retención 4% = 12%
 
-function openMubPanel(data) {
-    const container = document.getElementById('mub-panel-container');
+function openMubPanel(data, containerId = 'mub-panel-container') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const fmtShort = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     const tc = getTipoCambio();
@@ -3028,14 +3706,28 @@ function openMubPanel(data) {
     const moneda = hayTC ? 'USD' : 'MXN';
     const simbolo = hayTC ? 'US$' : '$';
 
-    const lineas = [
-        { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, esFlete: true, mub: 15, venta: 0, editando: 'mub' },
-    ];
-    for (const c of data.conceptos) {
-        if (c.monto > 0) {
-            lineas.push({ nombre: c.nombre, costo: c.monto, esFlete: false, mub: 15, venta: 0, editando: 'mub' });
-        }
-    }
+    const lineas = Array.isArray(data.lineas) && data.lineas.length
+        ? data.lineas
+            .filter(l => (parseFloat(l.costo) || 0) > 0)
+            .map(l => ({
+                nombre: l.nombre,
+                costo: parseFloat(l.costo) || 0,
+                esFlete: l.esFlete !== false,
+                mub: typeof l.mub === 'number' ? l.mub : 15,
+                venta: 0,
+                editando: 'mub'
+            }))
+        : [
+            { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, esFlete: true, mub: 15, venta: 0, editando: 'mub' },
+            ...((data.conceptos || []).filter(c => c.monto > 0).map(c => ({
+                nombre: c.nombre,
+                costo: c.monto,
+                esFlete: false,
+                mub: 15,
+                venta: 0,
+                editando: 'mub'
+            })))
+        ];
 
     // costoBase MXN = costo con impuestos (flete) o directo (conceptos)
     function costoBaseMXN(l) {
@@ -3451,6 +4143,177 @@ function scheduleRouteUpdate() {
     routeDebounce = setTimeout(updateRoute, 400);
 }
 
+let maritimeRouteLine = null;
+let maritimeDestMarker = null;
+let maritimeRouteDebounce = null;
+let maritimeQuoteDebounce = null;
+let maritimeCurrentRouteKm = 0;
+
+const maritimeMap = document.getElementById('map-maritimo')
+    ? L.map('map-maritimo', {
+        center: [23.5, -102],
+        zoom: 5,
+        scrollWheelZoom: false,
+        zoomControl: true,
+    })
+    : null;
+
+const maritimeMarkers = {};
+
+if (maritimeMap) {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+    }).addTo(maritimeMap);
+
+    Object.entries(MARITIME_PORTS).forEach(([name, port]) => {
+        const marker = L.circleMarker([port.lat, port.lng], {
+            radius: 8,
+            fillColor: '#1e3a5f',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.9,
+        }).addTo(maritimeMap);
+
+        marker.bindTooltip(port.label, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, -10],
+            className: 'airport-tooltip',
+        });
+
+        marker.on('click', () => {
+            const puertoEl = document.getElementById('maritimo-puerto');
+            if (!puertoEl) return;
+            puertoEl.value = name;
+            puertoEl.dispatchEvent(new Event('change'));
+            updateMaritimeMapMarkers();
+        });
+
+        maritimeMarkers[name] = marker;
+    });
+
+    setTimeout(() => maritimeMap.invalidateSize(), 200);
+}
+
+function updateMaritimeMapMarkers() {
+    const selected = document.getElementById('maritimo-puerto')?.value || '';
+    Object.entries(maritimeMarkers).forEach(([name, marker]) => {
+        marker.setStyle({
+            fillColor: name === selected ? '#2563eb' : '#1e3a5f',
+            radius: name === selected ? 10 : 8,
+        });
+    });
+}
+
+function clearMaritimeRoute() {
+    if (!maritimeMap) return;
+    if (maritimeRouteLine) { maritimeMap.removeLayer(maritimeRouteLine); maritimeRouteLine = null; }
+    if (maritimeDestMarker) { maritimeMap.removeLayer(maritimeDestMarker); maritimeDestMarker = null; }
+    document.getElementById('route-info-maritimo')?.classList.remove('show');
+    const kmEl = document.getElementById('route-km-maritimo');
+    const timeEl = document.getElementById('route-time-maritimo');
+    if (kmEl) kmEl.textContent = '—';
+    if (timeEl) timeEl.textContent = '—';
+    maritimeCurrentRouteKm = 0;
+}
+
+function updateMaritimeRouteStats() {
+    if (maritimeCurrentRouteKm <= 0) return;
+    const hours = maritimeCurrentRouteKm / 55;
+    const kmEl = document.getElementById('route-km-maritimo');
+    const timeEl = document.getElementById('route-time-maritimo');
+    const unitEl = document.getElementById('route-unit-type-maritimo');
+    if (kmEl) kmEl.textContent = maritimeCurrentRouteKm.toLocaleString() + ' km';
+    if (timeEl) timeEl.textContent = formatTime(hours);
+    if (unitEl) unitEl.textContent = 'Portacontenedor';
+    document.getElementById('route-info-maritimo')?.classList.add('show');
+}
+
+async function updateMaritimeRoute() {
+    const puerto = document.getElementById('maritimo-puerto')?.value || '';
+    const ciudad = document.getElementById('maritimo-ciudad')?.value || '';
+
+    updateMaritimeMapMarkers();
+
+    if (!maritimeMap || !puerto || !ciudad) {
+        clearMaritimeRoute();
+        return;
+    }
+
+    const port = MARITIME_PORTS[puerto];
+    if (!port) {
+        clearMaritimeRoute();
+        return;
+    }
+
+    const geo = await geocodeCity(ciudad);
+    if (!geo) return;
+
+    if (maritimeRouteLine) maritimeMap.removeLayer(maritimeRouteLine);
+    if (maritimeDestMarker) maritimeMap.removeLayer(maritimeDestMarker);
+
+    maritimeDestMarker = L.circleMarker([geo.lat, geo.lng], {
+        radius: 7,
+        fillColor: '#ef4444',
+        color: '#fff',
+        weight: 2,
+        fillOpacity: 0.9,
+    }).addTo(maritimeMap);
+
+    maritimeDestMarker.bindTooltip(ciudad, {
+        permanent: true,
+        direction: 'bottom',
+        offset: [0, 10],
+        className: 'airport-tooltip',
+    });
+
+    const midLat = (port.lat + geo.lat) / 2;
+    const midLng = (port.lng + geo.lng) / 2;
+    const dx = geo.lng - port.lng;
+    const dy = geo.lat - port.lat;
+    const curveLat = midLat + dx * 0.1;
+    const curveLng = midLng - dy * 0.1;
+
+    const points = [];
+    for (let t = 0; t <= 1; t += 0.05) {
+        const lat = (1 - t) ** 2 * port.lat + 2 * (1 - t) * t * curveLat + t ** 2 * geo.lat;
+        const lng = (1 - t) ** 2 * port.lng + 2 * (1 - t) * t * curveLng + t ** 2 * geo.lng;
+        points.push([lat, lng]);
+    }
+
+    maritimeRouteLine = L.polyline(points, {
+        color: '#2563eb',
+        weight: 3,
+        opacity: 0.7,
+        dashArray: '8, 6',
+    }).addTo(maritimeMap);
+
+    const bounds = L.latLngBounds([[port.lat, port.lng], [geo.lat, geo.lng]]);
+    maritimeMap.fitBounds(bounds, { padding: [30, 30] });
+
+    const straightKm = haversineKm(port.lat, port.lng, geo.lat, geo.lng);
+    maritimeCurrentRouteKm = Math.round(straightKm * 1.35);
+    updateMaritimeRouteStats();
+}
+
+function scheduleMaritimeRouteUpdate() {
+    clearTimeout(maritimeRouteDebounce);
+    maritimeRouteDebounce = setTimeout(updateMaritimeRoute, 300);
+}
+
+function scheduleMaritimeQuoteRefresh() {
+    clearTimeout(maritimeQuoteDebounce);
+    maritimeQuoteDebounce = setTimeout(() => {
+        const btn = document.getElementById('btn-cotizar-maritimo');
+        const puerto = document.getElementById('maritimo-puerto')?.value || '';
+        const ciudad = document.getElementById('maritimo-ciudad')?.value || '';
+        if (btn && puerto && ciudad && !btn.disabled) {
+            btn.click();
+        }
+    }, 150);
+}
+
 // Geocoding solo cuando cambie aeropuerto o ciudad
 document.getElementById('ciudad-destino').addEventListener('change', scheduleRouteUpdate);
 acList.addEventListener('click', (e) => {
@@ -3845,6 +4708,7 @@ document.getElementById('btn-load-historial').addEventListener('click', async ()
 document.getElementById('btn-export-data').addEventListener('click', () => {
     const data = {
         proveedores: JSON.parse(localStorage.getItem('proveedores') || '[]'),
+        proveedoresMaritimos: JSON.parse(localStorage.getItem(MARITIME_STORAGE_KEY) || '[]'),
         conceptosFijos: JSON.parse(localStorage.getItem('conceptosFijos') || '{}'),
         exportDate: new Date().toISOString(),
     };
@@ -3868,16 +4732,20 @@ document.getElementById('import-file').addEventListener('change', (e) => {
     reader.onload = function(ev) {
         try {
             const data = JSON.parse(ev.target.result);
-            if (!data.proveedores && !data.conceptosFijos) {
+            if (!data.proveedores && !data.proveedoresMaritimos && !data.conceptosFijos) {
                 alert('Archivo no válido. No contiene datos de proveedores ni conceptos.');
                 return;
             }
             const msg = `Se importarán:\n• ${(data.proveedores || []).length} proveedores\n• ${Object.keys(data.conceptosFijos || {}).length} aeropuertos con conceptos fijos\n\n¿Reemplazar datos actuales?`;
             if (!confirm(msg)) return;
             if (data.proveedores) localStorage.setItem('proveedores', JSON.stringify(data.proveedores));
+            if (data.proveedoresMaritimos) localStorage.setItem(MARITIME_STORAGE_KEY, JSON.stringify(data.proveedoresMaritimos));
             if (data.conceptosFijos) localStorage.setItem('conceptosFijos', JSON.stringify(data.conceptosFijos));
             renderProvidersList();
             updateCotizarBtn();
+            renderMaritimeProvidersList();
+            renderMaritimePortOptions();
+            updateMaritimeCotizarBtn();
             renderConceptosTable();
             alert('Datos importados correctamente.');
         } catch (err) {
@@ -3891,6 +4759,13 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 // ===== INIT =====
 renderProvidersList();
 updateCotizarBtn();
+renderMaritimeProvidersList();
+renderMaritimePortOptions();
+updateMaritimeCotizarBtn();
+hideMaritimePlaceholderCard();
+document.querySelector('[data-tab="maritimo"] .tab-badge')?.remove();
+updateMaritimeMapMarkers();
+scheduleMaritimeRouteUpdate();
 
 // Check session — show login or restore user
 (function initSession() {
