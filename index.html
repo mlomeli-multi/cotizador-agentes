@@ -2630,18 +2630,32 @@ function autodetectHeader() {
     // Buscar la fila que tenga "DESTINO" y columnas de tarifas
     // Maneja Excels con logos/títulos y PDFs con metadatos arriba
     // Prefiere tabla de FORANEOS sobre LOCALES (más rutas)
-    const headerKeywords = ['destino', 'nissan', 'rabon', 'torton', 'camioneta', '1 ton', '3.5 ton', '5.5 ton', '8 ton', 'trailer', 'caja 53'];
+    const tariffKeywords = ['nissan', 'sprinter', 'rabon', 'torton', 'camioneta', 'f450', '1 ton', '3.5 ton', '5.5 ton', '6 tons', '8 ton', '17 tons', '19 tons', 'trailer', 'caja 20', 'caja 25', 'caja 53'];
     let bestHeaderIdx = 0;
     let bestScore = 0;
 
     for (let i = 0; i < Math.min(sheetDataTemp.length, 20); i++) {
         const row = sheetDataTemp[i];
-        const rowText = row.map(c => String(c).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')).join(' ');
+        const normalizedCells = row
+            .map(c => String(c).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim())
+            .filter(Boolean);
+        const rowText = normalizedCells.join(' ');
+        const hasDestino = rowText.includes('destino');
+        const hasOrigen = rowText.includes('origen');
+        const hasEstado = rowText.includes('estado');
+        const hasTipoUnidad = rowText.includes('tipo unidad');
+        const tariffHits = tariffKeywords.filter(kw => rowText.includes(kw)).length;
         let score = 0;
-        for (const kw of headerKeywords) {
-            if (rowText.includes(kw)) score++;
-        }
-        if (score >= bestScore && score >= 2) {
+        if (hasDestino) score += 6;
+        if (hasOrigen) score += 3;
+        if (hasEstado) score += 2;
+        if (hasTipoUnidad) score += 2;
+        score += tariffHits;
+        if (normalizedCells.length >= 7) score += 4;
+        else if (normalizedCells.length >= 5) score += 2;
+        else if (normalizedCells.length <= 2) score -= 3;
+        if (!hasDestino && !hasOrigen && rowText.length > 80) score -= 4;
+        if (score >= bestScore && score >= 5) {
             bestScore = score;
             bestHeaderIdx = i;
         }
