@@ -610,6 +610,175 @@
             transition: background 0.15s;
         }
         .quote-card .btn-venta:hover { background: var(--navy-light); }
+        .maritime-rankings {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        .maritime-ranking-panel {
+            margin: 0;
+            padding: 1rem;
+        }
+        .maritime-ranking-panel.single {
+            background: #f8fbff;
+            border: 1px solid #dbeafe;
+        }
+        .maritime-ranking-panel.full {
+            background: #fffaf2;
+            border: 1px solid #fde7c2;
+        }
+        .maritime-ranking-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.75rem;
+        }
+        .maritime-ranking-panel.single .maritime-ranking-title { color: var(--blue); }
+        .maritime-ranking-panel.full .maritime-ranking-title { color: var(--amber); }
+        .maritime-ranking-panel .quote-grid {
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+        }
+        .maritime-option-card { min-height: 100%; }
+        .maritime-option-card.selected {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+            background: #ffffff;
+        }
+        .maritime-selection-summary {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin: 0.5rem 0 0.9rem;
+        }
+        .maritime-selection-chip {
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.75rem 0.9rem;
+            background: #fff;
+            font-size: 0.82rem;
+            color: var(--gray-600);
+        }
+        .maritime-selection-chip strong {
+            display: block;
+            color: var(--navy);
+            margin-bottom: 0.2rem;
+        }
+        .maritime-selection-chip.pending {
+            border-style: dashed;
+            color: var(--gray-500);
+            background: var(--gray-50);
+        }
+        .maritime-selection-chip.ready.single {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+        }
+        .maritime-selection-chip.ready.full {
+            border-color: #fde7c2;
+            background: #fffbeb;
+        }
+        .maritime-results-head {
+            margin-top: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .maritime-results-meta {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+        .maritime-combined-shell {
+            margin-top: 0.25rem;
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            padding: 1rem;
+        }
+        .maritime-combined-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 0.9rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid #dbeafe;
+        }
+        .maritime-combined-title {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--navy);
+        }
+        .maritime-combined-subtitle {
+            margin-top: 0.25rem;
+            font-size: 0.78rem;
+            color: var(--gray-500);
+        }
+        .maritime-combined-badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .maritime-combined-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.35rem 0.55rem;
+            border-radius: 999px;
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.02em;
+        }
+        .maritime-combined-badge.single {
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .maritime-combined-badge.full {
+            background: #fef3c7;
+            color: #b45309;
+        }
+        .maritime-combined-picks {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 0.9rem;
+        }
+        .maritime-combined-pick {
+            border-radius: 10px;
+            padding: 0.8rem 0.9rem;
+            border: 1px solid var(--gray-200);
+            background: #fff;
+        }
+        .maritime-combined-pick.single {
+            border-color: #bfdbfe;
+            background: #eff6ff;
+        }
+        .maritime-combined-pick.full {
+            border-color: #fde7c2;
+            background: #fffbeb;
+        }
+        .maritime-combined-pick-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+        .maritime-combined-pick.single .maritime-combined-pick-label {
+            color: #1d4ed8;
+        }
+        .maritime-combined-pick.full .maritime-combined-pick-label {
+            color: #b45309;
+        }
+        .maritime-combined-pick-provider {
+            font-size: 0.84rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .maritime-combined-pick-meta {
+            margin-top: 0.2rem;
+            font-size: 0.74rem;
+            color: var(--gray-500);
+        }
 
         /* ===== CALCULADORA MUB ===== */
         .mub-panel {
@@ -1019,6 +1188,10 @@
             .main { padding: 1rem; }
             .form-grid { grid-template-columns: 1fr !important; }
             .quote-grid { grid-template-columns: 1fr; }
+            .maritime-rankings { grid-template-columns: 1fr; }
+            .maritime-selection-summary { grid-template-columns: 1fr; }
+            .maritime-combined-head { flex-direction: column; }
+            .maritime-combined-picks { grid-template-columns: 1fr; }
             .header { padding: 0.75rem 1rem; }
             .header-title h1 { font-size: 1.05rem; }
             .tabs-container { overflow-x: auto; }
@@ -1519,7 +1692,7 @@
                 </div>
                 <div class="layout-right">
                     <div class="form-section-title">&#x1F6A2; Ruta</div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr 220px;align-items:end;">
+                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;align-items:end;">
                         <div class="form-group">
                             <label>Puerto origen</label>
                             <select id="maritimo-puerto">
@@ -1532,16 +1705,9 @@
                                 <option value="">Seleccionar...</option>
                             </select>
                         </div>
-                        <div class="form-group">
-                            <label>Ordenar por</label>
-                            <select id="maritimo-modalidad">
-                                <option value="single">Single</option>
-                                <option value="full">Full</option>
-                            </select>
-                        </div>
                     </div>
                     <p style="font-size:0.78rem;color:var(--gray-500);margin-top:0.25rem;">
-                        Siempre verás ambas tarifas cuando el proveedor las tenga. La selección solo define el orden principal del Top 3.
+                        Veras dos rankings: mejores opciones Single y mejores opciones Full. Luego eliges una de cada lado para mandar ambas a la calculadora.
                     </p>
                     <div class="cotizar-actions">
                         <button class="btn btn-success btn-lg" id="btn-cotizar-maritimo" disabled>
@@ -3551,25 +3717,134 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 
 const maritimoPuertoEl = document.getElementById('maritimo-puerto');
 const maritimoCiudadEl = document.getElementById('maritimo-ciudad');
-const maritimoModalidadEl = document.getElementById('maritimo-modalidad');
+let maritimeSelection = { single: null, full: null };
 
-if (maritimoPuertoEl && maritimoCiudadEl && maritimoModalidadEl) {
+if (maritimoPuertoEl && maritimoCiudadEl) {
     maritimoPuertoEl.addEventListener('change', () => {
         renderMaritimeCityOptions();
         scheduleMaritimeRouteUpdate();
-    });
-    maritimoModalidadEl.addEventListener('change', () => {
-        scheduleMaritimeQuoteRefresh();
     });
     maritimoCiudadEl.addEventListener('change', () => {
         scheduleMaritimeRouteUpdate();
     });
 }
 
+function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
+    const selected = maritimeSelection[tipo] && maritimeSelection[tipo].providerKey === option.providerKey;
+    return `
+        <div class="quote-card maritime-option-card ${index === 0 ? 'best' : ''} ${selected ? 'selected' : ''}">
+            <div class="quote-rank">${rankLabels[index]}</div>
+            <div class="quote-provider" title="${escapeHtml(option.proveedor)}">${escapeHtml(option.proveedor)}</div>
+            <div class="quote-price">$${fmt(option[tipo])}</div>
+            <div class="quote-breakdown">
+                <table>
+                    <tr><td>Single</td><td>${option.single > 0 ? '$' + fmt(option.single) : '<span style="color:var(--gray-400);">-</span>'}</td></tr>
+                    <tr><td>Full</td><td>${option.full > 0 ? '$' + fmt(option.full) : '<span style="color:var(--gray-400);">-</span>'}</td></tr>
+                    <tr><td>Vigencia</td><td>${escapeHtml(option.vigencia || '-')}</td></tr>
+                    <tr><td>Horas libres</td><td>${escapeHtml(option.horasLibres || '-')}</td></tr>
+                </table>
+            </div>
+            ${option.comentarios ? `<p style="font-size:0.72rem;color:var(--gray-500);margin:0.75rem 0 0;">${escapeHtml(option.comentarios)}</p>` : ''}
+            <button class="btn-venta maritime-pick-btn" data-kind="${tipo}" data-key="${escapeHtml(option.providerKey)}">${selected ? `Elegido como ${tipo === 'single' ? 'Single' : 'Full'}` : `Usar como ${tipo === 'single' ? 'Single' : 'Full'}`}</button>
+        </div>`;
+}
+
+function renderMaritimeSelectionSummary(fmt) {
+    const summary = document.getElementById('maritime-selection-summary');
+    if (!summary) return;
+
+    const singleReady = !!maritimeSelection.single;
+    const fullReady = !!maritimeSelection.full;
+
+    summary.innerHTML = `
+        <div class="maritime-selection-chip ${singleReady ? 'ready single' : 'pending'}">
+            <strong>Single elegido</strong>
+            ${singleReady ? `${escapeHtml(maritimeSelection.single.proveedor)} ($${fmt(maritimeSelection.single.single)})` : 'Pendiente de seleccionar'}
+        </div>
+        <div class="maritime-selection-chip ${fullReady ? 'ready full' : 'pending'}">
+            <strong>Full elegido</strong>
+            ${fullReady ? `${escapeHtml(maritimeSelection.full.proveedor)} ($${fmt(maritimeSelection.full.full)})` : 'Pendiente de seleccionar'}
+        </div>
+    `;
+}
+
+function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-maritimo') {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    if (!maritimeSelection.single || !maritimeSelection.full) {
+        container.innerHTML = `
+            <div class="empty-state-mini" style="display:block;margin-top:1rem;">
+                Elige una opcion Single y una opcion Full para abrir la calculadora combinada.
+            </div>
+        `;
+        return;
+    }
+
+    const singleChoice = maritimeSelection.single;
+    const fullChoice = maritimeSelection.full;
+    const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    const innerContainerId = `${containerId}-inner`;
+
+    container.innerHTML = `
+        <div class="maritime-combined-shell">
+            <div class="maritime-combined-head">
+                <div>
+                    <div class="maritime-combined-title">Calculadora combinada maritima</div>
+                    <div class="maritime-combined-subtitle">Estas armando la venta final con una opcion Single y una opcion Full elegidas por separado.</div>
+                </div>
+                <div class="maritime-combined-badges">
+                    <span class="maritime-combined-badge single">Single seleccionado</span>
+                    <span class="maritime-combined-badge full">Full seleccionado</span>
+                </div>
+            </div>
+            <div class="maritime-combined-picks">
+                <div class="maritime-combined-pick single">
+                    <div class="maritime-combined-pick-label">Single</div>
+                    <div class="maritime-combined-pick-provider">${escapeHtml(singleChoice.proveedor)}</div>
+                    <div class="maritime-combined-pick-meta">$${fmt(singleChoice.single)}${singleChoice.vigencia ? ` · Vigencia ${escapeHtml(singleChoice.vigencia)}` : ''}</div>
+                    ${singleChoice.horasLibres ? `<div class="maritime-combined-pick-meta">Horas libres: ${escapeHtml(singleChoice.horasLibres)}</div>` : ''}
+                </div>
+                <div class="maritime-combined-pick full">
+                    <div class="maritime-combined-pick-label">Full</div>
+                    <div class="maritime-combined-pick-provider">${escapeHtml(fullChoice.proveedor)}</div>
+                    <div class="maritime-combined-pick-meta">$${fmt(fullChoice.full)}${fullChoice.vigencia ? ` · Vigencia ${escapeHtml(fullChoice.vigencia)}` : ''}</div>
+                    ${fullChoice.horasLibres ? `<div class="maritime-combined-pick-meta">Horas libres: ${escapeHtml(fullChoice.horasLibres)}</div>` : ''}
+                </div>
+            </div>
+            <div id="${innerContainerId}"></div>
+        </div>
+    `;
+
+    openMubPanel({
+        proveedor: `${singleChoice.proveedor} + ${fullChoice.proveedor}`,
+        lineas: [
+            { nombre: `Flete maritimo Single (${singleChoice.proveedor})`, costo: singleChoice.single, esFlete: true, mub: 15 },
+            { nombre: `Flete maritimo Full (${fullChoice.proveedor})`, costo: fullChoice.full, esFlete: true, mub: 15 },
+        ],
+        metaInfo: [
+            `Single: ${singleChoice.proveedor}`,
+            `Full: ${fullChoice.proveedor}`,
+            singleChoice.vigencia ? `Vigencia single: ${singleChoice.vigencia}` : '',
+            fullChoice.vigencia ? `Vigencia full: ${fullChoice.vigencia}` : '',
+            singleChoice.horasLibres ? `Horas libres single: ${singleChoice.horasLibres}` : '',
+            fullChoice.horasLibres ? `Horas libres full: ${fullChoice.horasLibres}` : '',
+            singleChoice.comentarios ? `Comentarios single: ${singleChoice.comentarios}` : '',
+            fullChoice.comentarios ? `Comentarios full: ${fullChoice.comentarios}` : ''
+        ].filter(Boolean).join(' | ')
+    }, innerContainerId);
+}
+
+function updateMaritimeHelpText() {
+    const helpText = document.querySelector('#tab-maritimo .layout-right p');
+    if (helpText) {
+        helpText.textContent = 'Veras dos rankings: mejores opciones Single y mejores opciones Full. Luego eliges una de cada lado para mandar ambas a la calculadora.';
+    }
+}
+
 document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () => {
     const puerto = document.getElementById('maritimo-puerto').value;
     const ciudad = document.getElementById('maritimo-ciudad').value;
-    const modalidad = document.getElementById('maritimo-modalidad').value;
     const resultsEl = document.getElementById('quote-results-maritimo');
     const emptyEl = document.getElementById('empty-cotizacion-maritimo');
 
@@ -3583,17 +3858,12 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
         if (provider.puerto !== puerto) return;
         provider.tarifas.forEach((tarifa) => {
             if ((tarifa.ciudadKey || normalizarCiudadMX(tarifa.ciudad)) !== ciudadKey) return;
-            const primaryRate = modalidad === 'full' ? tarifa.full : tarifa.single;
-            const fallbackRate = modalidad === 'full' ? tarifa.single : tarifa.full;
-            const sortRate = primaryRate > 0 ? primaryRate : (fallbackRate > 0 ? fallbackRate : 0);
-            if (!(sortRate > 0)) return;
+            if (!(tarifa.single > 0) && !(tarifa.full > 0)) return;
             results.push({
                 proveedor: provider.nombre,
                 puerto,
                 ciudad: tarifa.ciudad,
-                modalidad,
-                tarifaPrincipal: sortRate,
-                tarifaSeleccionada: primaryRate,
+                providerKey: `${provider.id}__${tarifa.ciudadKey || normalizarCiudadMX(tarifa.ciudad)}`,
                 tarifaSingle: tarifa.single,
                 tarifaFull: tarifa.full,
                 vigencia: tarifa.vigencia,
@@ -3604,86 +3874,100 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
         });
     });
 
-    results.sort((a, b) => a.tarifaPrincipal - b.tarifaPrincipal);
+    const singleResults = results.filter(r => r.tarifaSingle > 0).sort((a, b) => a.tarifaSingle - b.tarifaSingle);
+    const fullResults = results.filter(r => r.tarifaFull > 0).sort((a, b) => a.tarifaFull - b.tarifaFull);
 
-    if (results.length === 0) {
+    if (singleResults.length === 0 && fullResults.length === 0) {
         emptyEl.style.display = 'block';
         emptyEl.innerHTML = `
             <div class="empty-icon">&#x1F50D;</div>
-            <p>No se encontraron tarifas <strong>${escapeHtml(modalidad)}</strong> para <strong>${escapeHtml(ciudad)}</strong> desde <strong>${escapeHtml(puerto)}</strong>.</p>
-            <p style="margin-top:0.5rem;font-size:0.8rem;">Prueba otra modalidad o revisa que el tarifario incluya esa ruta.</p>
+            <p>No se encontraron tarifas para <strong>${escapeHtml(ciudad)}</strong> desde <strong>${escapeHtml(puerto)}</strong>.</p>
+            <p style="margin-top:0.5rem;font-size:0.8rem;">Revisa que el tarifario incluya esa ruta en Single o Full.</p>
         `;
         resultsEl.classList.remove('show');
         return;
     }
 
-    const top = results.slice(0, 3);
+    maritimeSelection = { single: null, full: null };
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opcion', '&#x1F949; 3ra opcion'];
 
     emptyEl.style.display = 'none';
     resultsEl.innerHTML = `
-        <div style="margin-top:0.75rem;margin-bottom:0.5rem;">
-            <div style="font-size:0.75rem;color:var(--gray-500);">
-                <strong>${escapeHtml(puerto)}</strong> -> <strong>${escapeHtml(ciudad)}</strong> | Orden principal <strong>${escapeHtml(modalidad)}</strong> | ${results.length} proveedor${results.length > 1 ? 'es' : ''}
+        <div class="maritime-results-head">
+            <div class="maritime-results-meta">
+                <strong>${escapeHtml(puerto)}</strong> -> <strong>${escapeHtml(ciudad)}</strong> | ${results.length} proveedores comparados
             </div>
         </div>
-        <div class="quote-grid">
-        ${top.map((r, i) => {
-            const lineas = [];
-            if (r.tarifaSingle > 0) lineas.push({ nombre: 'Flete maritimo Single', costo: r.tarifaSingle, esFlete: true, mub: 15 });
-            if (r.tarifaFull > 0) lineas.push({ nombre: 'Flete maritimo Full', costo: r.tarifaFull, esFlete: true, mub: 15 });
-            const calcData = encodeURIComponent(JSON.stringify({
-                proveedor: r.proveedor,
-                lineas,
-                metaInfo: [r.vigencia ? `Vigencia: ${r.vigencia}` : '', r.horasLibres ? `Horas libres: ${r.horasLibres}` : '', r.comentarios ? `Comentarios: ${r.comentarios}` : ''].filter(Boolean).join(' | ')
-            }));
-
-            return `
-            <div class="quote-card ${i === 0 ? 'best' : ''}">
-                <div class="quote-rank">${rankLabels[i]}</div>
-                <div class="quote-provider" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
-                <div class="quote-price">$${fmt(r.tarifaPrincipal)}</div>
-                <div class="quote-breakdown">
-                    <table>
-                        <tr><td>Base ranking ${modalidad === 'full' ? 'Full' : 'Single'}</td><td>${r.tarifaSeleccionada > 0 ? '$' + fmt(r.tarifaSeleccionada) : '<span style="color:var(--gray-400);">Sin tarifa</span>'}</td></tr>
-                        <tr><td>Single</td><td>${r.tarifaSingle > 0 ? '$' + fmt(r.tarifaSingle) : '<span style="color:var(--gray-400);">â€”</span>'}</td></tr>
-                        <tr><td>Full</td><td>${r.tarifaFull > 0 ? '$' + fmt(r.tarifaFull) : '<span style="color:var(--gray-400);">â€”</span>'}</td></tr>
-                        <tr><td>Vigencia</td><td>${escapeHtml(r.vigencia || 'â€”')}</td></tr>
-                        <tr><td>Horas libres</td><td>${escapeHtml(r.horasLibres || 'â€”')}</td></tr>
-                    </table>
+        <div class="maritime-rankings">
+            <div class="card maritime-ranking-panel single">
+                <div class="maritime-ranking-title">Top 3 Single</div>
+                <div class="quote-grid">
+                    ${singleResults.slice(0, 3).map((r, i) => createMaritimeOptionMarkup('single', rankLabels, fmt, {
+                        providerKey: r.providerKey,
+                        proveedor: r.proveedor,
+                        single: r.tarifaSingle,
+                        full: r.tarifaFull,
+                        vigencia: r.vigencia,
+                        horasLibres: r.horasLibres,
+                        comentarios: r.comentarios
+                    }, i)).join('')}
                 </div>
-                ${r.comentarios ? `<p style="font-size:0.72rem;color:var(--gray-500);margin:0.75rem 0 0;">${escapeHtml(r.comentarios)}</p>` : ''}
-                <button class="btn-venta" data-mub="${calcData}">&#x1F4B0; Calcular Venta</button>
-            </div>`;
-        }).join('')}
+            </div>
+            <div class="card maritime-ranking-panel full">
+                <div class="maritime-ranking-title">Top 3 Full</div>
+                <div class="quote-grid">
+                    ${fullResults.slice(0, 3).map((r, i) => createMaritimeOptionMarkup('full', rankLabels, fmt, {
+                        providerKey: r.providerKey,
+                        proveedor: r.proveedor,
+                        single: r.tarifaSingle,
+                        full: r.tarifaFull,
+                        vigencia: r.vigencia,
+                        horasLibres: r.horasLibres,
+                        comentarios: r.comentarios
+                    }, i)).join('')}
+                </div>
+            </div>
         </div>
+        <div id="maritime-selection-summary" class="maritime-selection-summary"></div>
         <div id="mub-panel-container-maritimo"></div>
     `;
     resultsEl.classList.add('show');
     scheduleMaritimeRouteUpdate();
 
-    registrarCotizacion(puerto, ciudad, 'Portacontenedor', top.map(r => ({
-        proveedor: r.proveedor,
-        tarifa: r.tarifaPrincipal,
-    })));
+    registrarCotizacion(puerto, ciudad, 'Portacontenedor', [
+        ...singleResults.slice(0, 3).map(r => ({ proveedor: `${r.proveedor} [Single]`, tarifa: r.tarifaSingle })),
+        ...fullResults.slice(0, 3).map(r => ({ proveedor: `${r.proveedor} [Full]`, tarifa: r.tarifaFull }))
+    ]);
 
-    resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
+    renderMaritimeSelectionSummary(fmt);
+    renderMaritimeCombinedCalculator();
+
+    resultsEl.querySelectorAll('.maritime-pick-btn').forEach(btn => {
         btn.addEventListener('click', () => {
-            const data = JSON.parse(decodeURIComponent(btn.dataset.mub));
-            openMubPanel(data, 'mub-panel-container-maritimo');
-            if (data.metaInfo) {
-                const panel = document.querySelector('#mub-panel-container-maritimo .mub-panel');
-                const header = panel?.querySelector('.mub-panel-header');
-                if (panel && header) {
-                    const meta = document.createElement('p');
-                    meta.style.fontSize = '0.72rem';
-                    meta.style.color = 'var(--gray-500)';
-                    meta.style.margin = '0 0 0.75rem';
-                    meta.textContent = data.metaInfo;
-                    header.insertAdjacentElement('afterend', meta);
-                }
-            }
+            const kind = btn.dataset.kind;
+            const key = btn.dataset.key;
+            const pool = kind === 'single' ? singleResults : fullResults;
+            const match = pool.find(item => item.providerKey === key);
+            if (!match) return;
+
+            maritimeSelection[kind] = {
+                providerKey: match.providerKey,
+                proveedor: match.proveedor,
+                single: match.tarifaSingle,
+                full: match.tarifaFull,
+                vigencia: match.vigencia,
+                horasLibres: match.horasLibres,
+                comentarios: match.comentarios
+            };
+
+            resultsEl.querySelectorAll(`.maritime-pick-btn[data-kind="${kind}"]`).forEach(otherBtn => {
+                const isCurrent = otherBtn.dataset.key === key;
+                otherBtn.textContent = isCurrent ? `Elegido como ${kind === 'single' ? 'Single' : 'Full'}` : `Usar como ${kind === 'single' ? 'Single' : 'Full'}`;
+            });
+
+            renderMaritimeSelectionSummary(fmt);
+            renderMaritimeCombinedCalculator();
         });
     });
 });
@@ -4302,18 +4586,6 @@ function scheduleMaritimeRouteUpdate() {
     maritimeRouteDebounce = setTimeout(updateMaritimeRoute, 300);
 }
 
-function scheduleMaritimeQuoteRefresh() {
-    clearTimeout(maritimeQuoteDebounce);
-    maritimeQuoteDebounce = setTimeout(() => {
-        const btn = document.getElementById('btn-cotizar-maritimo');
-        const puerto = document.getElementById('maritimo-puerto')?.value || '';
-        const ciudad = document.getElementById('maritimo-ciudad')?.value || '';
-        if (btn && puerto && ciudad && !btn.disabled) {
-            btn.click();
-        }
-    }, 150);
-}
-
 // Geocoding solo cuando cambie aeropuerto o ciudad
 document.getElementById('ciudad-destino').addEventListener('change', scheduleRouteUpdate);
 acList.addEventListener('click', (e) => {
@@ -4763,6 +5035,7 @@ renderMaritimeProvidersList();
 renderMaritimePortOptions();
 updateMaritimeCotizarBtn();
 hideMaritimePlaceholderCard();
+updateMaritimeHelpText();
 document.querySelector('[data-tab="maritimo"] .tab-badge')?.remove();
 updateMaritimeMapMarkers();
 scheduleMaritimeRouteUpdate();
