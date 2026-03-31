@@ -2862,7 +2862,7 @@ function getCiudadesDisponibles(aeropuerto) {
 }
 
 function normalizarTexto(str) {
-    return str.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    return String(str ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
 const MARITIME_STORAGE_KEY = 'proveedoresMaritimos';
