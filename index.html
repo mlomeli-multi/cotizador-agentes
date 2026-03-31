@@ -924,6 +924,48 @@
         .maritime-main .quote-card {
             padding: 0.8rem;
         }
+        .maritime-route-card .maritime-shell-legacy {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        .maritime-route-card .maritime-sidebar {
+            position: static;
+        }
+        .maritime-route-card .maritime-sidebar .map-container {
+            height: 360px;
+            border-radius: 18px 18px 0 0;
+        }
+        .maritime-route-card .maritime-main {
+            border: none;
+            background: transparent;
+            padding: 0;
+        }
+        .maritime-route-card .maritime-search-grid {
+            grid-template-columns: minmax(220px, 0.9fr) minmax(260px, 1.1fr) auto;
+            gap: 0.75rem;
+            align-items: end;
+        }
+        .maritime-route-card .cotizar-actions {
+            margin: 0;
+        }
+        .maritime-route-card .btn-lg {
+            width: auto;
+            min-width: 220px;
+        }
+        .maritime-route-card #maritime-help-text {
+            display: none;
+        }
+        .maritime-results-card .card-header {
+            margin-bottom: 0.9rem;
+        }
+        .maritime-results-card .maritime-help-text {
+            margin-top: -0.35rem;
+            margin-bottom: 0.85rem;
+            max-width: none;
+        }
+        .maritime-results-card .maritime-empty-panel {
+            min-height: 180px;
+        }
 
         /* ===== CALCULADORA MUB ===== */
         .mub-panel {
@@ -1335,6 +1377,8 @@
             .maritime-toolbar .btn-lg { width: 100%; min-width: 0; }
             .maritime-shell-legacy { grid-template-columns: 1fr; }
             .maritime-shell-legacy .maritime-sidebar .map-container { height: 280px; }
+            .maritime-route-card .maritime-search-grid { grid-template-columns: 1fr; }
+            .maritime-route-card .btn-lg { width: 100%; min-width: 0; }
         }
         @media (max-width: 768px) {
             .main { padding: 1rem; }
@@ -4628,6 +4672,51 @@ function updateMaritimeHelpText() {
     }
 }
 
+function setupMaritimeWorkspaceLayout() {
+    const tab = document.getElementById('tab-maritimo');
+    const routeCard = tab?.querySelector('.card.maritime-ready');
+    const adminCard = tab?.querySelector('.card.admin-only.maritime-ready');
+    const resultsEl = document.getElementById('quote-results-maritimo');
+    const emptyEl = document.getElementById('empty-cotizacion-maritimo');
+    const helpText = document.getElementById('maritime-help-text');
+    const searchGrid = tab?.querySelector('.maritime-search-grid');
+    const actionWrap = document.getElementById('btn-cotizar-maritimo')?.closest('.cotizar-actions');
+    if (!tab || !routeCard || !resultsEl || !emptyEl) return;
+
+    routeCard.classList.add('maritime-route-card');
+    if (searchGrid && actionWrap && actionWrap.parentElement !== searchGrid) {
+        searchGrid.appendChild(actionWrap);
+    }
+
+    let resultsCard = document.getElementById('maritime-results-card');
+    if (!resultsCard) {
+        resultsCard = document.createElement('div');
+        resultsCard.id = 'maritime-results-card';
+        resultsCard.className = 'card maritime-ready maritime-results-card';
+        resultsCard.innerHTML = `
+            <div class="card-header">
+                <div class="card-icon navy">&#x2693;</div>
+                <h2>Comparador de Opciones</h2>
+            </div>
+        `;
+        if (adminCard) {
+            tab.insertBefore(resultsCard, adminCard);
+        } else {
+            tab.appendChild(resultsCard);
+        }
+    }
+
+    if (helpText && helpText.parentElement !== resultsCard) {
+        resultsCard.appendChild(helpText);
+    }
+    if (resultsEl.parentElement !== resultsCard) {
+        resultsCard.appendChild(resultsEl);
+    }
+    if (emptyEl.parentElement !== resultsCard) {
+        resultsCard.appendChild(emptyEl);
+    }
+}
+
 document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () => {
     const puerto = document.getElementById('maritimo-puerto').value;
     const cityInput = document.getElementById('maritimo-ciudad');
@@ -5844,6 +5933,7 @@ renderMaritimeProvidersList();
 renderMaritimePortOptions();
 updateMaritimeCotizarBtn();
 hideMaritimePlaceholderCard();
+setupMaritimeWorkspaceLayout();
 updateMaritimeHelpText();
 document.querySelector('[data-tab="maritimo"] .tab-badge')?.remove();
 updateMaritimeMapMarkers();
