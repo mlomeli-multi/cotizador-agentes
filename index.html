@@ -2369,9 +2369,11 @@ if (uploadZoneMaritimo && fileInputMaritimo) {
 let workbookTemp = null;  // workbook actual leído
 let sheetDataTemp = null; // datos de la hoja seleccionada (array de arrays)
 let sheetsTemp = [];      // nombres de hojas
+let importFileNameTemp = '';
 
 function handleFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
+    importFileNameTemp = file.name || '';
     if (!['xlsx', 'xls', 'pdf'].includes(ext)) {
         alert('Solo se aceptan archivos .xlsx, .xls o .pdf');
         return;
@@ -2401,14 +2403,16 @@ function handleFile(file) {
 }
 
 function openMappingModal(fileName) {
-    document.getElementById('provider-name').value = fileName.replace(/\.[^.]+$/, '');
-    document.getElementById('provider-airport').value = '';
-    document.getElementById('airport-hint').textContent = '';
+    importFileNameTemp = fileName || importFileNameTemp || '';
+    const preset = getImportPreset(importFileNameTemp);
+    document.getElementById('provider-name').value = preset?.providerName || fileName.replace(/\.[^.]+$/, '');
+    document.getElementById('provider-airport').value = preset?.airport || '';
+    document.getElementById('airport-hint').textContent = preset?.hint || '';
     renderSheetTabs(0);
 
     // Si no se detectó aeropuerto por pestaña, revisar si hay columna ORIGEN
     if (!document.getElementById('provider-airport').value && sheetDataTemp) {
-        const headers = sheetDataTemp[0];
+        const headers = getSheetHeaderMeta().headers;
         const hasOrigen = headers && headers.some(h =>
             String(h).toLowerCase().trim() === 'origen'
         );
@@ -2424,6 +2428,7 @@ function openMappingModal(fileName) {
 // ===== PDF PARSING =====
 async function handlePDF(file) {
     try {
+        importFileNameTemp = file.name || importFileNameTemp || '';
         const arrayBuffer = await file.arrayBuffer();
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
@@ -2529,6 +2534,50 @@ function detectAirportFromSheetName(name) {
     return '';
 }
 
+function getImportPreset(fileName = '') {
+    const lower = String(fileName).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (lower.includes('hh') && lower.includes('transport')) {
+        return { providerName: 'HH Transportes', airport: 'AUTO', hint: 'Se detectó HH con columna ORIGEN; se separará por aeropuerto automáticamente.' };
+    }
+    if (lower.includes('romex')) {
+        return { providerName: 'ROMEX', airport: 'MTY', hint: 'Se detectó tarifario ROMEX para aeropuerto MTY.' };
+    }
+    return null;
+}
+
+function shouldUseRomexMergedHeader() {
+    const lower = String(importFileNameTemp || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    return lower.includes('romex');
+}
+
+function getSheetHeaderMeta() {
+    if (!sheetDataTemp || sheetDataTemp.length === 0) {
+        return { headers: [], dataRows: [], headerRowsUsed: 1 };
+    }
+
+    if (shouldUseRomexMergedHeader() && sheetDataTemp.length > 1) {
+        const rowA = sheetDataTemp[0] || [];
+        const rowB = sheetDataTemp[1] || [];
+        const maxCols = Math.max(rowA.length, rowB.length);
+        const headers = Array.from({ length: maxCols }, (_, idx) => {
+            const top = normalizeWhitespace(rowA[idx]);
+            const bottom = normalizeWhitespace(rowB[idx]);
+            return normalizeWhitespace([top, bottom].filter(Boolean).join(' '));
+        });
+        return {
+            headers,
+            dataRows: sheetDataTemp.slice(2),
+            headerRowsUsed: 2,
+        };
+    }
+
+    return {
+        headers: sheetDataTemp[0] || [],
+        dataRows: sheetDataTemp.slice(1),
+        headerRowsUsed: 1,
+    };
+}
+
 function renderSheetTabs(activeIdx) {
     const container = document.getElementById('sheet-tabs');
     container.innerHTML = '';
@@ -2607,15 +2656,17 @@ function renderPreviewTable() {
         table.innerHTML = '<tr><td>Sin datos</td></tr>';
         return;
     }
-    const maxCols = Math.max(...sheetDataTemp.slice(0, 10).map(r => r.length));
-    const headerRow = sheetDataTemp[0];
+    const meta = getSheetHeaderMeta();
+    const previewSource = [meta.headers, ...meta.dataRows];
+    const maxCols = Math.max(...previewSource.slice(0, 10).map(r => r.length));
+    const headerRow = meta.headers;
     let html = '<thead><tr>';
     for (let c = 0; c < maxCols; c++) {
         const val = headerRow[c] !== undefined ? headerRow[c] : '';
         html += `<th>${escapeHtml(String(val))}</th>`;
     }
     html += '</tr></thead><tbody>';
-    const previewRows = sheetDataTemp.slice(1, 6);
+    const previewRows = meta.dataRows.slice(0, 5);
     for (const row of previewRows) {
         html += '<tr>';
         for (let c = 0; c < maxCols; c++) {
@@ -2630,24 +2681,24 @@ function renderPreviewTable() {
 
 function renderMappingSelects() {
     if (!sheetDataTemp || sheetDataTemp.length === 0) return;
-    const headers = sheetDataTemp[0];
+    const headers = getSheetHeaderMeta().headers;
     const selectIds = ['map-ciudad', 'map-1ton', 'map-3-5ton', 'map-rabon', 'map-torton', 'map-caja53'];
 
     // Cada regla: { match: [...], exclude: [...] }
     // match = al menos uno debe coincidir, exclude = si coincide alguno se descarta
     const rules = [
         // Ciudad destino
-        { match: ['destino', 'ciudad', 'localidad', 'municipio', 'poblacion'], exclude: [] },
+        { match: ['destino', 'ciudad', 'localidad', 'municipio', 'poblacion', 'destino / origen'], exclude: ['tipo unidad'] },
         // 1 Tonelada: Barajas="NISSAN", Oslu="NISSAN", Trapol="1 TON"
-        { match: ['nissan', '1 ton'], exclude: ['0.7', '3.5', '5.5', '8 ton', '10 ton'] },
+        { match: ['nissan', '1 ton', 'sprinter'], exclude: ['0.7', '3.5', '5.5', '6 tons', '8 ton', '10 ton'] },
         // 3.5 Toneladas: Barajas="CAMIONETA 3 1/2", Oslu="CAMIONETA 3.5", Trapol="3.5 TON"
-        { match: ['3.5', '3 1/2', 'camioneta'], exclude: [] },
+        { match: ['3.5', '3 1/2', 'camioneta', 'f450'], exclude: ['3/4', 'partner', 'pick up'] },
         // Rabón (5 Ton): Barajas="RABON", Oslu="RABON", Trapol="5.5 TON"
-        { match: ['rabon', '5.5 ton', '5 ton'], exclude: ['3.5', '53'] },
+        { match: ['rabon', '5.5 ton', '5 ton', '6 tons', 'caja 20'], exclude: ['3.5', '53'] },
         // Tortón (10 Ton): Barajas="TORTON", Trapol="8 TON"
-        { match: ['torton', '8 ton'], exclude: [] },
+        { match: ['torton', '8 ton', '17 tons', 'caja 25'], exclude: [] },
         // Caja Seca 53': Barajas="TRAILER", Oslu="CAJA 53'", Trapol="trailer"
-        { match: ['caja 53', "53'", 'trailer'], exclude: [] },
+        { match: ['caja 53', "53'", 'trailer', '19 tons'], exclude: [] },
     ];
 
     selectIds.forEach((id, idx) => {
@@ -2714,6 +2765,29 @@ function detectAirportFromOrigen(origenValue) {
     return null;
 }
 
+function normalizeImportedCityName(value) {
+    const raw = normalizeWhitespace(value);
+    const lower = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (!raw || ['n/a', 'na', 'n.d.', 'nd', 'sin destino'].includes(lower)) return '';
+
+    const aliases = {
+        'cdmx': 'Ciudad de Mexico',
+        'slp': 'San Luis Potosi',
+        'aifa nlu': 'AIFA, Estado de Mexico',
+        'aifa': 'AIFA, Estado de Mexico',
+        'cd benito juarez, n.l.': 'Ciudad Benito Juarez, Nuevo Leon',
+        'el carmen, n.l.': 'El Carmen, Nuevo Leon',
+        'salinas victoria, n.l.': 'Salinas Victoria, Nuevo Leon',
+        'linares, n.l.': 'Linares, Nuevo Leon',
+        'nuevo laredo': 'Nuevo Laredo, Tamaulipas',
+        'durango,dgo': 'Durango, Durango',
+        'cd juarez': 'Ciudad Juarez, Chihuahua',
+        'cd victoria': 'Ciudad Victoria, Tamaulipas',
+    };
+
+    return aliases[lower] || raw;
+}
+
 document.getElementById('btn-save-mapping').addEventListener('click', () => {
     const nombre = document.getElementById('provider-name').value.trim();
     const aeropuerto = document.getElementById('provider-airport').value;
@@ -2740,7 +2814,7 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
     // Detectar columna ORIGEN si modo AUTO
     let colOrigen = -1;
     if (aeropuerto === 'AUTO') {
-        const headers = sheetDataTemp[0];
+        const headers = getSheetHeaderMeta().headers;
         colOrigen = headers.findIndex(h => {
             const lower = String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
             return lower === 'origen' || lower === 'origin';
@@ -2753,10 +2827,10 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
 
     // Extraer tarifas (agrupadas por aeropuerto si AUTO)
     const tarifasPorAeropuerto = {}; // { 'MEX': [...], 'NLU': [...] }
-    const dataRows = sheetDataTemp.slice(1);
+    const dataRows = getSheetHeaderMeta().dataRows;
 
     for (const row of dataRows) {
-        const ciudad = String(row[parseInt(colCiudad)] || '').trim();
+        const ciudad = normalizeImportedCityName(String(row[parseInt(colCiudad)] || '').trim());
         if (!ciudad) continue;
 
         // Determinar aeropuerto para esta fila
