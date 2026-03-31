@@ -2159,10 +2159,6 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
             setTimeout(() => map.invalidateSize(), 120);
         }
         if (btn.dataset.tab === 'maritimo' && maritimeMap) {
-            const portSelect = document.getElementById('maritimo-puerto');
-            if (portSelect && portSelect.options.length <= 1 && getMaritimeProviders().length > 0) {
-                renderMaritimePortOptions();
-            }
             setTimeout(() => maritimeMap.invalidateSize(), 120);
             setTimeout(updateMaritimeRoute, 150);
         }
