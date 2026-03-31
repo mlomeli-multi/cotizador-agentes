@@ -1699,11 +1699,10 @@
                                 <option value="">Seleccionar...</option>
                             </select>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group autocomplete-wrap">
                             <label>Ciudad destino final</label>
-                            <select id="maritimo-ciudad">
-                                <option value="">Seleccionar...</option>
-                            </select>
+                            <input type="text" id="maritimo-ciudad" placeholder="Ej: Chihuahua" autocomplete="off">
+                            <div class="autocomplete-list" id="autocomplete-list-maritimo"></div>
                         </div>
                     </div>
                     <p style="font-size:0.78rem;color:var(--gray-500);margin-top:0.25rem;">
@@ -3336,25 +3335,83 @@ function renderMaritimePortOptions() {
     renderMaritimeCityOptions();
 }
 
-function renderMaritimeCityOptions() {
-    const puerto = document.getElementById('maritimo-puerto')?.value || '';
-    const citySelect = document.getElementById('maritimo-ciudad');
-    if (!citySelect) return;
+function toTitleCaseLabel(value) {
+    return normalizeWhitespace(value)
+        .toLowerCase()
+        .split(',')
+        .map(part => part.trim().split(' ').filter(Boolean).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
+        .join(', ');
+}
 
-    const cityMap = new Map();
+function preferMaritimeCityLabel(current, candidate) {
+    const currentClean = normalizeWhitespace(current);
+    const candidateClean = normalizeWhitespace(candidate);
+    if (!currentClean) return candidateClean;
+    if (!candidateClean) return currentClean;
+
+    const currentHasState = currentClean.includes(',');
+    const candidateHasState = candidateClean.includes(',');
+    if (currentHasState !== candidateHasState) {
+        return candidateHasState ? candidateClean : currentClean;
+    }
+    if (candidateClean.length !== currentClean.length) {
+        return candidateClean.length > currentClean.length ? candidateClean : currentClean;
+    }
+    return currentClean;
+}
+
+function getMaritimeCitiesDisponibles(puerto) {
+    const groups = new Map();
+
     getMaritimeProviders().forEach((provider) => {
-        if (!puerto || provider.puerto !== puerto) return;
+        if (puerto && provider.puerto !== puerto) return;
         provider.tarifas.forEach((tarifa) => {
-            if (!cityMap.has(tarifa.ciudadKey)) {
-                cityMap.set(tarifa.ciudadKey, tarifa.ciudad);
+            const ciudadOriginal = normalizeWhitespace(tarifa.ciudad);
+            const ciudadKey = tarifa.ciudadKey || normalizarCiudadMX(ciudadOriginal);
+            if (!ciudadOriginal || !ciudadKey) return;
+
+            if (!groups.has(ciudadKey)) {
+                groups.set(ciudadKey, {
+                    variantes: new Set(),
+                    providers: new Set(),
+                    bestLabel: '',
+                });
             }
+
+            const group = groups.get(ciudadKey);
+            group.variantes.add(ciudadOriginal);
+            group.providers.add(provider.nombre);
+            group.bestLabel = preferMaritimeCityLabel(group.bestLabel, ciudadOriginal);
         });
     });
 
-    const cities = [...cityMap.values()].sort((a, b) => a.localeCompare(b, 'es-MX'));
-    const current = citySelect.value;
-    citySelect.innerHTML = '<option value="">Seleccionar...</option>' + cities.map(city => `<option value="${escapeHtml(city)}">${escapeHtml(city)}</option>`).join('');
-    if (cities.includes(current)) citySelect.value = current;
+    return groups;
+}
+
+function renderMaritimeCityOptions() {
+    const puerto = document.getElementById('maritimo-puerto')?.value || '';
+    const cityInput = document.getElementById('maritimo-ciudad');
+    const maritimeList = document.getElementById('autocomplete-list-maritimo');
+    if (!cityInput) return;
+
+    const currentKey = cityInput.dataset.cityKey || normalizarCiudadMX(cityInput.value);
+    const groups = getMaritimeCitiesDisponibles(puerto);
+    const currentGroup = currentKey ? groups.get(currentKey) : null;
+
+    if (!puerto || !currentGroup) {
+        cityInput.value = '';
+        delete cityInput.dataset.cityKey;
+        delete cityInput.dataset.variantes;
+        delete cityInput.dataset.fullLabel;
+    } else {
+        const variantes = [...currentGroup.variantes].sort((a, b) => a.localeCompare(b, 'es-MX'));
+        cityInput.value = toTitleCaseLabel(currentGroup.bestLabel || variantes[0] || cityInput.value);
+        cityInput.dataset.cityKey = currentKey;
+        cityInput.dataset.variantes = encodeURIComponent(JSON.stringify(variantes));
+        cityInput.dataset.fullLabel = cityInput.value;
+    }
+
+    maritimeList?.classList.remove('show');
 }
 
 function updateMaritimeCotizarBtn() {
@@ -3717,6 +3774,8 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 
 const maritimoPuertoEl = document.getElementById('maritimo-puerto');
 const maritimoCiudadEl = document.getElementById('maritimo-ciudad');
+const maritimeAcList = document.getElementById('autocomplete-list-maritimo');
+let maritimeAcIndex = -1;
 let maritimeSelection = { single: null, full: null };
 
 if (maritimoPuertoEl && maritimoCiudadEl) {
@@ -3724,10 +3783,107 @@ if (maritimoPuertoEl && maritimoCiudadEl) {
         renderMaritimeCityOptions();
         scheduleMaritimeRouteUpdate();
     });
+    maritimoCiudadEl.addEventListener('input', () => {
+        delete maritimoCiudadEl.dataset.cityKey;
+        delete maritimoCiudadEl.dataset.variantes;
+        delete maritimoCiudadEl.dataset.fullLabel;
+
+        const query = normalizarTexto(maritimoCiudadEl.value);
+        const puerto = maritimoPuertoEl.value;
+        if (!maritimeAcList || !puerto || query.length < 2) {
+            maritimeAcList?.classList.remove('show');
+            scheduleMaritimeRouteUpdate();
+            return;
+        }
+
+        const groups = getMaritimeCitiesDisponibles(puerto);
+        const matches = [];
+
+        for (const [cityKey, data] of groups) {
+            const baseCity = cityKey.includes('|') ? cityKey.split('|')[0] : cityKey;
+            const found = fuzzyMatch(baseCity, query);
+            if (!found) continue;
+
+            const variantes = [...data.variantes].sort((a, b) => a.localeCompare(b, 'es-MX'));
+            matches.push({
+                cityKey,
+                baseCity,
+                display: toTitleCaseLabel(data.bestLabel || variantes[0] || baseCity),
+                variantes,
+                providerCount: data.providers.size,
+                score: matchScore(baseCity, query),
+            });
+        }
+
+        matches.sort((a, b) => {
+            if (b.score !== a.score) return b.score - a.score;
+            return a.display.localeCompare(b.display, 'es-MX');
+        });
+
+        if (matches.length === 0) {
+            maritimeAcList.innerHTML = '<div class="autocomplete-item" style="color:var(--gray-400);cursor:default;">No se encontraron ciudades</div>';
+            maritimeAcList.classList.add('show');
+            scheduleMaritimeRouteUpdate();
+            return;
+        }
+
+        maritimeAcIndex = -1;
+        maritimeAcList.innerHTML = matches.slice(0, 20).map((match, index) => {
+            const variantesData = encodeURIComponent(JSON.stringify(match.variantes));
+            const variantesStr = match.variantes.map(v => escapeHtml(toTitleCaseLabel(v))).join(' · ');
+            return `<div class="autocomplete-item" data-idx="${index}" data-value="${escapeHtml(match.display)}" data-city-key="${escapeHtml(match.cityKey)}" data-full-label="${escapeHtml(match.display)}" data-variantes="${variantesData}">
+                ${escapeHtml(match.display)}<span class="ac-airport">${match.providerCount} prov.</span>
+                <span class="ac-variants">${variantesStr}</span>
+            </div>`;
+        }).join('');
+        maritimeAcList.classList.add('show');
+
+        maritimeAcList.querySelectorAll('.autocomplete-item[data-value]').forEach(item => {
+            item.addEventListener('click', () => {
+                maritimoCiudadEl.value = item.dataset.value || '';
+                maritimoCiudadEl.dataset.cityKey = item.dataset.cityKey || '';
+                maritimoCiudadEl.dataset.variantes = item.dataset.variantes || '';
+                maritimoCiudadEl.dataset.fullLabel = item.dataset.fullLabel || item.dataset.value || '';
+                maritimeAcList.classList.remove('show');
+                scheduleMaritimeRouteUpdate();
+            });
+        });
+    });
     maritimoCiudadEl.addEventListener('change', () => {
         scheduleMaritimeRouteUpdate();
     });
+    maritimoCiudadEl.addEventListener('keydown', (e) => {
+        const items = maritimeAcList?.querySelectorAll('.autocomplete-item') || [];
+        if (!items.length || !maritimeAcList?.classList.contains('show')) return;
+
+        if (e.key === 'ArrowDown') {
+            e.preventDefault();
+            maritimeAcIndex = Math.min(maritimeAcIndex + 1, items.length - 1);
+            items.forEach((it, i) => it.classList.toggle('selected', i === maritimeAcIndex));
+        } else if (e.key === 'ArrowUp') {
+            e.preventDefault();
+            maritimeAcIndex = Math.max(maritimeAcIndex - 1, 0);
+            items.forEach((it, i) => it.classList.toggle('selected', i === maritimeAcIndex));
+        } else if (e.key === 'Enter' && maritimeAcIndex >= 0) {
+            e.preventDefault();
+            const item = items[maritimeAcIndex];
+            maritimoCiudadEl.value = item.dataset.value || '';
+            maritimoCiudadEl.dataset.cityKey = item.dataset.cityKey || '';
+            maritimoCiudadEl.dataset.variantes = item.dataset.variantes || '';
+            maritimoCiudadEl.dataset.fullLabel = item.dataset.fullLabel || item.dataset.value || '';
+            maritimeAcList.classList.remove('show');
+            scheduleMaritimeRouteUpdate();
+        } else if (e.key === 'Escape') {
+            maritimeAcList.classList.remove('show');
+        }
+    });
 }
+
+document.addEventListener('click', (e) => {
+    if (!e.target.closest('.autocomplete-wrap')) {
+        maritimeAcList?.classList.remove('show');
+    }
+});
 
 function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
     const selected = maritimeSelection[tipo] && maritimeSelection[tipo].providerKey === option.providerKey;
@@ -3844,20 +4000,33 @@ function updateMaritimeHelpText() {
 
 document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () => {
     const puerto = document.getElementById('maritimo-puerto').value;
-    const ciudad = document.getElementById('maritimo-ciudad').value;
+    const cityInput = document.getElementById('maritimo-ciudad');
+    const ciudad = cityInput?.value || '';
     const resultsEl = document.getElementById('quote-results-maritimo');
     const emptyEl = document.getElementById('empty-cotizacion-maritimo');
 
     if (!puerto) { alert('Selecciona un puerto.'); return; }
     if (!ciudad) { alert('Selecciona una ciudad destino.'); return; }
 
-    const ciudadKey = normalizarCiudadMX(ciudad);
+    const ciudadKey = cityInput?.dataset.cityKey || normalizarCiudadMX(ciudad);
+    const variantesRaw = cityInput?.dataset.variantes || '';
+    let variantesOriginales = [];
+    try {
+        const parsed = JSON.parse(decodeURIComponent(variantesRaw));
+        if (Array.isArray(parsed) && parsed.length > 0) {
+            variantesOriginales = parsed;
+        }
+    } catch (e) {}
     const results = [];
 
     getMaritimeProviders().forEach((provider) => {
         if (provider.puerto !== puerto) return;
         provider.tarifas.forEach((tarifa) => {
-            if ((tarifa.ciudadKey || normalizarCiudadMX(tarifa.ciudad)) !== ciudadKey) return;
+            const tarifaKey = tarifa.ciudadKey || normalizarCiudadMX(tarifa.ciudad);
+            const matchPorKey = tarifaKey === ciudadKey;
+            const matchPorVariante = variantesOriginales.length > 0
+                && variantesOriginales.some(v => normalizarTexto(v) === normalizarTexto(tarifa.ciudad));
+            if (!matchPorKey && !matchPorVariante) return;
             if (!(tarifa.single > 0) && !(tarifa.full > 0)) return;
             results.push({
                 proveedor: provider.nombre,
@@ -4516,7 +4685,9 @@ function updateMaritimeRouteStats() {
 
 async function updateMaritimeRoute() {
     const puerto = document.getElementById('maritimo-puerto')?.value || '';
-    const ciudad = document.getElementById('maritimo-ciudad')?.value || '';
+    const cityInput = document.getElementById('maritimo-ciudad');
+    const ciudad = cityInput?.value || '';
+    const ciudadKey = cityInput?.dataset.cityKey || normalizarCiudadMX(ciudad);
 
     updateMaritimeMapMarkers();
 
@@ -4531,7 +4702,15 @@ async function updateMaritimeRoute() {
         return;
     }
 
-    const geo = await geocodeCity(ciudad);
+    const cityGroup = getMaritimeCitiesDisponibles(puerto).get(ciudadKey);
+    if (!cityGroup) {
+        clearMaritimeRoute();
+        return;
+    }
+
+    const ciudadGeoLabel = cityInput?.dataset.fullLabel || toTitleCaseLabel(cityGroup.bestLabel || ciudad);
+
+    const geo = await geocodeCity(ciudadGeoLabel);
     if (!geo) return;
 
     if (maritimeRouteLine) maritimeMap.removeLayer(maritimeRouteLine);
@@ -4545,7 +4724,7 @@ async function updateMaritimeRoute() {
         fillOpacity: 0.9,
     }).addTo(maritimeMap);
 
-    maritimeDestMarker.bindTooltip(ciudad, {
+    maritimeDestMarker.bindTooltip(ciudadGeoLabel, {
         permanent: true,
         direction: 'bottom',
         offset: [0, 10],
