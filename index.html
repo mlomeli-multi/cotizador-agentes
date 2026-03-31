@@ -5701,6 +5701,7 @@ document.getElementById('estibable').addEventListener('change', updateRouteStats
 const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbyYbBdGehpSxfibSf5fTdtwY5IyHo-wptY8D0RXFOvLbD9qfZ44bEi3LnITftkwb446pA/exec';
 const LAST_LOGIN_USER_KEY = 'lastLoginUser';
 const SHARED_DATA_URL = './data/cotizador-base.json';
+const SHARED_EXCHANGE_RATE_URL = './data/tipo-cambio.json';
 const TARIFF_MANAGER_USERS = new Set(['miguel', 'miguel lomeli']);
 
 function getLoginHelpEl() {
@@ -5757,6 +5758,22 @@ async function loadSharedOfficialData() {
         return true;
     } catch (err) {
         console.warn('No se pudo cargar la base oficial compartida:', err);
+        return false;
+    }
+}
+
+async function loadSharedExchangeRate() {
+    try {
+        const res = await fetch(`${SHARED_EXCHANGE_RATE_URL}?v=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (typeof data.tipoCambio === 'number' && data.tipoCambio > 0) {
+            localStorage.setItem('tipoCambio', String(data.tipoCambio));
+            syncTipoCambioInput();
+        }
+        return true;
+    } catch (err) {
+        console.warn('No se pudo cargar el tipo de cambio compartido:', err);
         return false;
     }
 }
@@ -6169,6 +6186,7 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 // ===== INIT =====
 (async function initApp() {
     await loadSharedOfficialData();
+    await loadSharedExchangeRate();
     renderProvidersList();
     updateCotizarBtn();
     renderMaritimeProvidersList();
