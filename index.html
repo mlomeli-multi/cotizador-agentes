@@ -2433,14 +2433,15 @@ async function handlePDF(file) {
         const arrayBuffer = await file.arrayBuffer();
         pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
         const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+        const pdfDebugPages = [];
 
         const lowerName = String(importFileNameTemp).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
         let specializedRows = null;
         if (lowerName.includes('hh') && lowerName.includes('transport')) {
-            specializedRows = await extractHHPDFRows(pdf);
+            specializedRows = await extractHHPDFRows(pdf, pdfDebugPages);
             if (specializedRows && specializedRows.length > 1) pdfImportStrategyTemp = 'hh-specific';
         } else if (lowerName.includes('romex')) {
-            specializedRows = await extractRomexPDFRows(pdf);
+            specializedRows = await extractRomexPDFRows(pdf, pdfDebugPages);
             if (specializedRows && specializedRows.length > 1) pdfImportStrategyTemp = 'romex-specific';
         }
 
@@ -2460,12 +2461,19 @@ async function handlePDF(file) {
             const page = await pdf.getPage(p);
             const textContent = await page.getTextContent();
             const pageRows = extractTableFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+            pdfDebugPages.push({
+                page: p,
+                strategy: 'generic',
+                rowCount: pageRows.length,
+                rows: pageRows.slice(0, 120),
+            });
             if (!isLikelyPDFTablePage(pageRows)) continue;
             allRows.push(...pageRows);
         }
 
         if (allRows.length === 0) {
-            alert('No se pudieron extraer datos tabulares del PDF.');
+            offerPDFDebugDownload(file.name, pdfDebugPages);
+            alert('No se pudieron extraer datos tabulares del PDF. Se preparó un archivo de diagnóstico para descarga.');
             return;
         }
 
@@ -2482,6 +2490,28 @@ async function handlePDF(file) {
     } catch (err) {
         alert('Error al leer el PDF: ' + err.message);
         fileInput.value = '';
+    }
+}
+
+function offerPDFDebugDownload(fileName, pages) {
+    try {
+        const payload = {
+            fileName,
+            createdAt: new Date().toISOString(),
+            pages,
+        };
+        const blob = new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const safeName = String(fileName || 'pdf').replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]+/gi, '_');
+        a.href = url;
+        a.download = `${safeName}_pdf_debug.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1500);
+    } catch (err) {
+        console.warn('No se pudo generar el debug del PDF:', err);
     }
 }
 
@@ -2559,7 +2589,7 @@ function extractPositionedRowsFromPDFPage(textContent, viewport, tolerance = 5) 
     return rows;
 }
 
-async function extractHHPDFRows(pdf) {
+async function extractHHPDFRows(pdf, debugPages = []) {
     const output = [['ORIGEN', 'ESTADO ORIGEN', 'DESTINO', 'ESTADO DESTINO', '1 TON', '3.5 TON', 'RABON', 'TORTON', "CAJA 53'"]];
     const seen = new Set();
 
@@ -2567,6 +2597,12 @@ async function extractHHPDFRows(pdf) {
         const page = await pdf.getPage(p);
         const textContent = await page.getTextContent();
         const rows = extractPositionedRowsFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+        debugPages.push({
+            page: p,
+            strategy: 'hh-specific',
+            rowCount: rows.length,
+            rows: rows.slice(0, 120).map(row => row.map(item => ({ text: item.text, x: item.x, y: item.y }))),
+        });
         const headerRow = rows.find(row => {
             const text = row.map(item => normalizePdfToken(item.text)).join(' ');
             return text.includes('origen') && text.includes('destino') && text.includes('unidad 1') && text.includes('caja 53');
@@ -2647,7 +2683,7 @@ async function extractHHPDFRows(pdf) {
     return output;
 }
 
-async function extractRomexPDFRows(pdf) {
+async function extractRomexPDFRows(pdf, debugPages = []) {
     const output = [['DESTINO', '1 TON', '3.5 TON', 'RABON', 'TORTON', "CAJA 53'"]];
     const seen = new Set();
 
@@ -2655,6 +2691,12 @@ async function extractRomexPDFRows(pdf) {
         const page = await pdf.getPage(p);
         const textContent = await page.getTextContent();
         const rows = extractRowTextsFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+        debugPages.push({
+            page: p,
+            strategy: 'romex-specific',
+            rowCount: rows.length,
+            rows: rows.slice(0, 120),
+        });
 
         rows.forEach(tokens => {
             const normalized = tokens.map(normalizePdfToken);
