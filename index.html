@@ -1524,6 +1524,8 @@
         /* ===== ADMIN MODE ===== */
         .admin-only { display: none; }
         body.admin-mode .admin-only { display: block; }
+        .tariff-manager-only { display: none; }
+        body.admin-mode.tariff-manager .tariff-manager-only { display: block; }
         body.admin-mode .admin-only-flex { display: flex; }
         .admin-only-flex { display: none; }
 
@@ -1870,7 +1872,7 @@
         </div>
 
         <!-- Card: Proveedores / Tarifas (ADMIN ONLY) -->
-        <div class="card admin-only">
+        <div class="card admin-only tariff-manager-only">
             <div class="card-header">
                 <div class="card-icon green">&#x1F4C4;</div>
                 <h2>Tarifas de Proveedores</h2>
@@ -2045,7 +2047,7 @@
             </div>
         </div>
 
-        <div class="card admin-only maritime-ready">
+        <div class="card admin-only maritime-ready tariff-manager-only">
             <div class="card-header">
                 <div class="card-icon green">&#x1F4C4;</div>
                 <h2>Tarifario Maritimo</h2>
@@ -5698,6 +5700,8 @@ document.getElementById('estibable').addEventListener('change', updateRouteStats
 // ===== GOOGLE SHEETS API =====
 const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbyYbBdGehpSxfibSf5fTdtwY5IyHo-wptY8D0RXFOvLbD9qfZ44bEi3LnITftkwb446pA/exec';
 const LAST_LOGIN_USER_KEY = 'lastLoginUser';
+const SHARED_DATA_URL = './data/cotizador-base.json';
+const TARIFF_MANAGER_USERS = new Set(['miguel', 'miguel lomeli']);
 
 function getLoginHelpEl() {
     return document.getElementById('login-help');
@@ -5730,6 +5734,31 @@ function getLastLoginUser() {
 function setLastLoginUser(nombre) {
     if (!nombre) return;
     localStorage.setItem(LAST_LOGIN_USER_KEY, nombre);
+}
+
+function normalizeUserName(value) {
+    return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+async function loadSharedOfficialData() {
+    try {
+        const res = await fetch(`${SHARED_DATA_URL}?v=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (Array.isArray(data.proveedores)) {
+            localStorage.setItem('proveedores', JSON.stringify(data.proveedores));
+        }
+        if (Array.isArray(data.proveedoresMaritimos)) {
+            localStorage.setItem(MARITIME_STORAGE_KEY, JSON.stringify(data.proveedoresMaritimos));
+        }
+        if (data.conceptosFijos && typeof data.conceptosFijos === 'object') {
+            localStorage.setItem('conceptosFijos', JSON.stringify(data.conceptosFijos));
+        }
+        return true;
+    } catch (err) {
+        console.warn('No se pudo cargar la base oficial compartida:', err);
+        return false;
+    }
 }
 
 function inferSheetsApiError(res, text) {
@@ -5793,8 +5822,16 @@ function setCurrentUser(user) {
 }
 
 function isAdmin() {
-    const user = getCurrentUser();
     return user && user.rol === 'admin';
+}
+
+function isTariffManager() {
+    const user = getCurrentUser();
+    return !!(user && TARIFF_MANAGER_USERS.has(normalizeUserName(user.nombre)));
+}
+
+function setTariffManagerMode(active) {
+    document.body.classList.toggle('tariff-manager', !!active);
 }
 
 function setAdminMode(active) {
@@ -5822,9 +5859,12 @@ function updateHeaderUser() {
         if (user.rol === 'admin') {
             setAdminMode(true);
         }
+        setTariffManagerMode(isTariffManager());
     } else {
         badge.style.display = 'none';
         logoutBtn.style.display = 'none';
+        adminBtn.style.display = 'none';
+        setTariffManagerMode(false);
     }
 }
 
@@ -5921,6 +5961,7 @@ document.getElementById('btn-reload-users').addEventListener('click', () => {
 document.getElementById('btn-logout').addEventListener('click', () => {
     setCurrentUser(null);
     setAdminMode(false);
+    setTariffManagerMode(false);
     showLogin();
 });
 
@@ -6126,25 +6167,27 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 });
 
 // ===== INIT =====
-renderProvidersList();
-updateCotizarBtn();
-renderMaritimeProvidersList();
-renderMaritimePortOptions();
-updateMaritimeCotizarBtn();
-hideMaritimePlaceholderCard();
-setupMaritimeWorkspaceLayout();
-updateMaritimeHelpText();
-document.querySelector('[data-tab="maritimo"] .tab-badge')?.remove();
-updateMaritimeMapMarkers();
-scheduleMaritimeRouteUpdate();
+(async function initApp() {
+    await loadSharedOfficialData();
+    renderProvidersList();
+    updateCotizarBtn();
+    renderMaritimeProvidersList();
+    renderMaritimePortOptions();
+    updateMaritimeCotizarBtn();
+    hideMaritimePlaceholderCard();
+    setupMaritimeWorkspaceLayout();
+    updateMaritimeHelpText();
+    document.querySelector('[data-tab="maritimo"] .tab-badge')?.remove();
+    updateMaritimeMapMarkers();
+    scheduleMaritimeRouteUpdate();
 
 // Check session — show login or restore user
-(function initSession() {
     const user = getCurrentUser();
     if (user) {
         hideLogin();
         updateHeaderUser();
     } else {
+        setTariffManagerMode(false);
         showLogin();
     }
 })();
