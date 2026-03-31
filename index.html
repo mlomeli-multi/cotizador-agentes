@@ -639,13 +639,118 @@
         .maritime-ranking-panel.full .maritime-ranking-title { color: var(--amber); }
         .maritime-ranking-panel .quote-grid {
             grid-template-columns: 1fr;
-            gap: 0.75rem;
+            gap: 0.65rem;
         }
-        .maritime-option-card { min-height: 100%; }
-        .maritime-option-card.selected {
+        .maritime-option-row {
+            border: 1px solid var(--gray-200);
+            border-radius: 14px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .maritime-option-row.best {
+            border-color: rgba(16, 185, 129, 0.45);
+            background: #f7fffb;
+        }
+        .maritime-option-row.selected {
             border-color: var(--blue);
             box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
-            background: #ffffff;
+        }
+        .maritime-option-summary {
+            display: grid;
+            grid-template-columns: auto minmax(0, 1fr) auto auto auto;
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.8rem 0.9rem;
+        }
+        .maritime-option-rank {
+            font-size: 0.65rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--gray-400);
+            white-space: nowrap;
+        }
+        .maritime-option-row.best .maritime-option-rank {
+            color: var(--green);
+        }
+        .maritime-option-provider {
+            min-width: 0;
+        }
+        .maritime-option-provider strong {
+            display: block;
+            font-size: 0.83rem;
+            color: var(--navy);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .maritime-option-provider span {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            margin-top: 0.12rem;
+        }
+        .maritime-option-price {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--blue);
+            white-space: nowrap;
+        }
+        .maritime-option-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.45rem;
+        }
+        .maritime-expand-btn {
+            border: 1px solid var(--gray-200);
+            background: var(--gray-50);
+            color: var(--gray-600);
+            border-radius: 999px;
+            padding: 0.42rem 0.75rem;
+            font-size: 0.72rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+        .maritime-expand-btn:hover {
+            background: var(--gray-100);
+        }
+        .maritime-option-row .btn-venta {
+            margin-top: 0;
+            width: auto;
+            min-width: 150px;
+            padding: 0.45rem 0.85rem;
+            white-space: nowrap;
+        }
+        .maritime-option-detail {
+            display: none;
+            padding: 0.85rem 0.95rem 0.95rem;
+            border-top: 1px solid var(--gray-100);
+            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+        }
+        .maritime-option-row.expanded .maritime-option-detail {
+            display: block;
+        }
+        .maritime-option-detail-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 0.6rem;
+            font-size: 0.74rem;
+            color: var(--gray-600);
+        }
+        .maritime-option-detail-item strong {
+            display: block;
+            font-size: 0.64rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--gray-400);
+            margin-bottom: 0.15rem;
+        }
+        .maritime-option-comment {
+            margin-top: 0.75rem;
+            font-size: 0.74rem;
+            color: var(--gray-500);
+            line-height: 1.45;
         }
         .maritime-selection-summary {
             display: grid;
@@ -1388,6 +1493,10 @@
             .maritime-selection-summary { grid-template-columns: 1fr; }
             .maritime-combined-head { flex-direction: column; }
             .maritime-combined-picks { grid-template-columns: 1fr; }
+            .maritime-option-summary { grid-template-columns: 1fr; }
+            .maritime-option-actions { justify-content: flex-start; }
+            .maritime-option-row .btn-venta { width: 100%; }
+            .maritime-option-detail-grid { grid-template-columns: 1fr 1fr; }
             .maritime-toolbar { padding: 0.85rem; }
             .maritime-help-text { margin-top: 0.5rem; }
             .maritime-selection-summary { position: static; }
@@ -4451,6 +4560,7 @@ const maritimoCiudadEl = document.getElementById('maritimo-ciudad');
 const maritimeAcList = document.getElementById('autocomplete-list-maritimo');
 let maritimeAcIndex = -1;
 let maritimeSelection = { single: null, full: null };
+let maritimeExpanded = { single: null, full: null };
 
 if (maritimoPuertoEl && maritimoCiudadEl) {
     maritimoPuertoEl.addEventListener('change', () => {
@@ -4561,22 +4671,123 @@ document.addEventListener('click', (e) => {
 
 function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
     const selected = maritimeSelection[tipo] && maritimeSelection[tipo].providerKey === option.providerKey;
+    const expanded = maritimeExpanded[tipo] === option.providerKey;
     return `
-        <div class="quote-card maritime-option-card ${index === 0 ? 'best' : ''} ${selected ? 'selected' : ''}">
-            <div class="quote-rank">${rankLabels[index]}</div>
-            <div class="quote-provider" title="${escapeHtml(option.proveedor)}">${escapeHtml(option.proveedor)}</div>
-            <div class="quote-price">$${fmt(option[tipo])}</div>
-            <div class="quote-breakdown">
-                <table>
-                    <tr><td>Single</td><td>${option.single > 0 ? '$' + fmt(option.single) : '<span style="color:var(--gray-400);">-</span>'}</td></tr>
-                    <tr><td>Full</td><td>${option.full > 0 ? '$' + fmt(option.full) : '<span style="color:var(--gray-400);">-</span>'}</td></tr>
-                    <tr><td>Vigencia</td><td>${escapeHtml(option.vigencia || '-')}</td></tr>
-                    <tr><td>Horas libres</td><td>${escapeHtml(option.horasLibres || '-')}</td></tr>
-                </table>
+        <div class="maritime-option-row ${index === 0 ? 'best' : ''} ${selected ? 'selected' : ''} ${expanded ? 'expanded' : ''}">
+            <div class="maritime-option-summary">
+                <div class="maritime-option-rank">${rankLabels[index]}</div>
+                <div class="maritime-option-provider">
+                    <strong title="${escapeHtml(option.proveedor)}">${escapeHtml(option.proveedor)}</strong>
+                    <span>${tipo === 'single' ? 'Tarifa base Single' : 'Tarifa base Full'}</span>
+                </div>
+                <div class="maritime-option-price">$${fmt(option[tipo])}</div>
+                <div class="maritime-option-actions">
+                    <button class="maritime-expand-btn" type="button" data-expand-kind="${tipo}" data-expand-key="${escapeHtml(option.providerKey)}">${expanded ? 'Ocultar notas' : 'Expandir notas'}</button>
+                </div>
+                <button class="btn-venta maritime-pick-btn" data-kind="${tipo}" data-key="${escapeHtml(option.providerKey)}">${selected ? `Elegido como ${tipo === 'single' ? 'Single' : 'Full'}` : `Usar como ${tipo === 'single' ? 'Single' : 'Full'}`}</button>
             </div>
-            ${option.comentarios ? `<p style="font-size:0.72rem;color:var(--gray-500);margin:0.75rem 0 0;">${escapeHtml(option.comentarios)}</p>` : ''}
-            <button class="btn-venta maritime-pick-btn" data-kind="${tipo}" data-key="${escapeHtml(option.providerKey)}">${selected ? `Elegido como ${tipo === 'single' ? 'Single' : 'Full'}` : `Usar como ${tipo === 'single' ? 'Single' : 'Full'}`}</button>
+            <div class="maritime-option-detail">
+                <div class="maritime-option-detail-grid">
+                    <div class="maritime-option-detail-item">
+                        <strong>Single</strong>
+                        ${option.single > 0 ? '$' + fmt(option.single) : '<span style="color:var(--gray-400);">-</span>'}
+                    </div>
+                    <div class="maritime-option-detail-item">
+                        <strong>Full</strong>
+                        ${option.full > 0 ? '$' + fmt(option.full) : '<span style="color:var(--gray-400);">-</span>'}
+                    </div>
+                    <div class="maritime-option-detail-item">
+                        <strong>Vigencia</strong>
+                        ${escapeHtml(option.vigencia || '-')}
+                    </div>
+                    <div class="maritime-option-detail-item">
+                        <strong>Horas libres</strong>
+                        ${escapeHtml(option.horasLibres || '-')}
+                    </div>
+                </div>
+                ${option.comentarios ? `<div class="maritime-option-comment">${escapeHtml(option.comentarios)}</div>` : ''}
+            </div>
         </div>`;
+}
+
+function bindMaritimeOptionInteractions(resultsEl, fmt, puerto, ciudad, results, singleResults, fullResults, rankLabels) {
+    if (!resultsEl) return;
+
+    const renderResultsContent = () => {
+        resultsEl.innerHTML = `
+            <div class="maritime-results-head">
+                <div class="maritime-results-meta">
+                    <strong>${escapeHtml(puerto)}</strong> -> <strong>${escapeHtml(ciudad)}</strong> | ${results.length} proveedores comparados
+                </div>
+            </div>
+            <div class="maritime-rankings">
+                <div class="card maritime-ranking-panel single">
+                    <div class="maritime-ranking-title">Top 3 Single</div>
+                    <div class="quote-grid">
+                        ${singleResults.slice(0, 3).map((r, i) => createMaritimeOptionMarkup('single', rankLabels, fmt, {
+                            providerKey: r.providerKey,
+                            proveedor: r.proveedor,
+                            single: r.tarifaSingle,
+                            full: r.tarifaFull,
+                            vigencia: r.vigencia,
+                            horasLibres: r.horasLibres,
+                            comentarios: r.comentarios
+                        }, i)).join('')}
+                    </div>
+                </div>
+                <div class="card maritime-ranking-panel full">
+                    <div class="maritime-ranking-title">Top 3 Full</div>
+                    <div class="quote-grid">
+                        ${fullResults.slice(0, 3).map((r, i) => createMaritimeOptionMarkup('full', rankLabels, fmt, {
+                            providerKey: r.providerKey,
+                            proveedor: r.proveedor,
+                            single: r.tarifaSingle,
+                            full: r.tarifaFull,
+                            vigencia: r.vigencia,
+                            horasLibres: r.horasLibres,
+                            comentarios: r.comentarios
+                        }, i)).join('')}
+                    </div>
+                </div>
+            </div>
+            <div id="maritime-selection-summary" class="maritime-selection-summary"></div>
+            <div id="mub-panel-container-maritimo"></div>
+        `;
+        renderMaritimeSelectionSummary(fmt);
+        renderMaritimeCombinedCalculator();
+        bindMaritimeOptionInteractions(resultsEl, fmt, puerto, ciudad, results, singleResults, fullResults, rankLabels);
+    };
+
+    resultsEl.querySelectorAll('.maritime-expand-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const kind = btn.dataset.expandKind;
+            const key = btn.dataset.expandKey;
+            maritimeExpanded[kind] = maritimeExpanded[kind] === key ? null : key;
+            renderResultsContent();
+        });
+    });
+
+    resultsEl.querySelectorAll('.maritime-pick-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const kind = btn.dataset.kind;
+            const key = btn.dataset.key;
+            const pool = kind === 'single' ? singleResults : fullResults;
+            const match = pool.find(item => item.providerKey === key);
+            if (!match) return;
+
+            maritimeSelection[kind] = {
+                providerKey: match.providerKey,
+                proveedor: match.proveedor,
+                single: match.tarifaSingle,
+                full: match.tarifaFull,
+                vigencia: match.vigencia,
+                horasLibres: match.horasLibres,
+                comentarios: match.comentarios
+            };
+
+            renderResultsContent();
+        });
+    });
 }
 
 function renderMaritimeSelectionSummary(fmt) {
@@ -4777,6 +4988,7 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
     }
 
     maritimeSelection = { single: null, full: null };
+    maritimeExpanded = { single: null, full: null };
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opcion', '&#x1F949; 3ra opcion'];
 
@@ -4830,34 +5042,7 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
 
     renderMaritimeSelectionSummary(fmt);
     renderMaritimeCombinedCalculator();
-
-    resultsEl.querySelectorAll('.maritime-pick-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const kind = btn.dataset.kind;
-            const key = btn.dataset.key;
-            const pool = kind === 'single' ? singleResults : fullResults;
-            const match = pool.find(item => item.providerKey === key);
-            if (!match) return;
-
-            maritimeSelection[kind] = {
-                providerKey: match.providerKey,
-                proveedor: match.proveedor,
-                single: match.tarifaSingle,
-                full: match.tarifaFull,
-                vigencia: match.vigencia,
-                horasLibres: match.horasLibres,
-                comentarios: match.comentarios
-            };
-
-            resultsEl.querySelectorAll(`.maritime-pick-btn[data-kind="${kind}"]`).forEach(otherBtn => {
-                const isCurrent = otherBtn.dataset.key === key;
-                otherBtn.textContent = isCurrent ? `Elegido como ${kind === 'single' ? 'Single' : 'Full'}` : `Usar como ${kind === 'single' ? 'Single' : 'Full'}`;
-            });
-
-            renderMaritimeSelectionSummary(fmt);
-            renderMaritimeCombinedCalculator();
-        });
-    });
+    bindMaritimeOptionInteractions(resultsEl, fmt, puerto, ciudad, results, singleResults, fullResults, rankLabels);
 });
 
 // ===== CALCULADORA MUB (Margen de Utilidad Bruta) =====
