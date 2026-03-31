@@ -2438,6 +2438,7 @@ async function handlePDF(file) {
             const page = await pdf.getPage(p);
             const textContent = await page.getTextContent();
             const pageRows = extractTableFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+            if (!isLikelyPDFTablePage(pageRows)) continue;
             allRows.push(...pageRows);
         }
 
@@ -2460,6 +2461,42 @@ async function handlePDF(file) {
         alert('Error al leer el PDF: ' + err.message);
         fileInput.value = '';
     }
+}
+
+function isLikelyPDFTablePage(rows) {
+    if (!Array.isArray(rows) || rows.length === 0) return false;
+
+    const normalizedRows = rows.map(row => row.map(cell =>
+        String(cell || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim()
+    ));
+
+    const joined = normalizedRows.map(row => row.join(' '));
+    const hasStructuredHeader = joined.some(text =>
+        text.includes('destino')
+        || (text.includes('origen') && text.includes('estado'))
+        || text.includes('tipo unidad')
+    );
+
+    const wideRows = normalizedRows.filter(row => row.filter(Boolean).length >= 6).length;
+    const tariffLikeRows = normalizedRows.filter(row => {
+        const filled = row.filter(Boolean);
+        const moneyLike = filled.filter(cell => /(\$|[0-9]+,[0-9]{3}|[0-9]+\.[0-9]{2}|[0-9]{4,})/.test(cell)).length;
+        return filled.length >= 6 && moneyLike >= 3;
+    }).length;
+
+    const notesOnly = joined.some(text =>
+        text.includes('condiciones generales')
+        || text.includes('precios mas iva')
+        || text.includes('la tarifa incluye')
+        || text.includes('demoras por hora')
+        || text.includes('nuestra tarifa esta limitada')
+        || text.includes('favor de confirmar')
+    );
+
+    if (notesOnly && !hasStructuredHeader && tariffLikeRows < 3) return false;
+    if (hasStructuredHeader) return true;
+    if (wideRows >= 4 && tariffLikeRows >= 3) return true;
+    return false;
 }
 
 function extractTableFromPDFPage(textContent, viewport) {
