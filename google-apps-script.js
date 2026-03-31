@@ -8,8 +8,36 @@ function doGet(e) {
   return handleRequest(e);
 }
 
+// Nota de despliegue:
+// - Ejecutar como: tu cuenta
+// - Quién tiene acceso: Cualquier persona
+// Si no, el frontend público no podrá leer usuarios ni cotizaciones.
+
+// Si el Apps Script NO está ligado directamente al Google Sheet,
+// pega aquí el ID del archivo para abrirlo de forma explícita.
+// Ejemplo:
+// const SPREADSHEET_ID = '1AbCdEf...';
+const SPREADSHEET_ID = '1EzBWkmi9PqjgnZ_C1iDlzRWnqTJvhsuL4Z5s3LMgYiE';
+
 function doPost(e) {
   return handleRequest(e);
+}
+
+function getDb() {
+  if (SPREADSHEET_ID) {
+    return SpreadsheetApp.openById(SPREADSHEET_ID);
+  }
+  return SpreadsheetApp.getActiveSpreadsheet();
+}
+
+function getSheetOrError(sheetName) {
+  const db = getDb();
+  if (!db) return { ok: false, error: 'No se pudo abrir el Google Sheet configurado' };
+
+  const sheet = db.getSheetByName(sheetName);
+  if (!sheet) return { ok: false, error: `Hoja ${sheetName} no encontrada` };
+
+  return { ok: true, sheet };
 }
 
 function handleRequest(e) {
@@ -79,8 +107,9 @@ function handleRequest(e) {
 // ===== USUARIOS =====
 
 function getUsuarios() {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Usuarios');
-  if (!sheet) return { ok: false, error: 'Hoja Usuarios no encontrada' };
+  const lookup = getSheetOrError('Usuarios');
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
 
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return { ok: true, usuarios: [] };
@@ -114,8 +143,9 @@ function login(nombre, pin) {
 }
 
 function crearUsuario(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Usuarios');
-  if (!sheet) return { ok: false, error: 'Hoja Usuarios no encontrada' };
+  const lookup = getSheetOrError('Usuarios');
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
 
   // Verificar si ya existe
   const existentes = sheet.getDataRange().getValues();
@@ -135,8 +165,9 @@ function crearUsuario(data) {
 }
 
 function editarUsuario(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Usuarios');
-  if (!sheet) return { ok: false, error: 'Hoja Usuarios no encontrada' };
+  const lookup = getSheetOrError('Usuarios');
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
 
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
@@ -152,8 +183,9 @@ function editarUsuario(data) {
 }
 
 function eliminarUsuario(nombre) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Usuarios');
-  if (!sheet) return { ok: false, error: 'Hoja Usuarios no encontrada' };
+  const lookup = getSheetOrError('Usuarios');
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
 
   const rows = sheet.getDataRange().getValues();
   for (let i = 1; i < rows.length; i++) {
@@ -168,8 +200,9 @@ function eliminarUsuario(nombre) {
 // ===== COTIZACIONES =====
 
 function guardarCotizacion(data) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Cotizaciones');
-  if (!sheet) return { ok: false, error: 'Hoja Cotizaciones no encontrada' };
+  const lookup = getSheetOrError('Cotizaciones');
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
 
   // Headers si es primera vez
   const existentes = sheet.getDataRange().getValues();
@@ -199,8 +232,9 @@ function guardarCotizacion(data) {
 }
 
 function getCotizaciones(usuario, todas) {
-  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('Cotizaciones');
-  if (!sheet) return { ok: false, error: 'Hoja Cotizaciones no encontrada' };
+  const lookup = getSheetOrError('Cotizaciones');
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
 
   const data = sheet.getDataRange().getValues();
   if (data.length <= 1) return { ok: true, cotizaciones: [] };
