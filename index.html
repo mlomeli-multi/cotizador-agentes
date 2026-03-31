@@ -1074,6 +1074,14 @@
             margin-top: 0.5rem;
             min-height: 1.2rem;
         }
+        .login-help {
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            margin-top: 0.5rem;
+            min-height: 2.2rem;
+            text-align: left;
+            line-height: 1.45;
+        }
         .login-loading {
             font-size: 0.75rem;
             color: var(--blue);
@@ -1213,6 +1221,7 @@
         </div>
         <button class="btn btn-primary" id="btn-login">Entrar</button>
         <div class="login-error" id="login-error"></div>
+        <div class="login-help" id="login-help"></div>
     </div>
 </div>
 
@@ -3437,7 +3446,38 @@ document.getElementById('peso').addEventListener('input', updateRouteStats);
 document.getElementById('estibable').addEventListener('change', updateRouteStats);
 
 // ===== GOOGLE SHEETS API =====
-const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbycVFtdZe2RKfbyoiQbF2mWN8ln8GjlDFLZg_jgO8haosn8bduxUvk3fhWWZtkrIlGbgA/exec';
+const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbyYbBdGehpSxfibSf5fTdtwY5IyHo-wptY8D0RXFOvLbD9qfZ44bEi3LnITftkwb446pA/exec';
+
+function getLoginHelpEl() {
+    return document.getElementById('login-help');
+}
+
+function setLoginHelp(message = '', isError = false) {
+    const helpEl = getLoginHelpEl();
+    if (!helpEl) return;
+    helpEl.textContent = message;
+    helpEl.style.color = isError ? 'var(--red)' : 'var(--gray-500)';
+}
+
+function inferSheetsApiError(res, text) {
+    const body = String(text || '');
+    const lower = body.toLowerCase();
+    const finalUrl = (res && res.url) ? res.url : SHEETS_API_URL;
+
+    if (finalUrl.includes('accounts.google.com') || lower.includes('accounts.google.com') || lower.includes('sign in')) {
+        return 'El Apps Script está pidiendo iniciar sesión con Google. Vuelve a desplegar la App web con acceso "Cualquier persona" y ejecutando como tu cuenta.';
+    }
+
+    if (res && (res.status === 401 || res.status === 403)) {
+        return 'El Apps Script rechazó el acceso. Revisa que la App web esté publicada para "Cualquier persona".';
+    }
+
+    if (lower.includes('<!doctype html') || lower.includes('<html')) {
+        return 'El Apps Script devolvió HTML en lugar de JSON. Normalmente eso significa que la URL publicada o sus permisos no son correctos.';
+    }
+
+    return 'Respuesta no válida del servidor';
+}
 
 async function sheetsAPI(action, data = {}) {
     try {
@@ -3448,11 +3488,16 @@ async function sheetsAPI(action, data = {}) {
             body: formData
         });
         const text = await res.text();
+        if (!res.ok) {
+            const error = inferSheetsApiError(res, text);
+            console.error('Sheets API HTTP error:', res.status, text.substring(0, 500));
+            return { ok: false, error, status: res.status };
+        }
         try {
             return JSON.parse(text);
         } catch (e) {
             console.error('Sheets API respuesta:', text.substring(0, 500));
-            return { ok: false, error: 'Respuesta no válida del servidor' };
+            return { ok: false, error: inferSheetsApiError(res, text) };
         }
     } catch (err) {
         console.error('Sheets API error:', err);
@@ -3514,17 +3559,21 @@ function updateHeaderUser() {
 async function loadLoginUsers() {
     const select = document.getElementById('login-user');
     select.innerHTML = '<option value="">Cargando...</option>';
+    setLoginHelp('Leyendo usuarios desde Google Sheets...');
     const res = await sheetsAPI('getUsuarios');
     if (res.ok && res.usuarios) {
         const activos = res.usuarios.filter(u => u.activo);
         if (activos.length === 0) {
             select.innerHTML = '<option value="">No hay usuarios — crea uno en Google Sheets</option>';
+            setLoginHelp('La conexión con Google Sheets sí funcionó, pero no hay usuarios activos para mostrar.');
             return;
         }
         select.innerHTML = '<option value="">Selecciona tu nombre</option>' +
             activos.map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
+        setLoginHelp('Usuarios cargados correctamente desde Google Sheets.');
     } else {
         select.innerHTML = '<option value="">Error al cargar usuarios</option>';
+        setLoginHelp(res.error || 'No se pudo leer la lista de usuarios.', true);
     }
 }
 
@@ -3560,6 +3609,7 @@ document.getElementById('btn-login').addEventListener('click', async () => {
         hideLogin();
         updateHeaderUser();
         document.getElementById('login-pin').value = '';
+        setLoginHelp('');
     } else {
         errorEl.textContent = res.error || 'Error al iniciar sesión';
     }
