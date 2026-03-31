@@ -54,3 +54,20 @@ NLU (Nuevo Laredo), MEX (CDMX), MTY (Monterrey), GDL (Guadalajara)
 - La hoja `Usuarios` luce correcta y los nombres/PIN/roles están bien estructurados.
 - El web app ya es público y responde; el problema restante es que no está leyendo el Google Sheet correcto.
 - Si el Apps Script no está ligado a la hoja, hay que pegar el ID del spreadsheet en `SPREADSHEET_ID`, volver a desplegar y usar la URL `/exec` actualizada.
+## Actualización posterior
+
+### Estado vigente
+- GitHub Pages ya quedó actualizado y el login funciona correctamente.
+- El Apps Script vigente quedó enlazado al spreadsheet `Cotizador Agentes DB` mediante `SPREADSHEET_ID`.
+- Las pestañas necesarias en Google Sheets son `Usuarios` y `Cotizaciones`.
+
+### Limpieza y UX agregadas por Codex
+- Se dejó el login con recarga manual de usuarios sin refrescar toda la página.
+- Se recuerda el último usuario seleccionado en el navegador para acelerar reingresos.
+- Los errores del login se limpian al cambiar usuario o volver a escribir el PIN.
+- Los controles del login se deshabilitan mientras se cargan usuarios para evitar estados intermedios confusos.
+
+### Siguientes mejoras recomendadas
+- Separar JS y CSS de `index.html` a archivos dedicados.
+- Agregar un indicador visual de versión o fecha de despliegue para detectar caché viejo más rápido.
+- Mejorar la administración de usuarios con edición más completa y validaciones de PIN.

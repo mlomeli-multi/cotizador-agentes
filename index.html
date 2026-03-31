@@ -1068,6 +1068,11 @@
             font-size: 0.9rem;
         }
         .login-card .btn { width: 100%; margin-top: 0.5rem; }
+        .login-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
         .login-error {
             font-size: 0.75rem;
             color: var(--red);
@@ -1086,6 +1091,16 @@
             font-size: 0.75rem;
             color: var(--blue);
             margin-top: 0.5rem;
+        }
+        .btn-login-secondary {
+            width: 100%;
+            margin-top: 0;
+            background: transparent;
+            color: var(--gray-600);
+            border: 1px solid var(--gray-200);
+        }
+        .btn-login-secondary:hover {
+            background: var(--gray-50);
         }
 
         /* ===== USER BADGE IN HEADER ===== */
@@ -1219,7 +1234,10 @@
             <label>PIN</label>
             <input type="password" id="login-pin" maxlength="6" placeholder="Ingresa tu PIN">
         </div>
-        <button class="btn btn-primary" id="btn-login">Entrar</button>
+        <div class="login-actions">
+            <button class="btn btn-primary" id="btn-login">Entrar</button>
+            <button class="btn btn-login-secondary" id="btn-reload-users" type="button">Recargar usuarios</button>
+        </div>
         <div class="login-error" id="login-error"></div>
         <div class="login-help" id="login-help"></div>
     </div>
@@ -3447,6 +3465,7 @@ document.getElementById('estibable').addEventListener('change', updateRouteStats
 
 // ===== GOOGLE SHEETS API =====
 const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbyYbBdGehpSxfibSf5fTdtwY5IyHo-wptY8D0RXFOvLbD9qfZ44bEi3LnITftkwb446pA/exec';
+const LAST_LOGIN_USER_KEY = 'lastLoginUser';
 
 function getLoginHelpEl() {
     return document.getElementById('login-help');
@@ -3457,6 +3476,28 @@ function setLoginHelp(message = '', isError = false) {
     if (!helpEl) return;
     helpEl.textContent = message;
     helpEl.style.color = isError ? 'var(--red)' : 'var(--gray-500)';
+}
+
+function setLoginError(message = '') {
+    const errorEl = document.getElementById('login-error');
+    if (!errorEl) return;
+    errorEl.textContent = message;
+}
+
+function setLoginControlsDisabled(disabled) {
+    document.getElementById('login-user').disabled = disabled;
+    document.getElementById('login-pin').disabled = disabled;
+    document.getElementById('btn-login').disabled = disabled;
+    document.getElementById('btn-reload-users').disabled = disabled;
+}
+
+function getLastLoginUser() {
+    return localStorage.getItem(LAST_LOGIN_USER_KEY) || '';
+}
+
+function setLastLoginUser(nombre) {
+    if (!nombre) return;
+    localStorage.setItem(LAST_LOGIN_USER_KEY, nombre);
 }
 
 function inferSheetsApiError(res, text) {
@@ -3558,7 +3599,10 @@ function updateHeaderUser() {
 // ===== LOGIN =====
 async function loadLoginUsers() {
     const select = document.getElementById('login-user');
+    const previousSelection = select.value || getLastLoginUser();
     select.innerHTML = '<option value="">Cargando...</option>';
+    setLoginControlsDisabled(true);
+    setLoginError('');
     setLoginHelp('Leyendo usuarios desde Google Sheets...');
     const res = await sheetsAPI('getUsuarios');
     if (res.ok && res.usuarios) {
@@ -3566,14 +3610,22 @@ async function loadLoginUsers() {
         if (activos.length === 0) {
             select.innerHTML = '<option value="">No hay usuarios — crea uno en Google Sheets</option>';
             setLoginHelp('La conexión con Google Sheets sí funcionó, pero no hay usuarios activos para mostrar.');
+            setLoginControlsDisabled(false);
+            document.getElementById('btn-login').disabled = true;
             return;
         }
         select.innerHTML = '<option value="">Selecciona tu nombre</option>' +
             activos.map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
+        if (previousSelection && activos.some(u => u.nombre === previousSelection)) {
+            select.value = previousSelection;
+        }
         setLoginHelp('Usuarios cargados correctamente desde Google Sheets.');
+        setLoginControlsDisabled(false);
     } else {
         select.innerHTML = '<option value="">Error al cargar usuarios</option>';
         setLoginHelp(res.error || 'No se pudo leer la lista de usuarios.', true);
+        setLoginControlsDisabled(false);
+        document.getElementById('btn-login').disabled = true;
     }
 }
 
@@ -3589,34 +3641,48 @@ function hideLogin() {
 document.getElementById('btn-login').addEventListener('click', async () => {
     const nombre = document.getElementById('login-user').value;
     const pin = document.getElementById('login-pin').value;
-    const errorEl = document.getElementById('login-error');
+    if (!nombre) { setLoginError('Selecciona tu nombre'); return; }
+    if (!pin) { setLoginError('Ingresa tu PIN'); return; }
 
-    if (!nombre) { errorEl.textContent = 'Selecciona tu nombre'; return; }
-    if (!pin) { errorEl.textContent = 'Ingresa tu PIN'; return; }
-
-    errorEl.textContent = '';
+    setLoginError('');
     const btn = document.getElementById('btn-login');
+    const reloadBtn = document.getElementById('btn-reload-users');
     btn.disabled = true;
+    reloadBtn.disabled = true;
     btn.textContent = 'Verificando...';
 
     const res = await sheetsAPI('login', { nombre, pin });
 
     btn.disabled = false;
+    reloadBtn.disabled = false;
     btn.textContent = 'Entrar';
 
     if (res.ok) {
         setCurrentUser(res.usuario);
+        setLastLoginUser(res.usuario.nombre);
         hideLogin();
         updateHeaderUser();
         document.getElementById('login-pin').value = '';
         setLoginHelp('');
     } else {
-        errorEl.textContent = res.error || 'Error al iniciar sesión';
+        setLoginError(res.error || 'Error al iniciar sesión');
     }
 });
 
 document.getElementById('login-pin').addEventListener('keydown', (e) => {
     if (e.key === 'Enter') document.getElementById('btn-login').click();
+});
+
+document.getElementById('login-user').addEventListener('change', () => {
+    setLoginError('');
+});
+
+document.getElementById('login-pin').addEventListener('input', () => {
+    setLoginError('');
+});
+
+document.getElementById('btn-reload-users').addEventListener('click', () => {
+    loadLoginUsers();
 });
 
 // Logout
