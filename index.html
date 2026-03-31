@@ -2529,6 +2529,36 @@ function extractRowTextsFromPDFPage(textContent, viewport, tolerance = 5) {
     return rows.map(row => row.sort((a, b) => a.x - b.x).map(item => item.text).filter(Boolean));
 }
 
+function extractPositionedRowsFromPDFPage(textContent, viewport, tolerance = 5) {
+    const items = textContent.items
+        .filter(item => item.str && item.str.trim() !== '')
+        .map(item => ({
+            text: item.str.trim(),
+            x: Math.round(item.transform[4]),
+            y: Math.round(viewport.height - item.transform[5]),
+            width: item.width || 0,
+        }));
+
+    if (items.length === 0) return [];
+
+    items.sort((a, b) => a.y - b.y || a.x - b.x);
+    const rows = [];
+    let current = [items[0]];
+    let currentY = items[0].y;
+
+    for (let i = 1; i < items.length; i++) {
+        if (Math.abs(items[i].y - currentY) <= tolerance) {
+            current.push(items[i]);
+        } else {
+            rows.push(current.sort((a, b) => a.x - b.x));
+            current = [items[i]];
+            currentY = items[i].y;
+        }
+    }
+    rows.push(current.sort((a, b) => a.x - b.x));
+    return rows;
+}
+
 async function extractHHPDFRows(pdf) {
     const output = [['ORIGEN', 'ESTADO ORIGEN', 'DESTINO', 'ESTADO DESTINO', '1 TON', '3.5 TON', 'RABON', 'TORTON', "CAJA 53'"]];
     const seen = new Set();
@@ -2536,39 +2566,80 @@ async function extractHHPDFRows(pdf) {
     for (let p = 1; p <= Math.min(pdf.numPages, 2); p++) {
         const page = await pdf.getPage(p);
         const textContent = await page.getTextContent();
-        const rows = extractRowTextsFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+        const rows = extractPositionedRowsFromPDFPage(textContent, page.getViewport({ scale: 1 }));
+        const headerRow = rows.find(row => {
+            const text = row.map(item => normalizePdfToken(item.text)).join(' ');
+            return text.includes('origen') && text.includes('destino') && text.includes('unidad 1') && text.includes('caja 53');
+        });
+        if (!headerRow) continue;
 
-        rows.forEach(tokens => {
-            const normalized = tokens.map(normalizePdfToken);
-            const originIdx = normalized.findIndex(t => t === 'aicm' || t === 'aifa');
-            if (originIdx < 0) return;
+        const columns = headerRow.map(item => ({ x: item.x, text: normalizePdfToken(item.text) }));
+        const originCol = columns.find(col => col.text === 'origen');
+        const estadoOrigenCol = columns.find((col, idx) => col.text === 'estado' && idx < columns.findIndex(c => c.text === 'destino'));
+        const destinoCol = columns.find(col => col.text === 'destino');
+        const estadoDestinoCol = columns.find((col, idx) => col.text === 'estado' && idx > columns.findIndex(c => c.text === 'destino'));
+        const oneTonCol = columns.find(col => col.text.includes('unidad 1'));
+        const threeFiveCol = columns.find(col => col.text.includes('unidad 3.5'));
+        const rabonCol = columns.find(col => col.text.includes('rabon'));
+        const tortonCol = columns.find(col => col.text.includes('torton'));
+        const caja53Col = columns.find(col => col.text.includes('caja 53'));
 
-            const firstMoneyIdx = tokens.findIndex((token, idx) => idx > originIdx && isPdfMoneyToken(token));
-            if (firstMoneyIdx < 0) return;
+        if (!originCol || !destinoCol || !estadoDestinoCol || !oneTonCol || !threeFiveCol || !rabonCol || !tortonCol || !caja53Col) continue;
 
-            const rateTokens = tokens.slice(firstMoneyIdx).filter(isPdfMoneyToken);
-            if (rateTokens.length < 5) return;
+        const xBounds = [
+            originCol.x,
+            estadoOrigenCol?.x ?? destinoCol.x - 40,
+            destinoCol.x,
+            estadoDestinoCol.x,
+            oneTonCol.x,
+            threeFiveCol.x,
+            rabonCol.x,
+            tortonCol.x,
+            caja53Col.x,
+        ];
 
-            const estadoDestino = normalizeWhitespace(tokens[firstMoneyIdx - 1]);
-            const destino = normalizeWhitespace(tokens.slice(originIdx + 2, firstMoneyIdx - 1).join(' '));
+        rows.forEach(row => {
+            const text = row.map(item => normalizePdfToken(item.text)).join(' ');
+            if (text.includes('tipo de mercancia') || text.includes('condiciones generales')) return;
+
+            const cells = new Array(9).fill('').map(() => []);
+            row.forEach(item => {
+                let bestIdx = 0;
+                let bestDist = Math.abs(item.x - xBounds[0]);
+                for (let i = 1; i < xBounds.length; i++) {
+                    const dist = Math.abs(item.x - xBounds[i]);
+                    if (dist < bestDist) {
+                        bestDist = dist;
+                        bestIdx = i;
+                    }
+                }
+                cells[bestIdx].push(item.text);
+            });
+
+            const origen = normalizeWhitespace(cells[0].join(' '));
+            const estadoOrigen = normalizeWhitespace(cells[1].join(' '));
+            const destino = normalizeWhitespace(cells[2].join(' '));
+            const estadoDestino = normalizeWhitespace(cells[3].join(' '));
+            const rates = cells.slice(4).map(cell => normalizeWhitespace(cell.join(' ')));
+
+            if (!/^(AICM|AIFA)$/i.test(origen)) return;
             if (!destino || !estadoDestino) return;
+            if (rates.filter(isPdfMoneyToken).length < 5) return;
 
-            const origen = normalizeWhitespace(tokens[originIdx]);
-            const estadoOrigen = normalizeWhitespace(tokens[originIdx + 1] || '');
             const rowKey = [origen, destino, estadoDestino].join('|').toLowerCase();
             if (seen.has(rowKey)) return;
             seen.add(rowKey);
 
             output.push([
                 origen,
-                estadoOrigen,
+                estadoOrigen || 'MEX',
                 destino,
                 estadoDestino,
-                rateTokens[0],
-                rateTokens[1],
-                rateTokens[2],
-                rateTokens[3],
-                rateTokens[4],
+                rates[0],
+                rates[1],
+                rates[2],
+                rates[3],
+                rates[4],
             ]);
         });
     }
