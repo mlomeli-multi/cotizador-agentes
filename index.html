@@ -55,7 +55,7 @@
             box-shadow: var(--shadow-md);
             position: sticky;
             top: 0;
-            z-index: 100;
+            z-index: 3000;
         }
         .header-title {
             display: flex;
@@ -90,6 +90,9 @@
             padding: 0 1.5rem;
             display: flex;
             gap: 0;
+            position: sticky;
+            top: 68px;
+            z-index: 2900;
         }
         .tab-btn {
             padding: 0.875rem 1.5rem;
@@ -1230,6 +1233,17 @@
             border-radius: var(--radius);
             overflow: hidden;
             border: 1px solid var(--gray-200);
+            position: relative;
+            z-index: 1;
+        }
+        .map-container .leaflet-container,
+        .map-container .leaflet-pane,
+        .map-container .leaflet-top,
+        .map-container .leaflet-bottom,
+        .map-container .leaflet-control,
+        .map-container .leaflet-tooltip,
+        .map-container .leaflet-popup {
+            z-index: 1 !important;
         }
 
         /* ===== MODAL ===== */
