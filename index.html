@@ -2900,10 +2900,10 @@ function renderSheetTabs(activeIdx) {
     const detectedAP = detectAirportFromSheetName(sheetsTemp[activeIdx]);
     const airportSel = document.getElementById('provider-airport');
     const airportHint = document.getElementById('airport-hint');
-    if (detectedAP) {
+    if (detectedAP && airportSel.value !== 'AUTO') {
         airportSel.value = detectedAP;
         airportHint.textContent = 'Detectado desde nombre de hoja: ' + sheetsTemp[activeIdx];
-    } else {
+    } else if (airportSel.value !== 'AUTO') {
         airportHint.textContent = '';
     }
 }
@@ -2921,12 +2921,22 @@ function loadSheetPreview(sheetName) {
     const ws = workbookTemp.Sheets[sheetName];
     const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
     // Filtrar filas completamente vacías
-    const nonEmpty = raw.filter(row => row.some(cell => cell !== ''));
 
-    sheetDataTemp = nonEmpty;
-    autodetectHeader();
+    sheetDataTemp = trimRowsToDetectedHeader(raw);
     renderPreviewTable();
     renderMappingSelects();
+}
+
+function trimRowsToDetectedHeader(rawRows) {
+    const nonEmpty = (rawRows || []).filter(row => row.some(cell => cell !== ''));
+    if (nonEmpty.length === 0) return [];
+
+    const previousSheetData = sheetDataTemp;
+    sheetDataTemp = nonEmpty;
+    autodetectHeader();
+    const trimmed = sheetDataTemp;
+    sheetDataTemp = previousSheetData;
+    return trimmed;
 }
 
 function autodetectHeader() {
@@ -3107,6 +3117,37 @@ function normalizeImportedCityName(value) {
     return aliases[lower] || raw;
 }
 
+function normalizeImportedStateName(value) {
+    const raw = normalizeWhitespace(value);
+    if (!raw) return '';
+    const lower = raw.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const aliases = {
+        'edo mex': 'Estado de Mexico',
+        'edomex': 'Estado de Mexico',
+        'nuevo leon': 'Nuevo Leon',
+        'cdmx': 'Ciudad de Mexico',
+    };
+    return aliases[lower] || raw;
+}
+
+function detectDestinationStateCol(headers) {
+    return (headers || []).findIndex(h => {
+        const lower = String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+        return lower === 'estado destino' || lower === 'destino estado' || (lower.includes('estado') && lower.includes('destino'));
+    });
+}
+
+function buildImportedDestinationLabel(cityValue, stateValue) {
+    const city = normalizeImportedCityName(cityValue);
+    if (!city) return '';
+    const state = normalizeImportedStateName(stateValue);
+    if (!state) return city;
+    const lowerCity = city.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    const lowerState = state.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    if (lowerCity.includes(lowerState)) return city;
+    return `${city}, ${state}`;
+}
+
 document.getElementById('btn-save-mapping').addEventListener('click', () => {
     const nombre = document.getElementById('provider-name').value.trim();
     const aeropuerto = document.getElementById('provider-airport').value;
@@ -3146,31 +3187,69 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
 
     // Extraer tarifas (agrupadas por aeropuerto si AUTO)
     const tarifasPorAeropuerto = {}; // { 'MEX': [...], 'NLU': [...] }
-    const dataRows = getSheetHeaderMeta().dataRows;
+    const activeSheetBtn = document.querySelector('.sheet-tab.active');
+    const activeSheetName = activeSheetBtn ? activeSheetBtn.textContent : (sheetsTemp[0] || '');
+    const sheetRowsToProcess = [];
 
-    for (const row of dataRows) {
-        const ciudad = normalizeImportedCityName(String(row[parseInt(colCiudad)] || '').trim());
-        if (!ciudad) continue;
+    if (aeropuerto === 'AUTO' && workbookTemp && !workbookTemp._isPDF) {
+        workbookTemp.SheetNames.forEach((sheetName) => {
+            const ws = workbookTemp.Sheets[sheetName];
+            const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+            const rowsForSheet = trimRowsToDetectedHeader(raw);
+            if (!rowsForSheet || rowsForSheet.length === 0) return;
+            const headers = rowsForSheet[0] || [];
+            const sheetColOrigen = headers.findIndex(h => {
+                const lower = String(h).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+                return lower === 'origen' || lower === 'origin';
+            });
+            if (sheetColOrigen < 0) return;
+            sheetRowsToProcess.push({
+                sheetName,
+                headers,
+                colOrigen: sheetColOrigen,
+                colEstadoDestino: detectDestinationStateCol(headers),
+                dataRows: rowsForSheet.slice(1),
+            });
+        });
+    } else {
+        const meta = getSheetHeaderMeta();
+        sheetRowsToProcess.push({
+            sheetName: activeSheetName,
+            headers: meta.headers,
+            colOrigen,
+            colEstadoDestino: detectDestinationStateCol(meta.headers),
+            dataRows: meta.dataRows,
+        });
+    }
 
-        // Determinar aeropuerto para esta fila
-        let apCode = aeropuerto;
-        if (aeropuerto === 'AUTO') {
-            const origenVal = row[colOrigen];
-            apCode = detectAirportFromOrigen(origenVal);
-            if (!apCode) continue; // No se pudo detectar, saltar fila
-        }
+    for (const sheetInfo of sheetRowsToProcess) {
+        for (const row of sheetInfo.dataRows) {
+            const ciudad = buildImportedDestinationLabel(
+                String(row[parseInt(colCiudad)] || '').trim(),
+                sheetInfo.colEstadoDestino >= 0 ? String(row[sheetInfo.colEstadoDestino] || '').trim() : ''
+            );
+            if (!ciudad) continue;
 
-        const entry = { ciudad };
-        for (const [tipoUnidad, colIdx] of asignadas) {
-            const raw = row[parseInt(colIdx)];
-            const precio = parseFloat(String(raw).replace(/[$,\s]/g, ''));
-            if (!isNaN(precio) && precio > 0) {
-                entry[tipoUnidad] = precio;
+            // Determinar aeropuerto para esta fila
+            let apCode = aeropuerto;
+            if (aeropuerto === 'AUTO') {
+                const origenVal = row[sheetInfo.colOrigen];
+                apCode = detectAirportFromOrigen(origenVal) || detectAirportFromSheetName(sheetInfo.sheetName);
+                if (!apCode) continue; // No se pudo detectar, saltar fila
             }
-        }
-        if (Object.keys(entry).length > 1) {
-            if (!tarifasPorAeropuerto[apCode]) tarifasPorAeropuerto[apCode] = [];
-            tarifasPorAeropuerto[apCode].push(entry);
+
+            const entry = { ciudad };
+            for (const [tipoUnidad, colIdx] of asignadas) {
+                const raw = row[parseInt(colIdx)];
+                const precio = parseFloat(String(raw).replace(/[$,\s]/g, ''));
+                if (!isNaN(precio) && precio > 0) {
+                    entry[tipoUnidad] = precio;
+                }
+            }
+            if (Object.keys(entry).length > 1) {
+                if (!tarifasPorAeropuerto[apCode]) tarifasPorAeropuerto[apCode] = [];
+                tarifasPorAeropuerto[apCode].push(entry);
+            }
         }
     }
 
@@ -3212,6 +3291,7 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
     document.getElementById('modal-mapping').classList.remove('show');
     workbookTemp = null;
     sheetDataTemp = null;
+    pdfImportStrategyTemp = '';
     renderProvidersList();
     updateCotizarBtn();
 });
