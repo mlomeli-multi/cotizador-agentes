@@ -5754,6 +5754,9 @@ async function loadSharedOfficialData() {
         if (data.conceptosFijos && typeof data.conceptosFijos === 'object') {
             localStorage.setItem('conceptosFijos', JSON.stringify(data.conceptosFijos));
         }
+        if (typeof data.tipoCambio === 'number' && data.tipoCambio > 0) {
+            localStorage.setItem('tipoCambio', String(data.tipoCambio));
+        }
         return true;
     } catch (err) {
         console.warn('No se pudo cargar la base oficial compartida:', err);
@@ -6120,6 +6123,7 @@ document.getElementById('btn-export-data').addEventListener('click', () => {
         proveedores: JSON.parse(localStorage.getItem('proveedores') || '[]'),
         proveedoresMaritimos: JSON.parse(localStorage.getItem(MARITIME_STORAGE_KEY) || '[]'),
         conceptosFijos: JSON.parse(localStorage.getItem('conceptosFijos') || '{}'),
+        tipoCambio: getTipoCambio(),
         exportDate: new Date().toISOString(),
     };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
@@ -6142,7 +6146,8 @@ document.getElementById('import-file').addEventListener('change', (e) => {
     reader.onload = function(ev) {
         try {
             const data = JSON.parse(ev.target.result);
-            if (!data.proveedores && !data.proveedoresMaritimos && !data.conceptosFijos) {
+            const hasTipoCambio = Number.isFinite(parseFloat(data.tipoCambio)) && parseFloat(data.tipoCambio) > 0;
+            if (!data.proveedores && !data.proveedoresMaritimos && !data.conceptosFijos && !hasTipoCambio) {
                 alert('Archivo no válido. No contiene datos de proveedores ni conceptos.');
                 return;
             }
@@ -6151,12 +6156,14 @@ document.getElementById('import-file').addEventListener('change', (e) => {
             if (data.proveedores) localStorage.setItem('proveedores', JSON.stringify(data.proveedores));
             if (data.proveedoresMaritimos) localStorage.setItem(MARITIME_STORAGE_KEY, JSON.stringify(data.proveedoresMaritimos));
             if (data.conceptosFijos) localStorage.setItem('conceptosFijos', JSON.stringify(data.conceptosFijos));
+            if (hasTipoCambio) localStorage.setItem('tipoCambio', String(parseFloat(data.tipoCambio)));
             renderProvidersList();
             updateCotizarBtn();
             renderMaritimeProvidersList();
             renderMaritimePortOptions();
             updateMaritimeCotizarBtn();
             renderConceptosTable();
+            syncTipoCambioInput();
             alert('Datos importados correctamente.');
         } catch (err) {
             alert('Error al leer el archivo: ' + err.message);
@@ -6169,6 +6176,7 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 // ===== INIT =====
 (async function initApp() {
     await loadSharedOfficialData();
+    syncTipoCambioInput();
     renderProvidersList();
     updateCotizarBtn();
     renderMaritimeProvidersList();
