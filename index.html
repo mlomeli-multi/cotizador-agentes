@@ -4054,58 +4054,49 @@ function resolveMaritimeDestinationConcepts(selection, puerto) {
         return { availableCarriers: carriers, selectedCarrierKey: '', lines: [], selectable: [], extras: [], notes: [] };
     }
 
-    const choices = [
-        { key: 'single', label: 'Single', data: maritimeSelection.single },
-        { key: 'full', label: 'Full', data: maritimeSelection.full }
-    ].filter(choice => !!choice.data);
-
     const selectedConceptIds = Array.isArray(selection?.selectedConceptIds) ? selection.selectedConceptIds : [];
     const selectable = [];
     const lines = [];
     const extras = [];
     const notes = [];
 
-    choices.forEach(choice => {
-        const context = {
-            puerto,
-            containerScope: normalizeMaritimeContainerScope(choice.key)
+    const context = {
+        puerto,
+        containerScope: ''
+    };
+
+    carrier.conceptos.forEach(concept => {
+        if (!maritimeConceptMatchesContext(concept, context)) return;
+
+        const optionId = concept.id;
+
+        if (concept.tipo === 'deposito' || concept.pricingMode === 'excluded') {
+            if (extras.some(item => item.id === concept.id)) return;
+            extras.push({
+                ...concept,
+                choiceLabel: ''
+            });
+            return;
+        }
+
+        if (concept.tipo !== 'automatico') {
+            if (notes.includes(concept.nombre)) return;
+            notes.push(concept.nombre);
+            return;
+        }
+
+        if (selectable.some(item => item.id === optionId)) return;
+        const option = {
+            id: optionId,
+            choiceKey: '',
+            choiceLabel: '',
+            selected: selectedConceptIds.includes(optionId),
+            ...concept
         };
-
-        carrier.conceptos.forEach(concept => {
-            if (!maritimeConceptMatchesContext(concept, context)) return;
-
-            const isPerShipment = ['BL', 'shipment'].includes((concept.baseCobro || '').toUpperCase());
-            const optionId = isPerShipment ? concept.id : `${choice.key}__${concept.id}`;
-            const optionChoiceLabel = isPerShipment ? '' : choice.label;
-
-            if (concept.tipo === 'deposito' || concept.pricingMode === 'excluded') {
-                if (isPerShipment && extras.some(item => item.id === concept.id)) return;
-                extras.push({
-                    ...concept,
-                    choiceLabel: optionChoiceLabel || choice.label
-                });
-                return;
-            }
-
-            if (concept.tipo !== 'automatico') {
-                if (isPerShipment && notes.includes(concept.nombre)) return;
-                notes.push(optionChoiceLabel ? `${optionChoiceLabel}: ${concept.nombre}` : concept.nombre);
-                return;
-            }
-
-            if (selectable.some(item => item.id === optionId)) return;
-            const option = {
-                id: optionId,
-                choiceKey: choice.key,
-                choiceLabel: optionChoiceLabel,
-                selected: selectedConceptIds.includes(optionId),
-                ...concept
-            };
-            selectable.push(option);
-            if (option.selected) {
-                lines.push(buildMaritimeDestinationLine(optionChoiceLabel, concept));
-            }
-        });
+        selectable.push(option);
+        if (option.selected) {
+            lines.push(buildMaritimeDestinationLine('', concept));
+        }
     });
 
     return {
@@ -5145,13 +5136,13 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
             <div style="margin-top:1rem;padding:0.85rem 1rem;border:1px solid rgba(37,99,235,0.15);border-radius:14px;background:#f8fbff;">
                 <div style="display:flex;gap:0.85rem;flex-wrap:wrap;align-items:end;">
                     <div style="flex:1 1 220px;">
-                        <div style="font-size:0.72rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.35rem;">Naviera destino</div>
+                        <div style="font-size:0.72rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.35rem;">Cargos en destino por naviera</div>
                         <select id="${containerId}-carrier" style="width:100%;padding:0.7rem 0.8rem;border:1px solid var(--gray-200);border-radius:10px;background:white;">
                             ${carrierOptions.map(carrier => `<option value="${escapeHtml(carrier.key)}"${carrier.key === defaultCarrierKey ? ' selected' : ''}>${escapeHtml(carrier.displayName || carrier.carrier || carrier.key)}</option>`).join('')}
                         </select>
                     </div>
                     <div style="flex:2 1 320px;font-size:0.76rem;color:var(--gray-500);">
-                        Piloto Fase 2: los conceptos destino se calculan por naviera y los depósitos o garantías se muestran aparte sin entrar al total DAP.
+                        Piloto Fase 2: los cargos en destino se eligen por naviera y los depósitos o garantías se muestran aparte sin entrar al total DAP.
                     </div>
                 </div>
                 <div id="${destinationMetaId}" style="margin-top:0.75rem;font-size:0.76rem;color:var(--gray-500);"></div>
@@ -5173,7 +5164,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         if (destinationMeta) {
             const lineCount = destinationData.lines.length;
             destinationMeta.innerHTML = destinationData.selectedCarrier
-                ? `Naviera piloto activa: <strong>${escapeHtml(destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier)}</strong> · ${lineCount} concepto${lineCount === 1 ? '' : 's'} seleccionado${lineCount === 1 ? '' : 's'} en el total.`
+                ? `Naviera activa: <strong>${escapeHtml(destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier)}</strong> · ${lineCount} cargo${lineCount === 1 ? '' : 's'} seleccionado${lineCount === 1 ? '' : 's'} en el total.`
                 : 'No hay naviera piloto disponible.';
         }
 
