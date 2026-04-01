@@ -3906,8 +3906,36 @@ function parseCurrencyValue(value) {
 }
 
 function parseDateDisplay(value) {
+    if (value === null || value === undefined || value === '') {
+        return { label: '', ts: 0 };
+    }
+
+    if (typeof value === 'number' && Number.isFinite(value)) {
+        const serialDate = XLSX.SSF.parse_date_code(value);
+        if (serialDate) {
+            const parsed = new Date(serialDate.y, serialDate.m - 1, serialDate.d, serialDate.H || 0, serialDate.M || 0, serialDate.S || 0);
+            return {
+                label: parsed.toLocaleDateString('es-MX'),
+                ts: parsed.getTime(),
+            };
+        }
+    }
+
     const raw = normalizeWhitespace(value);
     if (!raw) return { label: '', ts: 0 };
+
+    if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(raw)) {
+        const [d, m, y] = raw.split('/').map(part => parseInt(part, 10));
+        const fullYear = y < 100 ? 2000 + y : y;
+        const parsed = new Date(fullYear, (m || 1) - 1, d || 1);
+        if (!Number.isNaN(parsed.getTime())) {
+            return {
+                label: parsed.toLocaleDateString('es-MX'),
+                ts: parsed.getTime(),
+            };
+        }
+    }
+
     const parsed = new Date(raw);
     if (Number.isNaN(parsed.getTime())) return { label: raw, ts: 0 };
     return {
