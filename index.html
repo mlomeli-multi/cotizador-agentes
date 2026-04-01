@@ -3905,24 +3905,50 @@ function parseCurrencyValue(value) {
     return Number.isFinite(parsed) && parsed > 0 ? parsed : 0;
 }
 
+function parseExcelSerialDateValue(serial) {
+    if (!Number.isFinite(serial)) return null;
+    const serialDate = XLSX.SSF.parse_date_code(serial);
+    if (!serialDate) return null;
+
+    const parsed = new Date(
+        serialDate.y,
+        serialDate.m - 1,
+        serialDate.d,
+        serialDate.H || 0,
+        serialDate.M || 0,
+        serialDate.S || 0
+    );
+    if (Number.isNaN(parsed.getTime())) return null;
+
+    return {
+        label: parsed.toLocaleDateString('es-MX'),
+        ts: parsed.getTime(),
+    };
+}
+
 function parseDateDisplay(value) {
     if (value === null || value === undefined || value === '') {
         return { label: '', ts: 0 };
     }
 
     if (typeof value === 'number' && Number.isFinite(value)) {
-        const serialDate = XLSX.SSF.parse_date_code(value);
-        if (serialDate) {
-            const parsed = new Date(serialDate.y, serialDate.m - 1, serialDate.d, serialDate.H || 0, serialDate.M || 0, serialDate.S || 0);
-            return {
-                label: parsed.toLocaleDateString('es-MX'),
-                ts: parsed.getTime(),
-            };
-        }
+        const parsedSerial = parseExcelSerialDateValue(value);
+        if (parsedSerial) return parsedSerial;
     }
 
     const raw = normalizeWhitespace(value);
     if (!raw) return { label: '', ts: 0 };
+
+    if (/^\d+(?:\.\d+)?$/.test(raw)) {
+        const parsedSerial = parseExcelSerialDateValue(parseFloat(raw));
+        if (parsedSerial) return parsedSerial;
+    }
+
+    const slashSerialMatch = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{5,})$/);
+    if (slashSerialMatch) {
+        const parsedSerial = parseExcelSerialDateValue(parseInt(slashSerialMatch[3], 10));
+        if (parsedSerial) return parsedSerial;
+    }
 
     if (/^\d{1,2}\/\d{1,2}\/\d{2,4}$/.test(raw)) {
         const [d, m, y] = raw.split('/').map(part => parseInt(part, 10));
@@ -4005,11 +4031,33 @@ function mergeMaritimeEntries(current, candidate) {
 }
 
 function getMaritimeProviders() {
-    return JSON.parse(localStorage.getItem(MARITIME_STORAGE_KEY) || '[]');
+    const providers = JSON.parse(localStorage.getItem(MARITIME_STORAGE_KEY) || '[]');
+    const normalized = normalizeStoredMaritimeProviders(providers);
+    if (JSON.stringify(normalized) !== JSON.stringify(providers)) {
+        saveMaritimeProviders(normalized);
+    }
+    return normalized;
 }
 
 function saveMaritimeProviders(data) {
     localStorage.setItem(MARITIME_STORAGE_KEY, JSON.stringify(data));
+}
+
+function normalizeStoredMaritimeProviders(providers) {
+    if (!Array.isArray(providers)) return [];
+    return providers.map(provider => ({
+        ...provider,
+        tarifas: Array.isArray(provider?.tarifas)
+            ? provider.tarifas.map(tarifa => {
+                const vigencia = parseDateDisplay(tarifa?.vigencia || '');
+                return {
+                    ...tarifa,
+                    vigencia: vigencia.label || (tarifa?.vigencia || ''),
+                    vigenciaTs: vigencia.ts || tarifa?.vigenciaTs || 0,
+                };
+            })
+            : [],
+    }));
 }
 
 function findMaritimeHeaderIndex(rows) {
@@ -5775,6 +5823,10 @@ const LAST_LOGIN_USER_KEY = 'lastLoginUser';
 const SHARED_DATA_URL = './data/cotizador-base.json';
 const SHARED_EXCHANGE_RATE_URL = './data/tipo-cambio.json';
 const TARIFF_MANAGER_USERS = new Set(['miguel', 'miguel lomeli']);
+const USERS_FRONTEND_CACHE_TTL_MS = 30000;
+let usuariosCache = null;
+let usuariosCacheAt = 0;
+let usuariosPendingRequest = null;
 
 function getLoginHelpEl() {
     return document.getElementById('login-help');
@@ -5811,6 +5863,37 @@ function setLastLoginUser(nombre) {
 
 function normalizeUserName(value) {
     return String(value || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+}
+
+function invalidateUsuariosCache() {
+    usuariosCache = null;
+    usuariosCacheAt = 0;
+}
+
+async function fetchUsuarios(forceRefresh = false) {
+    const cacheFresh = usuariosCache && (Date.now() - usuariosCacheAt) < USERS_FRONTEND_CACHE_TTL_MS;
+    if (!forceRefresh && cacheFresh) {
+        return { ok: true, usuarios: usuariosCache };
+    }
+
+    if (usuariosPendingRequest) {
+        return usuariosPendingRequest;
+    }
+
+    usuariosPendingRequest = (async () => {
+        const res = await sheetsAPI('getUsuarios');
+        if (res.ok && Array.isArray(res.usuarios)) {
+            usuariosCache = res.usuarios;
+            usuariosCacheAt = Date.now();
+        }
+        return res;
+    })();
+
+    try {
+        return await usuariosPendingRequest;
+    } finally {
+        usuariosPendingRequest = null;
+    }
 }
 
 async function loadSharedOfficialData() {
@@ -5918,6 +6001,7 @@ function setCurrentUser(user) {
 }
 
 function isAdmin() {
+    const user = getCurrentUser();
     return user && user.rol === 'admin';
 }
 
@@ -5935,6 +6019,7 @@ function setAdminMode(active) {
         sessionStorage.setItem('adminMode', 'true');
         document.body.classList.add('admin-mode');
         document.getElementById('btn-admin').innerHTML = '&#x1F513; Admin activo';
+        renderUsersTable();
     } else {
         sessionStorage.removeItem('adminMode');
         document.body.classList.remove('admin-mode');
@@ -5965,17 +6050,33 @@ function updateHeaderUser() {
 }
 
 // ===== LOGIN =====
-async function loadLoginUsers() {
+function renderLoginUserOptions(usuarios, previousSelection = '') {
+    const select = document.getElementById('login-user');
+    const activos = usuarios.filter(u => u.activo);
+    if (activos.length === 0) {
+        select.innerHTML = '<option value="">No hay usuarios - crea uno en Google Sheets</option>';
+        return { hasUsers: false };
+    }
+
+    select.innerHTML = '<option value="">Selecciona tu nombre</option>' +
+        activos.map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
+    if (previousSelection && activos.some(u => u.nombre === previousSelection)) {
+        select.value = previousSelection;
+    }
+    return { hasUsers: true };
+}
+
+async function legacyLoadLoginUsersUnused(forceRefresh = false) {
     const select = document.getElementById('login-user');
     const previousSelection = select.value || getLastLoginUser();
     select.innerHTML = '<option value="">Cargando...</option>';
     setLoginControlsDisabled(true);
     setLoginError('');
     setLoginHelp('Leyendo usuarios desde Google Sheets...');
-    const res = await sheetsAPI('getUsuarios');
+    const res = await fetchUsuarios(forceRefresh);
     if (res.ok && res.usuarios) {
-        const activos = res.usuarios.filter(u => u.activo);
-        if (activos.length === 0) {
+        const { hasUsers } = renderLoginUserOptions(res.usuarios, previousSelection);
+        if (!hasUsers) {
             select.innerHTML = '<option value="">No hay usuarios — crea uno en Google Sheets</option>';
             setLoginHelp('La conexión con Google Sheets sí funcionó, pero no hay usuarios activos para mostrar.');
             setLoginControlsDisabled(false);
@@ -6000,6 +6101,34 @@ async function loadLoginUsers() {
 function showLogin() {
     document.getElementById('login-overlay').classList.remove('hidden');
     loadLoginUsers();
+}
+
+async function loadLoginUsers(forceRefresh = false) {
+    const select = document.getElementById('login-user');
+    const previousSelection = select.value || getLastLoginUser();
+    select.innerHTML = '<option value="">Cargando...</option>';
+    setLoginControlsDisabled(true);
+    setLoginError('');
+    setLoginHelp('Leyendo usuarios desde Google Sheets...');
+
+    const res = await fetchUsuarios(forceRefresh);
+    if (res.ok && res.usuarios) {
+        const { hasUsers } = renderLoginUserOptions(res.usuarios, previousSelection);
+        if (!hasUsers) {
+            setLoginHelp('La conexion con Google Sheets si funciono, pero no hay usuarios activos para mostrar.');
+            setLoginControlsDisabled(false);
+            document.getElementById('btn-login').disabled = true;
+            return;
+        }
+        setLoginHelp('Usuarios cargados correctamente desde Google Sheets.');
+        setLoginControlsDisabled(false);
+        return;
+    }
+
+    select.innerHTML = '<option value="">Error al cargar usuarios</option>';
+    setLoginHelp(res.error || 'No se pudo leer la lista de usuarios.', true);
+    setLoginControlsDisabled(false);
+    document.getElementById('btn-login').disabled = true;
 }
 
 function hideLogin() {
@@ -6050,7 +6179,8 @@ document.getElementById('login-pin').addEventListener('input', () => {
 });
 
 document.getElementById('btn-reload-users').addEventListener('click', () => {
-    loadLoginUsers();
+    invalidateUsuariosCache();
+    loadLoginUsers(true);
 });
 
 // Logout
@@ -6072,7 +6202,7 @@ document.getElementById('btn-admin').addEventListener('click', () => {
 });
 
 // ===== GESTIÓN DE USUARIOS (ADMIN) =====
-async function renderUsersTable() {
+async function legacyRenderUsersTableUnused() {
     const wrap = document.getElementById('users-table-wrap');
     wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">Cargando usuarios...</p>';
     const res = await sheetsAPI('getUsuarios');
@@ -6104,6 +6234,42 @@ async function renderUsersTable() {
         res.usuarios.filter(u => u.activo).map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
 }
 
+async function renderUsersTable(forceRefresh = false) {
+    const wrap = document.getElementById('users-table-wrap');
+    wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">Cargando usuarios...</p>';
+
+    const res = await fetchUsuarios(forceRefresh);
+    if (!res.ok) {
+        wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--red);">Error: ' + (res.error || '') + '</p>';
+        return;
+    }
+    if (res.usuarios.length === 0) {
+        wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">No hay usuarios registrados.</p>';
+        renderLoginUserOptions([], getLastLoginUser());
+        return;
+    }
+
+    wrap.innerHTML = `
+        <table class="users-table">
+            <thead><tr><th>Nombre</th><th>PIN</th><th>Rol</th><th>Estado</th><th></th></tr></thead>
+            <tbody>
+                ${res.usuarios.map(u => `<tr>
+                    <td>${escapeHtml(u.nombre)}</td>
+                    <td>${u.pin}</td>
+                    <td><span class="${u.rol === 'admin' ? 'badge-admin' : 'badge-user'}">${u.rol}</span></td>
+                    <td><span class="${u.activo ? 'badge-user' : 'badge-inactive'}">${u.activo ? 'Activo' : 'Inactivo'}</span></td>
+                    <td>${u.activo ? `<button class="btn btn-sm" style="font-size:0.65rem;padding:0.15rem 0.4rem;background:var(--red);color:white;border:none;border-radius:4px;cursor:pointer;" onclick="desactivarUsuario('${escapeHtml(u.nombre)}')">Desactivar</button>` : `<button class="btn btn-sm" style="font-size:0.65rem;padding:0.15rem 0.4rem;background:var(--green);color:white;border:none;border-radius:4px;cursor:pointer;" onclick="reactivarUsuario('${escapeHtml(u.nombre)}')">Reactivar</button>`}</td>
+                </tr>`).join('')}
+            </tbody>
+        </table>`;
+
+    const filterSelect = document.getElementById('hist-filter-user');
+    filterSelect.innerHTML = '<option value="">Todos</option>' +
+        res.usuarios.filter(u => u.activo).map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
+
+    renderLoginUserOptions(res.usuarios, document.getElementById('login-user').value || getLastLoginUser());
+}
+
 document.getElementById('btn-add-user').addEventListener('click', async () => {
     const nombre = document.getElementById('new-user-name').value.trim();
     const pin = document.getElementById('new-user-pin').value.trim();
@@ -6115,10 +6281,11 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
     msgEl.style.color = 'var(--blue)'; msgEl.textContent = 'Creando...';
     const res = await sheetsAPI('crearUsuario', { nombre, pin, rol });
     if (res.ok) {
+        invalidateUsuariosCache();
         msgEl.style.color = 'var(--green)'; msgEl.textContent = 'Usuario creado';
         document.getElementById('new-user-name').value = '';
         document.getElementById('new-user-pin').value = '';
-        renderUsersTable();
+        await renderUsersTable(true);
         setTimeout(() => msgEl.textContent = '', 3000);
     } else {
         msgEl.style.color = 'var(--red)'; msgEl.textContent = res.error || 'Error';
@@ -6127,13 +6294,19 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
 
 async function desactivarUsuario(nombre) {
     if (!confirm('¿Desactivar a ' + nombre + '?')) return;
-    await sheetsAPI('eliminarUsuario', { nombre });
-    renderUsersTable();
+    const res = await sheetsAPI('eliminarUsuario', { nombre });
+    if (res.ok) {
+        invalidateUsuariosCache();
+        await renderUsersTable(true);
+    }
 }
 
 async function reactivarUsuario(nombre) {
-    await sheetsAPI('editarUsuario', { nombreOriginal: nombre, activo: true });
-    renderUsersTable();
+    const res = await sheetsAPI('editarUsuario', { nombreOriginal: nombre, activo: true });
+    if (res.ok) {
+        invalidateUsuariosCache();
+        await renderUsersTable(true);
+    }
 }
 
 // ===== REGISTRAR COTIZACIÓN EN GOOGLE SHEETS =====
@@ -6264,8 +6437,10 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 
 // ===== INIT =====
 (async function initApp() {
-    await loadSharedOfficialData();
-    await loadSharedExchangeRate();
+    await Promise.allSettled([
+        loadSharedOfficialData(),
+        loadSharedExchangeRate()
+    ]);
     renderProvidersList();
     updateCotizarBtn();
     renderMaritimeProvidersList();
