@@ -5184,7 +5184,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                         <div style="display:flex;flex-direction:column;gap:0.45rem;">
                             ${destinationData.selectable.map(item => `
                                 <label style="display:flex;gap:0.65rem;align-items:flex-start;padding:0.45rem 0.2rem;border-bottom:1px solid rgba(148,163,184,0.14);cursor:pointer;">
-                                    <input type="checkbox" data-destination-concept="${escapeHtml(item.id)}"${item.selected ? ' checked' : ''} style="margin-top:0.2rem;">
+                                    <input type="checkbox" data-destination-concept="${escapeHtml(item.id)}"${item.selected ? ' checked' : ''} onchange="toggleMaritimeDestinationConcept(this)" style="margin-top:0.2rem;">
                                     <span style="display:block;font-size:0.76rem;color:var(--gray-600);">
                                         <strong style="color:var(--gray-800);">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
                                         <span style="display:block;">${escapeHtml(item.baseCobro || '')} · ${escapeHtml(item.moneda || '')} ${fmt(item.monto || 0)} · ${escapeHtml(item.pricingMode || '')}</span>
@@ -5252,21 +5252,20 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         maritimeDestinationSelection.selectedConceptIds = [];
         renderDestinationCalculatorState();
     });
-    document.getElementById(destinationConceptsId)?.addEventListener('change', (event) => {
-        const input = event.target?.closest?.('[data-destination-concept]');
-        if (!input) return;
-        const id = input.getAttribute('data-destination-concept');
-        if (!id) return;
-        const selected = new Set(maritimeDestinationSelection.selectedConceptIds || []);
-        if (input.checked) {
-            selected.add(id);
-        } else {
-            selected.delete(id);
-        }
-        maritimeDestinationSelection.selectedConceptIds = [...selected];
-        renderDestinationCalculatorState();
-    });
     renderDestinationCalculatorState();
+}
+
+function toggleMaritimeDestinationConcept(input) {
+    const id = input?.getAttribute?.('data-destination-concept');
+    if (!id) return;
+    const selected = new Set(maritimeDestinationSelection.selectedConceptIds || []);
+    if (input.checked) {
+        selected.add(id);
+    } else {
+        selected.delete(id);
+    }
+    maritimeDestinationSelection.selectedConceptIds = [...selected];
+    renderMaritimeCombinedCalculator();
 }
 
 function updateMaritimeHelpText() {
