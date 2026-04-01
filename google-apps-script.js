@@ -21,6 +21,8 @@ const SPREADSHEET_ID = '1EzBWkmi9PqjgnZ_C1iDlzRWnqTJvhsuL4Z5s3LMgYiE';
 const CONFIG_SHEET_NAME = 'Configuracion';
 const TIPO_CAMBIO_KEY = 'tipoCambio';
 const TIPO_CAMBIO_ALLOWED_USERS = ['miguel', 'miguel lomeli'];
+const USUARIOS_CACHE_KEY = 'cotizador_usuarios_cache_v1';
+const USUARIOS_CACHE_TTL_SECONDS = 180;
 
 function doPost(e) {
   return handleRequest(e);
@@ -189,30 +191,62 @@ function guardarTipoCambioCompartido(data) {
 
 // ===== USUARIOS =====
 
-function getUsuarios() {
+function getUsuariosCache() {
+  return CacheService.getScriptCache();
+}
+
+function clearUsuariosCache() {
+  getUsuariosCache().remove(USUARIOS_CACHE_KEY);
+}
+
+function loadUsuariosData(forceRefresh) {
+  const cache = getUsuariosCache();
+  if (!forceRefresh) {
+    const cached = cache.get(USUARIOS_CACHE_KEY);
+    if (cached) {
+      try {
+        return { ok: true, usuarios: JSON.parse(cached) };
+      } catch (err) {
+        cache.remove(USUARIOS_CACHE_KEY);
+      }
+    }
+  }
+
   const lookup = getSheetOrError('Usuarios');
   if (!lookup.ok) return lookup;
   const sheet = lookup.sheet;
 
-  const data = sheet.getDataRange().getValues();
-  if (data.length <= 1) return { ok: true, usuarios: [] };
+  const lastRow = sheet.getLastRow();
+  if (lastRow <= 1) {
+    cache.put(USUARIOS_CACHE_KEY, JSON.stringify([]), USUARIOS_CACHE_TTL_SECONDS);
+    return { ok: true, usuarios: [] };
+  }
 
+  const data = sheet.getRange(2, 1, lastRow - 1, 4).getValues();
   const usuarios = [];
-  for (let i = 1; i < data.length; i++) {
+  for (let i = 0; i < data.length; i++) {
+    const nombre = data[i][0];
+    if (!nombre) continue;
     usuarios.push({
-      nombre: data[i][0],
+      nombre: nombre,
       pin: String(data[i][1]),
       rol: data[i][2] || 'usuario',
       activo: data[i][3] !== false && data[i][3] !== 'FALSE' && data[i][3] !== 'No'
     });
   }
-  return { ok: true, usuarios };
+
+  cache.put(USUARIOS_CACHE_KEY, JSON.stringify(usuarios), USUARIOS_CACHE_TTL_SECONDS);
+  return { ok: true, usuarios: usuarios };
+}
+
+function getUsuarios() {
+  return loadUsuariosData(false);
 }
 
 function login(nombre, pin) {
   if (!nombre || !pin) return { ok: false, error: 'Nombre y PIN requeridos' };
 
-  const res = getUsuarios();
+  const res = loadUsuariosData(false);
   if (!res.ok) return res;
 
   const user = res.usuarios.find(u =>
@@ -244,6 +278,7 @@ function crearUsuario(data) {
   }
 
   sheet.appendRow([data.nombre, String(data.pin), data.rol || 'usuario', true]);
+  clearUsuariosCache();
   return { ok: true };
 }
 
@@ -259,6 +294,7 @@ function editarUsuario(data) {
       if (data.pin) sheet.getRange(i + 1, 2).setValue(String(data.pin));
       if (data.rol) sheet.getRange(i + 1, 3).setValue(data.rol);
       if (data.activo !== undefined) sheet.getRange(i + 1, 4).setValue(data.activo);
+      clearUsuariosCache();
       return { ok: true };
     }
   }
@@ -274,6 +310,7 @@ function eliminarUsuario(nombre) {
   for (let i = 1; i < rows.length; i++) {
     if (rows[i][0].toString().toLowerCase().trim() === nombre.toLowerCase().trim()) {
       sheet.getRange(i + 1, 4).setValue(false);
+      clearUsuariosCache();
       return { ok: true };
     }
   }
