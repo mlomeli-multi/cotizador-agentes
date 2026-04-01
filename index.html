@@ -4079,12 +4079,6 @@ function resolveMaritimeDestinationConcepts(selection, puerto) {
             return;
         }
 
-        if (concept.tipo !== 'automatico') {
-            if (notes.includes(concept.nombre)) return;
-            notes.push(concept.nombre);
-            return;
-        }
-
         if (selectable.some(item => item.id === optionId)) return;
         const option = {
             id: optionId,
