@@ -3996,12 +3996,15 @@ function getMaritimeDestinationCarriers() {
     return Object.entries(data.carriers || {}).map(([key, carrier]) => ({
         key,
         ...carrier,
+        aliases: Array.isArray(carrier.aliases)
+            ? carrier.aliases
+            : (carrier.aliases ? [carrier.aliases] : [])
     }));
 }
 
 function maritimeCarrierMatches(carrier, value) {
     const normalized = normalizeProviderKey(value);
-    const aliases = [carrier.displayName, carrier.carrier, ...(carrier.aliases || [])]
+    const aliases = [carrier.displayName, carrier.carrier, ...(Array.isArray(carrier.aliases) ? carrier.aliases : (carrier.aliases ? [carrier.aliases] : []))]
         .map(normalizeProviderKey)
         .filter(Boolean);
     return aliases.includes(normalized);
@@ -4029,7 +4032,7 @@ function maritimeConceptMatchesContext(concept, context) {
 function buildMaritimeDestinationLine(choiceLabel, concept) {
     const isMub = concept.pricingMode === 'mub';
     return {
-        nombre: `${concept.nombre} (${choiceLabel} · ${concept.moneda || 'USD'})`,
+        nombre: choiceLabel ? `${concept.nombre} (${choiceLabel} · ${concept.moneda || 'USD'})` : `${concept.nombre} (${concept.moneda || 'USD'})`,
         costo: parseFloat(concept.monto) || 0,
         monedaCosto: concept.moneda || 'USD',
         esFlete: false,
@@ -4071,30 +4074,36 @@ function resolveMaritimeDestinationConcepts(selection, puerto) {
         carrier.conceptos.forEach(concept => {
             if (!maritimeConceptMatchesContext(concept, context)) return;
 
+            const isPerShipment = ['BL', 'shipment'].includes((concept.baseCobro || '').toUpperCase());
+            const optionId = isPerShipment ? concept.id : `${choice.key}__${concept.id}`;
+            const optionChoiceLabel = isPerShipment ? '' : choice.label;
+
             if (concept.tipo === 'deposito' || concept.pricingMode === 'excluded') {
+                if (isPerShipment && extras.some(item => item.id === concept.id)) return;
                 extras.push({
                     ...concept,
-                    choiceLabel: choice.label
+                    choiceLabel: optionChoiceLabel || choice.label
                 });
                 return;
             }
 
             if (concept.tipo !== 'automatico') {
-                notes.push(`${choice.label}: ${concept.nombre}`);
+                if (isPerShipment && notes.includes(concept.nombre)) return;
+                notes.push(optionChoiceLabel ? `${optionChoiceLabel}: ${concept.nombre}` : concept.nombre);
                 return;
             }
 
-            const optionId = `${choice.key}__${concept.id}`;
+            if (selectable.some(item => item.id === optionId)) return;
             const option = {
                 id: optionId,
                 choiceKey: choice.key,
-                choiceLabel: choice.label,
+                choiceLabel: optionChoiceLabel,
                 selected: selectedConceptIds.includes(optionId),
                 ...concept
             };
             selectable.push(option);
             if (option.selected) {
-                lines.push(buildMaritimeDestinationLine(choice.label, concept));
+                lines.push(buildMaritimeDestinationLine(optionChoiceLabel, concept));
             }
         });
     });
@@ -5177,7 +5186,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                                 <label style="display:flex;gap:0.65rem;align-items:flex-start;padding:0.45rem 0.2rem;border-bottom:1px solid rgba(148,163,184,0.14);cursor:pointer;">
                                     <input type="checkbox" data-destination-concept="${escapeHtml(item.id)}"${item.selected ? ' checked' : ''} style="margin-top:0.2rem;">
                                     <span style="display:block;font-size:0.76rem;color:var(--gray-600);">
-                                        <strong style="color:var(--gray-800);">${escapeHtml(item.choiceLabel)} · ${escapeHtml(item.nombre)}</strong>
+                                        <strong style="color:var(--gray-800);">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
                                         <span style="display:block;">${escapeHtml(item.baseCobro || '')} · ${escapeHtml(item.moneda || '')} ${fmt(item.monto || 0)} · ${escapeHtml(item.pricingMode || '')}</span>
                                         ${item.notas ? `<span style="display:block;color:var(--gray-500);">${escapeHtml(item.notas)}</span>` : ''}
                                     </span>
@@ -5187,19 +5196,6 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     </div>
                 `;
 
-                destinationConcepts.querySelectorAll('[data-destination-concept]').forEach(input => {
-                    input.addEventListener('change', () => {
-                        const id = input.getAttribute('data-destination-concept');
-                        const selected = new Set(maritimeDestinationSelection.selectedConceptIds || []);
-                        if (input.checked) {
-                            selected.add(id);
-                        } else {
-                            selected.delete(id);
-                        }
-                        maritimeDestinationSelection.selectedConceptIds = [...selected];
-                        renderDestinationCalculatorState();
-                    });
-                });
             } else {
                 destinationConcepts.innerHTML = `
                     <div style="padding:0.8rem 0.9rem;border-radius:12px;background:white;border:1px solid rgba(148,163,184,0.16);font-size:0.76rem;color:var(--gray-500);">
@@ -5254,6 +5250,20 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
 
     document.getElementById(`${containerId}-carrier`)?.addEventListener('change', () => {
         maritimeDestinationSelection.selectedConceptIds = [];
+        renderDestinationCalculatorState();
+    });
+    document.getElementById(destinationConceptsId)?.addEventListener('change', (event) => {
+        const input = event.target?.closest?.('[data-destination-concept]');
+        if (!input) return;
+        const id = input.getAttribute('data-destination-concept');
+        if (!id) return;
+        const selected = new Set(maritimeDestinationSelection.selectedConceptIds || []);
+        if (input.checked) {
+            selected.add(id);
+        } else {
+            selected.delete(id);
+        }
+        maritimeDestinationSelection.selectedConceptIds = [...selected];
         renderDestinationCalculatorState();
     });
     renderDestinationCalculatorState();
