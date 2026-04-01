@@ -3980,6 +3980,136 @@ function normalizeProviderKey(value) {
     return normalizarTexto(normalizeWhitespace(value)).replace(/\s+/g, ' ');
 }
 
+function getMaritimeDestinationConceptsData() {
+    const raw = localStorage.getItem(MARITIME_DESTINATION_CONCEPTS_STORAGE_KEY);
+    if (!raw) return { carriers: {} };
+    try {
+        const parsed = JSON.parse(raw);
+        return parsed && parsed.carriers ? parsed : { carriers: {} };
+    } catch (err) {
+        return { carriers: {} };
+    }
+}
+
+function getMaritimeDestinationCarriers() {
+    const data = getMaritimeDestinationConceptsData();
+    return Object.entries(data.carriers || {}).map(([key, carrier]) => ({
+        key,
+        ...carrier,
+    }));
+}
+
+function maritimeCarrierMatches(carrier, value) {
+    const normalized = normalizeProviderKey(value);
+    const aliases = [carrier.displayName, carrier.carrier, ...(carrier.aliases || [])]
+        .map(normalizeProviderKey)
+        .filter(Boolean);
+    return aliases.includes(normalized);
+}
+
+function normalizeMaritimeContainerScope(choiceType) {
+    return choiceType === 'full' ? 'DRY' : 'DRY';
+}
+
+function maritimeConceptMatchesContext(concept, context) {
+    const aplica = concept.aplica || {};
+    const puertos = Array.isArray(aplica.puertos) ? aplica.puertos : [];
+    if (puertos.length && !puertos.some(port => normalizeWhitespace(port) === 'Todos' || normalizeProviderKey(port) === normalizeProviderKey(context.puerto))) {
+        return false;
+    }
+
+    const containerTypes = Array.isArray(aplica.containerTypes) ? aplica.containerTypes : [];
+    if (containerTypes.length && !containerTypes.some(type => normalizeProviderKey(type) === normalizeProviderKey(context.containerScope))) {
+        return false;
+    }
+
+    return true;
+}
+
+function buildMaritimeDestinationLine(choiceLabel, concept) {
+    const isMub = concept.pricingMode === 'mub';
+    return {
+        nombre: `${concept.nombre} (${choiceLabel} · ${concept.moneda || 'USD'})`,
+        costo: parseFloat(concept.monto) || 0,
+        monedaCosto: concept.moneda || 'USD',
+        esFlete: false,
+        mub: isMub ? (parseFloat(concept.mubDefault) || 15) : 0
+    };
+}
+
+function resolveMaritimeDestinationConcepts(selection, puerto) {
+    const carriers = getMaritimeDestinationCarriers();
+    if (!carriers.length) {
+        return { availableCarriers: [], selectedCarrierKey: '', lines: [], selectable: [], extras: [], notes: [] };
+    }
+
+    const selectedCarrierKey = selection?.carrierKey && carriers.some(carrier => carrier.key === selection.carrierKey)
+        ? selection.carrierKey
+        : carriers[0].key;
+    const carrier = carriers.find(item => item.key === selectedCarrierKey);
+    if (!carrier) {
+        return { availableCarriers: carriers, selectedCarrierKey: '', lines: [], selectable: [], extras: [], notes: [] };
+    }
+
+    const choices = [
+        { key: 'single', label: 'Single', data: maritimeSelection.single },
+        { key: 'full', label: 'Full', data: maritimeSelection.full }
+    ].filter(choice => !!choice.data);
+
+    const selectedConceptIds = Array.isArray(selection?.selectedConceptIds) ? selection.selectedConceptIds : [];
+    const selectable = [];
+    const lines = [];
+    const extras = [];
+    const notes = [];
+
+    choices.forEach(choice => {
+        const context = {
+            puerto,
+            containerScope: normalizeMaritimeContainerScope(choice.key)
+        };
+
+        carrier.conceptos.forEach(concept => {
+            if (!maritimeConceptMatchesContext(concept, context)) return;
+
+            if (concept.tipo === 'deposito' || concept.pricingMode === 'excluded') {
+                extras.push({
+                    ...concept,
+                    choiceLabel: choice.label
+                });
+                return;
+            }
+
+            if (concept.tipo !== 'automatico') {
+                notes.push(`${choice.label}: ${concept.nombre}`);
+                return;
+            }
+
+            const optionId = `${choice.key}__${concept.id}`;
+            const option = {
+                id: optionId,
+                choiceKey: choice.key,
+                choiceLabel: choice.label,
+                selected: selectedConceptIds.includes(optionId),
+                ...concept
+            };
+            selectable.push(option);
+            if (option.selected) {
+                lines.push(buildMaritimeDestinationLine(choice.label, concept));
+            }
+        });
+    });
+
+    return {
+        availableCarriers: carriers,
+        selectedCarrierKey,
+        selectedCarrier: carrier,
+        selectable,
+        lines,
+        extras,
+        notes
+    };
+}
+
 function createMaritimeRouteKey(entry) {
     return [
         normalizeProviderKey(entry.proveedor),
@@ -4696,6 +4826,7 @@ const maritimoCiudadEl = document.getElementById('maritimo-ciudad');
 const maritimeAcList = document.getElementById('autocomplete-list-maritimo');
 let maritimeAcIndex = -1;
 let maritimeSelection = { single: null, full: null };
+let maritimeDestinationSelection = { carrierKey: '', selectedConceptIds: [] };
 let maritimeExpanded = { single: null, full: null };
 
 if (maritimoPuertoEl && maritimoCiudadEl) {
@@ -4960,8 +5091,20 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
 
     const singleChoice = maritimeSelection.single;
     const fullChoice = maritimeSelection.full;
+    const puerto = document.getElementById('maritimo-puerto')?.value || '';
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const innerContainerId = `${containerId}-inner`;
+    const destinationMetaId = `${containerId}-destination-meta`;
+    const destinationConceptsId = `${containerId}-destination-concepts`;
+    const destinationExtrasId = `${containerId}-destination-extras`;
+    const carrierOptions = getMaritimeDestinationCarriers();
+    const defaultCarrierKey = maritimeDestinationSelection.carrierKey && carrierOptions.some(carrier => carrier.key === maritimeDestinationSelection.carrierKey)
+        ? maritimeDestinationSelection.carrierKey
+        : (carrierOptions[0]?.key || '');
+    maritimeDestinationSelection.carrierKey = defaultCarrierKey;
+    if (!Array.isArray(maritimeDestinationSelection.selectedConceptIds)) {
+        maritimeDestinationSelection.selectedConceptIds = [];
+    }
 
     container.innerHTML = `
         <div class="maritime-combined-shell">
@@ -4989,27 +5132,131 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     ${fullChoice.horasLibres ? `<div class="maritime-combined-pick-meta">Horas libres: ${escapeHtml(fullChoice.horasLibres)}</div>` : ''}
                 </div>
             </div>
+            <div style="margin-top:1rem;padding:0.85rem 1rem;border:1px solid rgba(37,99,235,0.15);border-radius:14px;background:#f8fbff;">
+                <div style="display:flex;gap:0.85rem;flex-wrap:wrap;align-items:end;">
+                    <div style="flex:1 1 220px;">
+                        <div style="font-size:0.72rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.35rem;">Naviera destino</div>
+                        <select id="${containerId}-carrier" style="width:100%;padding:0.7rem 0.8rem;border:1px solid var(--gray-200);border-radius:10px;background:white;">
+                            ${carrierOptions.map(carrier => `<option value="${escapeHtml(carrier.key)}"${carrier.key === defaultCarrierKey ? ' selected' : ''}>${escapeHtml(carrier.displayName || carrier.carrier || carrier.key)}</option>`).join('')}
+                        </select>
+                    </div>
+                    <div style="flex:2 1 320px;font-size:0.76rem;color:var(--gray-500);">
+                        Piloto Fase 2: los conceptos destino se calculan por naviera y los depósitos o garantías se muestran aparte sin entrar al total DAP.
+                    </div>
+                </div>
+                <div id="${destinationMetaId}" style="margin-top:0.75rem;font-size:0.76rem;color:var(--gray-500);"></div>
+                <div id="${destinationConceptsId}" style="margin-top:0.75rem;"></div>
+                <div id="${destinationExtrasId}" style="margin-top:0.75rem;"></div>
+            </div>
             <div id="${innerContainerId}"></div>
         </div>
     `;
 
-    openMubPanel({
-        proveedor: `${singleChoice.proveedor} + ${fullChoice.proveedor}`,
-        lineas: [
-            { nombre: `Flete maritimo Single (${singleChoice.proveedor})`, costo: singleChoice.single, esFlete: true, mub: 15 },
-            { nombre: `Flete maritimo Full (${fullChoice.proveedor})`, costo: fullChoice.full, esFlete: true, mub: 15 },
-        ],
-        metaInfo: [
-            `Single: ${singleChoice.proveedor}`,
-            `Full: ${fullChoice.proveedor}`,
-            singleChoice.vigencia ? `Vigencia single: ${singleChoice.vigencia}` : '',
-            fullChoice.vigencia ? `Vigencia full: ${fullChoice.vigencia}` : '',
-            singleChoice.horasLibres ? `Horas libres single: ${singleChoice.horasLibres}` : '',
-            fullChoice.horasLibres ? `Horas libres full: ${fullChoice.horasLibres}` : '',
-            singleChoice.comentarios ? `Comentarios single: ${singleChoice.comentarios}` : '',
-            fullChoice.comentarios ? `Comentarios full: ${fullChoice.comentarios}` : ''
-        ].filter(Boolean).join(' | ')
-    }, innerContainerId);
+    const renderDestinationCalculatorState = () => {
+        const carrierKey = document.getElementById(`${containerId}-carrier`)?.value || defaultCarrierKey;
+        maritimeDestinationSelection.carrierKey = carrierKey;
+        const destinationData = resolveMaritimeDestinationConcepts(maritimeDestinationSelection, puerto);
+        const destinationMeta = document.getElementById(destinationMetaId);
+        const destinationConcepts = document.getElementById(destinationConceptsId);
+        const destinationExtras = document.getElementById(destinationExtrasId);
+
+        if (destinationMeta) {
+            const lineCount = destinationData.lines.length;
+            destinationMeta.innerHTML = destinationData.selectedCarrier
+                ? `Naviera piloto activa: <strong>${escapeHtml(destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier)}</strong> · ${lineCount} concepto${lineCount === 1 ? '' : 's'} seleccionado${lineCount === 1 ? '' : 's'} en el total.`
+                : 'No hay naviera piloto disponible.';
+        }
+
+        if (destinationConcepts) {
+            if (destinationData.selectable.length) {
+                destinationConcepts.innerHTML = `
+                    <div style="padding:0.8rem 0.9rem;border-radius:12px;background:white;border:1px solid rgba(37,99,235,0.12);">
+                        <div style="font-size:0.78rem;font-weight:700;color:var(--gray-700);margin-bottom:0.45rem;">Cargos a seleccionar</div>
+                        <div style="display:flex;flex-direction:column;gap:0.45rem;">
+                            ${destinationData.selectable.map(item => `
+                                <label style="display:flex;gap:0.65rem;align-items:flex-start;padding:0.45rem 0.2rem;border-bottom:1px solid rgba(148,163,184,0.14);cursor:pointer;">
+                                    <input type="checkbox" data-destination-concept="${escapeHtml(item.id)}"${item.selected ? ' checked' : ''} style="margin-top:0.2rem;">
+                                    <span style="display:block;font-size:0.76rem;color:var(--gray-600);">
+                                        <strong style="color:var(--gray-800);">${escapeHtml(item.choiceLabel)} · ${escapeHtml(item.nombre)}</strong>
+                                        <span style="display:block;">${escapeHtml(item.baseCobro || '')} · ${escapeHtml(item.moneda || '')} ${fmt(item.monto || 0)} · ${escapeHtml(item.pricingMode || '')}</span>
+                                        ${item.notas ? `<span style="display:block;color:var(--gray-500);">${escapeHtml(item.notas)}</span>` : ''}
+                                    </span>
+                                </label>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+
+                destinationConcepts.querySelectorAll('[data-destination-concept]').forEach(input => {
+                    input.addEventListener('change', () => {
+                        const id = input.getAttribute('data-destination-concept');
+                        const selected = new Set(maritimeDestinationSelection.selectedConceptIds || []);
+                        if (input.checked) {
+                            selected.add(id);
+                        } else {
+                            selected.delete(id);
+                        }
+                        maritimeDestinationSelection.selectedConceptIds = [...selected];
+                        renderDestinationCalculatorState();
+                    });
+                });
+            } else {
+                destinationConcepts.innerHTML = `
+                    <div style="padding:0.8rem 0.9rem;border-radius:12px;background:white;border:1px solid rgba(148,163,184,0.16);font-size:0.76rem;color:var(--gray-500);">
+                        No hay cargos configurados para seleccionar con esta naviera piloto y el puerto actual.
+                    </div>
+                `;
+            }
+        }
+
+        if (destinationExtras) {
+            if (destinationData.extras.length) {
+                destinationExtras.innerHTML = `
+                    <div style="padding:0.8rem 0.9rem;border-radius:12px;background:#fff7ed;border:1px solid rgba(245,158,11,0.25);">
+                        <div style="font-size:0.78rem;font-weight:700;color:#9a3412;margin-bottom:0.45rem;">Depósitos y garantías</div>
+                        <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                            ${destinationData.extras.map(item => `
+                                <div style="font-size:0.76rem;color:#7c2d12;">
+                                    <strong>${escapeHtml(item.choiceLabel)}:</strong>
+                                    ${escapeHtml(item.nombre)}${item.monto ? ` — ${escapeHtml(item.moneda || '')} ${fmt(item.monto)}` : ''}
+                                    ${item.notas ? ` · ${escapeHtml(item.notas)}` : ''}
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else {
+                destinationExtras.innerHTML = '';
+            }
+        }
+
+        openMubPanel({
+            proveedor: `${singleChoice.proveedor} + ${fullChoice.proveedor}`,
+            lineas: [
+                { nombre: `Flete maritimo Single (${singleChoice.proveedor})`, costo: singleChoice.single, esFlete: true, mub: 15 },
+                { nombre: `Flete maritimo Full (${fullChoice.proveedor})`, costo: fullChoice.full, esFlete: true, mub: 15 },
+                ...destinationData.lines
+            ],
+            metaInfo: [
+                `Single: ${singleChoice.proveedor}`,
+                `Full: ${fullChoice.proveedor}`,
+                destinationData.selectedCarrier ? `Naviera destino: ${destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier}` : '',
+                singleChoice.vigencia ? `Vigencia single: ${singleChoice.vigencia}` : '',
+                fullChoice.vigencia ? `Vigencia full: ${fullChoice.vigencia}` : '',
+                singleChoice.horasLibres ? `Horas libres single: ${singleChoice.horasLibres}` : '',
+                fullChoice.horasLibres ? `Horas libres full: ${fullChoice.horasLibres}` : '',
+                singleChoice.comentarios ? `Comentarios single: ${singleChoice.comentarios}` : '',
+                fullChoice.comentarios ? `Comentarios full: ${fullChoice.comentarios}` : '',
+                destinationData.notes.length ? `Revisar manualmente: ${destinationData.notes.join(', ')}` : ''
+            ].filter(Boolean).join(' | ')
+        }, innerContainerId);
+    };
+
+    document.getElementById(`${containerId}-carrier`)?.addEventListener('change', () => {
+        maritimeDestinationSelection.selectedConceptIds = [];
+        renderDestinationCalculatorState();
+    });
+    renderDestinationCalculatorState();
 }
 
 function updateMaritimeHelpText() {
@@ -5205,16 +5452,18 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             .map(l => ({
                 nombre: l.nombre,
                 costo: parseFloat(l.costo) || 0,
+                monedaCosto: l.monedaCosto || 'MXN',
                 esFlete: l.esFlete !== false,
                 mub: typeof l.mub === 'number' ? l.mub : 15,
                 venta: 0,
                 editando: 'mub'
             }))
         : [
-            { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, esFlete: true, mub: 15, venta: 0, editando: 'mub' },
+            { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, monedaCosto: 'MXN', esFlete: true, mub: 15, venta: 0, editando: 'mub' },
             ...((data.conceptos || []).filter(c => c.monto > 0).map(c => ({
                 nombre: c.nombre,
                 costo: c.monto,
+                monedaCosto: 'MXN',
                 esFlete: false,
                 mub: 15,
                 venta: 0,
@@ -5224,10 +5473,18 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
     // costoBase MXN = costo con impuestos (flete) o directo (conceptos)
     function costoBaseMXN(l) {
-        return l.esFlete ? l.costo * (1 + IMPUESTO_FLETE) : l.costo;
+        const costoImpuesto = l.esFlete ? l.costo * (1 + IMPUESTO_FLETE) : l.costo;
+        if (l.monedaCosto === 'USD' && hayTC) return costoImpuesto * tc;
+        return costoImpuesto;
+    }
+    function costoSinImpMXN(l) {
+        if (l.monedaCosto === 'USD' && hayTC) return l.costo * tc;
+        return l.costo;
     }
     // costoBase en moneda de venta (USD si hay TC, MXN si no)
     function costoBaseVenta(l) {
+        const costoImpuesto = l.esFlete ? l.costo * (1 + IMPUESTO_FLETE) : l.costo;
+        if (hayTC && l.monedaCosto === 'USD') return costoImpuesto;
         return toUSD(costoBaseMXN(l));
     }
 
@@ -5260,7 +5517,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
         return `<tr>
             <td>${escapeHtml(l.nombre)}</td>
-            <td>$${fmt(l.costo)}</td>
+            <td>$${fmt(costoSinImpMXN(l))}</td>
             ${impCol}
             ${costoImpCell}
             ${usdCell}
@@ -5272,7 +5529,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
     const totalUtilidad = totalVenta - totalCostoBaseVenta;
     const mubTotal = totalVenta > 0 ? ((totalUtilidad / totalVenta) * 100) : 0;
-    const totalCostoSinImp = lineas.reduce((s, l) => s + l.costo, 0);
+    const totalCostoSinImp = lineas.reduce((s, l) => s + costoSinImpMXN(l), 0);
     const totalImpuestos = totalCostoBaseMXN - totalCostoSinImp;
 
     // Header de conversión
@@ -5345,7 +5602,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 l.mub = l.venta > cbVenta ? (1 - cbVenta / l.venta) * 100 : 0;
             }
             const utilidad = l.venta - cbVenta;
-            tCostoSinImp += l.costo;
+            tCostoSinImp += costoSinImpMXN(l);
             tCostoBaseMXN += costoBaseMXN(l);
             tCostoBaseVenta += cbVenta;
             tVenta += l.venta;
@@ -5822,7 +6079,9 @@ const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbyKOQ_PWGjTyAmWF
 const LAST_LOGIN_USER_KEY = 'lastLoginUser';
 const SHARED_DATA_URL = './data/cotizador-base.json';
 const SHARED_EXCHANGE_RATE_URL = './data/tipo-cambio.json';
+const SHARED_MARITIME_DESTINATION_CONCEPTS_URL = './data/conceptos-destino-maritimos.json';
 const TARIFF_MANAGER_USERS = new Set(['miguel', 'miguel lomeli']);
+const MARITIME_DESTINATION_CONCEPTS_STORAGE_KEY = 'conceptosDestinoMaritimos';
 const USERS_FRONTEND_CACHE_TTL_MS = 30000;
 let usuariosCache = null;
 let usuariosCacheAt = 0;
@@ -5936,6 +6195,21 @@ async function loadSharedExchangeRate() {
         return true;
     } catch (err) {
         console.warn('No se pudo cargar el tipo de cambio compartido:', err);
+        return false;
+    }
+}
+
+async function loadSharedMaritimeDestinationConcepts() {
+    try {
+        const res = await fetch(`${SHARED_MARITIME_DESTINATION_CONCEPTS_URL}?v=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (data && data.carriers && typeof data.carriers === 'object') {
+            localStorage.setItem(MARITIME_DESTINATION_CONCEPTS_STORAGE_KEY, JSON.stringify(data));
+        }
+        return true;
+    } catch (err) {
+        console.warn('No se pudieron cargar los conceptos destino maritimos:', err);
         return false;
     }
 }
@@ -6439,7 +6713,8 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 (async function initApp() {
     await Promise.allSettled([
         loadSharedOfficialData(),
-        loadSharedExchangeRate()
+        loadSharedExchangeRate(),
+        loadSharedMaritimeDestinationConcepts()
     ]);
     renderProvidersList();
     updateCotizarBtn();

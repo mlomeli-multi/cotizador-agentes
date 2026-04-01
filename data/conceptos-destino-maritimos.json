@@ -1,0 +1,237 @@
+{
+  "version": 1,
+  "updatedAt": "2026-04-01",
+  "notes": "MVP piloto de conceptos destino marítimos por naviera.",
+  "carriers": {
+    "msc": {
+      "carrier": "MSC",
+      "displayName": "MSC",
+      "aliases": [
+        "msc",
+        "mediterranean shipping company"
+      ],
+      "conceptos": [
+        {
+          "id": "msc-doc-fee-destination",
+          "nombre": "Doc Fee at Destination",
+          "tipo": "automatico",
+          "pricingMode": "mub",
+          "mubDefault": 15,
+          "moneda": "USD",
+          "monto": 45,
+          "baseCobro": "BL",
+          "aplica": {
+            "puertos": [],
+            "containerTypes": [],
+            "cargoTypes": [],
+            "transportMode": [],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Aplicable en todos los embarques de importacion."
+        },
+        {
+          "id": "msc-container-cleaning",
+          "nombre": "Container Cleaning Fee",
+          "tipo": "automatico",
+          "pricingMode": "cost",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 34.8,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [],
+            "containerTypes": [
+              "DRY"
+            ],
+            "cargoTypes": [],
+            "transportMode": [],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "iva_incluido",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Solo aplica para equipo DC/HC."
+        },
+        {
+          "id": "msc-empty-return-manzanillo",
+          "nombre": "Retorno de vacio",
+          "tipo": "automatico",
+          "pricingMode": "cost",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 130,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [
+              "Manzanillo"
+            ],
+            "containerTypes": [],
+            "cargoTypes": [],
+            "transportMode": [
+              "cy_cy",
+              "cy_door"
+            ],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Container Service Charge para retorno de vacio en Manzanillo."
+        },
+        {
+          "id": "msc-empty-return-lazaro",
+          "nombre": "Retorno de vacio",
+          "tipo": "automatico",
+          "pricingMode": "cost",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 70,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [
+              "Lazaro Cardenas"
+            ],
+            "containerTypes": [],
+            "cargoTypes": [],
+            "transportMode": [
+              "cy_cy",
+              "cy_door"
+            ],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Container Service Charge para retorno de vacio en Lazaro Cardenas."
+        },
+        {
+          "id": "msc-empty-return-altamira",
+          "nombre": "Retorno de vacio",
+          "tipo": "automatico",
+          "pricingMode": "cost",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 80,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [
+              "Altamira"
+            ],
+            "containerTypes": [],
+            "cargoTypes": [],
+            "transportMode": [
+              "cy_cy",
+              "cy_door"
+            ],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Container Service Charge para retorno de vacio en Altamira."
+        },
+        {
+          "id": "msc-empty-return-veracruz",
+          "nombre": "Retorno de vacio",
+          "tipo": "automatico",
+          "pricingMode": "cost",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 125,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [
+              "Veracruz"
+            ],
+            "containerTypes": [],
+            "cargoTypes": [],
+            "transportMode": [
+              "cy_cy",
+              "cy_door"
+            ],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Container Service Charge para retorno de vacio en Veracruz."
+        },
+        {
+          "id": "msc-empty-return-ensenada",
+          "nombre": "Retorno de vacio",
+          "tipo": "automatico",
+          "pricingMode": "cost",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 100,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [
+              "Ensenada"
+            ],
+            "containerTypes": [],
+            "cargoTypes": [],
+            "transportMode": [
+              "cy_cy",
+              "cy_door"
+            ],
+            "blCondition": [],
+            "requiresReview": false
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Container Service Charge para retorno de vacio en Ensenada."
+        },
+        {
+          "id": "msc-guarantee-dry",
+          "nombre": "Garantia 20DC/40DC/40HC",
+          "tipo": "deposito",
+          "pricingMode": "excluded",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 1100,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [],
+            "containerTypes": [
+              "DRY"
+            ],
+            "cargoTypes": [],
+            "transportMode": [],
+            "blCondition": [],
+            "requiresReview": true
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Deposito en garantia para equipos dry."
+        },
+        {
+          "id": "msc-guarantee-special",
+          "nombre": "Garantia OT/FR/RF",
+          "tipo": "deposito",
+          "pricingMode": "excluded",
+          "mubDefault": 0,
+          "moneda": "USD",
+          "monto": 2500,
+          "baseCobro": "CONT",
+          "aplica": {
+            "puertos": [],
+            "containerTypes": [
+              "SPECIAL"
+            ],
+            "cargoTypes": [],
+            "transportMode": [],
+            "blCondition": [],
+            "requiresReview": true
+          },
+          "impuestos": "na",
+          "validez": "Valido hasta previo aviso",
+          "notas": "Deposito en garantia para equipos especiales."
+        }
+      ]
+    }
+  }
+}
