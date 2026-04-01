@@ -4836,6 +4836,7 @@ const maritimeAcList = document.getElementById('autocomplete-list-maritimo');
 let maritimeAcIndex = -1;
 let maritimeSelection = { single: null, full: null };
 let maritimeDestinationSelection = { carrierKey: '', selectedConceptIds: [] };
+let rerenderMaritimeDestinationCalculator = null;
 let maritimeExpanded = { single: null, full: null };
 
 if (maritimoPuertoEl && maritimoCiudadEl) {
@@ -5248,6 +5249,8 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         }, innerContainerId);
     };
 
+    rerenderMaritimeDestinationCalculator = renderDestinationCalculatorState;
+
     document.getElementById(`${containerId}-carrier`)?.addEventListener('change', () => {
         maritimeDestinationSelection.selectedConceptIds = [];
         renderDestinationCalculatorState();
@@ -5265,6 +5268,10 @@ function toggleMaritimeDestinationConcept(input) {
         selected.delete(id);
     }
     maritimeDestinationSelection.selectedConceptIds = [...selected];
+    if (typeof rerenderMaritimeDestinationCalculator === 'function') {
+        rerenderMaritimeDestinationCalculator();
+        return;
+    }
     renderMaritimeCombinedCalculator();
 }
 
