@@ -3774,18 +3774,62 @@ function getTipoCambio() {
     return parseFloat(localStorage.getItem('tipoCambio')) || 0;
 }
 
+function syncTipoCambioInput() {
+    const input = document.getElementById('tipo-cambio');
+    if (!input) return;
+    const tc = getTipoCambio();
+    input.value = tc > 0 ? tc : '';
+}
+
+function showTipoCambioMessage(message, isError = false) {
+    const msg = document.getElementById('tc-saved-msg');
+    if (!msg) return;
+    msg.textContent = message;
+    msg.style.color = isError ? 'var(--red)' : 'var(--green)';
+    msg.style.display = 'inline';
+    setTimeout(() => { msg.style.display = 'none'; }, 2500);
+}
+
 // Cargar valor guardado
 const tcInput = document.getElementById('tipo-cambio');
 const tcSaved = getTipoCambio();
 if (tcSaved > 0) tcInput.value = tcSaved;
 
-document.getElementById('btn-save-tc').addEventListener('click', () => {
+document.getElementById('btn-save-tc').addEventListener('click', async () => {
     const val = parseFloat(tcInput.value);
     if (!val || val <= 0) { alert('Ingresa un tipo de cambio válido.'); return; }
+    if (!isTariffManager()) {
+        alert('No tienes permiso para actualizar el tipo de cambio compartido.');
+        return;
+    }
+
+    const user = getCurrentUser();
+    if (!user) {
+        alert('Primero inicia sesiÃ³n para actualizar el tipo de cambio compartido.');
+        return;
+    }
+
+    const btn = document.getElementById('btn-save-tc');
+    const originalText = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = 'Guardando...';
+
+    const res = await sheetsAPI('guardarTipoCambio', {
+        tipoCambio: val,
+        usuario: user.nombre
+    });
+
+    btn.disabled = false;
+    btn.textContent = originalText;
+
+    if (!res.ok) {
+        showTipoCambioMessage(res.error || 'No se pudo guardar', true);
+        return;
+    }
+
     localStorage.setItem('tipoCambio', val.toString());
-    const msg = document.getElementById('tc-saved-msg');
-    msg.style.display = 'inline';
-    setTimeout(() => { msg.style.display = 'none'; }, 2000);
+    syncTipoCambioInput();
+    showTipoCambioMessage('Publicado');
 });
 
 // ===== AUTOCOMPLETE CIUDAD DESTINO =====
@@ -5763,6 +5807,13 @@ async function loadSharedOfficialData() {
 }
 
 async function loadSharedExchangeRate() {
+    const sheetRes = await sheetsAPI('getTipoCambio');
+    if (sheetRes.ok && typeof sheetRes.tipoCambio === 'number' && sheetRes.tipoCambio > 0) {
+        localStorage.setItem('tipoCambio', String(sheetRes.tipoCambio));
+        syncTipoCambioInput();
+        return true;
+    }
+
     try {
         const res = await fetch(`${SHARED_EXCHANGE_RATE_URL}?v=${Date.now()}`, { cache: 'no-store' });
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

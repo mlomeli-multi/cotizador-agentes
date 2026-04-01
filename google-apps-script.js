@@ -18,6 +18,9 @@ function doGet(e) {
 // Ejemplo:
 // const SPREADSHEET_ID = '1AbCdEf...';
 const SPREADSHEET_ID = '1EzBWkmi9PqjgnZ_C1iDlzRWnqTJvhsuL4Z5s3LMgYiE';
+const CONFIG_SHEET_NAME = 'Configuracion';
+const TIPO_CAMBIO_KEY = 'tipoCambio';
+const TIPO_CAMBIO_ALLOWED_USERS = ['miguel', 'miguel lomeli'];
 
 function doPost(e) {
   return handleRequest(e);
@@ -90,6 +93,12 @@ function handleRequest(e) {
       case 'getCotizaciones':
         result = getCotizaciones(params.usuario || data.usuario, params.todas === 'true' || data.todas === true);
         break;
+      case 'getTipoCambio':
+        result = getTipoCambioCompartido();
+        break;
+      case 'guardarTipoCambio':
+        result = guardarTipoCambioCompartido(data);
+        break;
       default:
         result = { ok: false, error: 'Acción no válida' };
     }
@@ -102,6 +111,80 @@ function handleRequest(e) {
       .createTextOutput(JSON.stringify({ ok: false, error: err.message }))
       .setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function normalizeUserName(value) {
+  return String(value || '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .trim();
+}
+
+function getConfigSheet() {
+  const db = getDb();
+  if (!db) return { ok: false, error: 'No se pudo abrir el Google Sheet configurado' };
+
+  let sheet = db.getSheetByName(CONFIG_SHEET_NAME);
+  if (!sheet) {
+    sheet = db.insertSheet(CONFIG_SHEET_NAME);
+  }
+
+  if (sheet.getLastRow() === 0) {
+    sheet.getRange(1, 1, 1, 4).setValues([['Clave', 'Valor', 'Actualizado', 'Usuario']]);
+  }
+
+  return { ok: true, sheet };
+}
+
+function getTipoCambioCompartido() {
+  const lookup = getConfigSheet();
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
+  const data = sheet.getDataRange().getValues();
+
+  for (let i = 1; i < data.length; i++) {
+    if (String(data[i][0]).trim() === TIPO_CAMBIO_KEY) {
+      const tipoCambio = parseFloat(data[i][1]);
+      return {
+        ok: true,
+        tipoCambio: isNaN(tipoCambio) ? null : tipoCambio,
+        updatedAt: data[i][2] || '',
+        updatedBy: data[i][3] || ''
+      };
+    }
+  }
+
+  return { ok: true, tipoCambio: null, updatedAt: '', updatedBy: '' };
+}
+
+function guardarTipoCambioCompartido(data) {
+  const usuario = normalizeUserName(data && data.usuario);
+  if (!TIPO_CAMBIO_ALLOWED_USERS.includes(usuario)) {
+    return { ok: false, error: 'No autorizado para actualizar el tipo de cambio' };
+  }
+
+  const tipoCambio = parseFloat(data && data.tipoCambio);
+  if (!tipoCambio || tipoCambio <= 0) {
+    return { ok: false, error: 'Tipo de cambio inválido' };
+  }
+
+  const lookup = getConfigSheet();
+  if (!lookup.ok) return lookup;
+  const sheet = lookup.sheet;
+  const rows = sheet.getDataRange().getValues();
+  const now = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), 'yyyy-MM-dd HH:mm:ss');
+  const usuarioOriginal = (data && data.usuario) || '';
+
+  for (let i = 1; i < rows.length; i++) {
+    if (String(rows[i][0]).trim() === TIPO_CAMBIO_KEY) {
+      sheet.getRange(i + 1, 2, 1, 3).setValues([[tipoCambio, now, usuarioOriginal]]);
+      return { ok: true, tipoCambio: tipoCambio, updatedAt: now, updatedBy: usuarioOriginal };
+    }
+  }
+
+  sheet.appendRow([TIPO_CAMBIO_KEY, tipoCambio, now, usuarioOriginal]);
+  return { ok: true, tipoCambio: tipoCambio, updatedAt: now, updatedBy: usuarioOriginal };
 }
 
 // ===== USUARIOS =====
