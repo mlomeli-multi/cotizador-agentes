@@ -4040,6 +4040,47 @@ function buildMaritimeDestinationLine(choiceLabel, concept) {
     };
 }
 
+function getMaritimeConceptContainerLabel(concept) {
+    const fromConfig = Array.isArray(concept?.aplica?.containerTypes)
+        ? concept.aplica.containerTypes.filter(Boolean)
+        : [];
+    if (fromConfig.length) {
+        return fromConfig.join('/');
+    }
+
+    const sourceText = `${concept?.nombre || ''} ${concept?.notas || ''}`.toUpperCase();
+    const matches = [];
+    const patterns = [
+        { regex: /20DC/g, label: '20DC' },
+        { regex: /40DC\/HQ|40DC-HQ|40DC\s*\/\s*HQ/g, label: '40DC/HQ' },
+        { regex: /40HC|40HQ/g, label: '40HC' },
+        { regex: /40DC/g, label: '40DC' },
+        { regex: /REEFER|RF/g, label: 'REEFER' },
+        { regex: /NOR/g, label: 'NOR' },
+        { regex: /OT/g, label: 'OT' },
+        { regex: /FR/g, label: 'FR' },
+        { regex: /SPECIAL|ESPECIAL/g, label: 'SPECIAL' },
+        { regex: /DRY/g, label: 'DRY' }
+    ];
+
+    patterns.forEach(pattern => {
+        if (pattern.regex.test(sourceText) && !matches.includes(pattern.label)) {
+            matches.push(pattern.label);
+        }
+    });
+
+    return matches.join('/');
+}
+
+function formatMaritimeConceptRate(concept, fmt) {
+    const currency = concept?.moneda || 'USD';
+    const amount = fmt(parseFloat(concept?.monto) || 0);
+    const containerLabel = getMaritimeConceptContainerLabel(concept);
+    return containerLabel
+        ? `${currency} ${amount} · ${containerLabel}`
+        : `${currency} ${amount}`;
+}
+
 function resolveMaritimeDestinationConcepts(selection, puerto) {
     const carriers = getMaritimeDestinationCarriers();
     if (!carriers.length) {
@@ -5169,12 +5210,15 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                         <div style="font-size:0.78rem;font-weight:700;color:var(--gray-700);margin-bottom:0.45rem;">Cargos a seleccionar</div>
                         <div style="display:flex;flex-direction:column;gap:0.45rem;">
                             ${destinationData.selectable.map(item => `
-                                <label style="display:flex;gap:0.65rem;align-items:flex-start;padding:0.45rem 0.2rem;border-bottom:1px solid rgba(148,163,184,0.14);cursor:pointer;">
+                                <label style="display:flex;gap:0.65rem;align-items:flex-start;padding:0.55rem 0.2rem;border-bottom:1px solid rgba(148,163,184,0.14);cursor:pointer;">
                                     <input type="checkbox" data-destination-concept="${escapeHtml(item.id)}"${item.selected ? ' checked' : ''} onchange="toggleMaritimeDestinationConcept(this)" style="margin-top:0.2rem;">
-                                    <span style="display:block;font-size:0.76rem;color:var(--gray-600);">
-                                        <strong style="color:var(--gray-800);">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
-                                        <span style="display:block;">${escapeHtml(item.baseCobro || '')} · ${escapeHtml(item.moneda || '')} ${fmt(item.monto || 0)} · ${escapeHtml(item.pricingMode || '')}</span>
-                                        ${item.notas ? `<span style="display:block;color:var(--gray-500);">${escapeHtml(item.notas)}</span>` : ''}
+                                    <span style="display:block;font-size:0.76rem;color:var(--gray-600);flex:1 1 auto;min-width:0;">
+                                        <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                            <strong style="color:var(--gray-800);line-height:1.35;">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
+                                            <span style="flex:0 0 auto;font-weight:700;color:var(--navy);white-space:nowrap;">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
+                                        </span>
+                                        <span style="display:block;margin-top:0.2rem;color:var(--gray-600);font-size:0.72rem;">${escapeHtml(item.baseCobro || '')}</span>
+                                        ${item.notas ? `<span style="display:block;margin-top:0.18rem;color:var(--gray-500);font-size:0.72rem;line-height:1.35;">${escapeHtml(item.notas)}</span>` : ''}
                                     </span>
                                 </label>
                             `).join('')}
