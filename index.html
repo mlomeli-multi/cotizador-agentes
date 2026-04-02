@@ -527,7 +527,7 @@
             border-radius: 6px;
         }
 
-        /* ===== COTIZACIÓN RESULTADO ===== */
+        /* ===== COTIZACIÃ“N RESULTADO ===== */
         .quote-results {
             display: none;
         }
@@ -1722,7 +1722,7 @@
 <div class="login-overlay" id="login-overlay">
     <div class="login-card">
         <h2>Cotizador de Transporte</h2>
-        <p class="login-sub">Inicia sesión para cotizar</p>
+        <p class="login-sub">Inicia sesiÃ³n para cotizar</p>
         <div class="form-group">
             <label>Usuario</label>
             <select id="login-user">
@@ -1748,7 +1748,7 @@
         <div class="header-logo">&#x1F69A;</div>
         <div>
             <h1>Cotizador de Transporte</h1>
-            <div class="header-subtitle">Tarifas terrestres para importación</div>
+            <div class="header-subtitle">Tarifas terrestres para importaciÃ³n</div>
         </div>
     </div>
     <div style="display:flex;align-items:center;gap:0.5rem;">
@@ -1763,22 +1763,22 @@
 <nav class="tabs-container">
     <button class="tab-btn active" data-tab="aereo">
         <span class="tab-icon">&#9992;</span>
-        Aéreo Importación (DAP)
+        AÃ©reo ImportaciÃ³n (DAP)
     </button>
     <button class="tab-btn" data-tab="maritimo">
         <span class="tab-icon">&#x1F6A2;</span>
-        Marítimo Importación (DAP)
-        <span class="tab-badge">Próximamente</span>
+        MarÃ­timo ImportaciÃ³n (DAP)
+        <span class="tab-badge">PrÃ³ximamente</span>
     </button>
 </nav>
 
 <!-- ===== CONTENIDO PRINCIPAL ===== -->
 <main class="main">
 
-    <!-- TAB: AÉREO -->
+    <!-- TAB: AÃ‰REO -->
     <section class="tab-content active" id="tab-aereo">
 
-        <!-- Card: Ruta + Datos de carga + Cotización (todo en uno) -->
+        <!-- Card: Ruta + Datos de carga + CotizaciÃ³n (todo en uno) -->
         <div class="card">
             <div class="card-header">
                 <div class="card-icon blue">&#x1F4CD;</div>
@@ -1792,15 +1792,15 @@
                     <div class="route-info" id="route-info">
                         <div class="route-info-grid">
                             <div class="route-stat">
-                                <div class="stat-value" id="route-km">—</div>
-                                <div class="stat-label">Kilómetros aprox.</div>
+                                <div class="stat-value" id="route-km">â€”</div>
+                                <div class="stat-label">KilÃ³metros aprox.</div>
                             </div>
                             <div class="route-stat">
-                                <div class="stat-value" id="route-time">—</div>
-                                <div class="stat-label" id="route-time-label">Tiempo tránsito</div>
+                                <div class="stat-value" id="route-time">â€”</div>
+                                <div class="stat-label" id="route-time-label">Tiempo trÃ¡nsito</div>
                             </div>
                             <div class="route-stat">
-                                <div class="stat-value" id="route-unit-type">—</div>
+                                <div class="stat-value" id="route-unit-type">â€”</div>
                                 <div class="stat-label">Tipo unidad</div>
                             </div>
                         </div>
@@ -1811,13 +1811,13 @@
                     <div class="form-section-title">&#9992; Ruta</div>
                     <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
-                            <label>Aeropuerto en México</label>
+                            <label>Aeropuerto en MÃ©xico</label>
                             <select id="aeropuerto">
                                 <option value="">Seleccionar...</option>
-                                <option value="NLU">NLU — AIFA</option>
-                                <option value="MEX">MEX — Ciudad de México</option>
-                                <option value="MTY">MTY — Monterrey</option>
-                                <option value="GDL">GDL — Guadalajara</option>
+                                <option value="NLU">NLU â€” AIFA</option>
+                                <option value="MEX">MEX â€” Ciudad de MÃ©xico</option>
+                                <option value="MTY">MTY â€” Monterrey</option>
+                                <option value="GDL">GDL â€” Guadalajara</option>
                             </select>
                         </div>
                         <div class="form-group autocomplete-wrap">
@@ -1835,7 +1835,7 @@
                                 <input type="number" id="peso" min="1" placeholder="1500" style="width:120px;">
                             </div>
                             <div class="form-group" style="margin-bottom:0;">
-                                <label>¿Estibable?</label>
+                                <label>Â¿Estibable?</label>
                                 <div class="toggle-group">
                                     <label class="toggle">
                                         <input type="checkbox" id="estibable">
@@ -1849,20 +1849,20 @@
                     <div class="pallet-lines" id="pallet-lines"></div>
                     <button class="btn-add-pallet" id="btn-add-pallet" type="button">+ Agregar pallet</button>
 
-                    <!-- Resultado unidad (se muestra automáticamente) -->
+                    <!-- Resultado unidad (se muestra automÃ¡ticamente) -->
                     <div class="unit-result" id="unit-result">
                         <div class="unit-name" id="unit-name"></div>
                         <div class="unit-detail" id="unit-detail"></div>
                     </div>
 
-                    <!-- Botón cotizar -->
+                    <!-- BotÃ³n cotizar -->
                     <div class="cotizar-actions">
                         <button class="btn btn-success btn-lg" id="btn-cotizar" disabled>
                             &#x1F50D; Buscar mejores tarifas
                         </button>
                     </div>
 
-                    <!-- Resultados de cotización -->
+                    <!-- Resultados de cotizaciÃ³n -->
                     <div class="quote-results" id="quote-results"></div>
                     <div class="empty-state-mini" id="empty-cotizacion">
                         Sube tarifas de proveedores abajo para cotizar
@@ -1879,7 +1879,7 @@
             </div>
             <div class="upload-zone" id="upload-zone">
                 <div class="upload-icon">&#x1F4C2;</div>
-                <div class="upload-text">Arrastra un archivo Excel o PDF aquí o haz clic para subir</div>
+                <div class="upload-text">Arrastra un archivo Excel o PDF aquÃ­ o haz clic para subir</div>
                 <div class="upload-hint">Formatos soportados: .xlsx, .xls, .pdf</div>
                 <input type="file" id="file-input" accept=".xlsx,.xls,.pdf" style="display:none">
             </div>
@@ -1897,15 +1897,15 @@
                 <div class="card-icon red">&#x1F4CB;</div>
                 <h2>Conceptos Fijos por Aeropuerto</h2>
             </div>
-            <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:1rem;">Costos de operación que siempre se cobran (maniobras, almacenaje, etc). Se suman al flete.</p>
+            <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:1rem;">Costos de operaciÃ³n que siempre se cobran (maniobras, almacenaje, etc). Se suman al flete.</p>
 
             <div class="form-group" style="margin-bottom:1rem;max-width:250px;">
                 <label>Aeropuerto</label>
                 <select id="conceptos-airport">
-                    <option value="NLU">NLU — AIFA</option>
-                    <option value="MEX">MEX — Ciudad de México (AICM)</option>
-                    <option value="MTY">MTY — Monterrey</option>
-                    <option value="GDL">GDL — Guadalajara</option>
+                    <option value="NLU">NLU â€” AIFA</option>
+                    <option value="MEX">MEX â€” Ciudad de MÃ©xico (AICM)</option>
+                    <option value="MTY">MTY â€” Monterrey</option>
+                    <option value="GDL">GDL â€” Guadalajara</option>
                 </select>
             </div>
 
@@ -1938,11 +1938,11 @@
             </div>
         </div>
 
-        <!-- Card: Gestión de Usuarios (ADMIN ONLY) -->
+        <!-- Card: GestiÃ³n de Usuarios (ADMIN ONLY) -->
         <div class="card admin-only">
             <div class="card-header">
                 <div class="card-icon blue">&#x1F465;</div>
-                <h2>Gestión de Usuarios</h2>
+                <h2>GestiÃ³n de Usuarios</h2>
             </div>
             <p style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.75rem;">Usuarios que pueden acceder al cotizador. Cada uno con su PIN.</p>
             <div id="users-table-wrap"></div>
@@ -1989,7 +1989,7 @@
 
     </section>
 
-    <!-- TAB: MARÍTIMO (placeholder) -->
+    <!-- TAB: MARÃTIMO (placeholder) -->
     <section class="tab-content" id="tab-maritimo">
         <div class="card maritime-ready">
             <div class="card-header">
@@ -2002,12 +2002,12 @@
                     <div class="route-info" id="route-info-maritimo">
                         <div class="route-info-grid">
                             <div class="route-stat">
-                                <div class="stat-value" id="route-km-maritimo">—</div>
-                                <div class="stat-label">Kilómetros aprox.</div>
+                                <div class="stat-value" id="route-km-maritimo">â€”</div>
+                                <div class="stat-label">KilÃ³metros aprox.</div>
                             </div>
                             <div class="route-stat">
-                                <div class="stat-value" id="route-time-maritimo">—</div>
-                                <div class="stat-label">Tiempo tránsito</div>
+                                <div class="stat-value" id="route-time-maritimo">â€”</div>
+                                <div class="stat-label">Tiempo trÃ¡nsito</div>
                             </div>
                             <div class="route-stat">
                                 <div class="stat-value" id="route-unit-type-maritimo">Portacontenedor</div>
@@ -2068,7 +2068,7 @@
         <div class="card" style="display:none;">
             <div class="empty-state">
                 <div class="empty-icon">&#x1F6A2;</div>
-                <p>Marítimo Importación estará disponible próximamente</p>
+                <p>MarÃ­timo ImportaciÃ³n estarÃ¡ disponible prÃ³ximamente</p>
             </div>
         </div>
     </section>
@@ -2083,18 +2083,18 @@
 
         <div class="form-group" style="margin-bottom:1rem;">
             <label>Nombre del proveedor</label>
-            <input type="text" id="provider-name" placeholder="Ej: Transportes García">
+            <input type="text" id="provider-name" placeholder="Ej: Transportes GarcÃ­a">
         </div>
 
         <div class="form-group" style="margin-bottom:1rem;">
             <label>Aeropuerto origen</label>
             <select id="provider-airport">
                 <option value="">Seleccionar aeropuerto...</option>
-                <option value="NLU">NLU — AIFA</option>
-                <option value="MEX">MEX — Ciudad de México (AICM)</option>
-                <option value="MTY">MTY — Monterrey</option>
-                <option value="GDL">GDL — Guadalajara</option>
-                <option value="AUTO">Detectar automáticamente desde columna ORIGEN</option>
+                <option value="NLU">NLU â€” AIFA</option>
+                <option value="MEX">MEX â€” Ciudad de MÃ©xico (AICM)</option>
+                <option value="MTY">MTY â€” Monterrey</option>
+                <option value="GDL">GDL â€” Guadalajara</option>
+                <option value="AUTO">Detectar automÃ¡ticamente desde columna ORIGEN</option>
             </select>
             <span class="form-hint" id="airport-hint"></span>
         </div>
@@ -2122,11 +2122,11 @@
                 <select id="map-3-5ton"></select>
             </div>
             <div class="form-group">
-                <label>Rabón 5 Ton ($)</label>
+                <label>RabÃ³n 5 Ton ($)</label>
                 <select id="map-rabon"></select>
             </div>
             <div class="form-group">
-                <label>Tortón 10 Ton ($)</label>
+                <label>TortÃ³n 10 Ton ($)</label>
                 <select id="map-torton"></select>
             </div>
             <div class="form-group">
@@ -2144,7 +2144,7 @@
 
 <script>
 /* ===================================================================
-   COTIZADOR DE TRANSPORTE — JS
+   COTIZADOR DE TRANSPORTE â€” JS
    =================================================================== */
 
 // ===== TABS =====
@@ -2167,11 +2167,11 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
 
 // ===== TOGGLE ESTIBABLE LABEL =====
 document.getElementById('estibable').addEventListener('change', function() {
-    document.getElementById('estibable-label').textContent = this.checked ? 'Sí' : 'No';
+    document.getElementById('estibable-label').textContent = this.checked ? 'SÃ­' : 'No';
 });
 
-// ===== CATÁLOGO DE CIUDADES MEXICANAS (ciudad → estado) =====
-// Sirve para normalizar nombres de ciudades sin importar cómo las escriba cada proveedor
+// ===== CATÃLOGO DE CIUDADES MEXICANAS (ciudad â†’ estado) =====
+// Sirve para normalizar nombres de ciudades sin importar cÃ³mo las escriba cada proveedor
 const CIUDADES_MX = {
     // Aguascalientes
     'aguascalientes': 'AGS',
@@ -2197,7 +2197,7 @@ const CIUDADES_MX = {
     'cdmx': 'CDMX', 'ciudad de mexico': 'CDMX', 'mexico df': 'CDMX', 'df': 'CDMX',
     // Durango
     'durango': 'DGO', 'gomez palacio': 'DGO', 'lerdo': 'DGO', 'santiago papasquiaro': 'DGO', 'el salto': 'DGO',
-    // Estado de México
+    // Estado de MÃ©xico
     'toluca': 'MEX', 'naucalpan': 'MEX', 'ecatepec': 'MEX', 'tlalnepantla': 'MEX', 'nezahualcoyotl': 'MEX',
     'atizapan': 'MEX', 'cuautitlan': 'MEX', 'cuautitlan izcalli': 'MEX', 'texcoco': 'MEX', 'tultitlan': 'MEX',
     'ixtapaluca': 'MEX', 'chalco': 'MEX', 'coacalco': 'MEX', 'metepec': 'MEX', 'zinacantepec': 'MEX',
@@ -2218,7 +2218,7 @@ const CIUDADES_MX = {
     'puerto vallarta': 'JAL', 'vallarta': 'JAL', 'tlajomulco': 'JAL', 'lagos de moreno': 'JAL',
     'tepatitlan': 'JAL', 'ocotlan': 'JAL', 'ciudad guzman': 'JAL', 'autlan': 'JAL', 'arandas': 'JAL',
     'la barca': 'JAL', 'chapala': 'JAL', 'tequila': 'JAL', 'el salto jalisco': 'JAL', 'ameca': 'JAL',
-    // Michoacán
+    // MichoacÃ¡n
     'morelia': 'MICH', 'uruapan': 'MICH', 'zamora': 'MICH', 'lazaro cardenas': 'MICH',
     'apatzingan': 'MICH', 'zitacuaro': 'MICH', 'patzcuaro': 'MICH', 'la piedad': 'MICH',
     'sahuayo': 'MICH', 'hidalgo michoacan': 'MICH', 'maravatio': 'MICH', 'jiquilpan': 'MICH',
@@ -2227,7 +2227,7 @@ const CIUDADES_MX = {
     'jojutla': 'MOR', 'xochitepec': 'MOR',
     // Nayarit
     'tepic': 'NAY', 'bahia de banderas': 'NAY', 'nuevo vallarta': 'NAY', 'compostela': 'NAY', 'santiago ixcuintla': 'NAY',
-    // Nuevo León
+    // Nuevo LeÃ³n
     'monterrey': 'NL', 'san pedro garza garcia': 'NL', 'san pedro': 'NL', 'san nicolas de los garza': 'NL',
     'san nicolas': 'NL', 'apodaca': 'NL', 'guadalupe': 'NL', 'santa catarina': 'NL',
     'escobedo': 'NL', 'general escobedo': 'NL', 'garcia': 'NL', 'juarez nl': 'NL',
@@ -2241,13 +2241,13 @@ const CIUDADES_MX = {
     'puebla': 'PUE', 'tehuacan': 'PUE', 'san martin texmelucan': 'PUE', 'atlixco': 'PUE',
     'cholula': 'PUE', 'san andres cholula': 'PUE', 'san pedro cholula': 'PUE', 'izucar de matamoros': 'PUE',
     'huauchinango': 'PUE', 'teziutlan': 'PUE', 'xicotepec': 'PUE', 'zacatlan': 'PUE', 'amozoc': 'PUE',
-    // Querétaro
+    // QuerÃ©taro
     'queretaro': 'QRO', 'san juan del rio': 'QRO', 'corregidora': 'QRO', 'el marques': 'QRO',
     'pedro escobedo': 'QRO', 'tequisquiapan': 'QRO', 'ezequiel montes': 'QRO', 'cadereyta queretaro': 'QRO',
     // Quintana Roo
     'cancun': 'QROO', 'playa del carmen': 'QROO', 'chetumal': 'QROO', 'cozumel': 'QROO',
     'tulum': 'QROO', 'felipe carrillo puerto': 'QROO', 'isla mujeres': 'QROO', 'solidaridad': 'QROO',
-    // San Luis Potosí
+    // San Luis PotosÃ­
     'san luis potosi': 'SLP', 'slp': 'SLP', 'ciudad valles': 'SLP', 'valles': 'SLP',
     'matehuala': 'SLP', 'rioverde': 'SLP', 'soledad de graciano sanchez': 'SLP', 'soledad': 'SLP',
     'tamazunchale': 'SLP', 'ebano': 'SLP', 'cerritos': 'SLP',
@@ -2273,7 +2273,7 @@ const CIUDADES_MX = {
     'martinez de la torre': 'VER', 'papantla': 'VER', 'san andres tuxtla': 'VER', 'tierra blanca': 'VER',
     'cosamaloapan': 'VER', 'perote': 'VER', 'fortin': 'VER', 'fortin de las flores': 'VER',
     'acayucan': 'VER', 'coatepec': 'VER', 'las choapas': 'VER',
-    // Yucatán
+    // YucatÃ¡n
     'merida': 'YUC', 'valladolid': 'YUC', 'progreso': 'YUC', 'tizimin': 'YUC',
     'motul': 'YUC', 'uman': 'YUC', 'kanasin': 'YUC', 'tekax': 'YUC',
     // Zacatecas
@@ -2281,7 +2281,7 @@ const CIUDADES_MX = {
     'jerez': 'ZAC', 'sombrerete': 'ZAC', 'loreto zacatecas': 'ZAC', 'calera': 'ZAC', 'ojocaliente': 'ZAC',
 };
 
-// Alias de nombres de estados → abreviatura
+// Alias de nombres de estados â†’ abreviatura
 const ESTADOS_MX = {
     'aguascalientes': 'AGS', 'ags': 'AGS',
     'baja california': 'BC', 'bc': 'BC', 'baja california norte': 'BC',
@@ -2317,7 +2317,7 @@ const ESTADOS_MX = {
     'zacatecas': 'ZAC', 'zac': 'ZAC',
 };
 
-// Alias/abreviaturas de ciudades → nombre canónico
+// Alias/abreviaturas de ciudades â†’ nombre canÃ³nico
 // Para que "SLP" y "SAN LUIS POTOSI" se agrupen igual
 const CIUDAD_ALIAS = {
     'slp': 'san luis potosi',
@@ -2348,15 +2348,15 @@ const CIUDAD_ALIAS = {
     'pch': 'pachuca',
 };
 
-// Normaliza el nombre de una ciudad del proveedor a clave única: "ciudad|ESTADO"
-// Ej: "MONTERREY, NUEVO LEON" → "monterrey|NL"
-//     "LEON" → "leon|GTO"
-//     "SAN LUIS POTOSI" → "san luis potosi|SLP"
-//     "SLP" → "san luis potosi|SLP"
+// Normaliza el nombre de una ciudad del proveedor a clave Ãºnica: "ciudad|ESTADO"
+// Ej: "MONTERREY, NUEVO LEON" â†’ "monterrey|NL"
+//     "LEON" â†’ "leon|GTO"
+//     "SAN LUIS POTOSI" â†’ "san luis potosi|SLP"
+//     "SLP" â†’ "san luis potosi|SLP"
 function normalizarCiudadMX(str) {
     const norm = normalizarTexto(str);
 
-    // Separar por coma: "monterrey, nuevo leon" → ["monterrey", "nuevo leon"]
+    // Separar por coma: "monterrey, nuevo leon" â†’ ["monterrey", "nuevo leon"]
     const partes = norm.split(',').map(p => p.trim()).filter(Boolean);
 
     let ciudad = partes[0] || '';
@@ -2365,23 +2365,23 @@ function normalizarCiudadMX(str) {
     // Quitar prefijos comunes de ciudad
     ciudad = ciudad.replace(/^(ciudad de |cd\.\s*|cd |ciudad del )/i, '').trim();
 
-    // Resolver alias: "SLP" → "san luis potosi"
+    // Resolver alias: "SLP" â†’ "san luis potosi"
     if (CIUDAD_ALIAS[ciudad]) {
         ciudad = CIUDAD_ALIAS[ciudad];
     }
 
-    // Intentar resolver estado de la parte después de la coma
+    // Intentar resolver estado de la parte despuÃ©s de la coma
     let estadoCode = null;
     if (estadoPart) {
         estadoCode = ESTADOS_MX[estadoPart] || null;
     }
 
-    // Si no hay estado por coma, ver si la ciudad está en el catálogo
+    // Si no hay estado por coma, ver si la ciudad estÃ¡ en el catÃ¡logo
     if (!estadoCode && CIUDADES_MX[ciudad]) {
         estadoCode = CIUDADES_MX[ciudad];
     }
 
-    // Caso especial: el texto completo sin coma podría ser una ciudad conocida
+    // Caso especial: el texto completo sin coma podrÃ­a ser una ciudad conocida
     // Ej: "SAN LUIS POTOSI" (sin coma, pero es tanto ciudad como estado)
     if (!estadoCode) {
         const fullNorm = partes.join(' ');
@@ -2405,12 +2405,12 @@ function normalizarCiudadMX(str) {
 const UNIDADES = [
     { nombre: '1 Tonelada',     payload: 900,   largo: 190,  ancho: 150, alto: 150 },
     { nombre: '3.5 Toneladas',  payload: 3200,  largo: 315,  ancho: 225, alto: 180 },
-    { nombre: 'Rabón (5 Ton)',  payload: 5900,  largo: 600,  ancho: 240, alto: 215 },
-    { nombre: 'Tortón (10 Ton)',payload: 9900,  largo: 700,  ancho: 250, alto: 245 },
+    { nombre: 'RabÃ³n (5 Ton)',  payload: 5900,  largo: 600,  ancho: 240, alto: 215 },
+    { nombre: 'TortÃ³n (10 Ton)',payload: 9900,  largo: 700,  ancho: 250, alto: 245 },
     { nombre: 'Caja Seca 53\'', payload: 19500, largo: 1585, ancho: 238, alto: 238 },
 ];
 
-// ===== MOTOR DE CÁLCULO DE UNIDAD =====
+// ===== MOTOR DE CÃLCULO DE UNIDAD =====
 // ===== MULTI-PALLET SYSTEM =====
 let palletLineas = [];
 let palletLineCounter = 0;
@@ -2481,7 +2481,7 @@ function getPalletLines() {
     })).filter(l => l.qty > 0 && l.largo > 0 && l.ancho > 0 && l.alto > 0);
 }
 
-// Calcular mejor capacidad de UN tipo de pallet en la unidad (con rotación + combinación de filas)
+// Calcular mejor capacidad de UN tipo de pallet en la unidad (con rotaciÃ³n + combinaciÃ³n de filas)
 function capacidadPalletEnUnidad(largo, ancho, alto, unidad, estibable) {
     if (alto > unidad.alto) return 0;
 
@@ -2541,25 +2541,25 @@ function calcularUnidadMulti(lineas, pesoTotal, estibable) {
             if (pisos < 1) pisos = 1;
         }
 
-        // Para cada tipo de pallet, generar orientaciones válidas
+        // Para cada tipo de pallet, generar orientaciones vÃ¡lidas
         const tiposOri = lineas.map(l => {
             const oris = [];
             if (l.largo <= unidad.largo && l.ancho <= unidad.ancho) oris.push({ l: l.largo, a: l.ancho });
             if (l.ancho <= unidad.largo && l.largo <= unidad.ancho) oris.push({ l: l.ancho, a: l.largo });
-            return { qty: l.qty, oris, dims: `${l.largo}×${l.ancho}×${l.alto}` };
+            return { qty: l.qty, oris, dims: `${l.largo}Ã—${l.ancho}Ã—${l.alto}` };
         });
 
-        // Si algún tipo no tiene orientación válida, esta unidad no sirve
+        // Si algÃºn tipo no tiene orientaciÃ³n vÃ¡lida, esta unidad no sirve
         if (tiposOri.some(t => t.oris.length === 0)) continue;
 
         // Probar todas las combinaciones de orientaciones (2^N max)
-        // Para cada combo, asignar franjas (filas) a lo largo del camión
+        // Para cada combo, asignar franjas (filas) a lo largo del camiÃ³n
         const numTipos = tiposOri.length;
         const totalCombos = tiposOri.reduce((acc, t) => acc * t.oris.length, 1);
         let cabe = false;
 
         for (let combo = 0; combo < totalCombos; combo++) {
-            // Decodificar combo → orientación elegida para cada tipo
+            // Decodificar combo â†’ orientaciÃ³n elegida para cada tipo
             let c = combo;
             const oriElegida = tiposOri.map(t => {
                 const idx = c % t.oris.length;
@@ -2586,19 +2586,19 @@ function calcularUnidadMulti(lineas, pesoTotal, estibable) {
         }
 
         if (cabe) {
-            const detalles = lineas.map(l => `${l.qty}×(${l.largo}×${l.ancho}×${l.alto})`);
-            const detalleEstiba = pisos > 1 ? ` · ${pisos} pisos estiba` : '';
+            const detalles = lineas.map(l => `${l.qty}Ã—(${l.largo}Ã—${l.ancho}Ã—${l.alto})`);
+            const detalleEstiba = pisos > 1 ? ` Â· ${pisos} pisos estiba` : '';
             return {
                 unidad: unidad.nombre,
-                detalle: `${totalPallets} pallets (${detalles.join(' + ')})${detalleEstiba}. Payload máx: ${unidad.payload.toLocaleString()} kg.`
+                detalle: `${totalPallets} pallets (${detalles.join(' + ')})${detalleEstiba}. Payload mÃ¡x: ${unidad.payload.toLocaleString()} kg.`
             };
         }
     }
 
-    return { error: 'La carga no cabe en ninguna unidad disponible. Considera dividir el envío.' };
+    return { error: 'La carga no cabe en ninguna unidad disponible. Considera dividir el envÃ­o.' };
 }
 
-// ===== AUTO-CÁLCULO DE UNIDAD =====
+// ===== AUTO-CÃLCULO DE UNIDAD =====
 function autoCalcUnidad() {
     const peso = parseFloat(document.getElementById('peso').value);
     const estibable = document.getElementById('estibable').checked;
@@ -2628,11 +2628,11 @@ function autoCalcUnidad() {
     }
 }
 
-// Init: una línea por defecto + listeners
+// Init: una lÃ­nea por defecto + listeners
 document.getElementById('btn-add-pallet').addEventListener('click', () => addPalletLine());
 document.getElementById('peso').addEventListener('input', autoCalcUnidad);
 document.getElementById('estibable').addEventListener('change', autoCalcUnidad);
-addPalletLine(); // línea inicial
+addPalletLine(); // lÃ­nea inicial
 
 // ===== UPLOAD ZONE =====
 const uploadZone = document.getElementById('upload-zone');
@@ -2692,7 +2692,7 @@ if (uploadZoneMaritimo && fileInputMaritimo) {
 }
 
 // ===== XLSX: ESTADO TEMPORAL =====
-let workbookTemp = null;  // workbook actual leído
+let workbookTemp = null;  // workbook actual leÃ­do
 let sheetDataTemp = null; // datos de la hoja seleccionada (array de arrays)
 let sheetsTemp = [];      // nombres de hojas
 let importFileNameTemp = '';
@@ -2737,7 +2737,7 @@ function openMappingModal(fileName) {
     document.getElementById('airport-hint').textContent = preset?.hint || '';
     renderSheetTabs(0);
 
-    // Si no se detectó aeropuerto por pestaña, revisar si hay columna ORIGEN
+    // Si no se detectÃ³ aeropuerto por pestaÃ±a, revisar si hay columna ORIGEN
     if (!document.getElementById('provider-airport').value && sheetDataTemp) {
         const headers = getSheetHeaderMeta().headers;
         const hasOrigen = headers && headers.some(h =>
@@ -2745,7 +2745,7 @@ function openMappingModal(fileName) {
         );
         if (hasOrigen) {
             document.getElementById('provider-airport').value = 'AUTO';
-            document.getElementById('airport-hint').textContent = 'Detectado: columna ORIGEN en los datos. Se separará por aeropuerto automáticamente.';
+            document.getElementById('airport-hint').textContent = 'Detectado: columna ORIGEN en los datos. Se separarÃ¡ por aeropuerto automÃ¡ticamente.';
         }
     }
 
@@ -2799,12 +2799,12 @@ async function handlePDF(file) {
 
         if (allRows.length === 0) {
             offerPDFDebugDownload(file.name, pdfDebugPages);
-            alert('No se pudieron extraer datos tabulares del PDF. Se preparó un archivo de diagnóstico para descarga.');
+            alert('No se pudieron extraer datos tabulares del PDF. Se preparÃ³ un archivo de diagnÃ³stico para descarga.');
             return;
         }
 
         // Convertir a formato de sheetData (como si fuera un Excel)
-        // Detectar header: fila con más columnas o con keywords
+        // Detectar header: fila con mÃ¡s columnas o con keywords
         sheetDataTemp = allRows;
         sheetsTemp = ['PDF'];
         workbookTemp = { Sheets: { 'PDF': null }, SheetNames: ['PDF'] };
@@ -3122,20 +3122,20 @@ function extractTableFromPDFPage(textContent, viewport) {
     }
     rows.push(currentRow);
 
-    // Detectar columnas: encontrar las posiciones X más comunes
-    // Usar la fila con más elementos como referencia para las columnas
+    // Detectar columnas: encontrar las posiciones X mÃ¡s comunes
+    // Usar la fila con mÃ¡s elementos como referencia para las columnas
     const refRow = rows.reduce((best, r) => r.length > best.length ? r : best, []);
     const colPositions = refRow.map(item => item.x).sort((a, b) => a - b);
 
     // Convertir cada fila a array de celdas alineadas por columna
     const tableRows = [];
     for (const row of rows) {
-        if (row.length < 2) continue; // saltar filas con 1 solo elemento (títulos)
+        if (row.length < 2) continue; // saltar filas con 1 solo elemento (tÃ­tulos)
         row.sort((a, b) => a.x - b.x);
 
         const cells = new Array(colPositions.length).fill('');
         for (const item of row) {
-            // Encontrar la columna más cercana
+            // Encontrar la columna mÃ¡s cercana
             let bestCol = 0;
             let bestDist = Math.abs(item.x - colPositions[0]);
             for (let c = 1; c < colPositions.length; c++) {
@@ -3167,10 +3167,10 @@ function detectAirportFromSheetName(name) {
 function getImportPreset(fileName = '') {
     const lower = String(fileName).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
     if (lower.includes('hh') && lower.includes('transport')) {
-        return { providerName: 'HH Transportes', airport: 'AUTO', hint: 'Se detectó HH con columna ORIGEN; se separará por aeropuerto automáticamente.' };
+        return { providerName: 'HH Transportes', airport: 'AUTO', hint: 'Se detectÃ³ HH con columna ORIGEN; se separarÃ¡ por aeropuerto automÃ¡ticamente.' };
     }
     if (lower.includes('romex')) {
-        return { providerName: 'Romex', airport: 'MTY', hint: 'Se detectó tarifario ROMEX para aeropuerto MTY.' };
+        return { providerName: 'Romex', airport: 'MTY', hint: 'Se detectÃ³ tarifario ROMEX para aeropuerto MTY.' };
     }
     return null;
 }
@@ -3222,7 +3222,7 @@ function renderSheetTabs(activeIdx) {
     });
     loadSheetPreview(sheetsTemp[activeIdx]);
 
-    // Autodetectar aeropuerto desde nombre de pestaña
+    // Autodetectar aeropuerto desde nombre de pestaÃ±a
     const detectedAP = detectAirportFromSheetName(sheetsTemp[activeIdx]);
     const airportSel = document.getElementById('provider-airport');
     const airportHint = document.getElementById('airport-hint');
@@ -3235,7 +3235,7 @@ function renderSheetTabs(activeIdx) {
 }
 
 function loadSheetPreview(sheetName) {
-    // Si es PDF, sheetDataTemp ya está poblado
+    // Si es PDF, sheetDataTemp ya estÃ¡ poblado
     if (workbookTemp && workbookTemp._isPDF) {
         // sheetDataTemp ya fue asignado en handlePDF, solo autodetectar header
         autodetectHeader();
@@ -3246,7 +3246,7 @@ function loadSheetPreview(sheetName) {
 
     const ws = workbookTemp.Sheets[sheetName];
     const raw = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
-    // Filtrar filas completamente vacías
+    // Filtrar filas completamente vacÃ­as
 
     sheetDataTemp = trimRowsToDetectedHeader(raw);
     renderPreviewTable();
@@ -3268,8 +3268,8 @@ function trimRowsToDetectedHeader(rawRows) {
 function autodetectHeader() {
     if (!sheetDataTemp || sheetDataTemp.length === 0) return;
     // Buscar la fila que tenga "DESTINO" y columnas de tarifas
-    // Maneja Excels con logos/títulos y PDFs con metadatos arriba
-    // Prefiere tabla de FORANEOS sobre LOCALES (más rutas)
+    // Maneja Excels con logos/tÃ­tulos y PDFs con metadatos arriba
+    // Prefiere tabla de FORANEOS sobre LOCALES (mÃ¡s rutas)
     const tariffKeywords = ['nissan', 'sprinter', 'rabon', 'torton', 'camioneta', 'f450', '1 ton', '3.5 ton', '5.5 ton', '6 tons', '8 ton', '17 tons', '19 tons', 'trailer', 'caja 20', 'caja 25', 'caja 53'];
     let bestHeaderIdx = 0;
     let bestScore = 0;
@@ -3347,9 +3347,9 @@ function renderMappingSelects() {
         { match: ['nissan', '1 ton', 'sprinter'], exclude: ['0.7', '3.5', '5.5', '6 tons', '8 ton', '10 ton'] },
         // 3.5 Toneladas: Barajas="CAMIONETA 3 1/2", Oslu="CAMIONETA 3.5", Trapol="3.5 TON"
         { match: ['3.5', '3 1/2', 'camioneta', 'f450'], exclude: ['3/4', 'partner', 'pick up'] },
-        // Rabón (5 Ton): Barajas="RABON", Oslu="RABON", Trapol="5.5 TON"
+        // RabÃ³n (5 Ton): Barajas="RABON", Oslu="RABON", Trapol="5.5 TON"
         { match: ['rabon', '5.5 ton', '5 ton', '6 tons', 'caja 20'], exclude: ['3.5', '53'] },
-        // Tortón (10 Ton): Barajas="TORTON", Trapol="8 TON"
+        // TortÃ³n (10 Ton): Barajas="TORTON", Trapol="8 TON"
         { match: ['torton', '8 ton', '17 tons', 'caja 25'], exclude: [] },
         // Caja Seca 53': Barajas="TRAILER", Oslu="CAJA 53'", Trapol="trailer"
         { match: ['caja 53', "53'", 'trailer', '19 tons'], exclude: [] },
@@ -3357,7 +3357,7 @@ function renderMappingSelects() {
 
     selectIds.forEach((id, idx) => {
         const sel = document.getElementById(id);
-        sel.innerHTML = '<option value="">— No asignar —</option>';
+        sel.innerHTML = '<option value="">â€” No asignar â€”</option>';
         headers.forEach((h, ci) => {
             const opt = document.createElement('option');
             opt.value = ci;
@@ -3399,7 +3399,7 @@ document.getElementById('btn-cancel-mapping').addEventListener('click', () => {
     pdfImportStrategyTemp = '';
 });
 
-// Mapa de valores de ORIGEN en Excel -> código de aeropuerto
+// Mapa de valores de ORIGEN en Excel -> cÃ³digo de aeropuerto
 const ORIGEN_TO_AIRPORT = {
     'aicm': 'MEX', 'cdmx': 'MEX', 'cdmx (aicm)': 'MEX', 'ciudad de mexico': 'MEX',
     'ciudad de mexico (aicm)': 'MEX', 'mexico': 'MEX', 'mex': 'MEX',
@@ -3483,12 +3483,12 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
     if (!aeropuerto) { alert('Selecciona el aeropuerto origen.'); return; }
     if (colCiudad === '') { alert('Debes asignar la columna de Ciudad destino.'); return; }
 
-    // Verificar que al menos una columna de tarifa esté asignada
+    // Verificar que al menos una columna de tarifa estÃ© asignada
     const tarifaCols = {
         '1 Tonelada': document.getElementById('map-1ton').value,
         '3.5 Toneladas': document.getElementById('map-3-5ton').value,
-        'Rabón (5 Ton)': document.getElementById('map-rabon').value,
-        'Tortón (10 Ton)': document.getElementById('map-torton').value,
+        'RabÃ³n (5 Ton)': document.getElementById('map-rabon').value,
+        'TortÃ³n (10 Ton)': document.getElementById('map-torton').value,
         'Caja Seca 53\'': document.getElementById('map-caja53').value,
     };
     const asignadas = Object.entries(tarifaCols).filter(([, v]) => v !== '');
@@ -3506,7 +3506,7 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
             return lower === 'origen' || lower === 'origin';
         });
         if (colOrigen < 0) {
-            alert('No se encontró una columna "ORIGEN" en los datos. Selecciona el aeropuerto manualmente.');
+            alert('No se encontrÃ³ una columna "ORIGEN" en los datos. Selecciona el aeropuerto manualmente.');
             return;
         }
     }
@@ -3582,7 +3582,7 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
     // Verificar que hay tarifas
     const totalTarifas = Object.values(tarifasPorAeropuerto).reduce((s, t) => s + t.length, 0);
     if (totalTarifas === 0) {
-        alert('No se encontraron tarifas válidas. Revisa el mapeo de columnas.');
+        alert('No se encontraron tarifas vÃ¡lidas. Revisa el mapeo de columnas.');
         return;
     }
 
@@ -3607,10 +3607,10 @@ document.getElementById('btn-save-mapping').addEventListener('click', () => {
 
     localStorage.setItem('proveedores', JSON.stringify(proveedores));
 
-    // Mensaje de confirmación
+    // Mensaje de confirmaciÃ³n
     const airports = Object.keys(tarifasPorAeropuerto);
     if (airports.length > 1) {
-        alert(`Se crearon ${airports.length} proveedores automáticamente:\n${airports.map(a => `• ${nombre} (${a}): ${tarifasPorAeropuerto[a].length} rutas`).join('\n')}`);
+        alert(`Se crearon ${airports.length} proveedores automÃ¡ticamente:\n${airports.map(a => `â€¢ ${nombre} (${a}): ${tarifasPorAeropuerto[a].length} rutas`).join('\n')}`);
     }
 
     // Cerrar modal y actualizar lista
@@ -3636,7 +3636,7 @@ function renderProvidersList() {
         <div class="provider-item">
             <div>
                 <div class="provider-name">${escapeHtml(p.nombre)}</div>
-                <div class="provider-meta">${p.aeropuerto} · ${p.totalRutas} rutas · Cargado: ${p.fechaCarga}</div>
+                <div class="provider-meta">${p.aeropuerto} Â· ${p.totalRutas} rutas Â· Cargado: ${p.fechaCarga}</div>
             </div>
             <div class="provider-actions">
                 <button class="btn btn-secondary btn-sm" onclick="viewProvider('${p.id}')">Ver</button>
@@ -3647,7 +3647,7 @@ function renderProvidersList() {
 }
 
 function deleteProvider(id) {
-    if (!confirm('¿Eliminar este proveedor y sus tarifas?')) return;
+    if (!confirm('Â¿Eliminar este proveedor y sus tarifas?')) return;
     let proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
     proveedores = proveedores.filter(p => p.id !== id);
     localStorage.setItem('proveedores', JSON.stringify(proveedores));
@@ -3662,13 +3662,13 @@ function viewProvider(id) {
     let msg = `Proveedor: ${p.nombre}\nAeropuerto: ${p.aeropuerto}\nRutas: ${p.totalRutas}\n\nPrimeras 10 rutas:\n`;
     p.tarifas.slice(0, 10).forEach(t => {
         const precios = Object.entries(t).filter(([k]) => k !== 'ciudad').map(([k, v]) => `${k}: $${v.toLocaleString()}`).join(', ');
-        msg += `• ${t.ciudad}: ${precios}\n`;
+        msg += `â€¢ ${t.ciudad}: ${precios}\n`;
     });
-    if (p.tarifas.length > 10) msg += `\n... y ${p.tarifas.length - 10} rutas más.`;
+    if (p.tarifas.length > 10) msg += `\n... y ${p.tarifas.length - 10} rutas mÃ¡s.`;
     alert(msg);
 }
 
-// ===== HABILITAR BOTÓN COTIZAR =====
+// ===== HABILITAR BOTÃ“N COTIZAR =====
 function updateCotizarBtn() {
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
     document.getElementById('btn-cotizar').disabled = proveedores.length === 0;
@@ -3720,7 +3720,7 @@ function renderConceptosTable() {
 
     wrap.innerHTML = html;
 
-    // Event listeners para edición en vivo
+    // Event listeners para ediciÃ³n en vivo
     wrap.querySelectorAll('.concepto-input').forEach(input => {
         input.addEventListener('change', () => {
             const idx = parseInt(input.dataset.idx);
@@ -3759,7 +3759,7 @@ document.getElementById('btn-add-concepto').addEventListener('click', () => {
     allC[airport].push({ nombre: '', monto: 0 });
     saveConceptosFijos(allC);
     renderConceptosTable();
-    // Focus en el último input de nombre
+    // Focus en el Ãºltimo input de nombre
     setTimeout(() => {
         const inputs = document.querySelectorAll('.concepto-input[data-field="nombre"]');
         if (inputs.length) inputs[inputs.length - 1].focus();
@@ -3797,7 +3797,7 @@ if (tcSaved > 0) tcInput.value = tcSaved;
 
 document.getElementById('btn-save-tc').addEventListener('click', async () => {
     const val = parseFloat(tcInput.value);
-    if (!val || val <= 0) { alert('Ingresa un tipo de cambio válido.'); return; }
+    if (!val || val <= 0) { alert('Ingresa un tipo de cambio vÃ¡lido.'); return; }
     if (!isTariffManager()) {
         alert('No tienes permiso para actualizar el tipo de cambio compartido.');
         return;
@@ -3805,7 +3805,7 @@ document.getElementById('btn-save-tc').addEventListener('click', async () => {
 
     const user = getCurrentUser();
     if (!user) {
-        alert('Primero inicia sesiÃ³n para actualizar el tipo de cambio compartido.');
+        alert('Primero inicia sesiÃƒÂ³n para actualizar el tipo de cambio compartido.');
         return;
     }
 
@@ -3837,7 +3837,7 @@ const ciudadInput = document.getElementById('ciudad-destino');
 const acList = document.getElementById('autocomplete-list');
 let acIndex = -1;
 
-// Extraer nombre base de ciudad (sin estado): "MONTERREY, NUEVO LEON" → "monterrey"
+// Extraer nombre base de ciudad (sin estado): "MONTERREY, NUEVO LEON" â†’ "monterrey"
 function ciudadBase(str) {
     return normalizarCiudadMX(str);
 }
@@ -3860,7 +3860,7 @@ function getCiudadesDisponibles(aeropuerto) {
             const g = grupos.get(base);
             g.variantes.add(t.ciudad.trim());
             g.airports.add(p.aeropuerto);
-            // Guardar qué proveedor usa qué nombre exacto
+            // Guardar quÃ© proveedor usa quÃ© nombre exacto
             if (!g.provMap.has(p.nombre)) g.provMap.set(p.nombre, new Set());
             g.provMap.get(p.nombre).add(t.ciudad.trim());
         }
@@ -4032,7 +4032,7 @@ function maritimeConceptMatchesContext(concept, context) {
 function buildMaritimeDestinationLine(choiceLabel, concept) {
     const isMub = concept.pricingMode === 'mub';
     return {
-        nombre: choiceLabel ? `${concept.nombre} (${choiceLabel} · ${concept.moneda || 'USD'})` : `${concept.nombre} (${concept.moneda || 'USD'})`,
+        nombre: choiceLabel ? `${concept.nombre} [Charge by: ${concept.baseCobro || 'N/A'}] (${choiceLabel} · ${concept.moneda || 'USD'})` : `${concept.nombre} [Charge by: ${concept.baseCobro || 'N/A'}] (${concept.moneda || 'USD'})`,
         costo: parseFloat(concept.monto) || 0,
         monedaCosto: concept.moneda || 'USD',
         esFlete: false,
@@ -4077,8 +4077,32 @@ function formatMaritimeConceptRate(concept, fmt) {
     const amount = fmt(parseFloat(concept?.monto) || 0);
     const containerLabel = getMaritimeConceptContainerLabel(concept);
     return containerLabel
-        ? `${currency} ${amount} · ${containerLabel}`
+        ? `${currency} ${amount} Â· ${containerLabel}`
         : `${currency} ${amount}`;
+}
+
+function getMaritimeConceptComment(concept) {
+    const raw = normalizeWhitespace(concept?.notas || '');
+    if (!raw) return '';
+    const primary = raw.split('|').map(part => normalizeWhitespace(part)).filter(Boolean)[0] || raw;
+    return primary;
+}
+
+function getMaritimeConceptFreeDays(concept) {
+    const source = `${concept?.notas || ''} ${concept?.validez || ''}`;
+    const match = source.match(/(\d+\s*(?:days|d[iÃ­]as))/i);
+    return match ? normalizeWhitespace(match[1]) : '';
+}
+
+function getMaritimeCarrierFreeDaysLabel(concepts) {
+    const values = [];
+    (Array.isArray(concepts) ? concepts : []).forEach(concept => {
+        const value = getMaritimeConceptFreeDays(concept);
+        if (value && !values.includes(value)) {
+            values.push(value);
+        }
+    });
+    return values.join(' / ');
 }
 
 function resolveMaritimeDestinationConcepts(selection, puerto) {
@@ -4141,7 +4165,8 @@ function resolveMaritimeDestinationConcepts(selection, puerto) {
         selectable,
         lines,
         extras,
-        notes
+        notes,
+        freeDaysPol: getMaritimeCarrierFreeDaysLabel(carrier.conceptos)
     };
 }
 
@@ -4379,7 +4404,7 @@ function renderMaritimeProvidersList() {
         <div class="provider-item">
             <div>
                 <div class="provider-name">${escapeHtml(p.nombre)}</div>
-                <div class="provider-meta">${escapeHtml(p.puerto)} · ${p.totalRutas} rutas · Cargado: ${escapeHtml(p.fechaCarga)}</div>
+                <div class="provider-meta">${escapeHtml(p.puerto)} Â· ${p.totalRutas} rutas Â· Cargado: ${escapeHtml(p.fechaCarga)}</div>
             </div>
             <div class="provider-actions">
                 <button class="btn btn-secondary btn-sm" onclick="viewMaritimeProvider('${p.id}')">Ver</button>
@@ -4390,7 +4415,7 @@ function renderMaritimeProvidersList() {
 }
 
 function deleteMaritimeProvider(id) {
-    if (!confirm('¿Eliminar este proveedor marítimo y sus tarifas?')) return;
+    if (!confirm('Â¿Eliminar este proveedor marÃ­timo y sus tarifas?')) return;
     const updated = getMaritimeProviders().filter(p => p.id !== id);
     saveMaritimeProviders(updated);
     renderMaritimeProvidersList();
@@ -4402,9 +4427,9 @@ function viewMaritimeProvider(id) {
     const provider = getMaritimeProviders().find(item => item.id === id);
     if (!provider) return;
     const preview = provider.tarifas.slice(0, 10).map(t => {
-        const single = t.single ? `Single $${t.single.toLocaleString('es-MX')}` : 'Single —';
-        const full = t.full ? `Full $${t.full.toLocaleString('es-MX')}` : 'Full —';
-        return `• ${t.ciudad}: ${single} | ${full}`;
+        const single = t.single ? `Single $${t.single.toLocaleString('es-MX')}` : 'Single â€”';
+        const full = t.full ? `Full $${t.full.toLocaleString('es-MX')}` : 'Full â€”';
+        return `â€¢ ${t.ciudad}: ${single} | ${full}`;
     }).join('\n');
     alert(`Proveedor: ${provider.nombre}\nPuerto: ${provider.puerto}\nRutas: ${provider.totalRutas}\n\nPrimeras rutas:\n${preview}`);
 }
@@ -4507,7 +4532,7 @@ function updateMaritimeCotizarBtn() {
 function setMaritimeImportSummary(summary, providerCount, routeCount) {
     const summaryEl = document.getElementById('maritimo-import-summary');
     if (!summaryEl) return;
-    summaryEl.textContent = `Importadas ${routeCount} rutas consolidadas en ${providerCount} proveedor(es). Filas leídas: ${summary.totalRows}. Ignoradas por unidad: ${summary.skippedNonPortacontenedor}. Duplicados consolidados: ${summary.consolidatedDuplicates}.`;
+    summaryEl.textContent = `Importadas ${routeCount} rutas consolidadas en ${providerCount} proveedor(es). Filas leÃ­das: ${summary.totalRows}. Ignoradas por unidad: ${summary.skippedNonPortacontenedor}. Duplicados consolidados: ${summary.consolidatedDuplicates}.`;
 }
 
 function hideMaritimePlaceholderCard() {
@@ -4546,7 +4571,7 @@ function loadMaritimeWorkbookFromFile(file) {
 async function handleMaritimeFile(file) {
     const ext = file.name.split('.').pop().toLowerCase();
     if (!['csv', 'xlsx', 'xls'].includes(ext)) {
-        alert('Solo se aceptan archivos .csv, .xlsx o .xls para marítimo.');
+        alert('Solo se aceptan archivos .csv, .xlsx o .xls para marÃ­timo.');
         return;
     }
 
@@ -4572,7 +4597,7 @@ async function handleMaritimeFile(file) {
         });
 
         if (allEntries.length === 0) {
-            alert('No se encontraron rutas marítimas válidas en el archivo.');
+            alert('No se encontraron rutas marÃ­timas vÃ¡lidas en el archivo.');
             return;
         }
 
@@ -4584,9 +4609,9 @@ async function handleMaritimeFile(file) {
         setMaritimeImportSummary(combinedSummary, providers.length, allEntries.length);
         hideMaritimePlaceholderCard();
         scheduleMaritimeRouteUpdate();
-        alert(`Tarifario marítimo importado.\n\nProveedores: ${providers.length}\nRutas consolidadas: ${allEntries.length}\nDuplicados consolidados: ${combinedSummary.consolidatedDuplicates}\nFilas ignoradas por no ser Portacontenedor: ${combinedSummary.skippedNonPortacontenedor}`);
+        alert(`Tarifario marÃ­timo importado.\n\nProveedores: ${providers.length}\nRutas consolidadas: ${allEntries.length}\nDuplicados consolidados: ${combinedSummary.consolidatedDuplicates}\nFilas ignoradas por no ser Portacontenedor: ${combinedSummary.skippedNonPortacontenedor}`);
     } catch (err) {
-        alert('Error al importar tarifario marítimo: ' + err.message);
+        alert('Error al importar tarifario marÃ­timo: ' + err.message);
     } finally {
         if (fileInputMaritimo) fileInputMaritimo.value = '';
     }
@@ -4660,8 +4685,8 @@ ciudadInput.addEventListener('input', () => {
     acList.innerHTML = matches.slice(0, 20).map((m, i) => {
         const airportTags = [...m.airports].join(', ');
         // Mostrar variantes originales del proveedor (con estado si lo traen)
-        const variantesStr = m.variantes.map(v => escapeHtml(v)).join(' · ');
-        // data-variantes guarda todas las variantes para la cotización
+        const variantesStr = m.variantes.map(v => escapeHtml(v)).join(' Â· ');
+        // data-variantes guarda todas las variantes para la cotizaciÃ³n
         const variantesData = encodeURIComponent(JSON.stringify(m.variantes));
         return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}" data-variantes="${variantesData}">
             ${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span>
@@ -4673,7 +4698,7 @@ ciudadInput.addEventListener('input', () => {
     acList.querySelectorAll('.autocomplete-item[data-value]').forEach(item => {
         item.addEventListener('click', () => {
             ciudadInput.value = item.dataset.value;
-            // Guardar variantes seleccionadas para la cotización
+            // Guardar variantes seleccionadas para la cotizaciÃ³n
             ciudadInput.dataset.variantes = item.dataset.variantes || '';
             acList.classList.remove('show');
         });
@@ -4730,11 +4755,11 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         }
     }
     if (!tipoUnidad) {
-        alert('Primero calcula la unidad de transporte necesaria en la sección "Datos de Carga".');
+        alert('Primero calcula la unidad de transporte necesaria en la secciÃ³n "Datos de Carga".');
         return;
     }
 
-    // Buscar entre proveedores usando normalización de ciudades
+    // Buscar entre proveedores usando normalizaciÃ³n de ciudades
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
     // Obtener variantes guardadas del autocomplete (nombres exactos del proveedor)
     const variantesRaw = ciudadInput.dataset.variantes || '';
@@ -4801,12 +4826,12 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     emptyEl.style.display = 'none';
 
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-    const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opción', '&#x1F949; 3ra opción'];
+    const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opciÃ³n', '&#x1F949; 3ra opciÃ³n'];
 
     resultsEl.innerHTML = `
         <div style="margin-top:0.75rem;margin-bottom:0.5rem;">
             <div style="font-size:0.75rem;color:var(--gray-500);">
-                <strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong> · ${tipoUnidad} · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''}
+                <strong>${aeropuerto}</strong> â†’ <strong>${escapeHtml(ciudad)}</strong> Â· ${tipoUnidad} Â· ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''}
             </div>
         </div>
         <div class="quote-grid">
@@ -4829,7 +4854,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                         <tr><td>Flete</td><td>$${fmt(r.tarifaFlete)}</td></tr>
                         ${conceptos.length > 0 ? conceptos.map(c =>
                             `<tr><td>${escapeHtml(c.nombre)}</td><td>$${fmt(parseFloat(c.monto) || 0)}</td></tr>`
-                        ).join('') : '<tr><td>Conceptos</td><td style="color:var(--gray-400);">—</td></tr>'}
+                        ).join('') : '<tr><td>Conceptos</td><td style="color:var(--gray-400);">â€”</td></tr>'}
                         <tr class="total-row"><td>Total</td><td>$${fmt(total)}</td></tr>
                     </table>
                 </div>
@@ -4841,7 +4866,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     `;
     resultsEl.classList.add('show');
 
-    // Registrar cotización en Google Sheets
+    // Registrar cotizaciÃ³n en Google Sheets
     registrarCotizacion(aeropuerto, ciudad, tipoUnidad, top.map(r => ({
         proveedor: r.proveedor,
         tarifa: r.tarifaFlete + totalConceptos
@@ -4917,7 +4942,7 @@ if (maritimoPuertoEl && maritimoCiudadEl) {
         maritimeAcIndex = -1;
         maritimeAcList.innerHTML = matches.slice(0, 20).map((match, index) => {
             const variantesData = encodeURIComponent(JSON.stringify(match.variantes));
-            const variantesStr = match.variantes.map(v => escapeHtml(toTitleCaseLabel(v))).join(' · ');
+            const variantesStr = match.variantes.map(v => escapeHtml(toTitleCaseLabel(v))).join(' Â· ');
             return `<div class="autocomplete-item" data-idx="${index}" data-value="${escapeHtml(match.display)}" data-city-key="${escapeHtml(match.cityKey)}" data-full-label="${escapeHtml(match.display)}" data-variantes="${variantesData}">
                 ${escapeHtml(match.display)}<span class="ac-airport">${match.providerCount} prov.</span>
                 <span class="ac-variants">${variantesStr}</span>
@@ -5158,13 +5183,13 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                 <div class="maritime-combined-pick single">
                     <div class="maritime-combined-pick-label">Single</div>
                     <div class="maritime-combined-pick-provider">${escapeHtml(singleChoice.proveedor)}</div>
-                    <div class="maritime-combined-pick-meta">$${fmt(singleChoice.single)}${singleChoice.vigencia ? ` · Vigencia ${escapeHtml(singleChoice.vigencia)}` : ''}</div>
+                    <div class="maritime-combined-pick-meta">$${fmt(singleChoice.single)}${singleChoice.vigencia ? ` Â· Vigencia ${escapeHtml(singleChoice.vigencia)}` : ''}</div>
                     ${singleChoice.horasLibres ? `<div class="maritime-combined-pick-meta">Horas libres: ${escapeHtml(singleChoice.horasLibres)}</div>` : ''}
                 </div>
                 <div class="maritime-combined-pick full">
                     <div class="maritime-combined-pick-label">Full</div>
                     <div class="maritime-combined-pick-provider">${escapeHtml(fullChoice.proveedor)}</div>
-                    <div class="maritime-combined-pick-meta">$${fmt(fullChoice.full)}${fullChoice.vigencia ? ` · Vigencia ${escapeHtml(fullChoice.vigencia)}` : ''}</div>
+                    <div class="maritime-combined-pick-meta">$${fmt(fullChoice.full)}${fullChoice.vigencia ? ` Â· Vigencia ${escapeHtml(fullChoice.vigencia)}` : ''}</div>
                     ${fullChoice.horasLibres ? `<div class="maritime-combined-pick-meta">Horas libres: ${escapeHtml(fullChoice.horasLibres)}</div>` : ''}
                 </div>
             </div>
@@ -5177,7 +5202,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                         </select>
                     </div>
                     <div style="flex:2 1 320px;font-size:0.76rem;color:var(--gray-500);">
-                        Piloto Fase 2: los cargos en destino se eligen por naviera y los depósitos o garantías se muestran aparte sin entrar al total DAP.
+                        Piloto Fase 2: los cargos en destino se eligen por naviera y los depÃ³sitos o garantÃ­as se muestran aparte sin entrar al total DAP.
                     </div>
                 </div>
                 <div id="${destinationMetaId}" style="margin-top:0.75rem;font-size:0.76rem;color:var(--gray-500);"></div>
@@ -5199,7 +5224,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         if (destinationMeta) {
             const lineCount = destinationData.lines.length;
             destinationMeta.innerHTML = destinationData.selectedCarrier
-                ? `Naviera activa: <strong>${escapeHtml(destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier)}</strong> · ${lineCount} cargo${lineCount === 1 ? '' : 's'} seleccionado${lineCount === 1 ? '' : 's'} en el total.`
+                ? `Naviera activa: <strong>${escapeHtml(destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier)}</strong> · ${lineCount} cargo${lineCount === 1 ? '' : 's'} seleccionado${lineCount === 1 ? '' : 's'} en el total.${destinationData.freeDaysPol ? ` <span style="display:inline-flex;align-items:center;gap:0.3rem;margin-left:0.5rem;padding:0.18rem 0.5rem;border-radius:999px;background:#ecfeff;color:#0f766e;font-weight:700;">Free Days POL: ${escapeHtml(destinationData.freeDaysPol)}</span>` : ''}`
                 : 'No hay naviera piloto disponible.';
         }
 
@@ -5215,10 +5240,13 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                                     <span style="display:block;font-size:0.76rem;color:var(--gray-600);flex:1 1 auto;min-width:0;">
                                         <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
                                             <strong style="color:var(--gray-800);line-height:1.35;">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
-                                            <span style="flex:0 0 auto;font-weight:700;color:var(--navy);white-space:nowrap;">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
+                                            <span style="flex:0 0 auto;font-weight:800;color:#1d4ed8;white-space:nowrap;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:0.22rem 0.6rem;">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
                                         </span>
-                                        <span style="display:block;margin-top:0.2rem;color:var(--gray-600);font-size:0.72rem;">${escapeHtml(item.baseCobro || '')}</span>
-                                        ${item.notas ? `<span style="display:block;margin-top:0.18rem;color:var(--gray-500);font-size:0.72rem;line-height:1.35;">${escapeHtml(item.notas)}</span>` : ''}
+                                        <span style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-top:0.24rem;">
+                                            <span style="font-size:0.69rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em;">Charge by:</span>
+                                            <span style="display:inline-flex;align-items:center;padding:0.16rem 0.5rem;border-radius:999px;background:#f1f5f9;color:var(--gray-700);font-size:0.7rem;font-weight:700;">${escapeHtml(item.baseCobro || 'N/A')}</span>
+                                        </span>
+                                        ${getMaritimeConceptComment(item) ? `<span style="display:block;margin-top:0.22rem;color:var(--gray-500);font-size:0.72rem;line-height:1.35;">${escapeHtml(getMaritimeConceptComment(item))}</span>` : ''}
                                     </span>
                                 </label>
                             `).join('')}
@@ -5239,13 +5267,19 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
             if (destinationData.extras.length) {
                 destinationExtras.innerHTML = `
                     <div style="padding:0.8rem 0.9rem;border-radius:12px;background:#fff7ed;border:1px solid rgba(245,158,11,0.25);">
-                        <div style="font-size:0.78rem;font-weight:700;color:#9a3412;margin-bottom:0.45rem;">Depósitos y garantías</div>
+                        <div style="font-size:0.78rem;font-weight:700;color:#9a3412;margin-bottom:0.45rem;">DepÃ³sitos y garantÃ­as</div>
                         <div style="display:flex;flex-direction:column;gap:0.35rem;">
                             ${destinationData.extras.map(item => `
-                                <div style="font-size:0.76rem;color:#7c2d12;">
-                                    <strong>${escapeHtml(item.choiceLabel)}:</strong>
-                                    ${escapeHtml(item.nombre)}${item.monto ? ` — ${escapeHtml(item.moneda || '')} ${fmt(item.monto)}` : ''}
-                                    ${item.notas ? ` · ${escapeHtml(item.notas)}` : ''}
+                                <div style="padding:0.45rem 0.1rem;border-bottom:1px solid rgba(245,158,11,0.12);font-size:0.76rem;color:#7c2d12;">
+                                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
+                                        <strong style="line-height:1.35;">${escapeHtml(item.nombre)}</strong>
+                                        <span style="flex:0 0 auto;font-weight:800;color:#b45309;white-space:nowrap;background:#fff3e0;border:1px solid rgba(245,158,11,0.25);border-radius:999px;padding:0.22rem 0.6rem;">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
+                                    </div>
+                                    <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-top:0.24rem;">
+                                        <span style="font-size:0.69rem;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;">Charge by:</span>
+                                        <span style="display:inline-flex;align-items:center;padding:0.16rem 0.5rem;border-radius:999px;background:#ffedd5;color:#9a3412;font-size:0.7rem;font-weight:700;">${escapeHtml(item.baseCobro || 'N/A')}</span>
+                                    </div>
+                                    ${getMaritimeConceptComment(item) ? `<div style="margin-top:0.22rem;color:#9a3412;font-size:0.72rem;line-height:1.35;">${escapeHtml(getMaritimeConceptComment(item))}</div>` : ''}
                                 </div>
                             `).join('')}
                         </div>
@@ -5474,11 +5508,11 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
 });
 
 // ===== CALCULADORA MUB (Margen de Utilidad Bruta) =====
-// Flete: Costo + 12% (IVA - RET) = Costo c/impuestos → MUB% → Venta
-// Conceptos: ya incluyen IVA → MUB% se aplica directo
-// Fórmula: Venta = CostoBase / (1 - MUB%)
+// Flete: Costo + 12% (IVA - RET) = Costo c/impuestos â†’ MUB% â†’ Venta
+// Conceptos: ya incluyen IVA â†’ MUB% se aplica directo
+// FÃ³rmula: Venta = CostoBase / (1 - MUB%)
 // Inversa: MUB% = (1 - CostoBase / Venta) * 100
-const IMPUESTO_FLETE = 0.12; // IVA 16% - Retención 4% = 12%
+const IMPUESTO_FLETE = 0.12; // IVA 16% - RetenciÃ³n 4% = 12%
 
 function openMubPanel(data, containerId = 'mub-panel-container') {
     const container = document.getElementById(containerId);
@@ -5555,7 +5589,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
         const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
 
-        // Columna de conversión USD (solo si hay TC)
+        // Columna de conversiÃ³n USD (solo si hay TC)
         const usdCell = hayTC
             ? `<td class="mub-usd-cell" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</td>`
             : '';
@@ -5577,10 +5611,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const totalCostoSinImp = lineas.reduce((s, l) => s + costoSinImpMXN(l), 0);
     const totalImpuestos = totalCostoBaseMXN - totalCostoSinImp;
 
-    // Header de conversión
+    // Header de conversiÃ³n
     const tcBadge = hayTC
         ? `<span style="display:inline-block;background:var(--amber);color:white;font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;">TC: $${fmt(tc)} MXN/USD</span>`
-        : `<span style="display:inline-block;background:var(--gray-300);color:white;font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;">Sin TC — venta en MXN</span>`;
+        : `<span style="display:inline-block;background:var(--gray-300);color:white;font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;">Sin TC â€” venta en MXN</span>`;
 
     const usdTh = hayTC ? `<th>Costo ${moneda}</th>` : '';
 
@@ -5591,7 +5625,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             <button class="mub-panel-close" id="mub-close">&#x2716;</button>
         </div>
         <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">
-            ${escapeHtml(data.proveedor)} · Flete +12% (IVA−RET)${hayTC ? ' · MXN ÷ ' + fmt(tc) + ' = USD' : ''} · Edita MUB% o Venta
+            ${escapeHtml(data.proveedor)} Â· Flete +12% (IVAâˆ’RET)${hayTC ? ' Â· MXN Ã· ' + fmt(tc) + ' = USD' : ''} Â· Edita MUB% o Venta
         </p>
         <table class="mub-table">
             <thead><tr>
@@ -5718,10 +5752,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
 // ===== MAPA LEAFLET =====
 const AIRPORTS = {
-    NLU: { name: 'NLU — AIFA', lat: 19.7418, lng: -98.9844, label: 'NLU' },
-    MEX: { name: 'MEX — Ciudad de México (AICM)', lat: 19.4361, lng: -99.0719, label: 'AICM / MEX' },
-    MTY: { name: 'MTY — Monterrey', lat: 25.7785, lng: -100.1069, label: 'MTY' },
-    GDL: { name: 'GDL — Guadalajara', lat: 20.5218, lng: -103.3111, label: 'GDL' },
+    NLU: { name: 'NLU â€” AIFA', lat: 19.7418, lng: -98.9844, label: 'NLU' },
+    MEX: { name: 'MEX â€” Ciudad de MÃ©xico (AICM)', lat: 19.4361, lng: -99.0719, label: 'AICM / MEX' },
+    MTY: { name: 'MTY â€” Monterrey', lat: 25.7785, lng: -100.1069, label: 'MTY' },
+    GDL: { name: 'GDL â€” Guadalajara', lat: 20.5218, lng: -103.3111, label: 'GDL' },
 };
 
 const map = L.map('map', {
@@ -5783,7 +5817,7 @@ airportSelect.addEventListener('change', () => {
 // Fix mapa que no renderiza bien al cargar (contenedor oculto)
 setTimeout(() => map.invalidateSize(), 200);
 
-// ===== RUTA EN MAPA: GEOCODING + LÍNEA + DISTANCIA =====
+// ===== RUTA EN MAPA: GEOCODING + LÃNEA + DISTANCIA =====
 let routeLine = null;
 let destMarker = null;
 let routeDebounce = null;
@@ -5794,8 +5828,8 @@ let currentRouteKm = 0; // km guardados para recalcular solo tiempo
 const VELOCIDADES = {
     '1 Tonelada': 80,
     '3.5 Toneladas': 75,
-    'Rabón (5 Ton)': 65,
-    'Tortón (10 Ton)': 60,
+    'RabÃ³n (5 Ton)': 65,
+    'TortÃ³n (10 Ton)': 60,
     'Caja Seca 53\'': 55,
 };
 
@@ -5857,7 +5891,7 @@ function updateRouteStats() {
     const vel = VELOCIDADES[tipoUnidad] || 70;
     const hours = currentRouteKm / vel;
     document.getElementById('route-time').textContent = formatTime(hours);
-    document.getElementById('route-time-label').textContent = tipoUnidad ? `Tránsito (${tipoUnidad})` : 'Tiempo tránsito';
+    document.getElementById('route-time-label').textContent = tipoUnidad ? `TrÃ¡nsito (${tipoUnidad})` : 'Tiempo trÃ¡nsito';
     document.getElementById('route-unit-type').textContent = tipoUnidad || 'Sin calcular';
 }
 
@@ -5897,7 +5931,7 @@ async function updateRoute() {
         className: 'airport-tooltip',
     });
 
-    // Línea de ruta (curva bezier)
+    // LÃ­nea de ruta (curva bezier)
     const midLat = (ap.lat + geo.lat) / 2;
     const midLng = (ap.lng + geo.lng) / 2;
     const dx = geo.lng - ap.lng;
@@ -6008,8 +6042,8 @@ function clearMaritimeRoute() {
     document.getElementById('route-info-maritimo')?.classList.remove('show');
     const kmEl = document.getElementById('route-km-maritimo');
     const timeEl = document.getElementById('route-time-maritimo');
-    if (kmEl) kmEl.textContent = '—';
-    if (timeEl) timeEl.textContent = '—';
+    if (kmEl) kmEl.textContent = 'â€”';
+    if (timeEl) timeEl.textContent = 'â€”';
     maritimeCurrentRouteKm = 0;
 }
 
@@ -6265,18 +6299,18 @@ function inferSheetsApiError(res, text) {
     const finalUrl = (res && res.url) ? res.url : SHEETS_API_URL;
 
     if (finalUrl.includes('accounts.google.com') || lower.includes('accounts.google.com') || lower.includes('sign in')) {
-        return 'El Apps Script está pidiendo iniciar sesión con Google. Vuelve a desplegar la App web con acceso "Cualquier persona" y ejecutando como tu cuenta.';
+        return 'El Apps Script estÃ¡ pidiendo iniciar sesiÃ³n con Google. Vuelve a desplegar la App web con acceso "Cualquier persona" y ejecutando como tu cuenta.';
     }
 
     if (res && (res.status === 401 || res.status === 403)) {
-        return 'El Apps Script rechazó el acceso. Revisa que la App web esté publicada para "Cualquier persona".';
+        return 'El Apps Script rechazÃ³ el acceso. Revisa que la App web estÃ© publicada para "Cualquier persona".';
     }
 
     if (lower.includes('<!doctype html') || lower.includes('<html')) {
-        return 'El Apps Script devolvió HTML en lugar de JSON. Normalmente eso significa que la URL publicada o sus permisos no son correctos.';
+        return 'El Apps Script devolviÃ³ HTML en lugar de JSON. Normalmente eso significa que la URL publicada o sus permisos no son correctos.';
     }
 
-    return 'Respuesta no válida del servidor';
+    return 'Respuesta no vÃ¡lida del servidor';
 }
 
 async function sheetsAPI(action, data = {}) {
@@ -6301,11 +6335,11 @@ async function sheetsAPI(action, data = {}) {
         }
     } catch (err) {
         console.error('Sheets API error:', err);
-        return { ok: false, error: 'Error de conexión: ' + err.message };
+        return { ok: false, error: 'Error de conexiÃ³n: ' + err.message };
     }
 }
 
-// ===== SESIÓN DE USUARIO =====
+// ===== SESIÃ“N DE USUARIO =====
 function getCurrentUser() {
     const raw = sessionStorage.getItem('currentUser');
     return raw ? JSON.parse(raw) : null;
@@ -6396,8 +6430,8 @@ async function legacyLoadLoginUsersUnused(forceRefresh = false) {
     if (res.ok && res.usuarios) {
         const { hasUsers } = renderLoginUserOptions(res.usuarios, previousSelection);
         if (!hasUsers) {
-            select.innerHTML = '<option value="">No hay usuarios — crea uno en Google Sheets</option>';
-            setLoginHelp('La conexión con Google Sheets sí funcionó, pero no hay usuarios activos para mostrar.');
+            select.innerHTML = '<option value="">No hay usuarios â€” crea uno en Google Sheets</option>';
+            setLoginHelp('La conexiÃ³n con Google Sheets sÃ­ funcionÃ³, pero no hay usuarios activos para mostrar.');
             setLoginControlsDisabled(false);
             document.getElementById('btn-login').disabled = true;
             return;
@@ -6481,7 +6515,7 @@ document.getElementById('btn-login').addEventListener('click', async () => {
         document.getElementById('login-pin').value = '';
         setLoginHelp('');
     } else {
-        setLoginError(res.error || 'Error al iniciar sesión');
+        setLoginError(res.error || 'Error al iniciar sesiÃ³n');
     }
 });
 
@@ -6520,7 +6554,7 @@ document.getElementById('btn-admin').addEventListener('click', () => {
     }
 });
 
-// ===== GESTIÓN DE USUARIOS (ADMIN) =====
+// ===== GESTIÃ“N DE USUARIOS (ADMIN) =====
 async function legacyRenderUsersTableUnused() {
     const wrap = document.getElementById('users-table-wrap');
     wrap.innerHTML = '<p style="font-size:0.8rem;color:var(--gray-400);">Cargando usuarios...</p>';
@@ -6547,7 +6581,7 @@ async function legacyRenderUsersTableUnused() {
             </tbody>
         </table>`;
 
-    // También actualizar el filtro de historial
+    // TambiÃ©n actualizar el filtro de historial
     const filterSelect = document.getElementById('hist-filter-user');
     filterSelect.innerHTML = '<option value="">Todos</option>' +
         res.usuarios.filter(u => u.activo).map(u => `<option value="${escapeHtml(u.nombre)}">${escapeHtml(u.nombre)}</option>`).join('');
@@ -6612,7 +6646,7 @@ document.getElementById('btn-add-user').addEventListener('click', async () => {
 });
 
 async function desactivarUsuario(nombre) {
-    if (!confirm('¿Desactivar a ' + nombre + '?')) return;
+    if (!confirm('Â¿Desactivar a ' + nombre + '?')) return;
     const res = await sheetsAPI('eliminarUsuario', { nombre });
     if (res.ok) {
         invalidateUsuariosCache();
@@ -6628,7 +6662,7 @@ async function reactivarUsuario(nombre) {
     }
 }
 
-// ===== REGISTRAR COTIZACIÓN EN GOOGLE SHEETS =====
+// ===== REGISTRAR COTIZACIÃ“N EN GOOGLE SHEETS =====
 async function registrarCotizacion(aeropuerto, destino, unidad, resultados) {
     const user = getCurrentUser();
     if (!user) return;
@@ -6731,10 +6765,10 @@ document.getElementById('import-file').addEventListener('change', (e) => {
         try {
             const data = JSON.parse(ev.target.result);
             if (!data.proveedores && !data.proveedoresMaritimos && !data.conceptosFijos) {
-                alert('Archivo no válido. No contiene datos de proveedores ni conceptos.');
+                alert('Archivo no vÃ¡lido. No contiene datos de proveedores ni conceptos.');
                 return;
             }
-            const msg = `Se importarán:\n• ${(data.proveedores || []).length} proveedores\n• ${Object.keys(data.conceptosFijos || {}).length} aeropuertos con conceptos fijos\n\n¿Reemplazar datos actuales?`;
+            const msg = `Se importarÃ¡n:\nâ€¢ ${(data.proveedores || []).length} proveedores\nâ€¢ ${Object.keys(data.conceptosFijos || {}).length} aeropuertos con conceptos fijos\n\nÂ¿Reemplazar datos actuales?`;
             if (!confirm(msg)) return;
             if (data.proveedores) localStorage.setItem('proveedores', JSON.stringify(data.proveedores));
             if (data.proveedoresMaritimos) localStorage.setItem(MARITIME_STORAGE_KEY, JSON.stringify(data.proveedoresMaritimos));
@@ -6773,7 +6807,7 @@ document.getElementById('import-file').addEventListener('change', (e) => {
     updateMaritimeMapMarkers();
     scheduleMaritimeRouteUpdate();
 
-// Check session — show login or restore user
+// Check session â€” show login or restore user
     const user = getCurrentUser();
     if (user) {
         hideLogin();
