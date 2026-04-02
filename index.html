@@ -1526,7 +1526,7 @@
         }
         .destination-calc-controls {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 0.65rem;
             margin-top: 0.95rem;
             align-items: end;
@@ -1552,6 +1552,9 @@
             color: #15803d;
             font-size: 0.88rem;
             font-weight: 900;
+        }
+        .destination-calc-control.full-width {
+            grid-column: 1 / -1;
         }
         .destination-calc-comment {
             margin-top: 0.85rem;
@@ -5585,11 +5588,11 @@ function renderMaritimeSelectionSummary(fmt) {
     summary.innerHTML = `
         <div class="maritime-selection-chip ${singleReady ? 'ready single' : 'pending'}">
             <strong>Single elegido</strong>
-            ${singleReady ? `${escapeHtml(maritimeSelection.single.proveedor)} ($${fmt(maritimeSelection.single.single)})` : 'Pendiente de seleccionar'}
+            ${singleReady ? `$${fmt(maritimeSelection.single.single)}${maritimeSelection.single.vigencia ? ` · Vigencia ${escapeHtml(maritimeSelection.single.vigencia)}` : ''}` : 'Pendiente de seleccionar'}
         </div>
         <div class="maritime-selection-chip ${fullReady ? 'ready full' : 'pending'}">
             <strong>Full elegido</strong>
-            ${fullReady ? `${escapeHtml(maritimeSelection.full.proveedor)} ($${fmt(maritimeSelection.full.full)})` : 'Pendiente de seleccionar'}
+            ${fullReady ? `$${fmt(maritimeSelection.full.full)}${maritimeSelection.full.vigencia ? ` · Vigencia ${escapeHtml(maritimeSelection.full.vigencia)}` : ''}` : 'Pendiente de seleccionar'}
         </div>
     `;
 }
@@ -6202,7 +6205,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                             <div class="destination-calc-control-label">Venta ${moneda}</div>
                             <div>${simbolo} <input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${displayVenta}" min="0" step="1"></div>
                         </div>
-                        <div class="destination-calc-control">
+                        <div class="destination-calc-control full-width">
                             <div class="destination-calc-control-label">Utilidad</div>
                             <div class="destination-calc-util utilidad-col" id="mub-util-${i}">${simbolo}${fmt(utilidad)}</div>
                         </div>
