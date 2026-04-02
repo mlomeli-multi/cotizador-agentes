@@ -4233,12 +4233,22 @@ function buildMaritimeDestinationLine(choiceLabel, concept) {
         monedaCosto: concept.moneda || 'USD',
         esFlete: false,
         mub: isMub ? (parseFloat(concept.mubDefault) || 15) : 0,
+        impuestoRate: getMaritimeConceptTaxRate(concept),
+        impuestoLabel: concept.impuestos || '',
         quoteSection: 'destination',
         quoteLabel: concept.nombre,
         quoteChargeBy: concept.baseCobro || '',
         quoteComment: getMaritimeConceptComment(concept),
         quoteContainerLabel: getMaritimeConceptContainerLabel(concept)
     };
+}
+
+function getMaritimeConceptTaxRate(concept) {
+    const taxText = normalizeProviderKey(concept?.impuestos || '');
+    if (taxText.includes('mas-iva-16') || taxText.includes('mas iva 16')) {
+        return 0.16;
+    }
+    return 0;
 }
 
 function getMaritimeConceptContainerLabel(concept) {
@@ -5431,7 +5441,10 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
     const destinationExtrasId = `${containerId}-destination-extras`;
     const commercialSummaryId = `${containerId}-commercial-summary`;
     const carrierOptions = getMaritimeDestinationCarriers();
-    const defaultCarrierKey = maritimeDestinationSelection.carrierKey && carrierOptions.some(carrier => carrier.key === maritimeDestinationSelection.carrierKey)
+    const noneCarrierKey = '__sin-naviera__';
+    const defaultCarrierKey = maritimeDestinationSelection.carrierKey === noneCarrierKey
+        ? noneCarrierKey
+        : maritimeDestinationSelection.carrierKey && carrierOptions.some(carrier => carrier.key === maritimeDestinationSelection.carrierKey)
         ? maritimeDestinationSelection.carrierKey
         : (carrierOptions[0]?.key || '');
     maritimeDestinationSelection.carrierKey = defaultCarrierKey;
@@ -5470,9 +5483,12 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     <div style="display:flex;gap:0.85rem;flex-wrap:wrap;align-items:end;">
                         <div style="flex:1 1 220px;">
                             <div style="font-size:0.72rem;font-weight:700;color:var(--gray-600);text-transform:uppercase;letter-spacing:0.04em;margin-bottom:0.35rem;">Cargos en destino por naviera</div>
-                            <select id="${containerId}-carrier" style="width:100%;padding:0.7rem 0.8rem;border:1px solid var(--gray-200);border-radius:10px;background:white;">
-                                ${carrierOptions.map(carrier => `<option value="${escapeHtml(carrier.key)}"${carrier.key === defaultCarrierKey ? ' selected' : ''}>${escapeHtml(carrier.displayName || carrier.carrier || carrier.key)}</option>`).join('')}
-                            </select>
+                            <div style="display:flex;gap:0.5rem;align-items:center;">
+                                <select id="${containerId}-carrier" style="width:100%;padding:0.7rem 0.8rem;border:1px solid var(--gray-200);border-radius:10px;background:white;">
+                                    ${carrierOptions.map(carrier => `<option value="${escapeHtml(carrier.key)}"${carrier.key === defaultCarrierKey ? ' selected' : ''}>${escapeHtml(carrier.displayName || carrier.carrier || carrier.key)}</option>`).join('')}
+                                </select>
+                                <button type="button" id="${containerId}-carrier-none" style="flex:0 0 auto;padding:0.7rem 0.85rem;border:1px solid var(--gray-200);border-radius:10px;background:#fff;font-size:0.72rem;font-weight:700;color:var(--gray-600);cursor:pointer;">Sin naviera</button>
+                            </div>
                         </div>
                         <div style="flex:2 1 320px;font-size:0.76rem;color:var(--gray-500);">
                             Piloto Fase 2: los cargos en destino se eligen por naviera y los depósitos o garantías se muestran aparte sin entrar al total DAP.
@@ -5492,11 +5508,14 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         </div>
     `;
 
-    const renderDestinationCalculatorState = (syncCalculator = true, preserveScroll = false) => {
-        const scrollY = preserveScroll ? window.scrollY : null;
-        const carrierKey = document.getElementById(`${containerId}-carrier`)?.value || defaultCarrierKey;
-        maritimeDestinationSelection.carrierKey = carrierKey;
-        const destinationData = resolveMaritimeDestinationConcepts(maritimeDestinationSelection, puerto);
+        const renderDestinationCalculatorState = (syncCalculator = true, preserveScroll = false) => {
+            const scrollY = preserveScroll ? window.scrollY : null;
+            const selectValue = document.getElementById(`${containerId}-carrier`)?.value || '';
+            const carrierKey = maritimeDestinationSelection.carrierKey === noneCarrierKey ? noneCarrierKey : (selectValue || defaultCarrierKey);
+            maritimeDestinationSelection.carrierKey = carrierKey;
+            const destinationData = carrierKey === noneCarrierKey
+                ? { availableCarriers: carrierOptions, selectedCarrierKey: noneCarrierKey, selectedCarrier: null, selectable: [], lines: [], extras: [], notes: [], freeDaysPol: '' }
+                : resolveMaritimeDestinationConcepts(maritimeDestinationSelection, puerto);
         const destinationMeta = document.getElementById(destinationMetaId);
         const destinationConcepts = document.getElementById(destinationConceptsId);
         const destinationExtras = document.getElementById(destinationExtrasId);
@@ -5506,7 +5525,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
             const lineCount = destinationData.lines.length;
             destinationMeta.innerHTML = destinationData.selectedCarrier
                 ? `Naviera activa: <strong>${escapeHtml(destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier)}</strong> · ${lineCount} cargo${lineCount === 1 ? '' : 's'} seleccionado${lineCount === 1 ? '' : 's'} en el total.${destinationData.freeDaysPol ? ` <span style="display:inline-flex;align-items:center;gap:0.3rem;margin-left:0.5rem;padding:0.18rem 0.5rem;border-radius:999px;background:#ecfeff;color:#0f766e;font-weight:700;">Free Days POL: ${escapeHtml(destinationData.freeDaysPol)}</span>` : ''}`
-                : 'No hay naviera piloto disponible.';
+                : 'Sin naviera seleccionada. No se mostrarán opciones de destination charges.';
         }
 
         if (destinationConcepts) {
@@ -5577,13 +5596,13 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     <h4>Destination Charges</h4>
                     ${buildMaritimeCommercialLines(destinationData.lines, fmt)}
                 </div>
-                <div class="maritime-commercial-card">
-                    <h4>Inland Freight</h4>
-                    ${buildMaritimeInlandSummary(singleChoice, fullChoice, fmt)}
-                </div>
                 <div class="maritime-commercial-total">
                     <div class="maritime-commercial-total-label">Total preliminar destination charges</div>
                     <div class="maritime-commercial-total-value">${escapeHtml(formatMaritimeCommercialTotal(destinationData.lines, fmt))}</div>
+                </div>
+                <div class="maritime-commercial-card">
+                    <h4>Inland Freight</h4>
+                    ${buildMaritimeInlandSummary(singleChoice, fullChoice, fmt)}
                 </div>
                 <div class="maritime-commercial-mini">
                     El inland freight se muestra como referencia de costo por contenedor. El total preliminar solo suma los destination charges seleccionados.
@@ -5645,8 +5664,18 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
     rerenderMaritimeDestinationCalculator = renderDestinationCalculatorState;
 
     document.getElementById(`${containerId}-carrier`)?.addEventListener('change', () => {
+        maritimeDestinationSelection.carrierKey = document.getElementById(`${containerId}-carrier`)?.value || '';
         maritimeDestinationSelection.selectedConceptIds = [];
-        renderDestinationCalculatorState(false);
+        renderDestinationCalculatorState(true);
+    });
+    document.getElementById(`${containerId}-carrier-none`)?.addEventListener('click', () => {
+        const carrierSelect = document.getElementById(`${containerId}-carrier`);
+        if (carrierSelect) {
+            carrierSelect.value = '';
+        }
+        maritimeDestinationSelection.carrierKey = noneCarrierKey;
+        maritimeDestinationSelection.selectedConceptIds = [];
+        renderDestinationCalculatorState(true);
     });
     renderDestinationCalculatorState();
 }
@@ -5883,7 +5912,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
     // costoBase MXN = costo con impuestos (flete) o directo (conceptos)
     function costoBaseMXN(l) {
-        const costoImpuesto = l.esFlete ? l.costo * (1 + IMPUESTO_FLETE) : l.costo;
+        const taxRate = l.esFlete ? IMPUESTO_FLETE : (parseFloat(l.impuestoRate) || 0);
+        const costoImpuesto = l.costo * (1 + taxRate);
         if (l.monedaCosto === 'USD' && hayTC) return costoImpuesto * tc;
         return costoImpuesto;
     }
@@ -5893,7 +5923,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     }
     // costoBase en moneda de venta (USD si hay TC, MXN si no)
     function costoBaseVenta(l) {
-        const costoImpuesto = l.esFlete ? l.costo * (1 + IMPUESTO_FLETE) : l.costo;
+        const taxRate = l.esFlete ? IMPUESTO_FLETE : (parseFloat(l.impuestoRate) || 0);
+        const costoImpuesto = l.costo * (1 + taxRate);
         if (hayTC && l.monedaCosto === 'USD') return costoImpuesto;
         return toUSD(costoBaseMXN(l));
     }
@@ -5914,9 +5945,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         totalCostoBaseVenta += cbVenta;
         totalVenta += l.venta;
 
-        const impCol = l.esFlete
-            ? `<td>$${fmt(l.costo * IMPUESTO_FLETE)}</td>`
-            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl.</td>`;
+        const lineTaxRate = l.esFlete ? IMPUESTO_FLETE : (parseFloat(l.impuestoRate) || 0);
+        const lineTaxAmountMXN = l.monedaCosto === 'USD' && hayTC
+            ? (l.costo * lineTaxRate * tc)
+            : (l.costo * lineTaxRate);
+        const impCol = lineTaxRate > 0
+            ? `<td>$${fmt(lineTaxAmountMXN)}</td>`
+            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl./N/A</td>`;
 
         const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
 
@@ -5998,11 +6033,11 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 <div class="resumen-label" id="mub-res-label">Utilidad (MUB ${fmtShort(mubTotal)}%)</div>
             </div>
         </div>
-        <div class="maritime-quote-panel">
-            <h3>Resumen de cotización</h3>
-            <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
-            <div id="${quoteSummaryId}" class="maritime-quote-body"></div>
-        </div>
+    </div>
+    <div class="maritime-quote-panel">
+        <h3>Resumen de cotización</h3>
+        <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
+        <div id="${quoteSummaryId}" class="maritime-quote-body"></div>
     </div>`;
 
     function renderQuoteSummary() {
