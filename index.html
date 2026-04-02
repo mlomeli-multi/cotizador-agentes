@@ -4235,15 +4235,15 @@ function formatMaritimeCommercialTotal(lines, fmt) {
 
 function buildMaritimeInlandSummary(singleChoice, fullChoice, fmt) {
     const rows = [
-        { nombre: `Single · ${singleChoice.proveedor}`, monto: singleChoice.single, nota: 'Tarifa por 1 contenedor.' },
-        { nombre: `Full · ${fullChoice.proveedor}`, monto: fullChoice.full, nota: 'Tarifa por 2 contenedores.' },
-        { nombre: `Full por contenedor`, monto: (parseFloat(fullChoice.full) || 0) / 2, nota: 'Referencia comercial cuando el embarque es número par.' }
+        { etiqueta: 'Single por contenedor', proveedor: singleChoice.proveedor, monto: singleChoice.single, nota: 'Tarifa por 1 contenedor.' },
+        { etiqueta: 'Full por contenedor', proveedor: fullChoice.proveedor, monto: (parseFloat(fullChoice.full) || 0) / 2, nota: 'Referencia comercial cuando el embarque es número par.' }
     ].filter(row => (parseFloat(row.monto) || 0) > 0);
 
     return rows.map(row => `
         <div class="maritime-commercial-line">
             <div class="maritime-commercial-name">
-                <div>${escapeHtml(row.nombre)}</div>
+                <div>${escapeHtml(row.etiqueta)}</div>
+                <div style="margin-top:0.12rem;font-size:0.69rem;color:var(--gray-600);line-height:1.35;">${escapeHtml(row.proveedor)}</div>
                 ${row.nota ? `<div style="margin-top:0.12rem;font-size:0.68rem;color:var(--gray-500);line-height:1.35;">${escapeHtml(row.nota)}</div>` : ''}
             </div>
             <div class="maritime-commercial-value">MXN ${fmt(parseFloat(row.monto) || 0)}</div>
@@ -5367,7 +5367,8 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         </div>
     `;
 
-    const renderDestinationCalculatorState = (syncCalculator = true) => {
+    const renderDestinationCalculatorState = (syncCalculator = true, preserveScroll = false) => {
+        const scrollY = preserveScroll ? window.scrollY : null;
         const carrierKey = document.getElementById(`${containerId}-carrier`)?.value || defaultCarrierKey;
         maritimeDestinationSelection.carrierKey = carrierKey;
         const destinationData = resolveMaritimeDestinationConcepts(maritimeDestinationSelection, puerto);
@@ -5483,6 +5484,9 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     destinationData.notes.length ? `Revisar manualmente: ${destinationData.notes.join(', ')}` : ''
                 ].filter(Boolean).join(' | ')
             }, innerContainerId);
+            if (preserveScroll && scrollY !== null) {
+                requestAnimationFrame(() => window.scrollTo({ top: scrollY, behavior: 'auto' }));
+            }
         }
     };
 
@@ -5506,7 +5510,7 @@ function toggleMaritimeDestinationConcept(input) {
     }
     maritimeDestinationSelection.selectedConceptIds = [...selected];
     if (typeof rerenderMaritimeDestinationCalculator === 'function') {
-        rerenderMaritimeDestinationCalculator(false);
+        rerenderMaritimeDestinationCalculator(true, true);
         return;
     }
     renderMaritimeCombinedCalculator();
