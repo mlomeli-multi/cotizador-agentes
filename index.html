@@ -5461,7 +5461,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         <div class="maritime-combined-shell">
             <div class="maritime-combined-head">
                 <div>
-                    <div class="maritime-combined-title">Calculadora combinada maritima</div>
+                    <div class="maritime-combined-title">Armado comercial marítimo</div>
                     <div class="maritime-combined-subtitle">Estas armando la venta final con una opcion Single y una opcion Full elegidas por separado.</div>
                 </div>
                 <div class="maritime-combined-badges">
@@ -5880,7 +5880,6 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
                 </div>
             </div>
         </div>
-        <div id="maritime-selection-summary" class="maritime-selection-summary"></div>
         <div id="mub-panel-container-maritimo"></div>
     `;
     resultsEl.classList.add('show');
@@ -5891,7 +5890,6 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
         ...fullResults.slice(0, 3).map(r => ({ proveedor: `${r.proveedor} [Full]`, tarifa: r.tarifaFull }))
     ]);
 
-    renderMaritimeSelectionSummary(fmt);
     renderMaritimeCombinedCalculator();
     bindMaritimeOptionInteractions(resultsEl, fmt, puerto, ciudad, results, singleResults, fullResults, rankLabels);
 });
