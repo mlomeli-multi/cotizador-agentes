@@ -1350,13 +1350,25 @@
             color: var(--gray-400);
             border-color: var(--gray-100);
         }
-        .mub-table .total-row td {
-            border-top: 2px solid var(--gray-300);
+        .mub-table .section-row td {
+            padding: 0.55rem 0.5rem 0.35rem;
             border-bottom: none;
-            padding-top: 0.5rem;
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            background: #f8fafc;
+        }
+        .mub-table .section-row td:not(:first-child) {
+            text-align: left;
+        }
+        .mub-table tr.row-flete td:first-child {
             font-weight: 700;
             color: var(--navy);
-            font-size: 0.85rem;
+        }
+        .mub-table tr.row-destination td:first-child {
+            color: var(--gray-700);
         }
         .mub-table .utilidad-col { color: var(--green); font-weight: 600; }
         .mub-table .venta-col { color: var(--blue); font-weight: 700; }
@@ -5890,10 +5902,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 esFlete: l.esFlete !== false,
                 mub: typeof l.mub === 'number' ? l.mub : 15,
                 venta: 0,
-                editando: 'mub'
+                editando: 'mub',
+                costMode: !!l.costMode,
+                lastCustomMub: typeof l.lastCustomMub === 'number' ? l.lastCustomMub : (typeof l.mub === 'number' ? l.mub : 15),
+                lastCustomVenta: typeof l.lastCustomVenta === 'number' ? l.lastCustomVenta : 0
             }))
         : [
-            { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, monedaCosto: 'MXN', esFlete: true, mub: 15, venta: 0, editando: 'mub' },
+            { nombre: `Flete (${data.tipoUnidad})`, costo: data.tarifaFlete, monedaCosto: 'MXN', esFlete: true, mub: 15, venta: 0, editando: 'mub', costMode: false, lastCustomMub: 15, lastCustomVenta: 0 },
             ...((data.conceptos || []).filter(c => c.monto > 0).map(c => ({
                 nombre: c.nombre,
                 costo: c.monto,
@@ -5901,7 +5916,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 esFlete: false,
                 mub: 15,
                 venta: 0,
-                editando: 'mub'
+                editando: 'mub',
+                costMode: false,
+                lastCustomMub: 15,
+                lastCustomVenta: 0
             })))
         ];
 
@@ -5925,13 +5943,17 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     }
 
     // Calcular ventas iniciales desde MUB
-    lineas.forEach(l => { l.venta = costoBaseVenta(l) / (1 - l.mub / 100); });
+    lineas.forEach(l => {
+        l.venta = costoBaseVenta(l) / (1 - l.mub / 100);
+        l.lastCustomVenta = l.venta;
+    });
 
     // Render inicial
     let totalCostoBaseMXN = 0;
     let totalCostoBaseVenta = 0;
     let totalVenta = 0;
 
+    let currentSection = '';
     const rowsHtml = lineas.map((l, i) => {
         const cbMXN = costoBaseMXN(l);
         const cbVenta = costoBaseVenta(l);
@@ -5957,23 +5979,28 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
         const isDestinationCharge = (l.quoteSection || '') === 'destination';
         const costButton = isDestinationCharge
-            ? `<span class="mub-quick-actions"><button type="button" class="mub-cost-btn${(parseFloat(l.mub) || 0) === 0 ? ' active' : ''}" data-idx="${i}" title="Mandar este cargo al costo">Costo</button></span>`
+            ? `<span class="mub-quick-actions"><button type="button" class="mub-cost-btn${l.costMode ? ' active' : ''}" data-idx="${i}" title="Mandar este cargo al costo">Costo</button></span>`
             : '';
+        const section = isDestinationCharge ? 'destination' : 'inland';
+        const sectionLabel = section === 'destination' ? 'Destination Charges' : 'Inland Freight por contenedor';
+        const sectionHtml = currentSection !== section
+            ? `<tr class="section-row"><td colspan="${hayTC ? 8 : 7}">${sectionLabel}</td></tr>`
+            : '';
+        currentSection = section;
+        const displayMub = l.costMode ? 0 : (Math.round(l.mub * 10) / 10);
+        const displayVenta = l.costMode ? 0 : (Math.round(l.venta * 100) / 100);
 
-        return `<tr>
+        return `${sectionHtml}<tr class="${isDestinationCharge ? 'row-destination' : 'row-flete'}">
             <td>${escapeHtml(l.nombre)}</td>
             <td>$${fmt(costoSinImpMXN(l))}</td>
             ${impCol}
             ${costoImpCell}
             ${usdCell}
-            <td style="white-space:nowrap;"><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${Math.round(l.mub * 10) / 10}" min="0" max="99" step="0.1"> %${costButton}</td>
-            <td style="white-space:nowrap;">${simbolo} <input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${Math.round(l.venta * 100) / 100}" min="0" step="1"></td>
+            <td style="white-space:nowrap;"><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${displayMub}" min="0" max="99" step="0.1"> %${costButton}</td>
+            <td style="white-space:nowrap;">${simbolo} <input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${displayVenta}" min="0" step="1"></td>
             <td class="utilidad-col" id="mub-util-${i}">${simbolo}${fmt(utilidad)}</td>
         </tr>`;
     }).join('');
-
-    const totalCostoSinImp = lineas.reduce((s, l) => s + costoSinImpMXN(l), 0);
-    const totalImpuestos = totalCostoBaseMXN - totalCostoSinImp;
 
     // Header de conversión
     const tcBadge = hayTC
@@ -6005,16 +6032,6 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             </tr></thead>
             <tbody>
                 ${rowsHtml}
-                <tr class="total-row">
-                    <td>TOTAL</td>
-                    <td>$${fmt(totalCostoSinImp)}</td>
-                    <td id="mub-total-imp">$${fmt(totalImpuestos)}</td>
-                    <td>$${fmt(totalCostoBaseMXN)}</td>
-                    ${hayTC ? `<td class="mub-usd-cell" id="mub-total-usd">${simbolo}${fmt(totalCostoBaseVenta)}</td>` : ''}
-                    <td style="font-size:0.75rem;color:var(--gray-500);font-weight:700;">-</td>
-                    <td class="venta-col" id="mub-total-venta">${simbolo}${fmt(totalVenta)}</td>
-                    <td class="utilidad-col" id="mub-total-util">${simbolo}${fmt(totalVenta - totalCostoBaseVenta)}</td>
-                </tr>
             </tbody>
         </table>
     </div>
@@ -6082,7 +6099,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         let tCostoBaseVenta = 0, tVenta = 0, tCostoSinImp = 0, tCostoBaseMXN = 0;
         lineas.forEach((l, i) => {
             const cbVenta = costoBaseVenta(l);
-            if (l.editando === 'mub') {
+            if (l.costMode) {
+                l.mub = 0;
+                l.venta = cbVenta;
+            } else if (l.editando === 'mub') {
                 const mub = Math.min(Math.max(l.mub, 0), 99.9);
                 l.mub = mub;
                 l.venta = cbVenta / (1 - mub / 100);
@@ -6101,7 +6121,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const usdEl = document.getElementById(`mub-usd-${i}`);
             const costBtn = container.querySelector(`.mub-cost-btn[data-idx="${i}"]`);
 
-            if (l.editando === 'mub' && ventaInput && document.activeElement !== ventaInput) {
+            if (l.costMode) {
+                if (ventaInput && document.activeElement !== ventaInput) ventaInput.value = 0;
+                if (mubInput && document.activeElement !== mubInput) mubInput.value = 0;
+            } else if (l.editando === 'mub' && ventaInput && document.activeElement !== ventaInput) {
                 ventaInput.value = Math.round(l.venta * 100) / 100;
             } else if (l.editando === 'venta' && mubInput && document.activeElement !== mubInput) {
                 mubInput.value = Math.round(l.mub * 10) / 10;
@@ -6112,27 +6135,26 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 ventaInput.classList.toggle('active-input', l.editando === 'venta');
             }
             if (costBtn) {
-                costBtn.classList.toggle('active', (parseFloat(l.mub) || 0) === 0);
+                costBtn.classList.toggle('active', !!l.costMode);
             }
 
             if (utilEl) utilEl.textContent = simbolo + fmt(utilidad);
             if (usdEl) usdEl.textContent = simbolo + fmt(cbVenta);
         });
 
-        const tUtil = tVenta - tCostoBaseVenta;
-        const tImp = tCostoBaseMXN - tCostoSinImp;
-
-        const el = (id) => document.getElementById(id);
-        if (el('mub-total-imp')) el('mub-total-imp').textContent = '$' + fmt(tImp);
-        if (el('mub-total-usd')) el('mub-total-usd').textContent = simbolo + fmt(tCostoBaseVenta);
-        if (el('mub-total-venta')) el('mub-total-venta').textContent = simbolo + fmt(tVenta);
-        if (el('mub-total-util')) el('mub-total-util').textContent = simbolo + fmt(tUtil);
         renderQuoteSummary();
     }
 
     container.querySelectorAll('.mub-input').forEach(input => {
         input.addEventListener('focus', () => {
             const idx = parseInt(input.dataset.idx);
+            if (lineas[idx]?.costMode) {
+                lineas[idx].costMode = false;
+                lineas[idx].mub = typeof lineas[idx].lastCustomMub === 'number' ? lineas[idx].lastCustomMub : 15;
+                lineas[idx].venta = typeof lineas[idx].lastCustomVenta === 'number' && lineas[idx].lastCustomVenta > 0
+                    ? lineas[idx].lastCustomVenta
+                    : costoBaseVenta(lineas[idx]) / (1 - lineas[idx].mub / 100);
+            }
             lineas[idx].editando = input.dataset.field;
             updateValues();
         });
@@ -6143,9 +6165,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             if (field === 'mub') {
                 lineas[idx].mub = val;
                 lineas[idx].editando = 'mub';
+                lineas[idx].costMode = false;
+                lineas[idx].lastCustomMub = val;
             } else {
                 lineas[idx].venta = val;
                 lineas[idx].editando = 'venta';
+                lineas[idx].costMode = false;
+                lineas[idx].lastCustomVenta = val;
             }
             updateValues();
         });
@@ -6155,6 +6181,11 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         button.addEventListener('click', () => {
             const idx = parseInt(button.dataset.idx);
             if (Number.isNaN(idx) || !lineas[idx]) return;
+            if (!lineas[idx].costMode) {
+                lineas[idx].lastCustomMub = lineas[idx].mub;
+                lineas[idx].lastCustomVenta = lineas[idx].venta;
+            }
+            lineas[idx].costMode = true;
             lineas[idx].mub = 0;
             lineas[idx].editando = 'mub';
             updateValues();
