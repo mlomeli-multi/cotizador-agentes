@@ -4219,15 +4219,33 @@ function buildMaritimeCommercialLines(lines, fmt) {
     `).join('');
 }
 
+function formatMaritimeCommercialTotal(lines, fmt) {
+    const totals = new Map();
+    (Array.isArray(lines) ? lines : []).forEach(line => {
+        const currency = line?.monedaCosto || 'USD';
+        const amount = parseFloat(line?.costo) || 0;
+        if (amount <= 0) return;
+        totals.set(currency, (totals.get(currency) || 0) + amount);
+    });
+    if (!totals.size) {
+        return 'Sin cargos seleccionados';
+    }
+    return [...totals.entries()].map(([currency, amount]) => `${currency} ${fmt(amount)}`).join(' + ');
+}
+
 function buildMaritimeInlandSummary(singleChoice, fullChoice, fmt) {
     const rows = [
-        { nombre: `Single · ${singleChoice.proveedor}`, monto: singleChoice.single },
-        { nombre: `Full · ${fullChoice.proveedor}`, monto: fullChoice.full }
+        { nombre: `Single · ${singleChoice.proveedor}`, monto: singleChoice.single, nota: 'Tarifa por 1 contenedor.' },
+        { nombre: `Full · ${fullChoice.proveedor}`, monto: fullChoice.full, nota: 'Tarifa por 2 contenedores.' },
+        { nombre: `Full por contenedor`, monto: (parseFloat(fullChoice.full) || 0) / 2, nota: 'Referencia comercial cuando el embarque es número par.' }
     ].filter(row => (parseFloat(row.monto) || 0) > 0);
 
     return rows.map(row => `
         <div class="maritime-commercial-line">
-            <div class="maritime-commercial-name">${escapeHtml(row.nombre)}</div>
+            <div class="maritime-commercial-name">
+                <div>${escapeHtml(row.nombre)}</div>
+                ${row.nota ? `<div style="margin-top:0.12rem;font-size:0.68rem;color:var(--gray-500);line-height:1.35;">${escapeHtml(row.nota)}</div>` : ''}
+            </div>
             <div class="maritime-commercial-value">MXN ${fmt(parseFloat(row.monto) || 0)}</div>
         </div>
     `).join('');
@@ -5349,7 +5367,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         </div>
     `;
 
-    const renderDestinationCalculatorState = () => {
+    const renderDestinationCalculatorState = (syncCalculator = true) => {
         const carrierKey = document.getElementById(`${containerId}-carrier`)?.value || defaultCarrierKey;
         maritimeDestinationSelection.carrierKey = carrierKey;
         const destinationData = resolveMaritimeDestinationConcepts(maritimeDestinationSelection, puerto);
@@ -5428,8 +5446,6 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         }
 
         if (commercialSummary) {
-            const destinationSubtotal = destinationData.lines.reduce((sum, line) => sum + (parseFloat(line.costo) || 0), 0);
-            const inlandSubtotal = (parseFloat(singleChoice.single) || 0) + (parseFloat(fullChoice.full) || 0);
             commercialSummary.innerHTML = `
                 <div class="maritime-commercial-card">
                     <h4>Destination Charges</h4>
@@ -5440,39 +5456,41 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     ${buildMaritimeInlandSummary(singleChoice, fullChoice, fmt)}
                 </div>
                 <div class="maritime-commercial-total">
-                    <div class="maritime-commercial-total-label">Total preliminar</div>
-                    <div class="maritime-commercial-total-value">MXN ${fmt(inlandSubtotal)}${destinationSubtotal > 0 ? ` + ${fmt(destinationSubtotal)} USD` : ''}</div>
+                    <div class="maritime-commercial-total-label">Total preliminar destination charges</div>
+                    <div class="maritime-commercial-total-value">${escapeHtml(formatMaritimeCommercialTotal(destinationData.lines, fmt))}</div>
                 </div>
             `;
         }
 
-        openMubPanel({
-            proveedor: `${singleChoice.proveedor} + ${fullChoice.proveedor}`,
-            lineas: [
-                { nombre: `Flete maritimo Single (${singleChoice.proveedor})`, costo: singleChoice.single, esFlete: true, mub: 15 },
-                { nombre: `Flete maritimo Full (${fullChoice.proveedor})`, costo: fullChoice.full, esFlete: true, mub: 15 },
-                ...destinationData.lines
-            ],
-            metaInfo: [
-                `Single: ${singleChoice.proveedor}`,
-                `Full: ${fullChoice.proveedor}`,
-                destinationData.selectedCarrier ? `Naviera destino: ${destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier}` : '',
-                singleChoice.vigencia ? `Vigencia single: ${singleChoice.vigencia}` : '',
-                fullChoice.vigencia ? `Vigencia full: ${fullChoice.vigencia}` : '',
-                singleChoice.horasLibres ? `Horas libres single: ${singleChoice.horasLibres}` : '',
-                fullChoice.horasLibres ? `Horas libres full: ${fullChoice.horasLibres}` : '',
-                singleChoice.comentarios ? `Comentarios single: ${singleChoice.comentarios}` : '',
-                fullChoice.comentarios ? `Comentarios full: ${fullChoice.comentarios}` : '',
-                destinationData.notes.length ? `Revisar manualmente: ${destinationData.notes.join(', ')}` : ''
-            ].filter(Boolean).join(' | ')
-        }, innerContainerId);
+        if (syncCalculator) {
+            openMubPanel({
+                proveedor: `${singleChoice.proveedor} + ${fullChoice.proveedor}`,
+                lineas: [
+                    { nombre: `Flete maritimo Single (${singleChoice.proveedor})`, costo: singleChoice.single, esFlete: true, mub: 15 },
+                    { nombre: `Flete maritimo Full (${fullChoice.proveedor})`, costo: fullChoice.full, esFlete: true, mub: 15 },
+                    ...destinationData.lines
+                ],
+                metaInfo: [
+                    `Single: ${singleChoice.proveedor}`,
+                    `Full: ${fullChoice.proveedor}`,
+                    destinationData.selectedCarrier ? `Naviera destino: ${destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier}` : '',
+                    singleChoice.vigencia ? `Vigencia single: ${singleChoice.vigencia}` : '',
+                    fullChoice.vigencia ? `Vigencia full: ${fullChoice.vigencia}` : '',
+                    singleChoice.horasLibres ? `Horas libres single: ${singleChoice.horasLibres}` : '',
+                    fullChoice.horasLibres ? `Horas libres full: ${fullChoice.horasLibres}` : '',
+                    singleChoice.comentarios ? `Comentarios single: ${singleChoice.comentarios}` : '',
+                    fullChoice.comentarios ? `Comentarios full: ${fullChoice.comentarios}` : '',
+                    destinationData.notes.length ? `Revisar manualmente: ${destinationData.notes.join(', ')}` : ''
+                ].filter(Boolean).join(' | ')
+            }, innerContainerId);
+        }
     };
 
     rerenderMaritimeDestinationCalculator = renderDestinationCalculatorState;
 
     document.getElementById(`${containerId}-carrier`)?.addEventListener('change', () => {
         maritimeDestinationSelection.selectedConceptIds = [];
-        renderDestinationCalculatorState();
+        renderDestinationCalculatorState(false);
     });
     renderDestinationCalculatorState();
 }
@@ -5488,7 +5506,7 @@ function toggleMaritimeDestinationConcept(input) {
     }
     maritimeDestinationSelection.selectedConceptIds = [...selected];
     if (typeof rerenderMaritimeDestinationCalculator === 'function') {
-        rerenderMaritimeDestinationCalculator();
+        rerenderMaritimeDestinationCalculator(false);
         return;
     }
     renderMaritimeCombinedCalculator();
