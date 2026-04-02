@@ -4022,7 +4022,7 @@ function maritimeConceptMatchesContext(concept, context) {
     }
 
     const containerTypes = Array.isArray(aplica.containerTypes) ? aplica.containerTypes : [];
-    if (containerTypes.length && !containerTypes.some(type => normalizeProviderKey(type) === normalizeProviderKey(context.containerScope))) {
+    if (containerTypes.length && context.containerScope && !containerTypes.some(type => normalizeProviderKey(type) === normalizeProviderKey(context.containerScope))) {
         return false;
     }
 
