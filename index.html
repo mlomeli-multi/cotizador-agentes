@@ -1393,6 +1393,133 @@
             border-color: #86efac;
             color: #166534;
         }
+        .mub-calc-sections {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .mub-calc-block {
+            border: 1px solid rgba(148,163,184,0.18);
+            border-radius: 14px;
+            background: #fff;
+            overflow: hidden;
+        }
+        .mub-calc-block.destination {
+            background: linear-gradient(180deg, #fafcff 0%, #ffffff 100%);
+        }
+        .mub-calc-block.inland {
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+        }
+        .mub-calc-block-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.8rem 0.95rem;
+            border-bottom: 1px solid rgba(148,163,184,0.16);
+        }
+        .mub-calc-block-title {
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--gray-700);
+        }
+        .mub-calc-block-subtitle {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+        .mub-calc-table-wrap {
+            overflow-x: auto;
+        }
+        .destination-card-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 0.8rem;
+            padding: 0.95rem;
+        }
+        .destination-calc-card {
+            border: 1px solid rgba(37,99,235,0.14);
+            border-radius: 14px;
+            background: #ffffff;
+            padding: 0.9rem;
+            box-shadow: 0 10px 22px rgba(15,23,42,0.04);
+        }
+        .destination-calc-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .destination-calc-name {
+            font-size: 0.82rem;
+            font-weight: 800;
+            color: var(--gray-800);
+            line-height: 1.35;
+        }
+        .destination-calc-badges {
+            display: flex;
+            gap: 0.35rem;
+            flex-wrap: wrap;
+            margin-top: 0.35rem;
+        }
+        .destination-calc-badge {
+            display: inline-flex;
+            align-items: center;
+            border-radius: 999px;
+            padding: 0.16rem 0.45rem;
+            font-size: 0.66rem;
+            font-weight: 800;
+        }
+        .destination-calc-badge.charge {
+            background: #eff6ff;
+            color: #1d4ed8;
+        }
+        .destination-calc-badge.rate {
+            background: #ecfeff;
+            color: #0f766e;
+        }
+        .destination-calc-badge.cost {
+            background: #fef2f2;
+            color: #b91c1c;
+        }
+        .destination-calc-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+            margin-top: 0.85rem;
+        }
+        .destination-calc-metric {
+            border-radius: 10px;
+            background: #f8fafc;
+            padding: 0.45rem 0.55rem;
+        }
+        .destination-calc-metric-label {
+            font-size: 0.64rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            color: var(--gray-500);
+        }
+        .destination-calc-metric-value {
+            margin-top: 0.18rem;
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: var(--gray-800);
+        }
+        .destination-calc-controls {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-top: 0.85rem;
+        }
+        .destination-calc-comment {
+            margin-top: 0.75rem;
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            line-height: 1.45;
+        }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
@@ -5979,8 +6106,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     let totalCostoBaseVenta = 0;
     let totalVenta = 0;
 
-    let currentSection = '';
-    const rowsHtml = lineas.map((l, i) => {
+    const renderLineRow = (l, i, asCard = false) => {
         const cbMXN = costoBaseMXN(l);
         const cbVenta = costoBaseVenta(l);
         const utilidad = l.venta - cbVenta;
@@ -5992,31 +6118,60 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const lineTaxAmountMXN = l.monedaCosto === 'USD' && hayTC
             ? (l.costo * lineTaxRate * tc)
             : (l.costo * lineTaxRate);
-        const impCol = lineTaxRate > 0
-            ? `<td>$${fmt(lineTaxAmountMXN)}</td>`
-            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl./N/A</td>`;
-
-        const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
-
-        // Columna de conversión USD (solo si hay TC)
-        const usdCell = hayTC
-            ? `<td class="mub-usd-cell" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</td>`
-            : '';
-
         const isDestinationCharge = (l.quoteSection || '') === 'destination';
         const costButton = isDestinationCharge
             ? `<span class="mub-quick-actions"><button type="button" class="mub-cost-btn${l.costMode ? ' active' : ''}" data-idx="${i}" title="Mandar este cargo al costo">Costo</button></span>`
             : '';
-        const section = isDestinationCharge ? 'destination' : 'inland';
-        const sectionLabel = section === 'destination' ? 'Destination Charges' : 'Inland Freight por contenedor';
-        const sectionHtml = currentSection !== section
-            ? `<tr class="section-row"><td colspan="${hayTC ? 8 : 7}">${sectionLabel}</td></tr>`
-            : '';
-        currentSection = section;
         const displayMub = l.costMode ? 0 : (Math.round(l.mub * 10) / 10);
         const displayVenta = l.costMode ? 0 : (Math.round(l.venta * 100) / 100);
 
-        return `${sectionHtml}<tr class="${isDestinationCharge ? 'row-destination' : 'row-flete'}">
+        if (asCard) {
+            return `
+                <div class="destination-calc-card">
+                    <div class="destination-calc-head">
+                        <div style="min-width:0;">
+                            <div class="destination-calc-name">${escapeHtml(l.quoteLabel || l.nombre)}</div>
+                            <div class="destination-calc-badges">
+                                ${l.quoteChargeBy ? `<span class="destination-calc-badge charge">Charge by: ${escapeHtml(l.quoteChargeBy)}</span>` : ''}
+                                ${l.quoteContainerLabel ? `<span class="destination-calc-badge rate">${escapeHtml(l.quoteContainerLabel)}</span>` : ''}
+                                ${l.costMode ? `<span class="destination-calc-badge cost">Al costo</span>` : ''}
+                            </div>
+                        </div>
+                        <div class="destination-calc-badge rate">${simbolo}${fmt(cbVenta)}</div>
+                    </div>
+                    <div class="destination-calc-grid">
+                        <div class="destination-calc-metric">
+                            <div class="destination-calc-metric-label">Costo MXN</div>
+                            <div class="destination-calc-metric-value">$${fmt(costoSinImpMXN(l))}</div>
+                        </div>
+                        <div class="destination-calc-metric">
+                            <div class="destination-calc-metric-label">Impuestos</div>
+                            <div class="destination-calc-metric-value">${lineTaxRate > 0 ? '$' + fmt(lineTaxAmountMXN) : 'IVA incl./N/A'}</div>
+                        </div>
+                        <div class="destination-calc-metric">
+                            <div class="destination-calc-metric-label">Costo ${moneda}</div>
+                            <div class="destination-calc-metric-value" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</div>
+                        </div>
+                    </div>
+                    <div class="destination-calc-controls">
+                        <div style="white-space:nowrap;"><input type="number" class="mub-input mub-field active-input" data-idx="${i}" data-field="mub" value="${displayMub}" min="0" max="99" step="0.1"> %${costButton}</div>
+                        <div style="white-space:nowrap;">${simbolo} <input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${displayVenta}" min="0" step="1"></div>
+                        <div class="utilidad-col" id="mub-util-${i}" style="font-size:0.8rem;font-weight:800;">${simbolo}${fmt(utilidad)}</div>
+                    </div>
+                    ${l.quoteComment ? `<div class="destination-calc-comment">${escapeHtml(l.quoteComment)}</div>` : ''}
+                </div>
+            `;
+        }
+
+        const impCol = lineTaxRate > 0
+            ? `<td>$${fmt(lineTaxAmountMXN)}</td>`
+            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl./N/A</td>`;
+        const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
+        const usdCell = hayTC
+            ? `<td class="mub-usd-cell" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</td>`
+            : '';
+
+        return `<tr class="row-flete">
             <td>${escapeHtml(l.nombre)}</td>
             <td>$${fmt(costoSinImpMXN(l))}</td>
             ${impCol}
@@ -6026,7 +6181,18 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             <td style="white-space:nowrap;">${simbolo} <input type="number" class="mub-input venta-field" data-idx="${i}" data-field="venta" value="${displayVenta}" min="0" step="1"></td>
             <td class="utilidad-col" id="mub-util-${i}">${simbolo}${fmt(utilidad)}</td>
         </tr>`;
-    }).join('');
+    };
+
+    const inlandRowsHtml = lineas
+        .map((l, i) => ({ l, i }))
+        .filter(({ l }) => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland')
+        .map(({ l, i }) => renderLineRow(l, i, false))
+        .join('');
+    const destinationCardsHtml = lineas
+        .map((l, i) => ({ l, i }))
+        .filter(({ l }) => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'destination')
+        .map(({ l, i }) => renderLineRow(l, i, true))
+        .join('');
 
     // Header de conversión
     const tcBadge = hayTC
@@ -6045,21 +6211,40 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         <p style="font-size:0.7rem;color:var(--gray-400);margin-bottom:0.5rem;">
             ${escapeHtml(data.proveedor)} · Flete +12% (IVA−RET)${hayTC ? ' · MXN ÷ ' + fmt(tc) + ' = USD' : ''} · Edita MUB% o Venta
         </p>
-        <table class="mub-table">
-            <thead><tr>
-                <th>Concepto</th>
-                <th>Costo MXN</th>
-                <th>Impuestos</th>
-                <th>Costo c/imp</th>
-                ${usdTh}
-                <th>MUB %</th>
-                <th>Venta ${moneda}</th>
-                <th>Utilidad ${moneda}</th>
-            </tr></thead>
-            <tbody>
-                ${rowsHtml}
-            </tbody>
-        </table>
+        <div class="mub-calc-sections">
+            <div class="mub-calc-block inland">
+                <div class="mub-calc-block-header">
+                    <div class="mub-calc-block-title">Inland Freight</div>
+                    <div class="mub-calc-block-subtitle">Base de venta por contenedor para single y full.</div>
+                </div>
+                <div class="mub-calc-table-wrap">
+                    <table class="mub-table">
+                        <thead><tr>
+                            <th>Concepto</th>
+                            <th>Costo MXN</th>
+                            <th>Impuestos</th>
+                            <th>Costo c/imp</th>
+                            ${usdTh}
+                            <th>MUB %</th>
+                            <th>Venta ${moneda}</th>
+                            <th>Utilidad ${moneda}</th>
+                        </tr></thead>
+                        <tbody>
+                            ${inlandRowsHtml}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="mub-calc-block destination">
+                <div class="mub-calc-block-header">
+                    <div class="mub-calc-block-title">Destination Charges</div>
+                    <div class="mub-calc-block-subtitle">Ajusta cada cargo por separado o mándalo al costo.</div>
+                </div>
+                <div class="destination-card-list">
+                    ${destinationCardsHtml || `<div class="maritime-commercial-empty">Aún no has agregado cargos en destino.</div>`}
+                </div>
+            </div>
+        </div>
     </div>
     <div class="maritime-quote-panel">
         <h3>Resumen de cotización</h3>
