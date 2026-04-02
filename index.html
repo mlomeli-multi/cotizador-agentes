@@ -974,6 +974,77 @@
             color: var(--gray-500);
             line-height: 1.5;
         }
+        .maritime-quote-panel {
+            margin-top: 1rem;
+            padding: 1rem 1.05rem;
+            border: 1px solid rgba(15,23,42,0.1);
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+        .maritime-quote-panel h3 {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: #0f172a;
+            margin-bottom: 0.25rem;
+        }
+        .maritime-quote-subtitle {
+            font-size: 0.74rem;
+            color: var(--gray-500);
+            margin-bottom: 0.95rem;
+        }
+        .maritime-quote-body {
+            border: 1px solid rgba(148,163,184,0.2);
+            border-radius: 12px;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fbff 100%);
+            padding: 1rem 1.05rem;
+        }
+        .maritime-quote-greeting {
+            font-size: 0.78rem;
+            color: var(--gray-700);
+            line-height: 1.6;
+            margin-bottom: 0.95rem;
+        }
+        .maritime-quote-section {
+            padding-top: 0.9rem;
+            margin-top: 0.9rem;
+            border-top: 1px solid rgba(148,163,184,0.2);
+        }
+        .maritime-quote-section:first-of-type {
+            margin-top: 0;
+            padding-top: 0;
+            border-top: none;
+        }
+        .maritime-quote-section h4 {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: #111827;
+            margin-bottom: 0.6rem;
+        }
+        .maritime-quote-list {
+            margin: 0;
+            padding-left: 1.1rem;
+        }
+        .maritime-quote-list li {
+            margin: 0.42rem 0;
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+        .maritime-quote-total {
+            margin-top: 0.85rem;
+            padding-top: 0.8rem;
+            border-top: 1px solid rgba(148,163,184,0.2);
+            font-size: 0.78rem;
+            color: #0f172a;
+            font-weight: 700;
+        }
+        .maritime-quote-note {
+            margin-top: 0.85rem;
+            font-size: 0.73rem;
+            color: var(--gray-500);
+            line-height: 1.55;
+        }
         .maritime-combined-pick {
             border-radius: 10px;
             padding: 0.8rem 0.9rem;
@@ -4161,7 +4232,12 @@ function buildMaritimeDestinationLine(choiceLabel, concept) {
         costo: parseFloat(concept.monto) || 0,
         monedaCosto: concept.moneda || 'USD',
         esFlete: false,
-        mub: isMub ? (parseFloat(concept.mubDefault) || 15) : 0
+        mub: isMub ? (parseFloat(concept.mubDefault) || 15) : 0,
+        quoteSection: 'destination',
+        quoteLabel: concept.nombre,
+        quoteChargeBy: concept.baseCobro || '',
+        quoteComment: getMaritimeConceptComment(concept),
+        quoteContainerLabel: getMaritimeConceptContainerLabel(concept)
     };
 }
 
@@ -5407,8 +5483,8 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     <div id="${destinationExtrasId}" style="margin-top:0.75rem;"></div>
                 </div>
                 <div class="maritime-commercial-panel">
-                    <div class="maritime-commercial-title">Resumen comercial</div>
-                    <div class="maritime-commercial-subtitle">Vista previa de lo que se está armando antes de mandarlo a la calculadora.</div>
+                    <div class="maritime-commercial-title">Resumen de costos</div>
+                    <div class="maritime-commercial-subtitle">Vista rápida para decidir qué entra antes de pasar a venta.</div>
                     <div id="${commercialSummaryId}" class="maritime-commercial-sections"></div>
                 </div>
             </div>
@@ -5497,14 +5573,6 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
 
         if (commercialSummary) {
             commercialSummary.innerHTML = `
-                <div class="maritime-commercial-intro">
-                    Hola, te paso las tarifas.<br>
-                    Este bloque resume la cotización comercial antes de enviarla a la calculadora.
-                </div>
-                <div class="maritime-commercial-card">
-                    <h4>Service Details</h4>
-                    ${buildMaritimeServiceDetails(singleChoice, fullChoice, destinationData)}
-                </div>
                 <div class="maritime-commercial-card">
                     <h4>Destination Charges</h4>
                     ${buildMaritimeCommercialLines(destinationData.lines, fmt)}
@@ -5518,7 +5586,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     <div class="maritime-commercial-total-value">${escapeHtml(formatMaritimeCommercialTotal(destinationData.lines, fmt))}</div>
                 </div>
                 <div class="maritime-commercial-mini">
-                    El inland freight se muestra como referencia comercial por contenedor. Los destination charges sí se acumulan según los cargos seleccionados.
+                    El inland freight se muestra como referencia de costo por contenedor. El total preliminar solo suma los destination charges seleccionados.
                 </div>
             `;
         }
@@ -5527,10 +5595,34 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
             openMubPanel({
                 proveedor: `${singleChoice.proveedor} + ${fullChoice.proveedor}`,
                 lineas: [
-                    { nombre: `Flete maritimo Single (${singleChoice.proveedor})`, costo: singleChoice.single, esFlete: true, mub: 15 },
-                    { nombre: `Flete maritimo Full (${fullChoice.proveedor})`, costo: fullChoice.full, esFlete: true, mub: 15 },
+                    {
+                        nombre: `Flete maritimo Single (${singleChoice.proveedor})`,
+                        costo: singleChoice.single,
+                        esFlete: true,
+                        mub: 15,
+                        quoteSection: 'inland',
+                        quoteLabel: 'Single por contenedor',
+                        quoteProvider: singleChoice.proveedor,
+                        quoteChargeBy: 'CONT',
+                        quoteComment: 'Tarifa de inland para 1 contenedor.'
+                    },
+                    {
+                        nombre: `Flete maritimo Full (${fullChoice.proveedor})`,
+                        costo: (parseFloat(fullChoice.full) || 0) / 2,
+                        esFlete: true,
+                        mub: 15,
+                        quoteSection: 'inland',
+                        quoteLabel: 'Full por contenedor',
+                        quoteProvider: fullChoice.proveedor,
+                        quoteChargeBy: 'CONT',
+                        quoteComment: 'Referencia comercial por contenedor cuando el embarque es número par.'
+                    },
                     ...destinationData.lines
                 ],
+                quoteMeta: {
+                    serviceDetailsHtml: buildMaritimeServiceDetails(singleChoice, fullChoice, destinationData),
+                    carrierName: destinationData.selectedCarrier ? (destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier) : ''
+                },
                 metaInfo: [
                     `Single: ${singleChoice.proveedor}`,
                     `Full: ${fullChoice.proveedor}`,
@@ -5767,6 +5859,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         ? data.lineas
             .filter(l => (parseFloat(l.costo) || 0) > 0)
             .map(l => ({
+                ...l,
                 nombre: l.nombre,
                 costo: parseFloat(l.costo) || 0,
                 monedaCosto: l.monedaCosto || 'MXN',
@@ -5855,6 +5948,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         : `<span style="display:inline-block;background:var(--gray-300);color:white;font-size:0.65rem;font-weight:700;padding:0.15rem 0.5rem;border-radius:4px;margin-left:0.5rem;">Sin TC — venta en MXN</span>`;
 
     const usdTh = hayTC ? `<th>Costo ${moneda}</th>` : '';
+    const quoteSummaryId = `${containerId}-quote-summary`;
 
     container.innerHTML = `
     <div class="mub-panel">
@@ -5904,7 +5998,65 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 <div class="resumen-label" id="mub-res-label">Utilidad (MUB ${fmtShort(mubTotal)}%)</div>
             </div>
         </div>
+        <div class="maritime-quote-panel">
+            <h3>Resumen de cotización</h3>
+            <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
+            <div id="${quoteSummaryId}" class="maritime-quote-body"></div>
+        </div>
     </div>`;
+
+    function renderQuoteSummary() {
+        const quoteSummary = document.getElementById(quoteSummaryId);
+        if (!quoteSummary) return;
+
+        const destinationLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'destination');
+        const inlandLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland');
+        const totalDestinationVenta = destinationLines.reduce((sum, l) => sum + (parseFloat(l.venta) || 0), 0);
+
+        const destinationHtml = destinationLines.length
+            ? `<ul class="maritime-quote-list">${destinationLines.map(line => {
+                const amount = `${moneda} ${fmt(parseFloat(line.venta) || 0)}`;
+                const chargeBy = line.quoteChargeBy ? ` por ${line.quoteChargeBy}` : '';
+                const containerLabel = line.quoteContainerLabel ? ` · ${line.quoteContainerLabel}` : '';
+                const comment = line.quoteComment ? `<div class="maritime-commercial-meta">${escapeHtml(line.quoteComment)}</div>` : '';
+                return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy}${containerLabel}${comment}</li>`;
+            }).join('')}</ul>`
+            : `<div class="maritime-commercial-empty">Aún no has agregado cargos en destino a la venta.</div>`;
+
+        const inlandHtml = inlandLines.length
+            ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
+                const amount = `${moneda} ${fmt(parseFloat(line.venta) || 0)}`;
+                const provider = line.quoteProvider ? ` (${escapeHtml(line.quoteProvider)})` : '';
+                const chargeBy = line.quoteChargeBy ? ` por ${line.quoteChargeBy}` : '';
+                const comment = line.quoteComment ? `<div class="maritime-commercial-meta">${escapeHtml(line.quoteComment)}</div>` : '';
+                return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}${provider}:</strong> ${amount}${chargeBy}${comment}</li>`;
+            }).join('')}</ul>`
+            : `<div class="maritime-commercial-empty">Aún no hay inland freight calculado.</div>`;
+
+        quoteSummary.innerHTML = `
+            <div class="maritime-quote-greeting">
+                Hola,<br>
+                Te paso la cotización.<br>
+                ${data.quoteMeta?.carrierName ? `Naviera: <strong>${escapeHtml(data.quoteMeta.carrierName)}</strong>.` : ''}
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Service Details</h4>
+                ${data.quoteMeta?.serviceDetailsHtml || `<div class="maritime-commercial-empty">Aún no hay suficientes datos de servicio.</div>`}
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Destination Charges</h4>
+                ${destinationHtml}
+                <div class="maritime-quote-total">Total destination charges: ${moneda} ${fmt(totalDestinationVenta)}</div>
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Inland Freight</h4>
+                ${inlandHtml}
+            </div>
+            <div class="maritime-quote-note">
+                Los destination charges ya reflejan la venta actual de la calculadora. El inland freight se muestra por contenedor para tu armado comercial.
+            </div>
+        `;
+    }
 
     // Actualizar solo valores calculados sin tocar los inputs
     function updateValues() {
@@ -5958,6 +6110,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         if (el('mub-res-venta')) el('mub-res-venta').textContent = simbolo + fmt(tVenta);
         if (el('mub-res-util')) el('mub-res-util').textContent = simbolo + fmt(tUtil);
         if (el('mub-res-label')) el('mub-res-label').textContent = `Utilidad (MUB ${fmtShort(tMub)}%)`;
+        renderQuoteSummary();
     }
 
     container.querySelectorAll('.mub-input').forEach(input => {
@@ -5985,6 +6138,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         container.innerHTML = '';
     });
 
+    renderQuoteSummary();
     setTimeout(() => container.scrollIntoView({ behavior: 'smooth', block: 'nearest' }), 100);
 }
 
