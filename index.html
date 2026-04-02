@@ -864,53 +864,57 @@
             background: #f8fbff;
         }
         .maritime-commercial-panel {
-            padding: 0.9rem 1rem;
-            border: 1px solid rgba(15,23,42,0.08);
+            padding: 1rem 1.05rem;
+            border: 1px solid rgba(15,23,42,0.1);
             border-radius: 14px;
-            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
-            box-shadow: 0 8px 24px rgba(15, 23, 42, 0.04);
+            background: #ffffff;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
         }
         .maritime-commercial-title {
-            font-size: 0.82rem;
+            font-size: 0.9rem;
             font-weight: 800;
-            color: var(--navy);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
+            color: #0f172a;
         }
         .maritime-commercial-subtitle {
-            margin-top: 0.2rem;
-            font-size: 0.73rem;
+            margin-top: 0.28rem;
+            font-size: 0.74rem;
             color: var(--gray-500);
+        }
+        .maritime-commercial-intro {
+            margin-top: 0.8rem;
+            padding-top: 0.75rem;
+            border-top: 1px solid rgba(148,163,184,0.18);
+            font-size: 0.76rem;
+            color: var(--gray-700);
+            line-height: 1.55;
         }
         .maritime-commercial-sections {
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
-            margin-top: 0.85rem;
+            margin-top: 0.95rem;
         }
         .maritime-commercial-card {
-            border: 1px solid rgba(148,163,184,0.18);
-            border-radius: 12px;
+            border-top: 1px solid rgba(148,163,184,0.22);
+            border-radius: 0;
             background: #fff;
-            padding: 0.8rem 0.85rem;
+            padding: 0.9rem 0 0;
         }
         .maritime-commercial-card h4 {
-            font-size: 0.76rem;
+            font-size: 0.78rem;
             font-weight: 800;
-            color: var(--gray-700);
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
-            margin-bottom: 0.45rem;
+            color: #1f2937;
+            margin-bottom: 0.55rem;
         }
         .maritime-commercial-line {
             display: flex;
             justify-content: space-between;
             gap: 0.75rem;
             align-items: flex-start;
-            padding: 0.28rem 0;
+            padding: 0.24rem 0;
             font-size: 0.74rem;
             color: var(--gray-700);
-            border-bottom: 1px solid rgba(226,232,240,0.65);
+            border-bottom: none;
         }
         .maritime-commercial-line:last-child {
             border-bottom: none;
@@ -923,12 +927,25 @@
         .maritime-commercial-value {
             flex: 0 0 auto;
             font-weight: 800;
-            color: var(--navy);
+            color: #0f172a;
             white-space: nowrap;
         }
         .maritime-commercial-empty {
             font-size: 0.73rem;
             color: var(--gray-500);
+        }
+        .maritime-commercial-list {
+            margin: 0;
+            padding-left: 1.1rem;
+        }
+        .maritime-commercial-list li {
+            margin: 0.28rem 0;
+        }
+        .maritime-commercial-meta {
+            margin-top: 0.1rem;
+            font-size: 0.69rem;
+            color: var(--gray-500);
+            line-height: 1.4;
         }
         .maritime-commercial-total {
             margin-top: 0.85rem;
@@ -950,6 +967,12 @@
             font-size: 1.05rem;
             font-weight: 900;
             color: var(--blue);
+        }
+        .maritime-commercial-mini {
+            margin-top: 0.75rem;
+            font-size: 0.73rem;
+            color: var(--gray-500);
+            line-height: 1.5;
         }
         .maritime-combined-pick {
             border-radius: 10px;
@@ -4211,12 +4234,14 @@ function buildMaritimeCommercialLines(lines, fmt) {
     if (!Array.isArray(lines) || !lines.length) {
         return `<div class="maritime-commercial-empty">Aún no has agregado cargos en destino.</div>`;
     }
-    return lines.map(line => `
-        <div class="maritime-commercial-line">
-            <div class="maritime-commercial-name">${escapeHtml(line.nombre)}</div>
-            <div class="maritime-commercial-value">${escapeHtml(line.monedaCosto || 'USD')} ${fmt(parseFloat(line.costo) || 0)}</div>
-        </div>
-    `).join('');
+    return `<ul class="maritime-commercial-list">${lines.map(line => `
+        <li>
+            <div class="maritime-commercial-line">
+                <div class="maritime-commercial-name">${escapeHtml(line.nombre)}</div>
+                <div class="maritime-commercial-value">${escapeHtml(line.monedaCosto || 'USD')} ${fmt(parseFloat(line.costo) || 0)}</div>
+            </div>
+        </li>
+    `).join('')}</ul>`;
 }
 
 function formatMaritimeCommercialTotal(lines, fmt) {
@@ -4239,16 +4264,40 @@ function buildMaritimeInlandSummary(singleChoice, fullChoice, fmt) {
         { etiqueta: 'Full por contenedor', proveedor: fullChoice.proveedor, monto: (parseFloat(fullChoice.full) || 0) / 2, nota: 'Referencia comercial cuando el embarque es número par.' }
     ].filter(row => (parseFloat(row.monto) || 0) > 0);
 
-    return rows.map(row => `
-        <div class="maritime-commercial-line">
-            <div class="maritime-commercial-name">
-                <div>${escapeHtml(row.etiqueta)}</div>
-                <div style="margin-top:0.12rem;font-size:0.69rem;color:var(--gray-600);line-height:1.35;">${escapeHtml(row.proveedor)}</div>
-                ${row.nota ? `<div style="margin-top:0.12rem;font-size:0.68rem;color:var(--gray-500);line-height:1.35;">${escapeHtml(row.nota)}</div>` : ''}
+    return `<ul class="maritime-commercial-list">${rows.map(row => `
+        <li>
+            <div class="maritime-commercial-line">
+                <div class="maritime-commercial-name">
+                    <div>${escapeHtml(row.etiqueta)}</div>
+                    <div class="maritime-commercial-meta">${escapeHtml(row.proveedor)}</div>
+                    ${row.nota ? `<div class="maritime-commercial-meta">${escapeHtml(row.nota)}</div>` : ''}
+                </div>
+                <div class="maritime-commercial-value">MXN ${fmt(parseFloat(row.monto) || 0)}</div>
             </div>
-            <div class="maritime-commercial-value">MXN ${fmt(parseFloat(row.monto) || 0)}</div>
-        </div>
-    `).join('');
+        </li>
+    `).join('')}</ul>`;
+}
+
+function buildMaritimeServiceDetails(singleChoice, fullChoice, destinationData) {
+    const cityLabel = document.getElementById('maritimo-ciudad')?.dataset?.fullLabel
+        || document.getElementById('maritimo-ciudad')?.value
+        || '';
+    const portLabel = document.getElementById('maritimo-puerto')?.value || '';
+    const shippingLine = destinationData?.selectedCarrier?.displayName || destinationData?.selectedCarrier?.carrier || '';
+    const details = [
+        shippingLine ? `Shipping Line: ${shippingLine}` : '',
+        portLabel ? `POL: ${portLabel}` : '',
+        cityLabel ? `POD: ${cityLabel}` : '',
+        destinationData?.freeDaysPol ? `Free time at POL: ${destinationData.freeDaysPol}` : '',
+        singleChoice?.horasLibres ? `Free time at POD (Single): ${singleChoice.horasLibres}` : '',
+        fullChoice?.horasLibres ? `Free time at POD (Full): ${fullChoice.horasLibres}` : ''
+    ].filter(Boolean);
+
+    if (!details.length) {
+        return `<div class="maritime-commercial-empty">Aún no hay suficientes datos de servicio.</div>`;
+    }
+
+    return `<ul class="maritime-commercial-list">${details.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
 }
 
 function resolveMaritimeDestinationConcepts(selection, puerto) {
@@ -5448,6 +5497,14 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
 
         if (commercialSummary) {
             commercialSummary.innerHTML = `
+                <div class="maritime-commercial-intro">
+                    Hola, te paso las tarifas.<br>
+                    Este bloque resume la cotización comercial antes de enviarla a la calculadora.
+                </div>
+                <div class="maritime-commercial-card">
+                    <h4>Service Details</h4>
+                    ${buildMaritimeServiceDetails(singleChoice, fullChoice, destinationData)}
+                </div>
                 <div class="maritime-commercial-card">
                     <h4>Destination Charges</h4>
                     ${buildMaritimeCommercialLines(destinationData.lines, fmt)}
@@ -5459,6 +5516,9 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                 <div class="maritime-commercial-total">
                     <div class="maritime-commercial-total-label">Total preliminar destination charges</div>
                     <div class="maritime-commercial-total-value">${escapeHtml(formatMaritimeCommercialTotal(destinationData.lines, fmt))}</div>
+                </div>
+                <div class="maritime-commercial-mini">
+                    El inland freight se muestra como referencia comercial por contenedor. Los destination charges sí se acumulan según los cargos seleccionados.
                 </div>
             `;
         }
