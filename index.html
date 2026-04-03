@@ -989,6 +989,12 @@
             color: #111827;
             margin-bottom: 0.6rem;
         }
+        .maritime-quote-subsection-title {
+            font-size: 0.76rem;
+            font-weight: 800;
+            color: #1f2937;
+            margin: 0.85rem 0 0.5rem;
+        }
         .maritime-quote-list {
             margin: 0;
             padding-left: 1.1rem;
@@ -1006,6 +1012,18 @@
             font-size: 0.78rem;
             color: #0f172a;
             font-weight: 700;
+        }
+        .maritime-quote-paragraph {
+            color: var(--gray-700);
+            font-size: 0.75rem;
+            line-height: 1.6;
+            margin: 0.55rem 0;
+        }
+        .maritime-quote-address {
+            display: block;
+            margin-top: 0.2rem;
+            padding-left: 0.1rem;
+            white-space: pre-line;
         }
         .maritime-quote-note {
             margin-top: 0.85rem;
@@ -4412,6 +4430,61 @@ function buildMaritimeServiceDetails(singleChoice, fullChoice, destinationData) 
     return `<ul class="maritime-commercial-list">${details.map(item => `<li>${escapeHtml(item)}</li>`).join('')}</ul>`;
 }
 
+function formatMaritimeEnglishDate(value) {
+    const raw = String(value || '').trim();
+    if (!raw) return '';
+    const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    const match = raw.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})$/);
+    if (match) {
+        const day = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10);
+        const year = parseInt(match[3], 10);
+        if (day >= 1 && day <= 31 && month >= 1 && month <= 12) {
+            return `${months[month - 1]} ${day}, ${year}`;
+        }
+    }
+    return raw;
+}
+
+function getMaritimeQuoteValidityLabel(singleChoice, fullChoice) {
+    const values = [singleChoice?.vigencia, fullChoice?.vigencia]
+        .map(v => String(v || '').trim())
+        .filter(Boolean);
+    const unique = [...new Set(values)];
+    if (!unique.length) return 'Rates subject to current tariff validity';
+    if (unique.length === 1) return `Rates valid until ${formatMaritimeEnglishDate(unique[0])}`;
+    return `Rates valid until Single: ${formatMaritimeEnglishDate(unique[0])} / Full: ${formatMaritimeEnglishDate(unique[1])}`;
+}
+
+function buildMaritimeQuoteContext(singleChoice, fullChoice, destinationData) {
+    const finalDeliveryAddress = document.getElementById('maritimo-ciudad')?.dataset?.fullLabel
+        || document.getElementById('maritimo-ciudad')?.value
+        || '';
+    const podLabel = document.getElementById('maritimo-puerto')?.value || '';
+    const shippingLine = destinationData?.selectedCarrier?.displayName || destinationData?.selectedCarrier?.carrier || '';
+    return {
+        commodity: 'General Cargo',
+        containerType: 'As per shipment requirement',
+        weight: 'Legal dimensions and weight',
+        pod: podLabel,
+        finalDeliveryAddress,
+        shippingLine,
+        freeDaysPol: destinationData?.freeDaysPol || '',
+        singleHours: singleChoice?.horasLibres || '',
+        fullHours: fullChoice?.horasLibres || '',
+        validityLabel: getMaritimeQuoteValidityLabel(singleChoice, fullChoice)
+    };
+}
+
+function formatMaritimeQuoteChargeBy(chargeBy) {
+    const raw = String(chargeBy || '').trim();
+    const normalized = raw.toUpperCase();
+    if (!raw) return '';
+    if (normalized.includes('BL')) return 'per BL';
+    if (normalized.includes('CONT')) return 'per container';
+    return `per ${raw}`;
+}
+
 function resolveMaritimeDestinationConcepts(selection, puerto) {
     const carriers = getMaritimeDestinationCarriers();
     if (!carriers.length) {
@@ -5650,7 +5723,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     ...destinationData.lines
                 ],
                 quoteMeta: {
-                    serviceDetailsHtml: buildMaritimeServiceDetails(singleChoice, fullChoice, destinationData),
+                    serviceDetails: buildMaritimeQuoteContext(singleChoice, fullChoice, destinationData),
                     carrierName: destinationData.selectedCarrier ? (destinationData.selectedCarrier.displayName || destinationData.selectedCarrier.carrier) : ''
                 },
                 metaInfo: [
@@ -6103,6 +6176,90 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const destinationLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'destination');
         const inlandLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland');
         const totalDestinationVenta = destinationLines.reduce((sum, l) => sum + (parseFloat(l.venta) || 0), 0);
+        const serviceDetails = data.quoteMeta?.serviceDetails || {};
+        const ratesCurrency = moneda || 'USD';
+
+        const destinationHtmlEmail = destinationLines.length
+            ? `<ul class="maritime-quote-list">
+                <li><strong>Destination charges (direct from shipping line):</strong> ${serviceDetails.shippingLine ? `Based on current selected charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.` : `Subject to shipping line's final invoice.`}</li>
+                ${destinationLines.map(line => {
+                    const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                    const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                    const containerLabel = line.quoteContainerLabel ? ` (${escapeHtml(line.quoteContainerLabel)})` : '';
+                    return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}${containerLabel}</li>`;
+                }).join('')}
+            </ul>`
+            : `<ul class="maritime-quote-list"><li><strong>Destination charges (direct from shipping line):</strong> Subject to shipping line's final invoice.</li></ul>`;
+
+        const inlandHtmlEmail = inlandLines.length
+            ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
+                const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}</li>`;
+            }).join('')}</ul>`
+            : `<div class="maritime-commercial-empty">Aún no hay inland freight calculado.</div>`;
+
+        const shipmentDetailsHtml = `
+            <ul class="maritime-quote-list">
+                <li><strong>Commodity:</strong> ${escapeHtml(serviceDetails.commodity || 'General Cargo')}</li>
+                <li><strong>Container Type:</strong> ${escapeHtml(serviceDetails.containerType || 'As per shipment requirement')}</li>
+                <li><strong>Weight:</strong> ${escapeHtml(serviceDetails.weight || 'Legal dimensions and weight')}</li>
+                <li><strong>POD:</strong> ${escapeHtml(serviceDetails.pod || 'To be confirmed')}</li>
+                <li><strong>Final Delivery Address:</strong><span class="maritime-quote-address">${escapeHtml(serviceDetails.finalDeliveryAddress || 'To be confirmed')}</span></li>
+            </ul>
+        `;
+
+        const importantNotes = [
+            serviceDetails.validityLabel || 'Rates subject to current tariff validity',
+            'Rates subject to final delivery address and transport availability',
+            'THC is billed NET-NET as per terminal invoice',
+            'THC includes maneuver from vessel to terminal and terminal to truck only',
+            'Customs clearance, import/export duties, and taxes are not included',
+            'Rates only valid for legal weight. (Unless stated otherwise)'
+        ];
+
+        quoteSummary.innerHTML = `
+            <div class="maritime-quote-greeting">
+                Dear [Cliente],<br>
+                Hope you are doing well.<br>
+                Please find below our DAP quotation based on the information shared.
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Shipment Details</h4>
+                ${shipmentDetailsHtml}
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Rates (${escapeHtml(ratesCurrency)})</h4>
+                <div class="maritime-quote-subsection-title">Destination Charges</div>
+                ${destinationHtmlEmail}
+                <div class="maritime-quote-subsection-title">Inland Freight (Round Trip)</div>
+                ${inlandHtmlEmail}
+                <div class="maritime-quote-subsection-title">Additional Charges</div>
+                <ul class="maritime-quote-list">
+                    <li><strong>Handling Fee:</strong> USD 80.00 per BL</li>
+                    <li><strong>Other Charges:</strong> At cost, if applicable</li>
+                </ul>
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Customs Clearance</h4>
+                <p class="maritime-quote-paragraph">Customs clearance in Mexico is performed exclusively under the importer of record (consignee) and their appointed customs broker.</p>
+                <p class="maritime-quote-paragraph">Due to current Mexican customs regulations, clearance services can only be handled for known and compliant importers with an active customs broker in Mexico.</p>
+                <p class="maritime-quote-paragraph">If the consignee already has a customs broker, clearance will be coordinated directly with them.</p>
+                <p class="maritime-quote-paragraph">If the consignee is a first-time importer or does not have a broker, unfortunately customs clearance cannot be supported under DAP until this requirement is fulfilled.</p>
+                <p class="maritime-quote-paragraph">Customs clearance costs (if applicable) are quoted separately, subject to the broker's final invoice.</p>
+                <p class="maritime-quote-paragraph">Taxes, duties, VAT, and government fees are not included.</p>
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Important Notes</h4>
+                <ul class="maritime-quote-list">${importantNotes.map(note => `<li>${escapeHtml(note)}</li>`).join('')}</ul>
+            </div>
+            <div class="maritime-quote-note">
+                If you have any questions or would like us to proceed, please let us know.<br>
+                We will be happy to support you.<br><br>
+                Saludos / Best Regards.
+            </div>
+        `;
+        return;
 
         const destinationHtml = destinationLines.length
             ? `<ul class="maritime-quote-list">${destinationLines.map(line => {
