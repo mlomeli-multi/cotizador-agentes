@@ -956,10 +956,61 @@
             color: #0f172a;
             margin-bottom: 0.25rem;
         }
+        .maritime-quote-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.9rem;
+            margin-bottom: 0.95rem;
+        }
+        .maritime-quote-header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.55rem;
+            flex-wrap: wrap;
+        }
+        .maritime-quote-tabs {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+            padding: 0.2rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            border: 1px solid #dbeafe;
+        }
+        .maritime-quote-tab {
+            border: none;
+            background: transparent;
+            color: #1d4ed8;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.35rem 0.7rem;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        .maritime-quote-tab.active {
+            background: white;
+            color: #0f172a;
+            box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+        }
+        .maritime-quote-copy-btn {
+            border: 1px solid rgba(16,185,129,0.24);
+            background: #ecfdf5;
+            color: #047857;
+            font-size: 0.72rem;
+            font-weight: 800;
+            padding: 0.5rem 0.82rem;
+            border-radius: 999px;
+            cursor: pointer;
+        }
+        .maritime-quote-copy-btn.copied {
+            background: #047857;
+            color: white;
+            border-color: #047857;
+        }
         .maritime-quote-subtitle {
             font-size: 0.74rem;
             color: var(--gray-500);
-            margin-bottom: 0.95rem;
         }
         .maritime-quote-body {
             border: 1px solid rgba(148,163,184,0.2);
@@ -6104,6 +6155,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
     const usdTh = hayTC ? `<th>Costo ${moneda}</th>` : '';
     const quoteSummaryId = `${containerId}-quote-summary`;
+    const quoteTabsId = `${containerId}-quote-tabs`;
+    const quoteCopyBtnId = `${containerId}-quote-copy`;
+    let quoteSummaryLang = 'en';
 
     container.innerHTML = `
     <div class="mub-panel">
@@ -6166,6 +6220,11 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     <div class="maritime-quote-panel">
         <h3>Resumen de cotización</h3>
         <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
+        <div id="${quoteTabsId}" class="maritime-quote-tabs" style="margin:0 0 0.8rem auto;width:max-content;">
+            <button type="button" class="maritime-quote-tab active" data-lang="en">EN</button>
+            <button type="button" class="maritime-quote-tab" data-lang="es">ES</button>
+        </div>
+        <button type="button" id="${quoteCopyBtnId}" class="maritime-quote-copy-btn" style="margin:0 0 0.8rem auto;display:block;">Copiar correo</button>
         <div id="${quoteSummaryId}" class="maritime-quote-body"></div>
     </div>`;
 
@@ -6217,8 +6276,16 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             'Customs clearance, import/export duties, and taxes are not included',
             'Rates only valid for legal weight. (Unless stated otherwise)'
         ];
+        const importantNotesEs = [
+            serviceDetails.validityLabel || 'Tarifas sujetas a vigencia actual',
+            'Tarifas sujetas a domicilio final de entrega y disponibilidad de transporte',
+            'THC se factura NET-NET segun factura final de terminal',
+            'THC incluye maniobra de buque a terminal y de terminal a camion unicamente',
+            'Despacho aduanal, impuestos de importacion/exportacion y contribuciones no incluidos',
+            'Tarifas validas solo para peso legal. (Salvo indicacion contraria)'
+        ];
 
-        quoteSummary.innerHTML = `
+        const englishHtml = `
             <div class="maritime-quote-greeting">
                 Dear [Cliente],<br>
                 Hope you are doing well.<br>
@@ -6259,6 +6326,77 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 Saludos / Best Regards.
             </div>
         `;
+        const destinationHtmlEs = destinationLines.length
+            ? `<ul class="maritime-quote-list">
+                <li><strong>Gastos en destino (directos de la naviera):</strong> ${serviceDetails.shippingLine ? `Con base en los cargos actualmente seleccionados para ${escapeHtml(serviceDetails.shippingLine)} y sujetos a la factura final de la naviera.` : `Sujetos a la factura final de la naviera.`}</li>
+                ${destinationLines.map(line => {
+                    const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                    const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                    return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}</li>`;
+                }).join('')}
+            </ul>`
+            : `<ul class="maritime-quote-list"><li><strong>Gastos en destino (directos de la naviera):</strong> Sujetos a la factura final de la naviera.</li></ul>`;
+        const inlandHtmlEs = inlandLines.length
+            ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
+                const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}</li>`;
+            }).join('')}</ul>`
+            : `<div class="maritime-commercial-empty">Aun no hay inland freight calculado.</div>`;
+        const shipmentDetailsHtmlEs = `
+            <ul class="maritime-quote-list">
+                <li><strong>Mercancia:</strong> ${escapeHtml(serviceDetails.commodity || 'Carga general')}</li>
+                <li><strong>Tipo de contenedor:</strong> ${escapeHtml(serviceDetails.containerType || 'Segun requerimiento del embarque')}</li>
+                <li><strong>Peso:</strong> ${escapeHtml(serviceDetails.weight || 'Dimensiones y peso legal')}</li>
+                <li><strong>POD:</strong> ${escapeHtml(serviceDetails.pod || 'Por confirmar')}</li>
+                <li><strong>Domicilio final de entrega:</strong><span class="maritime-quote-address">${escapeHtml(serviceDetails.finalDeliveryAddress || 'Por confirmar')}</span></li>
+            </ul>
+        `;
+        const spanishHtml = `
+            <div class="maritime-quote-greeting">
+                Estimado(a) [Cliente],<br>
+                Espero que se encuentre muy bien.<br>
+                Comparto a continuacion nuestra cotizacion DAP con base en la informacion recibida.
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Detalles del embarque</h4>
+                ${shipmentDetailsHtmlEs}
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Tarifas (${escapeHtml(ratesCurrency)})</h4>
+                <div class="maritime-quote-subsection-title">Gastos en destino</div>
+                ${destinationHtmlEs}
+                <div class="maritime-quote-subsection-title">Inland Freight (Round Trip)</div>
+                ${inlandHtmlEs}
+                <div class="maritime-quote-subsection-title">Cargos adicionales</div>
+                <ul class="maritime-quote-list">
+                    <li><strong>Handling Fee:</strong> USD 80.00 per BL</li>
+                    <li><strong>Otros cargos:</strong> Al costo, si aplican</li>
+                </ul>
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Despacho aduanal</h4>
+                <p class="maritime-quote-paragraph">El despacho aduanal en Mexico se realiza exclusivamente bajo el importador de registro (consignatario) y su agente aduanal designado.</p>
+                <p class="maritime-quote-paragraph">Por regulaciones aduanales vigentes en Mexico, este servicio solo puede coordinarse para importadores conocidos y cumplidos que cuenten con agente aduanal activo en Mexico.</p>
+                <p class="maritime-quote-paragraph">Si el consignatario ya tiene agente aduanal, el despacho se coordinara directamente con ellos.</p>
+                <p class="maritime-quote-paragraph">Si el consignatario es importador por primera vez o no cuenta con agente aduanal, lamentablemente no se puede soportar el despacho bajo DAP hasta cumplir ese requisito.</p>
+                <p class="maritime-quote-paragraph">Los costos de despacho aduanal (si aplican) se cotizan por separado, sujetos a la factura final del agente aduanal.</p>
+                <p class="maritime-quote-paragraph">Impuestos, derechos, IVA y cargos gubernamentales no incluidos.</p>
+            </div>
+            <div class="maritime-quote-section">
+                <h4>Notas importantes</h4>
+                <ul class="maritime-quote-list">${importantNotesEs.map(note => `<li>${escapeHtml(note)}</li>`).join('')}</ul>
+            </div>
+            <div class="maritime-quote-note">
+                Si tiene cualquier duda o desea que avancemos, quedamos atentos.<br>
+                Con gusto le apoyamos.<br><br>
+                Saludos.
+            </div>
+        `;
+        quoteSummary.innerHTML = quoteSummaryLang === 'es' ? spanishHtml : englishHtml;
+        document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+            btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
+        });
         return;
 
         const destinationHtml = destinationLines.length
@@ -6304,6 +6442,44 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 Los destination charges ya reflejan la venta actual de la calculadora. El inland freight se muestra por contenedor para tu armado comercial.
             </div>
         `;
+    }
+
+    const quoteTabsEl = document.getElementById(quoteTabsId);
+    if (quoteTabsEl) {
+        quoteTabsEl.querySelectorAll('.maritime-quote-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                quoteSummaryLang = btn.dataset.lang === 'es' ? 'es' : 'en';
+                renderQuoteSummary();
+            });
+        });
+    }
+
+    const quoteCopyBtn = document.getElementById(quoteCopyBtnId);
+    if (quoteCopyBtn) {
+        quoteCopyBtn.addEventListener('click', async () => {
+            const textToCopy = document.getElementById(quoteSummaryId)?.innerText?.trim() || '';
+            if (!textToCopy) return;
+            try {
+                if (navigator.clipboard?.writeText) {
+                    await navigator.clipboard.writeText(textToCopy);
+                } else {
+                    const helper = document.createElement('textarea');
+                    helper.value = textToCopy;
+                    document.body.appendChild(helper);
+                    helper.select();
+                    document.execCommand('copy');
+                    helper.remove();
+                }
+                quoteCopyBtn.classList.add('copied');
+                quoteCopyBtn.textContent = 'Copiado';
+                setTimeout(() => {
+                    quoteCopyBtn.classList.remove('copied');
+                    quoteCopyBtn.textContent = 'Copiar correo';
+                }, 1400);
+            } catch (error) {
+                console.error('No se pudo copiar el resumen:', error);
+            }
+        });
     }
 
     // Actualizar solo valores calculados sin tocar los inputs
