@@ -4536,6 +4536,12 @@ function formatMaritimeQuoteChargeBy(chargeBy) {
     return `per ${raw}`;
 }
 
+function htmlToPlainText(html) {
+    const div = document.createElement('div');
+    div.innerHTML = String(html || '').replace(/<br\s*\/?>/gi, '\n');
+    return (div.innerText || div.textContent || '').trim();
+}
+
 function resolveMaritimeDestinationConcepts(selection, puerto) {
     const carriers = getMaritimeDestinationCarriers();
     if (!carriers.length) {
@@ -6158,6 +6164,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const quoteTabsId = `${containerId}-quote-tabs`;
     const quoteCopyBtnId = `${containerId}-quote-copy`;
     let quoteSummaryLang = 'en';
+    let quoteClipboardPayload = { en: { html: '', text: '' }, es: { html: '', text: '' } };
 
     container.innerHTML = `
     <div class="mub-panel">
@@ -6284,6 +6291,15 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             'Despacho aduanal, impuestos de importacion/exportacion y contribuciones no incluidos',
             'Tarifas validas solo para peso legal. (Salvo indicacion contraria)'
         ];
+        const clipSection = (title, content) => `
+            <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;">
+                <div style="font-family:Calibri, Arial, sans-serif;font-size:20px;font-weight:700;color:#1f2937;margin:0 0 12px;">${title}</div>
+                ${content}
+            </div>
+        `;
+        const clipSubTitle = (title) => `<div style="font-family:Calibri, Arial, sans-serif;font-size:15px;font-weight:700;color:#1f2937;margin:14px 0 8px;">${title}</div>`;
+        const clipList = (items) => `<ul style="margin:0 0 0 18px;padding:0;font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${items.map(item => `<li style="margin:4px 0;">${item}</li>`).join('')}</ul>`;
+        const clipParagraph = (text) => `<p style="margin:10px 0;font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${text}</p>`;
 
         const englishHtml = `
             <div class="maritime-quote-greeting">
@@ -6393,6 +6409,103 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 Saludos.
             </div>
         `;
+        const englishClipboardHtml = `
+            <div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">
+                <p style="margin:0 0 10px;">Dear [Cliente],</p>
+                <p style="margin:0 0 10px;">Hope you are doing well.</p>
+                <p style="margin:0 0 12px;">Please find below our DAP quotation based on the information shared.</p>
+                ${clipSection('Shipment Details', clipList([
+                    `<strong>Commodity:</strong> ${escapeHtml(serviceDetails.commodity || 'General Cargo')}`,
+                    `<strong>Container Type:</strong> ${escapeHtml(serviceDetails.containerType || 'As per shipment requirement')}`,
+                    `<strong>Weight:</strong> ${escapeHtml(serviceDetails.weight || 'Legal dimensions and weight')}`,
+                    `<strong>POD:</strong> ${escapeHtml(serviceDetails.pod || 'To be confirmed')}`,
+                    `<strong>Final Delivery Address:</strong><div style="margin-top:4px;white-space:pre-line;">${escapeHtml(serviceDetails.finalDeliveryAddress || 'To be confirmed')}</div>`
+                ]))}
+                ${clipSection(`Rates (${escapeHtml(ratesCurrency)})`, `
+                    ${clipSubTitle('Destination Charges')}
+                    ${clipList([
+                        `<strong>Destination charges (direct from shipping line):</strong> ${serviceDetails.shippingLine ? `Based on current selected charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.` : `Subject to shipping line's final invoice.`}`,
+                        ...destinationLines.map(line => {
+                            const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                            const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                            const containerLabel = line.quoteContainerLabel ? ` (${escapeHtml(line.quoteContainerLabel)})` : '';
+                            return `<strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}${containerLabel}`;
+                        })
+                    ])}
+                    ${clipSubTitle('Inland Freight (Round Trip)')}
+                    ${clipList(inlandLines.length ? inlandLines.map(line => {
+                        const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                        const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                        return `<strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}`;
+                    }) : ['Inland freight pending calculation.'])}
+                    ${clipSubTitle('Additional Charges')}
+                    ${clipList([
+                        '<strong>Handling Fee:</strong> USD 80.00 per BL',
+                        '<strong>Other Charges:</strong> At cost, if applicable'
+                    ])}
+                `)}
+                ${clipSection('Customs Clearance', [
+                    'Customs clearance in Mexico is performed exclusively under the importer of record (consignee) and their appointed customs broker.',
+                    'Due to current Mexican customs regulations, clearance services can only be handled for known and compliant importers with an active customs broker in Mexico.',
+                    'If the consignee already has a customs broker, clearance will be coordinated directly with them.',
+                    'If the consignee is a first-time importer or does not have a broker, unfortunately customs clearance cannot be supported under DAP until this requirement is fulfilled.',
+                    'Customs clearance costs (if applicable) are quoted separately, subject to the broker\\'s final invoice.',
+                    'Taxes, duties, VAT, and government fees are not included.'
+                ].map(clipParagraph).join(''))}
+                ${clipSection('Important Notes', clipList(importantNotes.map(note => escapeHtml(note))))}
+                <p style="margin:18px 0 0;font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">If you have any questions or would like us to proceed, please let us know.<br>We will be happy to support you.<br><br>Saludos / Best Regards.</p>
+            </div>
+        `;
+        const spanishClipboardHtml = `
+            <div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">
+                <p style="margin:0 0 10px;">Estimado(a) [Cliente],</p>
+                <p style="margin:0 0 10px;">Espero que se encuentre muy bien.</p>
+                <p style="margin:0 0 12px;">Comparto a continuacion nuestra cotizacion DAP con base en la informacion recibida.</p>
+                ${clipSection('Detalles del embarque', clipList([
+                    `<strong>Mercancia:</strong> ${escapeHtml(serviceDetails.commodity || 'Carga general')}`,
+                    `<strong>Tipo de contenedor:</strong> ${escapeHtml(serviceDetails.containerType || 'Segun requerimiento del embarque')}`,
+                    `<strong>Peso:</strong> ${escapeHtml(serviceDetails.weight || 'Dimensiones y peso legal')}`,
+                    `<strong>POD:</strong> ${escapeHtml(serviceDetails.pod || 'Por confirmar')}`,
+                    `<strong>Domicilio final de entrega:</strong><div style="margin-top:4px;white-space:pre-line;">${escapeHtml(serviceDetails.finalDeliveryAddress || 'Por confirmar')}</div>`
+                ]))}
+                ${clipSection(`Tarifas (${escapeHtml(ratesCurrency)})`, `
+                    ${clipSubTitle('Gastos en destino')}
+                    ${clipList([
+                        `<strong>Gastos en destino (directos de la naviera):</strong> ${serviceDetails.shippingLine ? `Con base en los cargos actualmente seleccionados para ${escapeHtml(serviceDetails.shippingLine)} y sujetos a la factura final de la naviera.` : `Sujetos a la factura final de la naviera.`}`,
+                        ...destinationLines.map(line => {
+                            const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                            const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                            return `<strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}`;
+                        })
+                    ])}
+                    ${clipSubTitle('Inland Freight (Round Trip)')}
+                    ${clipList(inlandLines.length ? inlandLines.map(line => {
+                        const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
+                        const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
+                        return `<strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}`;
+                    }) : ['El inland freight aun no esta calculado.'])}
+                    ${clipSubTitle('Cargos adicionales')}
+                    ${clipList([
+                        '<strong>Handling Fee:</strong> USD 80.00 per BL',
+                        '<strong>Otros cargos:</strong> Al costo, si aplican'
+                    ])}
+                `)}
+                ${clipSection('Despacho aduanal', [
+                    'El despacho aduanal en Mexico se realiza exclusivamente bajo el importador de registro (consignatario) y su agente aduanal designado.',
+                    'Por regulaciones aduanales vigentes en Mexico, este servicio solo puede coordinarse para importadores conocidos y cumplidos que cuenten con agente aduanal activo en Mexico.',
+                    'Si el consignatario ya tiene agente aduanal, el despacho se coordinara directamente con ellos.',
+                    'Si el consignatario es importador por primera vez o no cuenta con agente aduanal, lamentablemente no se puede soportar el despacho bajo DAP hasta cumplir ese requisito.',
+                    'Los costos de despacho aduanal (si aplican) se cotizan por separado, sujetos a la factura final del agente aduanal.',
+                    'Impuestos, derechos, IVA y cargos gubernamentales no incluidos.'
+                ].map(clipParagraph).join(''))}
+                ${clipSection('Notas importantes', clipList(importantNotesEs.map(note => escapeHtml(note))))}
+                <p style="margin:18px 0 0;font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">Si tiene cualquier duda o desea que avancemos, quedamos atentos.<br>Con gusto le apoyamos.<br><br>Saludos.</p>
+            </div>
+        `;
+        quoteClipboardPayload = {
+            en: { html: englishClipboardHtml, text: htmlToPlainText(englishClipboardHtml) },
+            es: { html: spanishClipboardHtml, text: htmlToPlainText(spanishClipboardHtml) }
+        };
         quoteSummary.innerHTML = quoteSummaryLang === 'es' ? spanishHtml : englishHtml;
         document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
             btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
@@ -6457,10 +6570,19 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const quoteCopyBtn = document.getElementById(quoteCopyBtnId);
     if (quoteCopyBtn) {
         quoteCopyBtn.addEventListener('click', async () => {
-            const textToCopy = document.getElementById(quoteSummaryId)?.innerText?.trim() || '';
-            if (!textToCopy) return;
+            const payload = quoteClipboardPayload[quoteSummaryLang] || {};
+            const htmlToCopy = payload.html || '';
+            const textToCopy = payload.text || document.getElementById(quoteSummaryId)?.innerText?.trim() || '';
+            if (!htmlToCopy && !textToCopy) return;
             try {
-                if (navigator.clipboard?.writeText) {
+                if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined' && htmlToCopy) {
+                    await navigator.clipboard.write([
+                        new ClipboardItem({
+                            'text/html': new Blob([htmlToCopy], { type: 'text/html' }),
+                            'text/plain': new Blob([textToCopy], { type: 'text/plain' })
+                        })
+                    ]);
+                } else if (navigator.clipboard?.writeText) {
                     await navigator.clipboard.writeText(textToCopy);
                 } else {
                     const helper = document.createElement('textarea');
