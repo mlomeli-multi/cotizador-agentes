@@ -6261,7 +6261,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}${containerLabel}</li>`;
                 }).join('')}
             </ul>`
-            : `<div class="maritime-commercial-empty">No destination charges selected.</div>`;
+            : `<div class="maritime-commercial-empty">No shipping line assigned yet.</div>`;
 
         const inlandHtmlEmail = inlandLines.length
             ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
@@ -6356,7 +6356,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}</li>`;
                 }).join('')}
             </ul>`
-            : `<div class="maritime-commercial-empty">No hay gastos en destino seleccionados.</div>`;
+            : `<div class="maritime-commercial-empty">Aún no se ha asignado naviera.</div>`;
         const inlandHtmlEs = inlandLines.length
             ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
                 const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
