@@ -6245,9 +6245,15 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const serviceDetails = data.quoteMeta?.serviceDetails || {};
         const ratesCurrency = moneda || 'USD';
 
+        const destinationChargeNoteEn = serviceDetails.shippingLine
+            ? `<span style="font-weight:500;color:var(--gray-500);margin-left:0.45rem;">Based on charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.</span>`
+            : '';
+        const destinationChargeNoteEs = serviceDetails.shippingLine
+            ? `<span style="font-weight:500;color:var(--gray-500);margin-left:0.45rem;">Con base en cargos de ${escapeHtml(serviceDetails.shippingLine)} y sujetos a la factura final de la naviera.</span>`
+            : '';
+
         const destinationHtmlEmail = destinationLines.length
             ? `<ul class="maritime-quote-list">
-                <li><strong>Destination charges (direct from shipping line):</strong> ${serviceDetails.shippingLine ? `Based on current selected charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.` : `Subject to shipping line's final invoice.`}</li>
                 ${destinationLines.map(line => {
                     const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
                     const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
@@ -6255,7 +6261,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}${containerLabel}</li>`;
                 }).join('')}
             </ul>`
-            : `<ul class="maritime-quote-list"><li><strong>Destination charges (direct from shipping line):</strong> Subject to shipping line's final invoice.</li></ul>`;
+            : `<div class="maritime-commercial-empty">No destination charges selected.</div>`;
 
         const inlandHtmlEmail = inlandLines.length
             ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
@@ -6313,7 +6319,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             </div>
             <div class="maritime-quote-section">
                 <h4>Rates (${escapeHtml(ratesCurrency)})</h4>
-                <div class="maritime-quote-subsection-title">Destination Charges</div>
+                <div class="maritime-quote-subsection-title">Destination Charges${destinationChargeNoteEn}</div>
                 ${destinationHtmlEmail}
                 <div class="maritime-quote-subsection-title">Inland Freight (Round Trip)</div>
                 ${inlandHtmlEmail}
@@ -6344,14 +6350,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         `;
         const destinationHtmlEs = destinationLines.length
             ? `<ul class="maritime-quote-list">
-                <li><strong>Gastos en destino (directos de la naviera):</strong> ${serviceDetails.shippingLine ? `Con base en los cargos actualmente seleccionados para ${escapeHtml(serviceDetails.shippingLine)} y sujetos a la factura final de la naviera.` : `Sujetos a la factura final de la naviera.`}</li>
                 ${destinationLines.map(line => {
                     const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
                     const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
                     return `<li><strong>${escapeHtml(line.quoteLabel || line.nombre)}:</strong> ${amount}${chargeBy ? ` ${chargeBy}` : ''}</li>`;
                 }).join('')}
             </ul>`
-            : `<ul class="maritime-quote-list"><li><strong>Gastos en destino (directos de la naviera):</strong> Sujetos a la factura final de la naviera.</li></ul>`;
+            : `<div class="maritime-commercial-empty">No hay gastos en destino seleccionados.</div>`;
         const inlandHtmlEs = inlandLines.length
             ? `<ul class="maritime-quote-list">${inlandLines.map(line => {
                 const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
@@ -6380,7 +6385,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             </div>
             <div class="maritime-quote-section">
                 <h4>Tarifas (${escapeHtml(ratesCurrency)})</h4>
-                <div class="maritime-quote-subsection-title">Gastos en destino</div>
+                <div class="maritime-quote-subsection-title">Gastos en destino${destinationChargeNoteEs}</div>
                 ${destinationHtmlEs}
                 <div class="maritime-quote-subsection-title">Inland Freight (Round Trip)</div>
                 ${inlandHtmlEs}
@@ -6422,9 +6427,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     `<strong>Final Delivery Address:</strong><div style="margin-top:4px;white-space:pre-line;">${escapeHtml(serviceDetails.finalDeliveryAddress || 'To be confirmed')}</div>`
                 ]))}
                 ${clipSection(`Rates (${escapeHtml(ratesCurrency)})`, `
-                    ${clipSubTitle('Destination Charges')}
+                    ${clipSubTitle(`Destination Charges${serviceDetails.shippingLine ? ` <span style="font-weight:500;color:#6b7280;">Based on charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.</span>` : ''}`)}
                     ${clipList([
-                        `<strong>Destination charges (direct from shipping line):</strong> ${serviceDetails.shippingLine ? `Based on current selected charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.` : `Subject to shipping line's final invoice.`}`,
                         ...destinationLines.map(line => {
                             const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
                             const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
@@ -6469,9 +6473,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     `<strong>Domicilio final de entrega:</strong><div style="margin-top:4px;white-space:pre-line;">${escapeHtml(serviceDetails.finalDeliveryAddress || 'Por confirmar')}</div>`
                 ]))}
                 ${clipSection(`Tarifas (${escapeHtml(ratesCurrency)})`, `
-                    ${clipSubTitle('Gastos en destino')}
+                    ${clipSubTitle(`Gastos en destino${serviceDetails.shippingLine ? ` <span style="font-weight:500;color:#6b7280;">Con base en cargos de ${escapeHtml(serviceDetails.shippingLine)} y sujetos a la factura final de la naviera.</span>` : ''}`)}
                     ${clipList([
-                        `<strong>Gastos en destino (directos de la naviera):</strong> ${serviceDetails.shippingLine ? `Con base en los cargos actualmente seleccionados para ${escapeHtml(serviceDetails.shippingLine)} y sujetos a la factura final de la naviera.` : `Sujetos a la factura final de la naviera.`}`,
                         ...destinationLines.map(line => {
                             const amount = `${ratesCurrency} ${fmt(parseFloat(line.venta) || 0)}`;
                             const chargeBy = formatMaritimeQuoteChargeBy(line.quoteChargeBy);
