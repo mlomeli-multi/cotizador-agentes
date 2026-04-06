@@ -4161,7 +4161,7 @@ function getCiudadesDisponibles(aeropuerto) {
 }
 
 function normalizarTexto(str) {
-    return String(str ?? '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
+    return sanitizeCityLabel(str).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim();
 }
 
 const MARITIME_STORAGE_KEY = 'proveedoresMaritimos';
@@ -4184,6 +4184,40 @@ const MARITIME_PORTS = {
 
 function normalizeWhitespace(value) {
     return String(value || '').replace(/\s+/g, ' ').trim();
+}
+
+function sanitizeCityLabel(value) {
+    let text = normalizeWhitespace(value);
+    if (!text) return '';
+
+    const mojibakeMap = {
+        'Ã¡': 'a',
+        'Ã©': 'e',
+        'Ã­': 'i',
+        'Ã³': 'o',
+        'Ãº': 'u',
+        'Ã': 'A',
+        'Ã‰': 'E',
+        'Ã': 'I',
+        'Ã“': 'O',
+        'Ãš': 'U',
+        'Ã±': 'n',
+        'Ã‘': 'N',
+        'Ã¼': 'u',
+        'Ãœ': 'U',
+        'Â': '',
+        'â€™': "'",
+        'â€œ': '"',
+        'â€': '"',
+        'â€“': '-',
+        'â€”': '-'
+    };
+
+    Object.entries(mojibakeMap).forEach(([bad, good]) => {
+        text = text.split(bad).join(good);
+    });
+
+    return text.normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 }
 
 function normalizeHeader(value) {
@@ -4882,7 +4916,7 @@ function renderMaritimePortOptions() {
 }
 
 function toTitleCaseLabel(value) {
-    return normalizeWhitespace(value)
+    return sanitizeCityLabel(value)
         .toLowerCase()
         .split(',')
         .map(part => part.trim().split(' ').filter(Boolean).map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' '))
