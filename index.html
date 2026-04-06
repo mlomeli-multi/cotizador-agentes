@@ -613,6 +613,14 @@
             transition: background 0.15s;
         }
         .quote-card .btn-venta:hover { background: var(--navy-light); }
+        .quote-note {
+            margin-top: 0.55rem;
+            padding-top: 0.5rem;
+            border-top: 1px dashed rgba(148,163,184,0.35);
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            line-height: 1.45;
+        }
         .maritime-rankings {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -4305,6 +4313,32 @@ function normalizeProviderKey(value) {
     return normalizarTexto(normalizeWhitespace(value)).replace(/\s+/g, ' ');
 }
 
+const AIR_PROVIDER_CONDITION_SUMMARIES = {
+    'birlesti express': 'Tarifa local para carga general. No incluye maniobras ni peajes. Tiempo libre de carga/descarga: 2 horas; horas extra y servicios extraordinarios se cotizan aparte.',
+    'sandoval': 'Tarifa local GDL para rango 40-50 km del aeropuerto. Base aplicada a Guadalajara y zona metropolitana referida en el tarifario. Maniobras, horarios extraordinarios y demoras se cotizan por separado.',
+    'ramce': 'Tarifario importaciones MTY 2026 cargado desde hoja MTY IMPORTACIONES.',
+    'raymon pack': 'Se ignoraron filas sin tarifa como Plataforma y Cama Baja. Mudancero-Torton se mapeo como Torton (10 Ton).'
+};
+
+function getAirProviderConditionsSummary(providerName) {
+    return AIR_PROVIDER_CONDITION_SUMMARIES[normalizeProviderKey(providerName)] || '';
+}
+
+function getAirTariffPrice(tariff, tipoUnidad) {
+    if (!tariff || !tipoUnidad) return 0;
+    const direct = tariff[tipoUnidad];
+    if (typeof direct === 'number' && direct > 0) return direct;
+
+    const normalizedTarget = normalizarTexto(tipoUnidad);
+    for (const [key, value] of Object.entries(tariff)) {
+        if (typeof value !== 'number' || value <= 0) continue;
+        if (normalizarTexto(key) === normalizedTarget) {
+            return value;
+        }
+    }
+    return 0;
+}
+
 function getMaritimeDestinationConceptsData() {
     const raw = localStorage.getItem(MARITIME_DESTINATION_CONCEPTS_STORAGE_KEY);
     if (!raw) return { carriers: {} };
@@ -5260,7 +5294,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 
             if (!matchPorKey && !matchPorVariante) continue;
 
-            const precio = t[tipoUnidad];
+            const precio = getAirTariffPrice(t, tipoUnidad);
             if (precio && precio > 0) {
                 resultados.push({
                     proveedor: p.nombre,
@@ -5268,6 +5302,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                     ciudad: t.ciudad,
                     tipoUnidad,
                     tarifaFlete: precio,
+                    condicionesResumen: p.condicionesResumen || getAirProviderConditionsSummary(p.nombre),
                 });
             }
         }
@@ -5314,6 +5349,15 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                 tarifaFlete: r.tarifaFlete,
                 tipoUnidad: r.tipoUnidad,
                 conceptos: conceptos.map(c => ({ nombre: c.nombre, monto: parseFloat(c.monto) || 0 })),
+                quoteMeta: {
+                    mode: 'air',
+                    aeropuerto: r.aeropuerto,
+                    ciudad: r.ciudad,
+                    tipoUnidad: r.tipoUnidad,
+                    proveedor: r.proveedor,
+                    providerNote: r.condicionesResumen || getAirProviderConditionsSummary(r.proveedor),
+                    airportCharges: conceptos.map(c => ({ nombre: c.nombre, monto: parseFloat(c.monto) || 0 }))
+                },
             }));
             return `
             <div class="quote-card ${i === 0 ? 'best' : ''}">
@@ -5329,6 +5373,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                         <tr class="total-row"><td>Total</td><td>$${fmt(total)}</td></tr>
                     </table>
                 </div>
+                ${(r.condicionesResumen || getAirProviderConditionsSummary(r.proveedor)) ? `<div class="quote-note">${escapeHtml(r.condicionesResumen || getAirProviderConditionsSummary(r.proveedor))}</div>` : ''}
                 <button class="btn-venta" data-mub="${mubData}">&#x1F4B0; Calcular Venta</button>
             </div>`;
         }).join('')}
@@ -6278,6 +6323,133 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const totalDestinationVenta = destinationLines.reduce((sum, l) => sum + (parseFloat(l.venta) || 0), 0);
         const serviceDetails = data.quoteMeta?.serviceDetails || {};
         const ratesCurrency = moneda || 'USD';
+
+        if (data.quoteMeta?.mode === 'air') {
+            const airMeta = data.quoteMeta || {};
+            const airportCharges = Array.isArray(airMeta.airportCharges) ? airMeta.airportCharges : [];
+            const providerNote = airMeta.providerNote || '';
+            const fleteLine = lineas.find(l => l.esFlete) || null;
+            const airportChargeHtml = airportCharges.length
+                ? `<ul class="maritime-quote-list">${airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> MXN ${fmt(parseFloat(c.monto) || 0)}</li>`).join('')}</ul>`
+                : `<div class="maritime-commercial-empty">No fixed airport charges configured.</div>`;
+            const airChargeHtmlEs = airportCharges.length
+                ? `<ul class="maritime-quote-list">${airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> MXN ${fmt(parseFloat(c.monto) || 0)}</li>`).join('')}</ul>`
+                : `<div class="maritime-commercial-empty">No hay conceptos fijos configurados para este aeropuerto.</div>`;
+            const fleteAmount = fleteLine ? `${ratesCurrency} ${fmt(parseFloat(fleteLine.venta) || 0)}` : `${ratesCurrency} 0.00`;
+            const providerLabel = escapeHtml(airMeta.proveedor || data.proveedor || '');
+            const airportLabel = escapeHtml(airMeta.aeropuerto || '');
+            const cityLabel = escapeHtml(airMeta.ciudad || '');
+            const unitLabel = escapeHtml(airMeta.tipoUnidad || data.tipoUnidad || '');
+            const englishHtml = `
+                <div class="maritime-quote-greeting">
+                    Dear [Cliente],<br>
+                    Hope you are doing well.<br>
+                    Please find below our DAP quotation based on the information shared.
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Shipment Details</h4>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Commodity:</strong> General Cargo</li>
+                        <li><strong>Airport in Mexico:</strong> ${airportLabel || 'To be confirmed'}</li>
+                        <li><strong>Final Delivery City:</strong> ${cityLabel || 'To be confirmed'}</li>
+                        <li><strong>Truck Type:</strong> ${unitLabel || 'To be confirmed'}</li>
+                        <li><strong>Carrier / Provider:</strong> ${providerLabel || 'To be confirmed'}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Rates (${escapeHtml(ratesCurrency)})</h4>
+                    <div class="maritime-quote-subsection-title">Airport Charges</div>
+                    ${airportChargeHtml}
+                    <div class="maritime-quote-subsection-title">Inland Freight</div>
+                    <ul class="maritime-quote-list"><li><strong>${providerLabel || 'Selected provider'}:</strong> ${fleteAmount} per trip</li></ul>
+                </div>
+                ${providerNote ? `<div class="maritime-quote-section"><h4>Operational Notes</h4><p class="maritime-quote-paragraph">${escapeHtml(providerNote)}</p></div>` : ''}
+                <div class="maritime-quote-section">
+                    <h4>Important Notes</h4>
+                    <ul class="maritime-quote-list">
+                        <li>Rates subject to final delivery address and transport availability.</li>
+                        <li>Airport charges are shown separately when configured.</li>
+                        <li>Taxes, duties, VAT, and customs-related charges are not included unless clearly stated.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    If you have any questions or would like us to proceed, please let us know.<br>
+                    We will be happy to support you.<br><br>
+                    Saludos / Best Regards.
+                </div>
+            `;
+            const spanishHtml = `
+                <div class="maritime-quote-greeting">
+                    Estimado(a) [Cliente],<br>
+                    Espero que se encuentre muy bien.<br>
+                    Comparto a continuacion nuestra cotizacion DAP con base en la informacion recibida.
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Detalles del embarque</h4>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Mercancia:</strong> Carga general</li>
+                        <li><strong>Aeropuerto en Mexico:</strong> ${airportLabel || 'Por confirmar'}</li>
+                        <li><strong>Ciudad destino final:</strong> ${cityLabel || 'Por confirmar'}</li>
+                        <li><strong>Tipo de unidad:</strong> ${unitLabel || 'Por confirmar'}</li>
+                        <li><strong>Proveedor:</strong> ${providerLabel || 'Por confirmar'}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Tarifas (${escapeHtml(ratesCurrency)})</h4>
+                    <div class="maritime-quote-subsection-title">Conceptos fijos del aeropuerto</div>
+                    ${airChargeHtmlEs}
+                    <div class="maritime-quote-subsection-title">Flete terrestre</div>
+                    <ul class="maritime-quote-list"><li><strong>${providerLabel || 'Proveedor seleccionado'}:</strong> ${fleteAmount} por viaje</li></ul>
+                </div>
+                ${providerNote ? `<div class="maritime-quote-section"><h4>Notas operativas</h4><p class="maritime-quote-paragraph">${escapeHtml(providerNote)}</p></div>` : ''}
+                <div class="maritime-quote-section">
+                    <h4>Notas importantes</h4>
+                    <ul class="maritime-quote-list">
+                        <li>Tarifas sujetas a domicilio final de entrega y disponibilidad de transporte.</li>
+                        <li>Los conceptos fijos del aeropuerto se muestran por separado cuando están configurados.</li>
+                        <li>Impuestos, derechos, IVA y cargos relacionados con aduana no incluidos salvo indicacion expresa.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Si tiene cualquier duda o desea que avancemos, quedamos atentos.<br>
+                    Con gusto le apoyamos.<br><br>
+                    Saludos.
+                </div>
+            `;
+            const englishClipboardHtml = `
+                <div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">
+                    <p style="margin:0 0 10px;">Dear [Cliente],</p>
+                    <p style="margin:0 0 10px;">Hope you are doing well.</p>
+                    <p style="margin:0 0 12px;">Please find below our DAP quotation based on the information shared.</p>
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Shipment Details</div><ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;"><li><strong>Commodity:</strong> General Cargo</li><li><strong>Airport in Mexico:</strong> ${airportLabel || 'To be confirmed'}</li><li><strong>Final Delivery City:</strong> ${cityLabel || 'To be confirmed'}</li><li><strong>Truck Type:</strong> ${unitLabel || 'To be confirmed'}</li><li><strong>Carrier / Provider:</strong> ${providerLabel || 'To be confirmed'}</li></ul></div>
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Rates (${escapeHtml(ratesCurrency)})</div><div style="font-size:15px;font-weight:700;margin:14px 0 8px;">Airport Charges</div>${airportCharges.length ? `<ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;">${airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> MXN ${fmt(parseFloat(c.monto) || 0)}</li>`).join('')}</ul>` : `<p style="margin:10px 0;">No fixed airport charges configured.</p>`}<div style="font-size:15px;font-weight:700;margin:14px 0 8px;">Inland Freight</div><ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;"><li><strong>${providerLabel || 'Selected provider'}:</strong> ${fleteAmount} per trip</li></ul></div>
+                    ${providerNote ? `<div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Operational Notes</div><p style="margin:10px 0;">${escapeHtml(providerNote)}</p></div>` : ''}
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Important Notes</div><ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;"><li>Rates subject to final delivery address and transport availability.</li><li>Airport charges are shown separately when configured.</li><li>Taxes, duties, VAT, and customs-related charges are not included unless clearly stated.</li></ul></div>
+                    <p style="margin:18px 0 0;">If you have any questions or would like us to proceed, please let us know.<br>We will be happy to support you.<br><br>Saludos / Best Regards.</p>
+                </div>
+            `;
+            const spanishClipboardHtml = `
+                <div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">
+                    <p style="margin:0 0 10px;">Estimado(a) [Cliente],</p>
+                    <p style="margin:0 0 10px;">Espero que se encuentre muy bien.</p>
+                    <p style="margin:0 0 12px;">Comparto a continuacion nuestra cotizacion DAP con base en la informacion recibida.</p>
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Detalles del embarque</div><ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;"><li><strong>Mercancia:</strong> Carga general</li><li><strong>Aeropuerto en Mexico:</strong> ${airportLabel || 'Por confirmar'}</li><li><strong>Ciudad destino final:</strong> ${cityLabel || 'Por confirmar'}</li><li><strong>Tipo de unidad:</strong> ${unitLabel || 'Por confirmar'}</li><li><strong>Proveedor:</strong> ${providerLabel || 'Por confirmar'}</li></ul></div>
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Tarifas (${escapeHtml(ratesCurrency)})</div><div style="font-size:15px;font-weight:700;margin:14px 0 8px;">Conceptos fijos del aeropuerto</div>${airportCharges.length ? `<ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;">${airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> MXN ${fmt(parseFloat(c.monto) || 0)}</li>`).join('')}</ul>` : `<p style="margin:10px 0;">No hay conceptos fijos configurados para este aeropuerto.</p>`}<div style="font-size:15px;font-weight:700;margin:14px 0 8px;">Flete terrestre</div><ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;"><li><strong>${providerLabel || 'Proveedor seleccionado'}:</strong> ${fleteAmount} por viaje</li></ul></div>
+                    ${providerNote ? `<div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Notas operativas</div><p style="margin:10px 0;">${escapeHtml(providerNote)}</p></div>` : ''}
+                    <div style="margin-top:18px;padding-top:16px;border-top:1px solid #d1d5db;"><div style="font-size:20px;font-weight:700;margin:0 0 12px;">Notas importantes</div><ul style="margin:0 0 0 18px;padding:0;font-size:16px;line-height:1.6;"><li>Tarifas sujetas a domicilio final de entrega y disponibilidad de transporte.</li><li>Los conceptos fijos del aeropuerto se muestran por separado cuando están configurados.</li><li>Impuestos, derechos, IVA y cargos relacionados con aduana no incluidos salvo indicacion expresa.</li></ul></div>
+                    <p style="margin:18px 0 0;">Si tiene cualquier duda o desea que avancemos, quedamos atentos.<br>Con gusto le apoyamos.<br><br>Saludos.</p>
+                </div>
+            `;
+            quoteClipboardPayload = {
+                en: { html: englishClipboardHtml, text: htmlToPlainText(englishClipboardHtml) },
+                es: { html: spanishClipboardHtml, text: htmlToPlainText(spanishClipboardHtml) }
+            };
+            quoteSummary.innerHTML = quoteSummaryLang === 'es' ? spanishHtml : englishHtml;
+            document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
+            });
+            return;
+        }
 
         const destinationChargeNoteEn = serviceDetails.shippingLine
             ? `<span style="font-weight:500;color:var(--gray-500);margin-left:0.45rem;">Based on charges for ${escapeHtml(serviceDetails.shippingLine)} and subject to shipping line's final invoice.</span>`
