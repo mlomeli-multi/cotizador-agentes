@@ -6153,6 +6153,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const toUSD = (mxn) => hayTC ? mxn / tc : mxn;
     const moneda = hayTC ? 'USD' : 'MXN';
     const simbolo = hayTC ? 'US$' : '$';
+    const isAirQuote = data.quoteMeta?.mode === 'air';
 
     const lineas = Array.isArray(data.lineas) && data.lineas.length
         ? data.lineas
@@ -6277,6 +6278,17 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const quoteCopyBtnId = `${containerId}-quote-copy`;
     let quoteSummaryLang = 'en';
     let quoteClipboardPayload = { en: { html: '', text: '' }, es: { html: '', text: '' } };
+    const inlandBlockTitle = isAirQuote ? 'Flete terrestre aeroportuario' : 'Selección base por contenedor';
+    const inlandBlockSubtitle = isAirQuote
+        ? 'Base de venta del traslado terrestre para esta ruta y tipo de unidad.'
+        : 'Base de venta por contenedor para single y full.';
+    const secondaryBlockTitle = isAirQuote ? 'Conceptos fijos del aeropuerto' : 'Destination Charges';
+    const secondaryBlockSubtitle = isAirQuote
+        ? 'Ajusta cada concepto fijo del aeropuerto por separado o mándalo al costo.'
+        : 'Ajusta cada cargo por separado o mándalo al costo.';
+    const secondaryEmptyState = isAirQuote
+        ? 'Aún no hay conceptos fijos del aeropuerto para esta cotización.'
+        : 'Aún no has agregado cargos en destino.';
 
     container.innerHTML = `
     <div class="mub-panel">
@@ -6290,8 +6302,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         <div class="mub-calc-sections">
             <div class="mub-calc-block inland">
                 <div class="mub-calc-block-header">
-                    <div class="mub-calc-block-title">Selección base por contenedor</div>
-                    <div class="mub-calc-block-subtitle">Base de venta por contenedor para single y full.</div>
+                    <div class="mub-calc-block-title">${inlandBlockTitle}</div>
+                    <div class="mub-calc-block-subtitle">${inlandBlockSubtitle}</div>
                 </div>
                 <div class="mub-calc-table-wrap">
                     <table class="mub-table">
@@ -6313,8 +6325,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             </div>
             <div class="mub-calc-block destination">
                 <div class="mub-calc-block-header">
-                    <div class="mub-calc-block-title">Destination Charges</div>
-                    <div class="mub-calc-block-subtitle">Ajusta cada cargo por separado o mándalo al costo.</div>
+                    <div class="mub-calc-block-title">${secondaryBlockTitle}</div>
+                    <div class="mub-calc-block-subtitle">${secondaryBlockSubtitle}</div>
                 </div>
                 <div class="mub-calc-table-wrap">
                     <table class="mub-table destination-table">
@@ -6329,7 +6341,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                             <th>Utilidad ${moneda}</th>
                         </tr></thead>
                         <tbody>
-                            ${destinationRowsHtml || `<tr><td colspan="${hayTC ? 8 : 7}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">Aún no has agregado cargos en destino.</td></tr>`}
+                            ${destinationRowsHtml || `<tr><td colspan="${hayTC ? 8 : 7}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">${secondaryEmptyState}</td></tr>`}
                         </tbody>
                     </table>
                 </div>
