@@ -136,7 +136,7 @@
 
         /* ===== MAIN CONTENT ===== */
         .main {
-            max-width: 1400px;
+            max-width: 1680px;
             margin: 0 auto;
             padding: 1.5rem;
         }
@@ -1514,6 +1514,29 @@
             position: sticky;
             top: 80px;
         }
+        .air-dap-card .layout-split {
+            grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+            gap: 1rem;
+        }
+        .air-dap-card .layout-right {
+            min-width: 0;
+        }
+        .air-dap-card .map-container {
+            height: clamp(420px, 52vh, 560px);
+            border-radius: 18px 18px 0 0;
+        }
+        .air-dap-card .route-info {
+            margin-top: 0;
+            border-radius: 0 0 18px 18px;
+            border-top: none;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+        .air-dap-card .quote-results {
+            margin-top: 1rem;
+        }
+        .air-dap-card .quote-grid {
+            grid-template-columns: repeat(3, minmax(240px, 1fr));
+        }
         .form-section-title {
             font-size: 0.8rem;
             font-weight: 700;
@@ -1787,6 +1810,16 @@
             .layout-split { grid-template-columns: 1fr; }
             .layout-left { position: static; }
             .map-container { height: 250px; }
+            .air-dap-card .layout-split { grid-template-columns: 1fr; }
+            .air-dap-card .map-container {
+                height: 300px;
+                border-radius: var(--radius);
+            }
+            .air-dap-card .route-info {
+                margin-top: 0.75rem;
+                border-radius: var(--radius);
+                border-top: 1px solid #bfdbfe;
+            }
             .maritime-body { grid-template-columns: 1fr; }
             .maritime-sidebar { position: static; }
             .maritime-map-frame .map-container { height: 280px; }
@@ -2078,7 +2111,7 @@
     <section class="tab-content active" id="tab-aereo">
 
         <!-- Card: Ruta + Datos de carga + Cotización (todo en uno) -->
-        <div class="card">
+        <div class="card air-dap-card">
             <div class="card-header">
                 <div class="card-icon blue">&#x1F4CD;</div>
                 <h2>Cotizador de Flete Terrestre</h2>
