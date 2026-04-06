@@ -6602,10 +6602,64 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     </ul>
                 </div>
             `;
+            const brendaEnglishHtml = `
+                <div class="maritime-quote-greeting">
+                    Dear [Client Name],<br><br>
+                    Rate by LTL below:
+                </div>
+                <div class="maritime-quote-section">
+                    <ul class="maritime-quote-list">
+                        ${airportCharges.length ? airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> ${ratesCurrency} ${fmt(parseFloat(c.monto) || 0)}</li>`).join('') : '<li><strong>AWB Release:</strong> Pending</li><li><strong>Entry to airport:</strong> Pending</li>'}
+                        <li><strong>Delivery:</strong> ${fleteAmount}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <ul class="maritime-quote-list">
+                        <li><strong>Inland T.T.</strong> 3 days approx.</li>
+                        <li>Rates for general ${isStackable ? 'stackable' : 'declared'} cargo</li>
+                        <li>Not including customs clearance/thc</li>
+                        <li>Not including loading/unloading maneuvers</li>
+                        <li>2 free hours to load/unload</li>
+                        <li>Weekends and after hours from carrier: USD 85.00 (if needed only)</li>
+                        <li>Insurance not included</li>
+                        ${providerNote ? `<li>${escapeHtml(providerNote)}</li>` : ''}
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Remain at your disposal!
+                </div>
+            `;
+            const brendaSpanishHtml = `
+                <div class="maritime-quote-greeting">
+                    Estimado(a) [Nombre del cliente],<br><br>
+                    Comparto tarifa en esquema LTL:
+                </div>
+                <div class="maritime-quote-section">
+                    <ul class="maritime-quote-list">
+                        ${airportCharges.length ? airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> ${ratesCurrency} ${fmt(parseFloat(c.monto) || 0)}</li>`).join('') : '<li><strong>Liberacion AWB:</strong> Pendiente</li><li><strong>Entrada a aeropuerto:</strong> Pendiente</li>'}
+                        <li><strong>Entrega:</strong> ${fleteAmount}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <ul class="maritime-quote-list">
+                        <li><strong>T.T. terrestre:</strong> 3 dias aprox.</li>
+                        <li>Tarifas para carga general ${isStackable ? 'estibable' : 'declarada'}</li>
+                        <li>No incluye despacho aduanal / THC</li>
+                        <li>No incluye maniobras de carga / descarga</li>
+                        <li>2 horas libres para carga / descarga</li>
+                        <li>Fines de semana y horario extendido por parte del carrier: USD 85.00 (solo si se requiere)</li>
+                        <li>Seguro no incluido</li>
+                        ${providerNote ? `<li>${escapeHtml(providerNote)}</li>` : ''}
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Quedo a sus ordenes.
+                </div>
+            `;
 
             const stylePayloads = {
                 official: { en: officialEnglishHtml, es: officialSpanishHtml },
-                brenda: { en: genericEnglishHtml, es: genericSpanishHtml },
+                brenda: { en: brendaEnglishHtml, es: brendaSpanishHtml },
                 rodrigo: { en: genericEnglishHtml, es: genericSpanishHtml }
             };
             const activeStylePayload = stylePayloads[quoteSummaryStyle] || stylePayloads.official;
