@@ -6439,6 +6439,24 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 : 0;
             const totalWeight = parseFloat(document.getElementById('peso')?.value || 0);
             const isStackable = !!document.getElementById('estibable')?.checked;
+            const airAwbRate = ({ NLU: 100, MEX: 100, MTY: 130, GDL: 160 }[airMeta.aeropuerto || '']) || 100;
+            const airEntryRate = 45;
+            const airTransitLabelEn = currentRouteKm > 900 ? '1-2 days transit' : '3 days approx.';
+            const airTransitLabelEs = currentRouteKm > 900 ? '1-2 dias de transito' : '3 dias aprox.';
+            const officialAirportChargesHtml = `
+                <ul class="maritime-quote-list">
+                    <li><strong>AWB Release:</strong> USD ${fmt(airAwbRate)} per AWB</li>
+                    <li><strong>Entry to Airport:</strong> USD ${fmt(airEntryRate)} per truck</li>
+                    <li><strong>Delivery (Dedicated Truck):</strong> ${fleteAmount}</li>
+                </ul>
+            `;
+            const officialAirportChargesHtmlEs = `
+                <ul class="maritime-quote-list">
+                    <li><strong>Liberacion AWB:</strong> USD ${fmt(airAwbRate)} por AWB</li>
+                    <li><strong>Entrada a aeropuerto:</strong> USD ${fmt(airEntryRate)} por camion</li>
+                    <li><strong>Entrega (Unidad dedicada):</strong> ${fleteAmount}</li>
+                </ul>
+            `;
             const awbChargesHtml = airportCharges.length
                 ? `<ul class="maritime-quote-list">${airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> MXN ${fmt(parseFloat(c.monto) || 0)}</li>`).join('')}</ul>`
                 : `<div class="maritime-commercial-empty">Pending fixed airport charges.</div>`;
@@ -6462,9 +6480,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <h4>From ${airportLabel || 'AOD'} Airport (TT - #)</h4>
-                    ${awbChargesHtml}
-                    <div class="maritime-quote-subsection-title">Delivery</div>
-                    <ul class="maritime-quote-list"><li><strong>${providerLabel || 'Dedicated Truck'}:</strong> ${fleteAmount}</li></ul>
+                    ${officialAirportChargesHtml}
                 </div>
                 <div class="maritime-quote-section">
                     <h4>Remarks & Conditions</h4>
@@ -6507,9 +6523,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <h4>Desde aeropuerto ${airportLabel || 'AOD'} (TT - #)</h4>
-                    ${awbChargesHtmlEs}
-                    <div class="maritime-quote-subsection-title">Entrega</div>
-                    <ul class="maritime-quote-list"><li><strong>${providerLabel || 'Unidad dedicada'}:</strong> ${fleteAmount}</li></ul>
+                    ${officialAirportChargesHtmlEs}
                 </div>
                 <div class="maritime-quote-section">
                     <h4>Comentarios y condiciones</h4>
@@ -6609,13 +6623,14 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
-                        ${airportCharges.length ? airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> ${ratesCurrency} ${fmt(parseFloat(c.monto) || 0)}</li>`).join('') : '<li><strong>AWB Release:</strong> Pending</li><li><strong>Entry to airport:</strong> Pending</li>'}
+                        <li><strong>AWB Release:</strong> USD ${fmt(airAwbRate)}</li>
+                        <li><strong>Entry to airport:</strong> USD ${fmt(airEntryRate)}</li>
                         <li><strong>Delivery:</strong> ${fleteAmount}</li>
                     </ul>
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
-                        <li><strong>Inland T.T.</strong> 3 days approx.</li>
+                        <li><strong>Inland T.T.</strong> ${airTransitLabelEn}</li>
                         <li>Rates for general ${isStackable ? 'stackable' : 'declared'} cargo</li>
                         <li>Not including customs clearance/thc</li>
                         <li>Not including loading/unloading maneuvers</li>
@@ -6636,13 +6651,14 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
-                        ${airportCharges.length ? airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}:</strong> ${ratesCurrency} ${fmt(parseFloat(c.monto) || 0)}</li>`).join('') : '<li><strong>Liberacion AWB:</strong> Pendiente</li><li><strong>Entrada a aeropuerto:</strong> Pendiente</li>'}
+                        <li><strong>Liberacion AWB:</strong> USD ${fmt(airAwbRate)}</li>
+                        <li><strong>Entrada a aeropuerto:</strong> USD ${fmt(airEntryRate)}</li>
                         <li><strong>Entrega:</strong> ${fleteAmount}</li>
                     </ul>
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
-                        <li><strong>T.T. terrestre:</strong> 3 dias aprox.</li>
+                        <li><strong>T.T. terrestre:</strong> ${airTransitLabelEs}</li>
                         <li>Tarifas para carga general ${isStackable ? 'estibable' : 'declarada'}</li>
                         <li>No incluye despacho aduanal / THC</li>
                         <li>No incluye maniobras de carga / descarga</li>
@@ -6664,9 +6680,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
-                        ${airportCharges.length ? airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}</strong>....................${ratesCurrency} ${fmt(parseFloat(c.monto) || 0)}</li>`).join('') : '<li><strong>AWB</strong>....................USD 130.00 per AWB</li><li><strong>Entry to airport</strong>......USD 45.00 per truck</li>'}
+                        <li><strong>AWB</strong>....................USD ${fmt(airAwbRate)} per AWB</li>
+                        <li><strong>Entry to airport</strong>......USD ${fmt(airEntryRate)} per truck</li>
                         <li><strong>Delivery</strong>......................${fleteAmount} per truck</li>
-                        <li><strong>TOTAL:</strong> ${ratesCurrency} ${fmt((airportCharges.reduce((sum, c) => sum + (parseFloat(c.monto) || 0), 0)) + (parseFloat(fleteLine?.venta) || 0))}</li>
+                        <li><strong>TOTAL:</strong> USD ${fmt(airAwbRate + airEntryRate + (parseFloat(fleteLine?.venta) || 0))}</li>
                     </ul>
                 </div>
                 <div class="maritime-quote-section">
@@ -6694,9 +6711,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
-                        ${airportCharges.length ? airportCharges.map(c => `<li><strong>${escapeHtml(c.nombre)}</strong>....................${ratesCurrency} ${fmt(parseFloat(c.monto) || 0)}</li>`).join('') : '<li><strong>AWB</strong>....................USD 130.00 por AWB</li><li><strong>Entrada a aeropuerto</strong>......USD 45.00 por camion</li>'}
+                        <li><strong>AWB</strong>....................USD ${fmt(airAwbRate)} por AWB</li>
+                        <li><strong>Entrada a aeropuerto</strong>......USD ${fmt(airEntryRate)} por camion</li>
                         <li><strong>Entrega</strong>......................${fleteAmount} por camion</li>
-                        <li><strong>TOTAL:</strong> ${ratesCurrency} ${fmt((airportCharges.reduce((sum, c) => sum + (parseFloat(c.monto) || 0), 0)) + (parseFloat(fleteLine?.venta) || 0))}</li>
+                        <li><strong>TOTAL:</strong> USD ${fmt(airAwbRate + airEntryRate + (parseFloat(fleteLine?.venta) || 0))}</li>
                     </ul>
                 </div>
                 <div class="maritime-quote-section">
