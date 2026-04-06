@@ -6289,6 +6289,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const secondaryEmptyState = isAirQuote
         ? 'Aún no hay conceptos fijos del aeropuerto para esta cotización.'
         : 'Aún no has agregado cargos en destino.';
+    const showSecondaryBlock = !isAirQuote;
 
     container.innerHTML = `
     <div class="mub-panel">
@@ -6323,29 +6324,31 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     </table>
                 </div>
             </div>
-            <div class="mub-calc-block destination">
-                <div class="mub-calc-block-header">
-                    <div class="mub-calc-block-title">${secondaryBlockTitle}</div>
-                    <div class="mub-calc-block-subtitle">${secondaryBlockSubtitle}</div>
+            ${showSecondaryBlock ? `
+                <div class="mub-calc-block destination">
+                    <div class="mub-calc-block-header">
+                        <div class="mub-calc-block-title">${secondaryBlockTitle}</div>
+                        <div class="mub-calc-block-subtitle">${secondaryBlockSubtitle}</div>
+                    </div>
+                    <div class="mub-calc-table-wrap">
+                        <table class="mub-table destination-table">
+                            <thead><tr>
+                                <th>Concepto</th>
+                                <th>Costo MXN</th>
+                                <th>Impuestos</th>
+                                <th>Costo c/imp</th>
+                                ${usdTh}
+                                <th>MUB %</th>
+                                <th>Venta ${moneda}</th>
+                                <th>Utilidad ${moneda}</th>
+                            </tr></thead>
+                            <tbody>
+                                ${destinationRowsHtml || `<tr><td colspan="${hayTC ? 8 : 7}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">${secondaryEmptyState}</td></tr>`}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div class="mub-calc-table-wrap">
-                    <table class="mub-table destination-table">
-                        <thead><tr>
-                            <th>Concepto</th>
-                            <th>Costo MXN</th>
-                            <th>Impuestos</th>
-                            <th>Costo c/imp</th>
-                            ${usdTh}
-                            <th>MUB %</th>
-                            <th>Venta ${moneda}</th>
-                            <th>Utilidad ${moneda}</th>
-                        </tr></thead>
-                        <tbody>
-                            ${destinationRowsHtml || `<tr><td colspan="${hayTC ? 8 : 7}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">${secondaryEmptyState}</td></tr>`}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            ` : ''}
         </div>
     </div>
     <div class="maritime-quote-panel">
