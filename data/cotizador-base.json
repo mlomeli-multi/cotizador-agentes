@@ -1,4 +1,4 @@
-﻿{
+{
     "proveedores":  [
                         {
                             "id":  "mnc1nhbt8jbg",
@@ -3209,6 +3209,274 @@
                                         ],
                             "totalRutas":  27,
                             "fechaCarga":  "31/3/2026"
+                        },
+                        {
+                            "id":  "c07756a26f10",
+                            "nombre":  "Birlesti Express",
+                            "aeropuerto":  "MTY",
+                            "tarifas":  [
+                                            {
+                                                "ciudad":  "MONTERREY",
+                                                "1 Tonelada":  1900,
+                                                "3.5 Toneladas":  2800,
+                                                "RabÃ³n (5 Ton)":  4800
+                                            },
+                                            {
+                                                "ciudad":  "RAMOS ARIZPE",
+                                                "1 Tonelada":  3450,
+                                                "3.5 Toneladas":  4950,
+                                                "RabÃ³n (5 Ton)":  7950
+                                            },
+                                            {
+                                                "ciudad":  "SALTILLO",
+                                                "1 Tonelada":  3600,
+                                                "3.5 Toneladas":  4950,
+                                                "RabÃ³n (5 Ton)":  8200
+                                            },
+                                            {
+                                                "ciudad":  "DERRAMADERO",
+                                                "1 Tonelada":  3850,
+                                                "3.5 Toneladas":  5350,
+                                                "RabÃ³n (5 Ton)":  8600
+                                            }
+                                        ],
+                            "totalRutas":  4,
+                            "fechaCarga":  "06/04/2026"
+                        },
+                        {
+                            "id":  "e8cc0fdb0fc6",
+                            "nombre":  "Sandoval",
+                            "aeropuerto":  "GDL",
+                            "tarifas":  [
+                                            {
+                                                "ciudad":  "GUADALAJARA",
+                                                "1 Tonelada":  2000,
+                                                "3.5 Toneladas":  2500,
+                                                "TortÃ³n (10 Ton)":  4500,
+                                                "Caja Seca 53\u0027":  8000
+                                            }
+                                        ],
+                            "totalRutas":  1,
+                            "fechaCarga":  "06/04/2026"
+                        },
+                        {
+                            "id":  "e501943be075",
+                            "nombre":  "Ramce",
+                            "aeropuerto":  "MTY",
+                            "tarifas":  [
+                                            {
+                                                "ciudad":  "MONTERREY, NUEVO LEON",
+                                                "1 Tonelada":  2200,
+                                                "3.5 Toneladas":  2700,
+                                                "RabÃ³n (5 Ton)":  4700,
+                                                "Caja Seca 53\u0027":  7500
+                                            },
+                                            {
+                                                "ciudad":  "SALTILLO, COAHUILA",
+                                                "1 Tonelada":  4500,
+                                                "3.5 Toneladas":  5500,
+                                                "RabÃ³n (5 Ton)":  6500,
+                                                "Caja Seca 53\u0027":  12500
+                                            },
+                                            {
+                                                "ciudad":  "RAMOS ARIZPE, COAHUILA",
+                                                "1 Tonelada":  4500,
+                                                "3.5 Toneladas":  5500,
+                                                "RabÃ³n (5 Ton)":  6500,
+                                                "Caja Seca 53\u0027":  12500
+                                            },
+                                            {
+                                                "ciudad":  "LEON, GUANAJUATO",
+                                                "1 Tonelada":  38200,
+                                                "3.5 Toneladas":  45400,
+                                                "RabÃ³n (5 Ton)":  61200,
+                                                "Caja Seca 53\u0027":  69500
+                                            },
+                                            {
+                                                "ciudad":  "SILAO, GUANAJUATO",
+                                                "1 Tonelada":  38200,
+                                                "3.5 Toneladas":  45400,
+                                                "RabÃ³n (5 Ton)":  61200,
+                                                "Caja Seca 53\u0027":  69500
+                                            },
+                                            {
+                                                "ciudad":  "CELAYA, GUANAJUATO",
+                                                "1 Tonelada":  38200,
+                                                "3.5 Toneladas":  45400,
+                                                "RabÃ³n (5 Ton)":  61200,
+                                                "Caja Seca 53\u0027":  69500
+                                            },
+                                            {
+                                                "ciudad":  "IRAPUATO, GUANAJUATO",
+                                                "1 Tonelada":  38200,
+                                                "3.5 Toneladas":  45400,
+                                                "RabÃ³n (5 Ton)":  61200,
+                                                "Caja Seca 53\u0027":  69500
+                                            },
+                                            {
+                                                "ciudad":  "QUERETARO, QUERETARO",
+                                                "1 Tonelada":  35400,
+                                                "3.5 Toneladas":  46000,
+                                                "RabÃ³n (5 Ton)":  62400,
+                                                "Caja Seca 53\u0027":  71200
+                                            },
+                                            {
+                                                "ciudad":  "PUEBLA, PUEBLA",
+                                                "1 Tonelada":  48050,
+                                                "3.5 Toneladas":  50000,
+                                                "RabÃ³n (5 Ton)":  63000,
+                                                "Caja Seca 53\u0027":  83200
+                                            },
+                                            {
+                                                "ciudad":  "CIUDAD DE MEXICO, CIUDAD DE MEXICO",
+                                                "1 Tonelada":  48050,
+                                                "3.5 Toneladas":  50000,
+                                                "RabÃ³n (5 Ton)":  63000,
+                                                "Caja Seca 53\u0027":  83200
+                                            },
+                                            {
+                                                "ciudad":  "SAN LUIS POTOSI, SAN LUIS POTOSI",
+                                                "1 Tonelada":  21500,
+                                                "3.5 Toneladas":  26500,
+                                                "RabÃ³n (5 Ton)":  31500,
+                                                "Caja Seca 53\u0027":  36500
+                                            },
+                                            {
+                                                "ciudad":  "GUADALAJARA, JALISCO",
+                                                "1 Tonelada":  41000,
+                                                "3.5 Toneladas":  46700,
+                                                "RabÃ³n (5 Ton)":  53300,
+                                                "Caja Seca 53\u0027":  72000
+                                            },
+                                            {
+                                                "ciudad":  "AGUASCALIENTES, AGUASCALIENTES",
+                                                "1 Tonelada":  29300,
+                                                "3.5 Toneladas":  34500,
+                                                "RabÃ³n (5 Ton)":  39500,
+                                                "Caja Seca 53\u0027":  47300
+                                            },
+                                            {
+                                                "ciudad":  "CD JUAREZ, CHIHUAHUA",
+                                                "1 Tonelada":  18900,
+                                                "3.5 Toneladas":  27800,
+                                                "RabÃ³n (5 Ton)":  33400,
+                                                "Caja Seca 53\u0027":  62300
+                                            },
+                                            {
+                                                "ciudad":  "CHIHUAHUA, CHIHUAHUA",
+                                                "1 Tonelada":  18900,
+                                                "3.5 Toneladas":  27800,
+                                                "RabÃ³n (5 Ton)":  33400,
+                                                "Caja Seca 53\u0027":  62300
+                                            },
+                                            {
+                                                "ciudad":  "REYNOSA, TAMAULIPAS",
+                                                "1 Tonelada":  8900,
+                                                "3.5 Toneladas":  17500,
+                                                "RabÃ³n (5 Ton)":  24300,
+                                                "Caja Seca 53\u0027":  34000
+                                            }
+                                        ],
+                            "totalRutas":  16,
+                            "fechaCarga":  "06/04/2026"
+                        },
+                        {
+                            "id":  "eed51a2a7438",
+                            "nombre":  "Raymon Pack",
+                            "aeropuerto":  "NLU",
+                            "tarifas":  [
+                                            {
+                                                "ciudad":  "SAN LUIS POTOSI",
+                                                "1 Tonelada":  10800,
+                                                "3.5 Toneladas":  16800,
+                                                "RabÃ³n (5 Ton)":  23500,
+                                                "TortÃ³n (10 Ton)":  27000,
+                                                "Caja Seca 53\u0027":  32740
+                                            },
+                                            {
+                                                "ciudad":  "TOLUCA",
+                                                "1 Tonelada":  5500,
+                                                "3.5 Toneladas":  8000,
+                                                "RabÃ³n (5 Ton)":  9500,
+                                                "TortÃ³n (10 Ton)":  11100,
+                                                "Caja Seca 53\u0027":  17200
+                                            },
+                                            {
+                                                "ciudad":  "QUERETARO",
+                                                "1 Tonelada":  6600,
+                                                "3.5 Toneladas":  10000,
+                                                "RabÃ³n (5 Ton)":  11500,
+                                                "TortÃ³n (10 Ton)":  12500,
+                                                "Caja Seca 53\u0027":  20570
+                                            },
+                                            {
+                                                "ciudad":  "CELAYA",
+                                                "1 Tonelada":  7000,
+                                                "3.5 Toneladas":  11000,
+                                                "RabÃ³n (5 Ton)":  12500,
+                                                "TortÃ³n (10 Ton)":  13500,
+                                                "Caja Seca 53\u0027":  23500
+                                            },
+                                            {
+                                                "ciudad":  "SALTILLO",
+                                                "1 Tonelada":  17930,
+                                                "3.5 Toneladas":  21230,
+                                                "RabÃ³n (5 Ton)":  31130,
+                                                "TortÃ³n (10 Ton)":  35640,
+                                                "Caja Seca 53\u0027":  46750
+                                            }
+                                        ],
+                            "totalRutas":  5,
+                            "fechaCarga":  "06/04/2026"
+                        },
+                        {
+                            "id":  "69480680f0b8",
+                            "nombre":  "Raymon Pack",
+                            "aeropuerto":  "MEX",
+                            "tarifas":  [
+                                            {
+                                                "ciudad":  "SAN LUIS POTOSI",
+                                                "1 Tonelada":  10800,
+                                                "3.5 Toneladas":  16800,
+                                                "RabÃ³n (5 Ton)":  23500,
+                                                "TortÃ³n (10 Ton)":  27000,
+                                                "Caja Seca 53\u0027":  32740
+                                            },
+                                            {
+                                                "ciudad":  "TOLUCA",
+                                                "1 Tonelada":  4510,
+                                                "3.5 Toneladas":  6930,
+                                                "RabÃ³n (5 Ton)":  8800,
+                                                "TortÃ³n (10 Ton)":  10890,
+                                                "Caja Seca 53\u0027":  15180
+                                            },
+                                            {
+                                                "ciudad":  "QUERETARO",
+                                                "1 Tonelada":  6600,
+                                                "3.5 Toneladas":  10000,
+                                                "RabÃ³n (5 Ton)":  11500,
+                                                "TortÃ³n (10 Ton)":  12500,
+                                                "Caja Seca 53\u0027":  20570
+                                            },
+                                            {
+                                                "ciudad":  "CELAYA",
+                                                "1 Tonelada":  7000,
+                                                "3.5 Toneladas":  11000,
+                                                "RabÃ³n (5 Ton)":  12500,
+                                                "TortÃ³n (10 Ton)":  13500,
+                                                "Caja Seca 53\u0027":  23500
+                                            },
+                                            {
+                                                "ciudad":  "SALTILLO",
+                                                "1 Tonelada":  17270,
+                                                "3.5 Toneladas":  20240,
+                                                "RabÃ³n (5 Ton)":  29920,
+                                                "TortÃ³n (10 Ton)":  34320,
+                                                "Caja Seca 53\u0027":  44550
+                                            }
+                                        ],
+                            "totalRutas":  5,
+                            "fechaCarga":  "06/04/2026"
                         }
                     ],
     "proveedoresMaritimos":  [
