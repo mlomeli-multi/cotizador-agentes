@@ -6449,6 +6449,12 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const palletDetailsHtmlEs = palletDetails.length
                 ? `<ul class="maritime-quote-list">${palletDetails.map(detail => `<li>${escapeHtml(detail)}</li>`).join('')}</ul>`
                 : ' Pendiente de confirmar';
+            const rodrigoPalletLine = Array.isArray(palletLineas) && palletLineas.length
+                ? palletLineas
+                    .filter(line => (parseInt(line.pallets) || 0) > 0)
+                    .map(line => `${parseInt(line.pallets) || 0} @ ${parseInt(line.largo) || 0} x ${parseInt(line.ancho) || 0} x ${parseInt(line.alto) || 0} cms`)
+                    .join(' | ')
+                : '[cargo dimensions]';
             const officialAirportChargesHtml = `
                 <ul class="maritime-quote-list">
                     <li><strong>AWB Release:</strong> USD ${fmt(airAwbRate)} per AWB</li>
@@ -6682,7 +6688,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 <div class="maritime-quote-greeting">
                     [Client Name],<br>
                     Hope you are doing well!<br><br>
-                    For the ${totalPallets || 1} @ ${palletDetails.length ? escapeHtml(palletDetails.join(' / ')) : '[cargo dimensions]'} with a total weight of ${totalWeight > 0 ? `${fmt(totalWeight)} kgs` : '[weight]'} going from ${airportLabel || '[AOD]'} airport to ${cityLabel || '[Final Destination]'} we have the following solution:
+                    For the ${escapeHtml(rodrigoPalletLine)} with a total weight of ${totalWeight > 0 ? `${fmt(totalWeight)} kgs` : '[weight]'} going from ${airportLabel || '[AOD]'} airport to ${cityLabel || '[Final Destination]'} we have the following solution:
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
@@ -6713,7 +6719,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 <div class="maritime-quote-greeting">
                     [Nombre del cliente],<br>
                     Espero que se encuentre muy bien.<br><br>
-                    Para ${totalPallets || 1} @ ${palletDetails.length ? escapeHtml(palletDetails.join(' / ')) : '[dimensiones de la carga]'} con un peso total de ${totalWeight > 0 ? `${fmt(totalWeight)} kgs` : '[peso]'} desde aeropuerto ${airportLabel || '[AOD]'} hacia ${cityLabel || '[Destino final]'} tenemos la siguiente opcion:
+                    Para ${escapeHtml(rodrigoPalletLine)} con un peso total de ${totalWeight > 0 ? `${fmt(totalWeight)} kgs` : '[peso]'} desde aeropuerto ${airportLabel || '[AOD]'} hacia ${cityLabel || '[Destino final]'} tenemos la siguiente opcion:
                 </div>
                 <div class="maritime-quote-section">
                     <ul class="maritime-quote-list">
