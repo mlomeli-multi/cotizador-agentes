@@ -350,23 +350,24 @@
             border: 1px solid #bfdbfe;
             border-radius: 16px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
-            padding: 0.85rem 0.95rem 0.95rem;
+            padding: 0.95rem;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
         }
         .carga-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            align-items: flex-start;
             margin-top: 0;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.9rem;
             gap: 1rem;
         }
         .air-cargo-head-main {
             display: flex;
-            align-items: center;
-            gap: 0.7rem;
-            flex-wrap: wrap;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.9rem;
             min-width: 0;
+            flex: 1;
         }
         .carga-header .form-section-title {
             margin: 0;
@@ -381,23 +382,43 @@
             font-size: 0.72rem;
             letter-spacing: 0.06em;
         }
+        .air-cargo-head-copy {
+            min-width: 0;
+            flex: 1;
+        }
         .air-cargo-copy {
-            margin-top: 0;
-            font-size: 0.68rem;
+            margin-top: 0.2rem;
+            font-size: 0.72rem;
             color: var(--gray-500);
-            line-height: 1.35;
-            max-width: 560px;
+            line-height: 1.45;
+            max-width: 32rem;
+        }
+        .air-cargo-step-badge {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         .carga-global {
-            display: inline-flex;
-            gap: 0.85rem;
-            align-items: center;
+            display: grid;
+            grid-template-columns: 132px auto;
+            gap: 0.75rem;
+            align-items: end;
             margin-bottom: 0;
-            padding: 0.5rem 0.7rem;
+            padding: 0.7rem 0.8rem;
             border: 1px solid #dbeafe;
-            border-radius: 999px;
+            border-radius: 14px;
             background: rgba(255,255,255,0.92);
-            flex-wrap: wrap;
+            min-width: 260px;
         }
         .carga-global .form-group { margin-bottom: 0; }
         .carga-global .form-group label {
@@ -411,6 +432,7 @@
         .carga-global input {
             height: 36px;
             border-radius: 10px;
+            width: 100%;
         }
         .carga-global .toggle-group {
             min-height: 36px;
@@ -419,6 +441,16 @@
             gap: 0.45rem;
         }
         .air-cargo-body {
+            display: grid;
+            grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+            gap: 0.9rem;
+            align-items: start;
+        }
+        .air-cargo-lines {
+            display: grid;
+            gap: 0.75rem;
+        }
+        .air-cargo-side {
             display: grid;
             gap: 0.75rem;
         }
@@ -476,6 +508,49 @@
             margin-top: 0;
         }
         .btn-add-pallet:hover { border-color: var(--blue); background: #f0f7ff; }
+        .air-cargo-unit-card {
+            border: 1px solid #dbeafe;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+            padding: 0.8rem;
+        }
+        .air-cargo-unit-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.65rem;
+        }
+        .air-cargo-unit-title {
+            font-size: 0.74rem;
+            font-weight: 900;
+            color: #1e3a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .air-cargo-unit-note {
+            font-size: 0.66rem;
+            color: var(--gray-500);
+        }
+        .air-cargo-unit-card .unit-result {
+            margin-top: 0;
+        }
+        .air-cargo-unit-card .unit-result:not(.show) {
+            display: block;
+            border-style: dashed;
+            background: #f8fafc;
+        }
+        .air-cargo-unit-card .unit-result:not(.show) .unit-name::before {
+            content: 'Sin calcular';
+            color: var(--gray-400);
+        }
+        .air-cargo-unit-card .unit-result:not(.show) .unit-detail::before {
+            content: 'Completa peso, pallets y medidas para sugerir la unidad.';
+            color: var(--gray-400);
+        }
+        .air-cargo-unit-card .cotizar-actions {
+            margin-top: 0.75rem;
+        }
 
         /* ===== COTIZAR ACTIONS ===== */
         .cotizar-actions {
@@ -2506,8 +2581,9 @@
             .air-provider-actions { justify-content: stretch; }
             .air-provider-card .btn-venta { width: 100%; }
             .carga-header { flex-direction: column; align-items: stretch; }
-            .air-cargo-head-main { align-items: flex-start; }
-            .carga-global { width: 100%; border-radius: 14px; justify-content: space-between; }
+            .air-cargo-head-main { align-items: flex-start; flex-direction: column; }
+            .carga-global { width: 100%; border-radius: 14px; grid-template-columns: 1fr 1fr; min-width: 0; }
+            .air-cargo-body { grid-template-columns: 1fr; }
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
@@ -2938,15 +3014,18 @@
                     <div class="air-cargo-panel">
                     <div class="carga-header">
                         <div class="air-cargo-head-main">
-                            <div class="form-section-title">&#x1F4E6; Carga</div>
-                            <div class="air-cargo-copy">Captura peso y medidas reales para sugerir la unidad y buscar proveedores compatibles.</div>
-                        </div>
-                        <div class="carga-global" style="gap:1rem;">
-                            <div class="form-group" style="margin-bottom:0;">
-                                <label>Peso total (kg)</label>
-                                <input type="number" id="peso" min="1" placeholder="1500" style="width:120px;">
+                            <div class="air-cargo-head-copy">
+                                <div class="form-section-title">&#x1F4E6; Carga</div>
+                                <div class="air-cargo-copy">Captura el peso total y las medidas reales de cada pallet para sugerir la unidad y buscar proveedores compatibles.</div>
                             </div>
-                            <div class="form-group" style="margin-bottom:0;">
+                            <div class="air-cargo-step-badge">Paso 2</div>
+                        </div>
+                        <div class="carga-global">
+                            <div class="form-group">
+                                <label>Peso total (kg)</label>
+                                <input type="number" id="peso" min="1" placeholder="1500">
+                            </div>
+                            <div class="form-group">
                                 <label>¿Estibable?</label>
                                 <div class="toggle-group">
                                     <label class="toggle">
@@ -2959,10 +3038,18 @@
                         </div>
                     </div>
                     <div class="air-cargo-body">
+                    <div class="air-cargo-lines">
                     <div class="pallet-lines" id="pallet-lines"></div>
                     <button class="btn-add-pallet" id="btn-add-pallet" type="button">+ Agregar pallet</button>
+                    </div>
 
                     <!-- Resultado unidad (se muestra automáticamente) -->
+                    <div class="air-cargo-side">
+                    <div class="air-cargo-unit-card">
+                        <div class="air-cargo-unit-head">
+                            <div class="air-cargo-unit-title">Unidad sugerida</div>
+                            <div class="air-cargo-unit-note">Se actualiza en automatico.</div>
+                        </div>
                     <div class="unit-result" id="unit-result">
                         <div class="unit-name" id="unit-name"></div>
                         <div class="unit-detail" id="unit-detail"></div>
@@ -2973,6 +3060,8 @@
                         <button class="btn btn-success btn-lg" id="btn-cotizar" disabled>
                             &#x1F50D; Buscar mejores tarifas
                         </button>
+                    </div>
+                    </div>
                     </div>
                     </div>
                     </div>
