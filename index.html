@@ -1712,6 +1712,18 @@
             color: var(--gray-500);
             line-height: 1.35;
         }
+        .mub-air-sales-row-label span.inline-note {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.25rem;
+            flex-wrap: wrap;
+        }
+        .mub-air-sales-row-label span.inline-note strong {
+            display: inline;
+            font-size: inherit;
+            color: var(--gray-700);
+            font-weight: 800;
+        }
         .mub-air-sales-row-value {
             font-size: 0.86rem;
             font-weight: 800;
@@ -6635,14 +6647,13 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                 },
             }));
             return `
-            <div class="air-provider-card ${i === 0 ? 'best selected' : ''}" data-air-provider-card="${escapeHtml(r.proveedor)}|${escapeHtml(r.tipoUnidad)}">
+            <div class="air-provider-card ${i === 0 ? 'best' : ''}" data-air-provider-card="${escapeHtml(r.proveedor)}|${escapeHtml(r.tipoUnidad)}">
                 <div class="air-provider-main">
                     <div class="air-provider-rank">${rankLabels[i]}</div>
                     <div class="air-provider-name" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
                     <div class="air-provider-unit">${escapeHtml(r.tipoUnidad)}</div>
                 </div>
                 <div class="air-provider-price-block">
-                    ${i === 0 ? '<div class="air-provider-selected-badge">Seleccionado</div>' : ''}
                     <div class="air-provider-price">$${fmt(r.tarifaFlete)}</div>
                     <div class="air-provider-price-label">Solo flete</div>
                 </div>
@@ -6654,12 +6665,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         </div>
         </div>
         <div id="air-cost-summary-panel">
-            ${buildAirCostSummaryHtml({
-                proveedor: top[0]?.proveedor || '',
-                tipoUnidad: top[0]?.tipoUnidad || tipoUnidad,
-                tarifaFlete: top[0]?.tarifaFlete || 0,
-                conceptos
-            })}
+            ${buildAirCostSummaryHtml(null)}
         </div>
         </div>
         <div id="mub-panel-container"></div>
@@ -7683,7 +7689,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                                 <div class="mub-air-sales-row">
                                     <div class="mub-air-sales-row-label">
                                         <strong>Venta flete</strong>
-                                        <span>MUB final: <span id="air-summary-freight-mub">${fmtShort(freightMubFinal)}</span>%</span>
+                                        <span class="inline-note">MUB final: <strong><span id="air-summary-freight-mub">${fmtShort(freightMubFinal)}</span>%</strong></span>
                                     </div>
                                     <div class="mub-air-sales-row-value positive">
                                         ${simbolo}<span id="air-summary-freight-sale">${fmt(freightSaleVenta)}</span>
