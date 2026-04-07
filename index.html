@@ -7827,11 +7827,11 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
             const palletDetails = Array.isArray(palletLineas)
                 ? palletLineas
-                    .filter(line => (parseInt(line.pallets) || 0) > 0)
-                    .map(line => `${parseInt(line.largo) || 0} x ${parseInt(line.ancho) || 0} x ${parseInt(line.alto) || 0} cm (${parseInt(line.pallets) || 0} plt)`)
+                    .filter(line => (parseInt(line.qty) || 0) > 0)
+                    .map(line => `${parseInt(line.largo) || 0} x ${parseInt(line.ancho) || 0} x ${parseInt(line.alto) || 0} cm (${parseInt(line.qty) || 0} plt)`)
                 : [];
             const totalPallets = Array.isArray(palletLineas)
-                ? palletLineas.reduce((sum, line) => sum + (parseInt(line.pallets) || 0), 0)
+                ? palletLineas.reduce((sum, line) => sum + (parseInt(line.qty) || 0), 0)
                 : 0;
             const totalWeight = parseFloat(document.getElementById('peso')?.value || 0);
             const isStackable = !!document.getElementById('estibable')?.checked;
@@ -7847,8 +7847,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 : ' Pendiente de confirmar';
             const rodrigoPalletLine = Array.isArray(palletLineas) && palletLineas.length
                 ? palletLineas
-                    .filter(line => (parseInt(line.pallets) || 0) > 0)
-                    .map(line => `${parseInt(line.pallets) || 0} @ ${parseInt(line.largo) || 0} x ${parseInt(line.ancho) || 0} x ${parseInt(line.alto) || 0} cms`)
+                    .filter(line => (parseInt(line.qty) || 0) > 0)
+                    .map(line => `${parseInt(line.qty) || 0} @ ${parseInt(line.largo) || 0} x ${parseInt(line.ancho) || 0} x ${parseInt(line.alto) || 0} cms`)
                     .join(' | ')
                 : '[cargo dimensions]';
             const officialAirportChargesHtml = `
