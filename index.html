@@ -2070,6 +2070,22 @@
             display: grid;
             gap: 0.55rem;
         }
+        .air-provider-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+            padding: 0.6rem 0.75rem;
+            border-radius: 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            font-size: 0.72rem;
+            color: var(--gray-500);
+        }
+        .air-provider-meta strong {
+            color: var(--gray-800);
+        }
         .air-provider-card {
             border: 1px solid var(--gray-200);
             border-radius: 14px;
@@ -2096,6 +2112,27 @@
             width: 4px;
             border-radius: 14px 0 0 14px;
             background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
+        }
+        .air-provider-card.selected {
+            border-color: #60a5fa;
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
+        }
+        .air-provider-card.selected::after {
+            content: 'Seleccionado';
+            position: absolute;
+            top: 0.6rem;
+            right: 0.75rem;
+            display: inline-flex;
+            align-items: center;
+            padding: 0.18rem 0.45rem;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
         .air-provider-main {
             min-width: 0;
@@ -2152,12 +2189,20 @@
             padding: 0.48rem 0.85rem;
             font-size: 0.72rem;
         }
+        .air-provider-card.selected .btn-venta {
+            background: #1d4ed8;
+            color: white;
+            border-color: #1d4ed8;
+        }
         .air-cost-summary {
             border: 1px solid #dbeafe;
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
             padding: 0.95rem;
             height: 100%;
+        }
+        .air-cost-summary.is-selected {
+            box-shadow: 0 14px 30px rgba(37, 99, 235, 0.08);
         }
         .air-cost-summary-head {
             display: grid;
@@ -2200,6 +2245,10 @@
             background: rgba(255,255,255,0.9);
             border: 1px solid #dbeafe;
             margin-bottom: 0.85rem;
+        }
+        .air-cost-summary-provider.selected {
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            border-color: #93c5fd;
         }
         .air-cost-summary-provider strong {
             display: block;
@@ -2637,6 +2686,7 @@
             .air-provider-actions { justify-content: stretch; }
             .air-provider-stage-badge,
             .air-cost-summary-badge { align-self: flex-start; }
+            .air-provider-meta { flex-direction: column; align-items: flex-start; }
             .air-provider-card .btn-venta { width: 100%; }
             .carga-header { flex-direction: column; align-items: stretch; }
             .air-cargo-head-main { align-items: flex-start; flex-direction: column; }
@@ -6451,7 +6501,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opción', '&#x1F949; 3ra opción'];
     const buildAirCostSummaryHtml = (selected) => `
-        <div class="air-cost-summary">
+        <div class="air-cost-summary ${selected?.proveedor ? 'is-selected' : ''}">
             <div class="air-cost-summary-head">
                 <div>
                     <div class="air-cost-summary-title">Resumen de costos</div>
@@ -6459,7 +6509,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                 </div>
                 <div class="air-cost-summary-badge">Paso 3</div>
             </div>
-            <div class="air-cost-summary-provider">
+            <div class="air-cost-summary-provider ${selected?.proveedor ? 'selected' : ''}">
                 <strong>${escapeHtml(selected?.proveedor || top[0]?.proveedor || '')}</strong>
                 <span>${escapeHtml(selected?.tipoUnidad || tipoUnidad)} · ${escapeHtml(aeropuerto)} → ${escapeHtml(ciudad)}</span>
             </div>
@@ -6504,6 +6554,10 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
             </div>
             <div class="air-provider-stage-badge">Paso 3</div>
         </div>
+        <div class="air-provider-meta">
+            <span><strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong></span>
+            <span>${tipoUnidad} · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''}</span>
+        </div>
         <div class="air-provider-list">
         ${top.map((r, i) => {
             // Guardar datos en data attributes para la calculadora MUB
@@ -6534,7 +6588,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                 },
             }));
             return `
-            <div class="air-provider-card ${i === 0 ? 'best' : ''}">
+            <div class="air-provider-card ${i === 0 ? 'best selected' : ''}" data-air-provider-card="${escapeHtml(r.proveedor)}|${escapeHtml(r.tipoUnidad)}">
                 <div class="air-provider-main">
                     <div class="air-provider-rank">${rankLabels[i]}</div>
                     <div class="air-provider-name" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
@@ -6574,6 +6628,10 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
         btn.addEventListener('click', () => {
             const data = JSON.parse(decodeURIComponent(btn.dataset.mub));
+            resultsEl.querySelectorAll('[data-air-provider-card]').forEach(card => {
+                card.classList.remove('selected');
+            });
+            btn.closest('[data-air-provider-card]')?.classList.add('selected');
             airSummaryState.selectedProvider = {
                 proveedor: data.proveedor,
                 tipoUnidad: data.tipoUnidad,
