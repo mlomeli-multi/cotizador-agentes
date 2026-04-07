@@ -1680,6 +1680,38 @@
             display: grid;
             gap: 0.45rem;
         }
+        .mub-air-sales-totals {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 0.55rem;
+            padding-top: 0.15rem;
+        }
+        .mub-air-total-pill {
+            border: 1px solid #dbeafe;
+            border-radius: 12px;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            padding: 0.65rem 0.75rem;
+            display: grid;
+            gap: 0.16rem;
+        }
+        .mub-air-total-pill label {
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+        .mub-air-total-pill strong {
+            font-size: 0.9rem;
+            color: var(--navy);
+            line-height: 1.1;
+        }
+        .mub-air-total-pill strong.positive {
+            color: var(--green);
+        }
+        .mub-air-total-pill strong.negative {
+            color: #dc2626;
+        }
         .mub-air-sales-group-title {
             font-size: 0.7rem;
             font-weight: 800;
@@ -1825,6 +1857,9 @@
         }
         .air-dap-side {
             min-width: 0;
+            position: sticky;
+            top: 84px;
+            align-self: start;
         }
         .air-dap-main {
             min-width: 0;
@@ -1908,8 +1943,7 @@
             color: #166534;
         }
         .air-workspace-summary {
-            position: sticky;
-            top: 84px;
+            position: static;
             border: 1px solid #dbeafe;
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
@@ -2729,6 +2763,7 @@
             .quote-grid { grid-template-columns: 1fr; }
             .air-dap-shell { grid-template-columns: 1fr; }
             .air-dap-rail { grid-column: auto; }
+            .air-dap-side,
             .air-stepper,
             .air-workspace-summary { position: static; }
             .air-stepper-list { grid-template-columns: 1fr; }
@@ -2755,6 +2790,7 @@
             .pallet-line .btn-remove-line,
             .pallet-line span[style="width:22px;"] { grid-column: 3; justify-self: end; }
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
+            .mub-air-sales-totals { grid-template-columns: 1fr; }
             .mub-stage-head { flex-direction: column; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
@@ -7745,6 +7781,20 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                                     </div>
                                 </div>
                             </div>
+                            <div class="mub-air-sales-totals">
+                                <div class="mub-air-total-pill">
+                                    <label>Total costo</label>
+                                    <strong id="air-summary-total-cost">${simbolo}${fmt(freightCostVenta + airportCostTotalVenta)}</strong>
+                                </div>
+                                <div class="mub-air-total-pill">
+                                    <label>Total venta</label>
+                                    <strong id="air-summary-total-sale">${simbolo}${fmt(freightSaleVenta + airAirportSalesTotal)}</strong>
+                                </div>
+                                <div class="mub-air-total-pill">
+                                    <label>Total utilidad</label>
+                                    <strong id="air-summary-total-profit" class="${(freightUtilityVenta + airAirportUtility) >= 0 ? 'positive' : 'negative'}">${simbolo}${fmt(freightUtilityVenta + airAirportUtility)}</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -8607,6 +8657,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const freightMubEl = document.getElementById('air-summary-freight-mub');
             const airportCostEl = document.getElementById('air-summary-airport-cost');
             const airportProfitEl = document.getElementById('air-summary-airport-profit');
+            const totalCostEl = document.getElementById('air-summary-total-cost');
+            const totalSaleEl = document.getElementById('air-summary-total-sale');
+            const totalProfitEl = document.getElementById('air-summary-total-profit');
 
             if (freightCostEl) freightCostEl.textContent = fmt(currentFreightCost);
             if (freightSaleEl) freightSaleEl.textContent = fmt(currentFreightSale);
@@ -8621,6 +8674,14 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 airportProfitEl.textContent = fmt(currentAirportProfit);
                 airportProfitEl.parentElement?.classList.toggle('positive', currentAirportProfit >= 0);
                 airportProfitEl.parentElement?.classList.toggle('negative', currentAirportProfit < 0);
+            }
+            if (totalCostEl) totalCostEl.textContent = `${simbolo}${fmt(currentFreightCost + currentAirportCost)}`;
+            if (totalSaleEl) totalSaleEl.textContent = `${simbolo}${fmt(currentFreightSale + airAwbRate + airEntryRate)}`;
+            if (totalProfitEl) {
+                const totalProfit = currentFreightProfit + currentAirportProfit;
+                totalProfitEl.textContent = `${simbolo}${fmt(totalProfit)}`;
+                totalProfitEl.classList.toggle('positive', totalProfit >= 0);
+                totalProfitEl.classList.toggle('negative', totalProfit < 0);
             }
         }
 
