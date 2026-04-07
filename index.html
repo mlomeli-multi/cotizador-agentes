@@ -2021,22 +2021,22 @@
         }
         .air-provider-layout {
             display: grid;
-            grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.95fr);
-            gap: 0.85rem;
+            grid-template-columns: minmax(0, 1.3fr) 360px;
+            gap: 1rem;
             align-items: start;
         }
         .air-provider-stage {
             border: 1px solid #dbeafe;
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
-            padding: 0.85rem;
+            padding: 0.95rem;
         }
         .air-provider-stage-head {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
             gap: 0.75rem;
-            margin-bottom: 0.7rem;
+            align-items: start;
+            margin-bottom: 0.85rem;
         }
         .air-provider-stage-title {
             font-size: 0.82rem;
@@ -2048,28 +2048,58 @@
         .air-provider-stage-note {
             font-size: 0.7rem;
             color: var(--gray-500);
+            line-height: 1.4;
+            margin-top: 0.18rem;
+            max-width: 34rem;
+        }
+        .air-provider-stage-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         .air-provider-list {
             display: grid;
-            gap: 0.45rem;
+            gap: 0.55rem;
         }
         .air-provider-card {
             border: 1px solid var(--gray-200);
             border-radius: 14px;
             background: #fff;
-            padding: 0.65rem 0.75rem;
+            padding: 0.8rem 0.9rem;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) auto auto;
-            gap: 0.7rem;
-            align-items: center;
+            grid-template-columns: minmax(0, 1fr) auto;
+            grid-template-areas:
+                "main price"
+                "action action";
+            gap: 0.55rem 0.9rem;
+            align-items: start;
         }
         .air-provider-card.best {
             border-color: #86efac;
             background: linear-gradient(180deg, #f8fffb 0%, #ffffff 100%);
             box-shadow: 0 8px 20px rgba(34, 197, 94, 0.08);
+            position: relative;
+        }
+        .air-provider-card.best::before {
+            content: '';
+            position: absolute;
+            inset: 0 auto 0 0;
+            width: 4px;
+            border-radius: 14px 0 0 14px;
+            background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
         }
         .air-provider-main {
             min-width: 0;
+            grid-area: main;
         }
         .air-provider-rank {
             font-size: 0.64rem;
@@ -2080,7 +2110,7 @@
             margin-bottom: 0.14rem;
         }
         .air-provider-name {
-            font-size: 0.88rem;
+            font-size: 0.94rem;
             font-weight: 800;
             color: var(--navy);
             line-height: 1.25;
@@ -2090,15 +2120,18 @@
         }
         .air-provider-unit {
             margin-top: 0.18rem;
-            font-size: 0.7rem;
+            font-size: 0.72rem;
             color: var(--gray-500);
         }
+        .air-provider-price-block {
+            grid-area: price;
+            text-align: right;
+        }
         .air-provider-price {
-            font-size: 1.2rem;
+            font-size: 1.28rem;
             font-weight: 900;
             color: var(--blue);
             line-height: 1;
-            text-align: right;
         }
         .air-provider-price-label {
             margin-top: 0.2rem;
@@ -2106,32 +2139,32 @@
             color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 0.04em;
-            text-align: right;
         }
         .air-provider-actions {
             display: flex;
-            justify-content: flex-end;
+            justify-content: flex-start;
+            grid-area: action;
         }
         .air-provider-card .btn-venta {
             margin-top: 0;
             width: auto;
-            min-width: 138px;
-            padding: 0.42rem 0.75rem;
+            min-width: 170px;
+            padding: 0.48rem 0.85rem;
             font-size: 0.72rem;
         }
         .air-cost-summary {
             border: 1px solid #dbeafe;
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
-            padding: 0.8rem 0.9rem;
+            padding: 0.95rem;
             height: 100%;
         }
         .air-cost-summary-head {
-            display: flex;
-            align-items: baseline;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
             gap: 0.75rem;
-            margin-bottom: 0.75rem;
+            align-items: start;
+            margin-bottom: 0.85rem;
         }
         .air-cost-summary-title {
             font-size: 0.82rem;
@@ -2143,13 +2176,30 @@
         .air-cost-summary-note {
             font-size: 0.7rem;
             color: var(--gray-500);
+            line-height: 1.4;
+            margin-top: 0.18rem;
+            max-width: 16rem;
+        }
+        .air-cost-summary-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
         }
         .air-cost-summary-provider {
-            padding: 0.7rem 0.75rem;
+            padding: 0.8rem;
             border-radius: 12px;
             background: rgba(255,255,255,0.9);
             border: 1px solid #dbeafe;
-            margin-bottom: 0.75rem;
+            margin-bottom: 0.85rem;
         }
         .air-cost-summary-provider strong {
             display: block;
@@ -2164,14 +2214,14 @@
         }
         .air-cost-summary-list {
             display: grid;
-            gap: 0.42rem;
+            gap: 0.5rem;
         }
         .air-cost-summary-row {
             display: flex;
             align-items: center;
             justify-content: space-between;
             gap: 0.8rem;
-            padding: 0.55rem 0.65rem;
+            padding: 0.65rem 0.7rem;
             border-radius: 10px;
             background: rgba(255,255,255,0.85);
             border: 1px solid #e5eefb;
@@ -2191,14 +2241,14 @@
             color: var(--gray-500);
         }
         .air-cost-summary-row-value {
-            font-size: 0.86rem;
+            font-size: 0.92rem;
             font-weight: 800;
             color: var(--navy);
             white-space: nowrap;
         }
         .air-cost-summary-foot {
-            margin-top: 0.7rem;
-            padding-top: 0.65rem;
+            margin-top: 0.8rem;
+            padding-top: 0.75rem;
             border-top: 1px dashed #cbd5e1;
             font-size: 0.7rem;
             color: var(--gray-500);
@@ -2580,10 +2630,13 @@
                 flex-direction: column;
                 align-items: flex-start;
             }
-            .air-provider-card { grid-template-columns: 1fr; }
+            .air-provider-card { grid-template-columns: 1fr; grid-template-areas: "main" "price" "action"; }
+            .air-provider-price-block,
             .air-provider-price,
             .air-provider-price-label { text-align: left; }
             .air-provider-actions { justify-content: stretch; }
+            .air-provider-stage-badge,
+            .air-cost-summary-badge { align-self: flex-start; }
             .air-provider-card .btn-venta { width: 100%; }
             .carga-header { flex-direction: column; align-items: stretch; }
             .air-cargo-head-main { align-items: flex-start; flex-direction: column; }
@@ -6400,8 +6453,11 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     const buildAirCostSummaryHtml = (selected) => `
         <div class="air-cost-summary">
             <div class="air-cost-summary-head">
-                <div class="air-cost-summary-title">Resumen de costos</div>
-                <div class="air-cost-summary-note">Vista rápida antes de pasar a venta.</div>
+                <div>
+                    <div class="air-cost-summary-title">Resumen de costos</div>
+                    <div class="air-cost-summary-note">Vista rápida de flete terrestre y costos aeroportuarios antes de pasar a venta.</div>
+                </div>
+                <div class="air-cost-summary-badge">Paso 3</div>
             </div>
             <div class="air-cost-summary-provider">
                 <strong>${escapeHtml(selected?.proveedor || top[0]?.proveedor || '')}</strong>
@@ -6442,8 +6498,11 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         <div class="air-provider-layout">
         <div class="air-provider-stage">
         <div class="air-provider-stage-head">
-            <div class="air-provider-stage-title">Selección de proveedor</div>
-            <div class="air-provider-stage-note">Comparativo rápido del flete terrestre para elegir a quién mandar a calculadora.</div>
+            <div>
+                <div class="air-provider-stage-title">Selección de proveedor</div>
+                <div class="air-provider-stage-note">Compara opciones de flete terrestre y manda la elegida directo a calculadora.</div>
+            </div>
+            <div class="air-provider-stage-badge">Paso 3</div>
         </div>
         <div class="air-provider-list">
         ${top.map((r, i) => {
@@ -6481,7 +6540,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                     <div class="air-provider-name" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
                     <div class="air-provider-unit">${escapeHtml(r.tipoUnidad)}</div>
                 </div>
-                <div>
+                <div class="air-provider-price-block">
                     <div class="air-provider-price">$${fmt(r.tarifaFlete)}</div>
                     <div class="air-provider-price-label">Solo flete</div>
                 </div>
