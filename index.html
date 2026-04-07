@@ -1676,6 +1676,157 @@
             gap: 1rem;
             align-items: stretch;
         }
+        .air-dap-shell {
+            display: grid;
+            grid-template-columns: 220px minmax(0, 1fr) 320px;
+            gap: 1rem;
+            align-items: start;
+        }
+        .air-dap-rail,
+        .air-dap-side {
+            min-width: 0;
+        }
+        .air-dap-main {
+            min-width: 0;
+        }
+        .air-stepper {
+            position: sticky;
+            top: 84px;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+            padding: 0.85rem;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+        .air-stepper-title {
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: #1e3a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.7rem;
+        }
+        .air-stepper-list {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .air-step {
+            display: flex;
+            gap: 0.7rem;
+            align-items: flex-start;
+            padding: 0.7rem 0.75rem;
+            border: 1px solid var(--gray-100);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.18s ease;
+        }
+        .air-step-index {
+            width: 28px;
+            height: 28px;
+            border-radius: 999px;
+            border: 1px solid #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.72rem;
+            font-weight: 800;
+            color: var(--gray-500);
+            flex: 0 0 auto;
+            background: white;
+        }
+        .air-step-copy {
+            min-width: 0;
+        }
+        .air-step-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--gray-800);
+        }
+        .air-step-desc {
+            margin-top: 0.14rem;
+            font-size: 0.68rem;
+            color: var(--gray-500);
+            line-height: 1.35;
+        }
+        .air-step.is-active {
+            border-color: #93c5fd;
+            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+        }
+        .air-step.is-active .air-step-index {
+            border-color: #60a5fa;
+            background: #dbeafe;
+            color: #1d4ed8;
+        }
+        .air-step.is-complete {
+            border-color: #86efac;
+            background: linear-gradient(180deg, #f0fdf4 0%, #ffffff 100%);
+        }
+        .air-step.is-complete .air-step-index {
+            border-color: #86efac;
+            background: #dcfce7;
+            color: #166534;
+        }
+        .air-workspace-summary {
+            position: sticky;
+            top: 84px;
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+            padding: 0.85rem 0.9rem;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+        .air-workspace-summary-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+        .air-workspace-summary-title {
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: #1e3a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .air-workspace-summary-note {
+            font-size: 0.68rem;
+            color: var(--gray-500);
+        }
+        .air-workspace-group {
+            border-top: 1px dashed #dbeafe;
+            padding-top: 0.7rem;
+            margin-top: 0.7rem;
+            display: grid;
+            gap: 0.42rem;
+        }
+        .air-workspace-group:first-of-type {
+            border-top: none;
+            padding-top: 0;
+            margin-top: 0;
+        }
+        .air-workspace-group-title {
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+        .air-workspace-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 0.6rem;
+            align-items: baseline;
+            font-size: 0.74rem;
+        }
+        .air-workspace-row strong {
+            color: var(--gray-800);
+            font-weight: 700;
+        }
+        .air-workspace-row span {
+            color: var(--gray-500);
+            text-align: right;
+        }
         .air-dap-card .layout-left {
             display: flex;
             flex-direction: column;
@@ -2299,6 +2450,9 @@
             .main { padding: 1rem; }
             .form-grid { grid-template-columns: 1fr !important; }
             .quote-grid { grid-template-columns: 1fr; }
+            .air-dap-shell { grid-template-columns: 1fr; }
+            .air-stepper,
+            .air-workspace-summary { position: static; }
             .air-provider-layout { grid-template-columns: 1fr; }
             .air-provider-stage-head {
                 flex-direction: column;
@@ -2595,6 +2749,43 @@
                 <div class="card-icon blue">&#x1F4CD;</div>
                 <h2>Cotizador de Flete Terrestre</h2>
             </div>
+            <div class="air-dap-shell">
+                <aside class="air-dap-rail">
+                    <div class="air-stepper">
+                        <div class="air-stepper-title">Flujo DAP Aéreo</div>
+                        <div class="air-stepper-list">
+                            <div class="air-step is-active" data-air-step="route">
+                                <div class="air-step-index">1</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Ruta</div>
+                                    <div class="air-step-desc">Define aeropuerto origen y ciudad destino final.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-air-step="cargo">
+                                <div class="air-step-index">2</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Carga</div>
+                                    <div class="air-step-desc">Captura pallets, peso total y condición de estiba.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-air-step="provider">
+                                <div class="air-step-index">3</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Proveedor</div>
+                                    <div class="air-step-desc">Elige la mejor opción de flete terrestre.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-air-step="sale">
+                                <div class="air-step-index">4</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Venta</div>
+                                    <div class="air-step-desc">Abre calculadora y prepara el correo comercial.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <div class="air-dap-main">
             <div class="layout-split">
                 <!-- Izquierda: Mapa + Info ruta -->
                 <div class="layout-left">
@@ -2743,6 +2934,39 @@
                     <div class="empty-state-mini" id="empty-cotizacion">
                         Sube tarifas de proveedores abajo para cotizar
                     </div>
+            </div>
+                </div>
+                <aside class="air-dap-side">
+                    <div class="air-workspace-summary" id="air-workspace-summary">
+                        <div class="air-workspace-summary-head">
+                            <div class="air-workspace-summary-title">Resumen operativo</div>
+                            <div class="air-workspace-summary-note">Siempre visible mientras armas la cotización.</div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Ruta</div>
+                            <div class="air-workspace-row"><strong>Aeropuerto</strong><span id="air-summary-airport">Pendiente</span></div>
+                            <div class="air-workspace-row"><strong>Destino</strong><span id="air-summary-city">Pendiente</span></div>
+                            <div class="air-workspace-row"><strong>Tránsito</strong><span id="air-summary-transit">Pendiente</span></div>
+                            <div class="air-workspace-row"><strong>Distancia</strong><span id="air-summary-km">Pendiente</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Carga</div>
+                            <div class="air-workspace-row"><strong>Pallets</strong><span id="air-summary-pallets">Pendiente</span></div>
+                            <div class="air-workspace-row"><strong>Peso total</strong><span id="air-summary-weight">Pendiente</span></div>
+                            <div class="air-workspace-row"><strong>Estibable</strong><span id="air-summary-stackable">No</span></div>
+                            <div class="air-workspace-row"><strong>Unidad sugerida</strong><span id="air-summary-unit">Pendiente</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Proveedor</div>
+                            <div class="air-workspace-row"><strong>Selección</strong><span id="air-summary-provider">Pendiente</span></div>
+                            <div class="air-workspace-row"><strong>Flete</strong><span id="air-summary-freight">Pendiente</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Venta</div>
+                            <div class="air-workspace-row"><strong>Calculadora</strong><span id="air-summary-sale-status">Pendiente</span></div>
+                        </div>
+                    </div>
+                </aside>
             </div>
         </div>
 
@@ -3289,18 +3513,87 @@ const UNIDADES = [
 // ===== MULTI-PALLET SYSTEM =====
 let palletLineas = [];
 let palletLineCounter = 0;
+let airSummaryState = {
+    selectedProvider: null,
+};
+
+function clearAirSelectedProviderSummary() {
+    airSummaryState.selectedProvider = null;
+}
+
+function renderAirWorkspaceSummary() {
+    const airportEl = document.getElementById('aeropuerto');
+    const cityEl = document.getElementById('ciudad-destino');
+    const weightEl = document.getElementById('peso');
+    const stackableEl = document.getElementById('estibable');
+    const unitNameEl = document.getElementById('unit-name');
+    const unitResultEl = document.getElementById('unit-result');
+    const routeInfoEl = document.getElementById('route-info');
+    const routeTimeEl = document.getElementById('route-time');
+    const kmEl = document.getElementById('route-km');
+    const providerResultsEl = document.getElementById('quote-results');
+    const salePanelEl = document.getElementById('mub-panel-container');
+    const airport = airportEl?.value || '';
+    const airportNames = {
+        NLU: 'NLU - AIFA',
+        MEX: 'MEX - Ciudad de Mexico',
+        MTY: 'MTY - Monterrey',
+        GDL: 'GDL - Guadalajara',
+    };
+    const airportLabel = airport ? (airportNames[airport] || airport) : 'Pendiente';
+    const city = cityEl?.value?.trim() || '';
+    const weight = parseFloat(weightEl?.value || 0);
+    const palletCount = getPalletLines().reduce((sum, line) => sum + (parseFloat(line.qty) || 0), 0);
+    const unitLabel = unitResultEl?.classList.contains('show') ? (unitNameEl?.textContent || 'Pendiente') : 'Pendiente';
+    const hasRoute = !!airport && city.length >= 3 && !!routeInfoEl?.classList.contains('show');
+    const hasCargo = weight > 0 && palletCount > 0 && !!unitResultEl?.classList.contains('show') && !unitResultEl?.classList.contains('error');
+    const hasProvider = !!airSummaryState.selectedProvider;
+    const hasSale = hasProvider && !!salePanelEl?.children?.length;
+
+    const setText = (id, value) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+    };
+
+    setText('air-summary-airport', airportLabel);
+    setText('air-summary-city', city || 'Pendiente');
+    setText('air-summary-transit', hasRoute ? (routeTimeEl?.textContent || 'Pendiente') : 'Pendiente');
+    setText('air-summary-km', hasRoute ? (kmEl?.textContent || 'Pendiente') : 'Pendiente');
+    setText('air-summary-pallets', palletCount > 0 ? `${palletCount} pallet${palletCount !== 1 ? 's' : ''}` : 'Pendiente');
+    setText('air-summary-weight', weight > 0 ? `${weight.toLocaleString('es-MX')} kg` : 'Pendiente');
+    setText('air-summary-stackable', stackableEl?.checked ? 'Sí' : 'No');
+    setText('air-summary-unit', unitLabel);
+    setText('air-summary-provider', hasProvider ? `${airSummaryState.selectedProvider.proveedor} · ${airSummaryState.selectedProvider.tipoUnidad}` : (providerResultsEl?.classList.contains('show') ? 'Selecciona una opción' : 'Pendiente'));
+    setText('air-summary-freight', hasProvider ? `$${(parseFloat(airSummaryState.selectedProvider.tarifaFlete) || 0).toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} MXN` : 'Pendiente');
+    setText('air-summary-sale-status', hasSale ? 'Calculadora abierta' : (hasProvider ? 'Lista para abrir' : 'Pendiente'));
+
+    const stepStates = {
+        route: hasRoute,
+        cargo: hasCargo,
+        provider: hasProvider,
+        sale: hasSale,
+    };
+    const activeStep = !hasRoute ? 'route' : !hasCargo ? 'cargo' : !hasProvider ? 'provider' : !hasSale ? 'sale' : 'sale';
+    document.querySelectorAll('[data-air-step]').forEach((el) => {
+        const key = el.getAttribute('data-air-step');
+        el.classList.toggle('is-complete', !!stepStates[key]);
+        el.classList.toggle('is-active', key === activeStep && !stepStates[key]);
+    });
+}
 
 function addPalletLine(qty, largo, ancho, alto) {
     palletLineCounter++;
     const id = palletLineCounter;
     palletLineas.push({ id, qty: qty || '', largo: largo || '', ancho: ancho || '', alto: alto || '' });
     renderPalletLines();
+    clearAirSelectedProviderSummary();
     autoCalcUnidad();
 }
 
 function removePalletLine(id) {
     palletLineas = palletLineas.filter(l => l.id !== id);
     renderPalletLines();
+    clearAirSelectedProviderSummary();
     autoCalcUnidad();
 }
 
@@ -3339,6 +3632,7 @@ function renderPalletLines() {
             if (inp.classList.contains('pl-largo')) linea.largo = inp.value;
             if (inp.classList.contains('pl-ancho')) linea.ancho = inp.value;
             if (inp.classList.contains('pl-alto')) linea.alto = inp.value;
+            clearAirSelectedProviderSummary();
             autoCalcUnidad();
         });
     });
@@ -3485,6 +3779,7 @@ function autoCalcUnidad() {
 
     if (!peso || lineas.length === 0) {
         el.classList.remove('show');
+        renderAirWorkspaceSummary();
         return;
     }
 
@@ -3501,12 +3796,19 @@ function autoCalcUnidad() {
         nameEl.innerHTML = '&#x2705; ' + result.unidad;
         detailEl.textContent = result.detalle;
     }
+    renderAirWorkspaceSummary();
 }
 
 // Init: una línea por defecto + listeners
 document.getElementById('btn-add-pallet').addEventListener('click', () => addPalletLine());
-document.getElementById('peso').addEventListener('input', autoCalcUnidad);
-document.getElementById('estibable').addEventListener('change', autoCalcUnidad);
+document.getElementById('peso').addEventListener('input', () => {
+    clearAirSelectedProviderSummary();
+    autoCalcUnidad();
+});
+document.getElementById('estibable').addEventListener('change', () => {
+    clearAirSelectedProviderSummary();
+    autoCalcUnidad();
+});
 addPalletLine(); // línea inicial
 
 // ===== UPLOAD ZONE =====
@@ -6068,11 +6370,17 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
         btn.addEventListener('click', () => {
             const data = JSON.parse(decodeURIComponent(btn.dataset.mub));
+            airSummaryState.selectedProvider = {
+                proveedor: data.proveedor,
+                tipoUnidad: data.tipoUnidad,
+                tarifaFlete: data.tarifaFlete
+            };
             const summaryPanel = document.getElementById('air-cost-summary-panel');
             if (summaryPanel) {
                 summaryPanel.innerHTML = buildAirCostSummaryHtml(data);
             }
             openMubPanel(data);
+            renderAirWorkspaceSummary();
         });
     });
 });
@@ -8036,9 +8344,11 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
     document.getElementById('mub-close').addEventListener('click', () => {
         container.innerHTML = '';
+        renderAirWorkspaceSummary();
     });
 
     renderQuoteSummary();
+    renderAirWorkspaceSummary();
 }
 
 // ===== MAPA LEAFLET =====
@@ -8173,6 +8483,8 @@ function clearRoute() {
     if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
     document.getElementById('route-info').classList.remove('show');
     currentRouteKm = 0;
+    clearAirSelectedProviderSummary();
+    renderAirWorkspaceSummary();
 }
 
 // Actualizar solo los stats de tiempo (sin tocar el mapa)
@@ -8184,6 +8496,7 @@ function updateRouteStats() {
     document.getElementById('route-time').textContent = formatTime(hours);
     document.getElementById('route-time-label').textContent = tipoUnidad ? `Tránsito (${tipoUnidad})` : 'Tiempo tránsito';
     document.getElementById('route-unit-type').textContent = tipoUnidad || 'Sin calcular';
+    renderAirWorkspaceSummary();
 }
 
 // Actualizar ruta completa (geocoding + mapa + stats)
@@ -8255,6 +8568,7 @@ async function updateRoute() {
     document.getElementById('route-km').textContent = currentRouteKm.toLocaleString() + ' km';
     document.getElementById('route-info').classList.add('show');
     updateRouteStats();
+    renderAirWorkspaceSummary();
 }
 
 // Debounce compartido para updateRoute
@@ -8433,9 +8747,17 @@ function scheduleMaritimeRouteUpdate() {
 }
 
 // Geocoding solo cuando cambie aeropuerto o ciudad
-document.getElementById('ciudad-destino').addEventListener('change', scheduleRouteUpdate);
+document.getElementById('aeropuerto').addEventListener('change', () => {
+    clearAirSelectedProviderSummary();
+    scheduleRouteUpdate();
+});
+document.getElementById('ciudad-destino').addEventListener('change', () => {
+    clearAirSelectedProviderSummary();
+    scheduleRouteUpdate();
+});
 acList.addEventListener('click', (e) => {
     if (e.target.closest('.autocomplete-item[data-value]')) {
+        clearAirSelectedProviderSummary();
         setTimeout(updateRoute, 100);
     }
 });
@@ -8443,6 +8765,7 @@ acList.addEventListener('click', (e) => {
 // Campos de carga: peso y estibable ya tienen listeners en autoCalcUnidad
 document.getElementById('peso').addEventListener('input', updateRouteStats);
 document.getElementById('estibable').addEventListener('change', updateRouteStats);
+renderAirWorkspaceSummary();
 
 // ===== GOOGLE SHEETS API =====
 const SHEETS_API_URL = 'https://script.google.com/macros/s/AKfycbyKOQ_PWGjTyAmWFqCSs6iUY--YAKT_PmliRCm-3uI81_wBeyRgXj1xAMvmcOWBDwEi/exec';
