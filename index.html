@@ -2118,22 +2118,6 @@
             background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
             box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
         }
-        .air-provider-card.selected::after {
-            content: 'Seleccionado';
-            position: absolute;
-            top: 0.6rem;
-            right: 0.75rem;
-            display: inline-flex;
-            align-items: center;
-            padding: 0.18rem 0.45rem;
-            border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
-            font-size: 0.6rem;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
         .air-provider-main {
             min-width: 0;
             grid-area: main;
@@ -2163,6 +2147,21 @@
         .air-provider-price-block {
             grid-area: price;
             text-align: right;
+            display: grid;
+            justify-items: end;
+            gap: 0.28rem;
+        }
+        .air-provider-selected-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.18rem 0.45rem;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 0.6rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
         .air-provider-price {
             font-size: 1.28rem;
@@ -2683,6 +2682,7 @@
             .air-provider-price-block,
             .air-provider-price,
             .air-provider-price-label { text-align: left; }
+            .air-provider-price-block { justify-items: start; }
             .air-provider-actions { justify-content: stretch; }
             .air-provider-stage-badge,
             .air-cost-summary-badge { align-self: flex-start; }
@@ -6595,6 +6595,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                     <div class="air-provider-unit">${escapeHtml(r.tipoUnidad)}</div>
                 </div>
                 <div class="air-provider-price-block">
+                    ${i === 0 ? '<div class="air-provider-selected-badge">Seleccionado</div>' : ''}
                     <div class="air-provider-price">$${fmt(r.tarifaFlete)}</div>
                     <div class="air-provider-price-label">Solo flete</div>
                 </div>
