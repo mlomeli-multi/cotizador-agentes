@@ -1612,14 +1612,16 @@
         .air-dap-card .layout-split {
             grid-template-columns: minmax(520px, 640px) minmax(0, 1fr);
             gap: 1rem;
-            align-items: start;
+            align-items: stretch;
         }
         .air-dap-card .layout-left {
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         .air-dap-card .layout-right {
             min-width: 0;
-            display: block;
+            display: flex;
+            flex-direction: column;
         }
         .air-dap-card .map-container {
             height: clamp(360px, 45vh, 430px);
@@ -1633,7 +1635,53 @@
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
         }
         .air-dap-top-panel {
-            display: block;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .air-route-panel {
+            border: 1px solid #bfdbfe;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+            padding: 0.9rem 0.95rem;
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+            margin-bottom: 0.9rem;
+        }
+        .air-route-panel .form-section-title {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-bottom: 0.8rem;
+            padding: 0.42rem 0.7rem;
+            border: none;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 0.72rem;
+            letter-spacing: 0.06em;
+        }
+        .air-route-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.8rem;
+        }
+        .air-route-panel .form-group {
+            margin-bottom: 0;
+        }
+        .air-route-panel .form-group label {
+            font-size: 0.65rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+            margin-bottom: 0.35rem;
+        }
+        .air-route-panel select,
+        .air-route-panel input {
+            height: 42px;
+            border-radius: 10px;
+            border-color: #cbd5e1;
+            background: rgba(255,255,255,0.95);
         }
         .air-dap-bottom {
             margin-top: 1rem;
@@ -1805,13 +1853,15 @@
             line-height: 1.45;
         }
         .unit-reference-card {
-            margin-top: 0.9rem;
+            margin-top: 0;
             margin-bottom: 0;
             border: 1px solid #dbeafe;
             border-radius: 14px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
             overflow: hidden;
-            display: block;
+            display: flex;
+            flex-direction: column;
+            flex: 1 1 auto;
         }
         .unit-reference-head {
             display: flex;
@@ -2142,6 +2192,7 @@
                 border-radius: var(--radius);
                 min-height: 300px;
             }
+            .air-route-grid { grid-template-columns: 1fr; }
             .air-dap-card .route-info {
                 margin-top: 0.75rem;
                 border-radius: var(--radius);
@@ -2475,22 +2526,24 @@
                 <!-- Derecha: Formularios + Resultado -->
                 <div class="layout-right">
                     <div class="air-dap-top-panel">
-                        <div class="form-section-title">&#9992; Ruta</div>
-                        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-                            <div class="form-group">
-                                <label>Aeropuerto en México</label>
-                                <select id="aeropuerto">
-                                    <option value="">Seleccionar...</option>
-                                    <option value="NLU">NLU — AIFA</option>
-                                    <option value="MEX">MEX — Ciudad de México</option>
-                                    <option value="MTY">MTY — Monterrey</option>
-                                    <option value="GDL">GDL — Guadalajara</option>
-                                </select>
-                            </div>
-                            <div class="form-group autocomplete-wrap">
-                                <label>Ciudad destino final</label>
-                                <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno" autocomplete="off">
-                                <div class="autocomplete-list" id="autocomplete-list"></div>
+                        <div class="air-route-panel">
+                            <div class="form-section-title">&#9992; Ruta</div>
+                            <div class="air-route-grid">
+                                <div class="form-group">
+                                    <label>Aeropuerto en México</label>
+                                    <select id="aeropuerto">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="NLU">NLU — AIFA</option>
+                                        <option value="MEX">MEX — Ciudad de México</option>
+                                        <option value="MTY">MTY — Monterrey</option>
+                                        <option value="GDL">GDL — Guadalajara</option>
+                                    </select>
+                                </div>
+                                <div class="form-group autocomplete-wrap">
+                                    <label>Ciudad destino final</label>
+                                    <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno" autocomplete="off">
+                                    <div class="autocomplete-list" id="autocomplete-list"></div>
+                                </div>
                             </div>
                         </div>
 
