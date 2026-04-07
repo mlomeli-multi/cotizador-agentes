@@ -6441,8 +6441,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const isStackable = !!document.getElementById('estibable')?.checked;
             const airAwbRate = ({ NLU: 100, MEX: 100, MTY: 130, GDL: 160 }[airMeta.aeropuerto || '']) || 100;
             const airEntryRate = 45;
-            const airTransitLabelEn = currentRouteKm > 900 ? '1-2 days transit' : '3 days approx.';
-            const airTransitLabelEs = currentRouteKm > 900 ? '1-2 dias de transito' : '3 dias aprox.';
+            const airTransitLabelEn = currentRouteKm > 900 ? '1-2 days transit' : '1 day transit';
+            const airTransitLabelEs = currentRouteKm > 900 ? '1-2 dias de transito' : '1 dia de transito';
             const palletDetailsHtmlEn = palletDetails.length
                 ? `<ul class="maritime-quote-list">${palletDetails.map(detail => `<li>${escapeHtml(detail)}</li>`).join('')}</ul>`
                 : ' Pending confirmation';
