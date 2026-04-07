@@ -442,22 +442,25 @@
         }
         .air-cargo-body {
             display: grid;
-            grid-template-columns: minmax(0, 1.45fr) minmax(260px, 0.85fr);
+            grid-template-columns: minmax(0, 1fr) 340px;
             gap: 0.9rem;
             align-items: start;
         }
         .air-cargo-lines {
             display: grid;
             gap: 0.75rem;
+            min-width: 0;
         }
         .air-cargo-side {
             display: grid;
             gap: 0.75rem;
+            min-width: 0;
         }
         .pallet-lines { display: flex; flex-direction: column; gap: 0.5rem; }
         .pallet-line {
-            display: flex;
-            align-items: center;
+            display: grid;
+            grid-template-columns: 26px repeat(4, minmax(0, 1fr)) 18px;
+            align-items: start;
             gap: 0.5rem;
             padding: 0.65rem 0.75rem;
             background: rgba(255,255,255,0.96);
@@ -469,6 +472,7 @@
             font-weight: 700;
             color: #1d4ed8;
             min-width: 22px;
+            padding-top: 1.25rem;
         }
         .pallet-line .form-group {
             margin-bottom: 0;
@@ -491,6 +495,7 @@
             cursor: pointer;
             padding: 0.2rem;
             line-height: 1;
+            align-self: center;
         }
         .pallet-line .btn-remove-line:hover { color: var(--red); }
         .btn-add-pallet {
@@ -2584,6 +2589,9 @@
             .air-cargo-head-main { align-items: flex-start; flex-direction: column; }
             .carga-global { width: 100%; border-radius: 14px; grid-template-columns: 1fr 1fr; min-width: 0; }
             .air-cargo-body { grid-template-columns: 1fr; }
+            .pallet-line { grid-template-columns: 26px 1fr 1fr; }
+            .pallet-line .btn-remove-line,
+            .pallet-line span[style="width:22px;"] { grid-column: 3; justify-self: end; }
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
