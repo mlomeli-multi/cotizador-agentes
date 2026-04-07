@@ -6443,6 +6443,12 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const airEntryRate = 45;
             const airTransitLabelEn = currentRouteKm > 900 ? '1-2 days transit' : '3 days approx.';
             const airTransitLabelEs = currentRouteKm > 900 ? '1-2 dias de transito' : '3 dias aprox.';
+            const palletDetailsHtmlEn = palletDetails.length
+                ? `<ul class="maritime-quote-list">${palletDetails.map(detail => `<li>${escapeHtml(detail)}</li>`).join('')}</ul>`
+                : ' Pending confirmation';
+            const palletDetailsHtmlEs = palletDetails.length
+                ? `<ul class="maritime-quote-list">${palletDetails.map(detail => `<li>${escapeHtml(detail)}</li>`).join('')}</ul>`
+                : ' Pendiente de confirmar';
             const officialAirportChargesHtml = `
                 <ul class="maritime-quote-list">
                     <li><strong>AWB Release:</strong> USD ${fmt(airAwbRate)} per AWB</li>
@@ -6473,13 +6479,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     <h4>Cargo Details</h4>
                     <ul class="maritime-quote-list">
                         <li><strong>Pallet:</strong> ${totalPallets || 'Pending confirmation'}</li>
-                        <li><strong>Dimensions${isStackable ? ' (stackable)' : ''}:</strong>${palletDetails.length ? `<span class="maritime-quote-address">${escapeHtml(palletDetails.join('\n'))}</span>` : ' Pending confirmation'}</li>
+                        <li><strong>Dimensions${isStackable ? ' (stackable)' : ''}:</strong>${palletDetailsHtmlEn}</li>
                         <li><strong>Total Weight:</strong> ${totalWeight > 0 ? `${fmt(totalWeight)} kg` : 'Pending confirmation'}</li>
                         <li><strong>Cargo Type:</strong> General Cargo</li>
                     </ul>
                 </div>
                 <div class="maritime-quote-section">
-                    <h4>From ${airportLabel || 'AOD'} Airport (TT - #)</h4>
+                    <h4>From ${airportLabel || 'AOD'} Airport (TT - ${airTransitLabelEn})</h4>
                     ${officialAirportChargesHtml}
                 </div>
                 <div class="maritime-quote-section">
@@ -6516,13 +6522,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     <h4>Detalles de la carga</h4>
                     <ul class="maritime-quote-list">
                         <li><strong>Pallets:</strong> ${totalPallets || 'Pendiente de confirmar'}</li>
-                        <li><strong>Dimensiones${isStackable ? ' (estibable)' : ''}:</strong>${palletDetails.length ? `<span class="maritime-quote-address">${escapeHtml(palletDetails.join('\n'))}</span>` : ' Pendiente de confirmar'}</li>
+                        <li><strong>Dimensiones${isStackable ? ' (estibable)' : ''}:</strong>${palletDetailsHtmlEs}</li>
                         <li><strong>Peso total:</strong> ${totalWeight > 0 ? `${fmt(totalWeight)} kg` : 'Pendiente de confirmar'}</li>
                         <li><strong>Tipo de carga:</strong> Carga general</li>
                     </ul>
                 </div>
                 <div class="maritime-quote-section">
-                    <h4>Desde aeropuerto ${airportLabel || 'AOD'} (TT - #)</h4>
+                    <h4>Desde aeropuerto ${airportLabel || 'AOD'} (TT - ${airTransitLabelEs})</h4>
                     ${officialAirportChargesHtmlEs}
                 </div>
                 <div class="maritime-quote-section">
