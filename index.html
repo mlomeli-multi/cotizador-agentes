@@ -1541,14 +1541,23 @@
             top: 80px;
         }
         .air-dap-card .layout-split {
-            grid-template-columns: minmax(320px, 420px) minmax(0, 1fr);
+            grid-template-columns: minmax(380px, 520px) minmax(0, 1fr);
             gap: 1rem;
+            align-items: stretch;
+        }
+        .air-dap-card .layout-left {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
         .air-dap-card .layout-right {
             min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
         .air-dap-card .map-container {
-            height: clamp(420px, 52vh, 560px);
+            flex: 1;
+            min-height: clamp(460px, 58vh, 620px);
             border-radius: 18px 18px 0 0;
         }
         .air-dap-card .route-info {
@@ -1556,6 +1565,14 @@
             border-radius: 0 0 18px 18px;
             border-top: none;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+        .air-dap-top-panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .air-dap-bottom {
+            margin-top: 1rem;
         }
         .air-dap-card .quote-results {
             margin-top: 1rem;
@@ -1565,11 +1582,14 @@
         }
         .unit-reference-card {
             margin-top: 0.9rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0;
             border: 1px solid #dbeafe;
             border-radius: 14px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
         }
         .unit-reference-head {
             display: flex;
@@ -1593,22 +1613,23 @@
         }
         .unit-reference-wrap {
             overflow-x: auto;
+            flex: 1;
         }
         .unit-reference-table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 760px;
+            min-width: 0;
         }
         .unit-reference-table th,
         .unit-reference-table td {
-            padding: 0.65rem 0.8rem;
+            padding: 0.5rem 0.65rem;
             border-bottom: 1px solid #e2e8f0;
             text-align: left;
-            font-size: 0.76rem;
-            white-space: nowrap;
+            font-size: 0.73rem;
+            white-space: normal;
         }
         .unit-reference-table th {
-            font-size: 0.64rem;
+            font-size: 0.6rem;
             text-transform: uppercase;
             letter-spacing: 0.05em;
             color: var(--gray-500);
@@ -1898,11 +1919,15 @@
             .air-dap-card .map-container {
                 height: 300px;
                 border-radius: var(--radius);
+                min-height: 300px;
             }
             .air-dap-card .route-info {
                 margin-top: 0.75rem;
                 border-radius: var(--radius);
                 border-top: 1px solid #bfdbfe;
+            }
+            .air-dap-top-panel {
+                height: auto;
             }
             .maritime-body { grid-template-columns: 1fr; }
             .maritime-sidebar { position: static; }
@@ -2224,76 +2249,81 @@
                 </div>
                 <!-- Derecha: Formularios + Resultado -->
                 <div class="layout-right">
-                    <div class="form-section-title">&#9992; Ruta</div>
-                    <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
-                        <div class="form-group">
-                            <label>Aeropuerto en México</label>
-                            <select id="aeropuerto">
-                                <option value="">Seleccionar...</option>
-                                <option value="NLU">NLU — AIFA</option>
-                                <option value="MEX">MEX — Ciudad de México</option>
-                                <option value="MTY">MTY — Monterrey</option>
-                                <option value="GDL">GDL — Guadalajara</option>
-                            </select>
+                    <div class="air-dap-top-panel">
+                        <div class="form-section-title">&#9992; Ruta</div>
+                        <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+                            <div class="form-group">
+                                <label>Aeropuerto en México</label>
+                                <select id="aeropuerto">
+                                    <option value="">Seleccionar...</option>
+                                    <option value="NLU">NLU — AIFA</option>
+                                    <option value="MEX">MEX — Ciudad de México</option>
+                                    <option value="MTY">MTY — Monterrey</option>
+                                    <option value="GDL">GDL — Guadalajara</option>
+                                </select>
+                            </div>
+                            <div class="form-group autocomplete-wrap">
+                                <label>Ciudad destino final</label>
+                                <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno" autocomplete="off">
+                                <div class="autocomplete-list" id="autocomplete-list"></div>
+                            </div>
                         </div>
-                        <div class="form-group autocomplete-wrap">
-                            <label>Ciudad destino final</label>
-                            <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno" autocomplete="off">
-                            <div class="autocomplete-list" id="autocomplete-list"></div>
+
+                        <div class="unit-reference-card">
+                            <div class="unit-reference-head">
+                                <div class="unit-reference-title">Medidas base por unidad</div>
+                                <div class="unit-reference-subtitle">Referencia comercial rápida de payload, dimensiones y cubicaje.</div>
+                            </div>
+                            <div class="unit-reference-wrap">
+                                <table class="unit-reference-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Unidad</th>
+                                            <th>Payload</th>
+                                            <th>Dimensiones base</th>
+                                            <th>CBM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>1 Ton Truck</td>
+                                            <td>900 kg</td>
+                                            <td>190 x 150 x 150 cm</td>
+                                            <td>4.275 cbm</td>
+                                        </tr>
+                                        <tr>
+                                            <td>3.5 Tons Truck</td>
+                                            <td>3,200 kg</td>
+                                            <td>315 x 225 x 180 cm</td>
+                                            <td>12.75 cbm</td>
+                                        </tr>
+                                        <tr>
+                                            <td>5 Ton (Rabón)</td>
+                                            <td>5,900 kg</td>
+                                            <td>600 x 240 x 215 cm</td>
+                                            <td>30.95 cbm</td>
+                                        </tr>
+                                        <tr>
+                                            <td>10 Ton (Tortón)</td>
+                                            <td>9,900 kg</td>
+                                            <td>700 x 250 x 245 cm</td>
+                                            <td>42.875 cbm</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Caja Seca 53'</td>
+                                            <td>20,000 kg</td>
+                                            <td>1500 x 250 x 270 cm</td>
+                                            <td>101.25 cbm</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
+                </div>
+            </div>
 
-                    <div class="unit-reference-card">
-                        <div class="unit-reference-head">
-                            <div class="unit-reference-title">Medidas base por unidad</div>
-                            <div class="unit-reference-subtitle">Referencia comercial rápida de payload, dimensiones y cubicaje.</div>
-                        </div>
-                        <div class="unit-reference-wrap">
-                            <table class="unit-reference-table">
-                                <thead>
-                                    <tr>
-                                        <th>Unidad</th>
-                                        <th>Payload</th>
-                                        <th>Dimensiones base</th>
-                                        <th>CBM</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>1 Ton Truck</td>
-                                        <td>900 kg</td>
-                                        <td>190 x 150 x 150 cm</td>
-                                        <td>4.275 cbm</td>
-                                    </tr>
-                                    <tr>
-                                        <td>3.5 Tons Truck</td>
-                                        <td>3,200 kg</td>
-                                        <td>315 x 225 x 180 cm</td>
-                                        <td>12.75 cbm</td>
-                                    </tr>
-                                    <tr>
-                                        <td>5 Ton (Rabón)</td>
-                                        <td>5,900 kg</td>
-                                        <td>600 x 240 x 215 cm</td>
-                                        <td>30.95 cbm</td>
-                                    </tr>
-                                    <tr>
-                                        <td>10 Ton (Tortón)</td>
-                                        <td>9,900 kg</td>
-                                        <td>700 x 250 x 245 cm</td>
-                                        <td>42.875 cbm</td>
-                                    </tr>
-                                    <tr>
-                                        <td>Caja Seca 53'</td>
-                                        <td>20,000 kg</td>
-                                        <td>1500 x 250 x 270 cm</td>
-                                        <td>101.25 cbm</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
+            <div class="air-dap-bottom">
                     <div class="carga-header">
                         <div class="form-section-title">&#x1F4E6; Carga</div>
                         <div class="carga-global" style="gap:1rem;">
@@ -2334,7 +2364,6 @@
                     <div class="empty-state-mini" id="empty-cotizacion">
                         Sube tarifas de proveedores abajo para cotizar
                     </div>
-                </div>
             </div>
         </div>
 
