@@ -1541,23 +1541,20 @@
             top: 80px;
         }
         .air-dap-card .layout-split {
-            grid-template-columns: minmax(380px, 520px) minmax(0, 1fr);
+            grid-template-columns: minmax(520px, 640px) minmax(0, 1fr);
             gap: 1rem;
-            align-items: stretch;
+            align-items: start;
         }
         .air-dap-card .layout-left {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            display: block;
         }
         .air-dap-card .layout-right {
             min-width: 0;
-            display: flex;
-            flex-direction: column;
+            display: block;
         }
         .air-dap-card .map-container {
-            flex: 1;
-            min-height: clamp(460px, 58vh, 620px);
+            height: clamp(360px, 45vh, 430px);
+            min-height: 360px;
             border-radius: 18px 18px 0 0;
         }
         .air-dap-card .route-info {
@@ -1567,9 +1564,7 @@
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
         }
         .air-dap-top-panel {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            display: block;
         }
         .air-dap-bottom {
             margin-top: 1rem;
@@ -1587,9 +1582,7 @@
             border-radius: 14px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
             overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            flex: 1;
+            display: block;
         }
         .unit-reference-head {
             display: flex;
@@ -1613,7 +1606,6 @@
         }
         .unit-reference-wrap {
             overflow-x: auto;
-            flex: 1;
         }
         .unit-reference-table {
             width: 100%;
@@ -1925,9 +1917,6 @@
                 margin-top: 0.75rem;
                 border-radius: var(--radius);
                 border-top: 1px solid #bfdbfe;
-            }
-            .air-dap-top-panel {
-                height: auto;
             }
             .maritime-body { grid-template-columns: 1fr; }
             .maritime-sidebar { position: static; }
