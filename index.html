@@ -1658,23 +1658,124 @@
         }
         .mub-air-bottom-grid {
             display: grid;
-            grid-template-columns: minmax(0, 1.35fr) minmax(290px, 0.9fr);
+            grid-template-columns: minmax(0, 1.18fr) minmax(320px, 0.82fr);
             gap: 1rem;
             align-items: start;
         }
-        .mub-table.airport-table {
-            min-width: 720px;
-        }
+        .mub-air-freight-card,
+        .mub-air-airport-card,
         .mub-air-sales-card {
             border: 1px solid rgba(148,163,184,0.18);
             border-radius: 14px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             overflow: hidden;
         }
+        .mub-air-freight-body,
+        .mub-air-airport-body,
         .mub-air-sales-body {
             padding: 0.9rem 0.95rem;
+        }
+        .mub-air-freight-body {
             display: grid;
             gap: 0.8rem;
+        }
+        .mub-air-freight-row {
+            display: grid;
+            grid-template-columns: minmax(180px, 1.15fr) repeat(4, minmax(120px, 0.7fr));
+            gap: 0.75rem;
+            align-items: end;
+            padding: 0.8rem;
+            border: 1px solid var(--gray-100);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.92);
+        }
+        .mub-air-freight-main strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--navy);
+        }
+        .mub-air-freight-main span {
+            display: block;
+            margin-top: 0.18rem;
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            line-height: 1.4;
+        }
+        .mub-air-mini-metric {
+            display: grid;
+            gap: 0.2rem;
+            min-width: 0;
+        }
+        .mub-air-mini-metric label {
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+        .mub-air-mini-metric .metric-value {
+            font-size: 0.95rem;
+            font-weight: 800;
+            color: var(--navy);
+            white-space: nowrap;
+        }
+        .mub-air-mini-metric .metric-value.positive {
+            color: var(--green);
+        }
+        .mub-air-mini-metric .metric-value.negative {
+            color: #dc2626;
+        }
+        .mub-air-mini-metric .metric-input-row {
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+            flex-wrap: nowrap;
+        }
+        .mub-air-mini-metric .mub-input {
+            width: 100%;
+        }
+        .mub-air-airport-body {
+            display: grid;
+            gap: 0.6rem;
+        }
+        .mub-air-airport-row {
+            display: grid;
+            grid-template-columns: minmax(160px, 1.2fr) repeat(3, minmax(90px, 0.6fr));
+            gap: 0.75rem;
+            align-items: center;
+            padding: 0.7rem 0.8rem;
+            border: 1px solid var(--gray-100);
+            border-radius: 12px;
+            background: rgba(255,255,255,0.92);
+        }
+        .mub-air-airport-row-head strong {
+            display: block;
+            font-size: 0.82rem;
+            color: var(--navy);
+        }
+        .mub-air-airport-row-head span {
+            display: block;
+            margin-top: 0.16rem;
+            font-size: 0.68rem;
+            color: var(--gray-500);
+            line-height: 1.35;
+        }
+        .mub-air-airport-metric {
+            display: grid;
+            gap: 0.16rem;
+            justify-items: end;
+        }
+        .mub-air-airport-metric label {
+            font-size: 0.64rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+        .mub-air-airport-metric span {
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: var(--navy);
         }
         .mub-air-sales-group {
             display: grid;
@@ -1760,6 +1861,7 @@
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
             padding: 1rem;
+            margin-top: 1.35rem;
         }
         .mub-panel-air .mub-panel {
             border: none;
@@ -2741,6 +2843,8 @@
             .pallet-line .btn-remove-line,
             .pallet-line span[style="width:22px;"] { grid-column: 3; justify-self: end; }
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
+            .mub-air-freight-row,
+            .mub-air-airport-row { grid-template-columns: 1fr; }
             .mub-stage-head { flex-direction: column; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
@@ -7537,6 +7641,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         })
         .map(({ l, i }) => renderLineRow(l, i, false))
         .join('');
+    const inlandLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland');
     const airportRows = lineas
         .map((l, i) => ({ l, i }))
         .filter(({ l }) => (l.quoteSection || '') === 'airport');
@@ -7558,7 +7663,74 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             </tr>`;
         })
         .join('');
-    const inlandLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland');
+    const airFreightCardHtml = inlandLines
+        .map((l, i) => {
+            const idx = lineas.indexOf(l);
+            const cbVenta = costoBaseVenta(l);
+            const utilidad = (parseFloat(l.venta) || 0) - cbVenta;
+            const displayMub = l.costMode ? 0 : (Math.round(l.mub * 10) / 10);
+            const displayVenta = l.costMode ? 0 : (Math.round(l.venta * 100) / 100);
+            return `
+                <div class="mub-air-freight-row">
+                    <div class="mub-air-freight-main">
+                        <strong>${escapeHtml(l.nombre)}</strong>
+                        <span>${escapeHtml(data.proveedor)} · ${escapeHtml(data.tipoUnidad || 'Flete terrestre')}</span>
+                    </div>
+                    <div class="mub-air-mini-metric">
+                        <label>Costo USD</label>
+                        <div class="metric-value">${simbolo}${fmt(cbVenta)}</div>
+                    </div>
+                    <div class="mub-air-mini-metric">
+                        <label>MUB %</label>
+                        <div class="metric-input-row">
+                            <input type="number" class="mub-input mub-field active-input" data-idx="${idx}" data-field="mub" value="${displayMub}" min="0" max="99" step="0.1">
+                            <span>%</span>
+                        </div>
+                    </div>
+                    <div class="mub-air-mini-metric">
+                        <label>Venta USD</label>
+                        <div class="metric-input-row">
+                            <span>${simbolo}</span>
+                            <input type="number" class="mub-input venta-field" data-idx="${idx}" data-field="venta" value="${displayVenta}" min="0" step="1">
+                        </div>
+                    </div>
+                    <div class="mub-air-mini-metric">
+                        <label>Utilidad USD</label>
+                        <div class="metric-value ${utilidad >= 0 ? 'positive' : 'negative'}" id="mub-util-${idx}">${simbolo}${fmt(utilidad)}</div>
+                    </div>
+                </div>
+            `;
+        })
+        .join('');
+    const airportCostCardHtml = airportRows
+        .map(({ l }) => {
+            const taxRate = parseFloat(l.impuestoRate) || 0;
+            const taxAmountMXN = l.monedaCosto === 'USD' && hayTC
+                ? (l.costo * taxRate * tc)
+                : (l.costo * taxRate);
+            const costUsd = `${simbolo}${fmt(costoBaseVenta(l))}`;
+            return `
+                <div class="mub-air-airport-row">
+                    <div class="mub-air-airport-row-head">
+                        <strong>${escapeHtml(l.nombre)}</strong>
+                        <span>Costo real con IVA 16% aplicado.</span>
+                    </div>
+                    <div class="mub-air-airport-metric">
+                        <label>Base MXN</label>
+                        <span>$${fmt(costoSinImpMXN(l))}</span>
+                    </div>
+                    <div class="mub-air-airport-metric">
+                        <label>IVA</label>
+                        <span>$${fmt(taxAmountMXN)}</span>
+                    </div>
+                    <div class="mub-air-airport-metric">
+                        <label>Costo USD</label>
+                        <span>${costUsd}</span>
+                    </div>
+                </div>
+            `;
+        })
+        .join('');
     const airportCostTotalVenta = airportRows.reduce((sum, { l }) => sum + costoBaseVenta(l), 0);
     const freightLine = inlandLines[0] || null;
     const freightCostVenta = freightLine ? costoBaseVenta(freightLine) : 0;
@@ -7620,46 +7792,23 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     <div class="mub-calc-block-title">${inlandBlockTitle}</div>
                     <div class="mub-calc-block-subtitle">${inlandBlockSubtitle}</div>
                 </div>
-                <div class="mub-calc-table-wrap">
-                    <table class="mub-table">
-                        <thead><tr>
-                            <th>Concepto</th>
-                            <th>Costo MXN</th>
-                            <th>Impuestos</th>
-                            <th>Costo c/imp</th>
-                            ${usdTh}
-                            <th>MUB %</th>
-                            <th>Venta ${moneda}</th>
-                            <th>Utilidad ${moneda}</th>
-                        </tr></thead>
-                        <tbody>
-                            ${inlandRowsHtml}
-                        </tbody>
-                    </table>
+                <div class="mub-air-freight-card">
+                    <div class="mub-air-freight-body">
+                        ${airFreightCardHtml}
+                    </div>
                 </div>
             </div>
             ${showSecondaryBlock ? (
                 isAirQuote
                     ? `
                 <div class="mub-air-bottom-grid">
-                    <div class="mub-calc-block destination">
+                    <div class="mub-air-airport-card">
                         <div class="mub-calc-block-header">
                             <div class="mub-calc-block-title">${secondaryBlockTitle}</div>
                             <div class="mub-calc-block-subtitle">Costo real con IVA 16% aplicado.</div>
                         </div>
-                        <div class="mub-calc-table-wrap">
-                            <table class="mub-table airport-table">
-                                <thead><tr>
-                                    <th>Concepto</th>
-                                    <th>Costo MXN</th>
-                                    <th>Impuestos</th>
-                                    <th>Costo c/imp</th>
-                                    ${usdTh}
-                                </tr></thead>
-                                <tbody>
-                                    ${airportCostRowsHtml || `<tr><td colspan="${hayTC ? 5 : 4}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">${secondaryEmptyState}</td></tr>`}
-                                </tbody>
-                            </table>
+                        <div class="mub-air-airport-body">
+                            ${airportCostCardHtml || `<div class="maritime-commercial-empty">${secondaryEmptyState}</div>`}
                         </div>
                     </div>
                     <div class="mub-air-sales-card">
