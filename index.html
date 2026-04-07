@@ -1680,9 +1680,34 @@
             display: grid;
             gap: 0.45rem;
         }
+        .mub-air-sales-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 0.5rem;
+        }
+        .mub-air-sales-summary-item {
+            border: 1px solid var(--gray-100);
+            border-radius: 10px;
+            background: rgba(255,255,255,0.92);
+            padding: 0.55rem 0.65rem;
+            display: grid;
+            gap: 0.14rem;
+        }
+        .mub-air-sales-summary-item label {
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            color: var(--gray-500);
+        }
+        .mub-air-sales-summary-item strong {
+            font-size: 0.8rem;
+            color: var(--navy);
+            line-height: 1.2;
+        }
         .mub-air-sales-totals {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 0.55rem;
             padding-top: 0.15rem;
         }
@@ -1858,7 +1883,7 @@
         .air-dap-side {
             min-width: 0;
             position: sticky;
-            top: 84px;
+            top: 116px;
             align-self: start;
         }
         .air-dap-main {
@@ -2790,6 +2815,7 @@
             .pallet-line .btn-remove-line,
             .pallet-line span[style="width:22px;"] { grid-column: 3; justify-self: end; }
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
+            .mub-air-sales-summary-grid,
             .mub-air-sales-totals { grid-template-columns: 1fr; }
             .mub-stage-head { flex-direction: column; }
             .maritime-rankings { grid-template-columns: 1fr; }
@@ -7713,6 +7739,27 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                         </div>
                         <div class="mub-air-sales-body">
                             <div class="mub-air-sales-group">
+                                <div class="mub-air-sales-group-title">Resumen operativo</div>
+                                <div class="mub-air-sales-summary-grid">
+                                    <div class="mub-air-sales-summary-item">
+                                        <label>Ruta</label>
+                                        <strong>${escapeHtml((data.quoteMeta?.aeropuerto || 'AOD'))} → ${escapeHtml((data.quoteMeta?.ciudad || 'Destino final'))}</strong>
+                                    </div>
+                                    <div class="mub-air-sales-summary-item">
+                                        <label>Proveedor</label>
+                                        <strong>${escapeHtml(data.proveedor || 'Pendiente')}</strong>
+                                    </div>
+                                    <div class="mub-air-sales-summary-item">
+                                        <label>Unidad</label>
+                                        <strong>${escapeHtml(data.tipoUnidad || 'Pendiente')}</strong>
+                                    </div>
+                                    <div class="mub-air-sales-summary-item">
+                                        <label>Cargos aeropuerto</label>
+                                        <strong>${airportRows.length} concepto${airportRows.length === 1 ? '' : 's'}</strong>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="mub-air-sales-group">
                                 <div class="mub-air-sales-group-title">Flete terrestre aeroportuario</div>
                                 <div class="mub-air-sales-row">
                                     <div class="mub-air-sales-row-label">
@@ -7793,6 +7840,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                                 <div class="mub-air-total-pill">
                                     <label>Total utilidad</label>
                                     <strong id="air-summary-total-profit" class="${(freightUtilityVenta + airAirportUtility) >= 0 ? 'positive' : 'negative'}">${simbolo}${fmt(freightUtilityVenta + airAirportUtility)}</strong>
+                                </div>
+                                <div class="mub-air-total-pill">
+                                    <label>Total MUB %</label>
+                                    <strong id="air-summary-total-mub">${fmtShort((freightSaleVenta + airAirportSalesTotal) > 0 ? ((freightUtilityVenta + airAirportUtility) / (freightSaleVenta + airAirportSalesTotal) * 100) : 0)}%</strong>
                                 </div>
                             </div>
                         </div>
@@ -8660,6 +8711,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const totalCostEl = document.getElementById('air-summary-total-cost');
             const totalSaleEl = document.getElementById('air-summary-total-sale');
             const totalProfitEl = document.getElementById('air-summary-total-profit');
+            const totalMubEl = document.getElementById('air-summary-total-mub');
 
             if (freightCostEl) freightCostEl.textContent = fmt(currentFreightCost);
             if (freightSaleEl) freightSaleEl.textContent = fmt(currentFreightSale);
@@ -8682,6 +8734,11 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 totalProfitEl.textContent = `${simbolo}${fmt(totalProfit)}`;
                 totalProfitEl.classList.toggle('positive', totalProfit >= 0);
                 totalProfitEl.classList.toggle('negative', totalProfit < 0);
+            }
+            if (totalMubEl) {
+                const totalSale = currentFreightSale + airAwbRate + airEntryRate;
+                const totalProfit = currentFreightProfit + currentAirportProfit;
+                totalMubEl.textContent = `${fmtShort(totalSale > 0 ? (totalProfit / totalSale) * 100 : 0)}%`;
             }
         }
 
