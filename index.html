@@ -1725,6 +1725,51 @@
         .mub-air-sales-row-value.negative {
             color: #dc2626;
         }
+        .mub-stage-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.9rem;
+            margin-bottom: 0.75rem;
+        }
+        .mub-stage-copy {
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            line-height: 1.45;
+            margin-top: 0.18rem;
+            max-width: 36rem;
+        }
+        .mub-step-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+        .mub-panel-air {
+            border: 1px solid rgba(148,163,184,0.18);
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
+            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+            padding: 1rem 1.05rem;
+        }
+        .mub-panel-air .mub-panel {
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            background: transparent;
+        }
+        .mub-panel-air .mub-panel-header {
+            margin-bottom: 0;
+        }
 
         /* ===== EMPTY STATE ===== */
         .empty-state {
@@ -2696,6 +2741,7 @@
             .pallet-line .btn-remove-line,
             .pallet-line span[style="width:22px;"] { grid-column: 3; justify-self: end; }
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
+            .mub-stage-head { flex-direction: column; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
             .maritime-combined-head { flex-direction: column; }
@@ -7551,6 +7597,15 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const showSecondaryBlock = !isAirQuote || !!destinationRowsHtml;
 
     container.innerHTML = `
+    <div class="${isAirQuote ? 'mub-panel-air' : ''}">
+    ${isAirQuote ? `
+    <div class="mub-stage-head">
+        <div>
+            <div class="air-provider-stage-title">Venta</div>
+            <div class="mub-stage-copy">Ajusta la venta final del flete terrestre, valida los costos aeroportuarios y deja listo el correo comercial.</div>
+        </div>
+        <div class="mub-step-badge">Paso 4</div>
+    </div>` : ''}
     <div class="mub-panel">
         <div class="mub-panel-header">
             <h3>&#x1F4B0; Calculadora de Venta ${tcBadge}</h3>
@@ -7714,9 +7769,15 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             ) : ''}
         </div>
     </div>
+    </div>
     <div class="maritime-quote-panel">
-        <h3>Resumen de cotización</h3>
-        <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
+        <div class="mub-stage-head" style="margin-bottom:0.95rem;">
+            <div>
+                <h3>Resumen de cotización</h3>
+                <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
+            </div>
+            ${isAirQuote ? '<div class="mub-step-badge">Paso 4</div>' : ''}
+        </div>
         <div id="${quoteTabsId}" class="maritime-quote-tabs" style="margin:0 0 0.8rem auto;width:max-content;">
             <button type="button" class="maritime-quote-tab active" data-lang="en">EN</button>
             <button type="button" class="maritime-quote-tab" data-lang="es">ES</button>
