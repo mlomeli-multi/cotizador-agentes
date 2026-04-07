@@ -1672,8 +1672,8 @@
             top: 80px;
         }
         .air-dap-card .layout-split {
-            grid-template-columns: minmax(560px, 1.2fr) minmax(360px, 0.8fr);
-            gap: 1.1rem;
+            grid-template-columns: minmax(600px, 1.25fr) minmax(390px, 0.9fr);
+            gap: 1rem;
             align-items: stretch;
         }
         .air-dap-shell {
@@ -1834,15 +1834,17 @@
         .air-dap-card .layout-left {
             display: flex;
             flex-direction: column;
+            min-height: 100%;
         }
         .air-dap-card .layout-right {
             min-width: 0;
             display: flex;
             flex-direction: column;
+            min-height: 100%;
         }
         .air-dap-card .map-container {
-            height: clamp(360px, 45vh, 430px);
-            min-height: 360px;
+            height: clamp(390px, 48vh, 470px);
+            min-height: 390px;
             border-radius: 18px 18px 0 0;
         }
         .air-dap-card .route-info {
@@ -1852,23 +1854,30 @@
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
         }
         .air-dap-top-panel {
-            display: flex;
-            flex-direction: column;
-            height: 100%;
+            display: grid;
+            grid-template-rows: auto minmax(0, 1fr);
+            gap: 0.9rem;
+            min-height: 100%;
         }
         .air-route-panel {
             border: 1px solid #bfdbfe;
             border-radius: 16px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
-            padding: 0.9rem 0.95rem;
+            padding: 1rem;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-            margin-bottom: 0.9rem;
+        }
+        .air-route-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 0.9rem;
+            margin-bottom: 0.85rem;
         }
         .air-route-panel .form-section-title {
             display: inline-flex;
             align-items: center;
             gap: 0.4rem;
-            margin-bottom: 0.8rem;
+            margin-bottom: 0.32rem;
             padding: 0.42rem 0.7rem;
             border: none;
             border-radius: 999px;
@@ -1877,10 +1886,31 @@
             font-size: 0.72rem;
             letter-spacing: 0.06em;
         }
+        .air-route-copy {
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            line-height: 1.45;
+            max-width: 30rem;
+        }
+        .air-route-step-badge {
+            flex: 0 0 auto;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.35rem 0.6rem;
+            border-radius: 999px;
+            background: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            font-size: 0.66rem;
+            font-weight: 800;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
         .air-route-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 0.65rem;
+            gap: 0.8rem;
         }
         .air-route-panel .form-group {
             margin-bottom: 0;
@@ -2110,20 +2140,22 @@
             align-items: center;
             justify-content: space-between;
             gap: 0.75rem;
-            padding: 0.8rem 0.95rem;
+            padding: 0.7rem 0.85rem;
             background: #eff6ff;
             border-bottom: 1px solid #dbeafe;
         }
         .unit-reference-title {
-            font-size: 0.78rem;
+            font-size: 0.74rem;
             font-weight: 800;
             letter-spacing: 0.04em;
             text-transform: uppercase;
             color: #1e3a8a;
         }
         .unit-reference-subtitle {
-            font-size: 0.72rem;
+            font-size: 0.66rem;
             color: var(--gray-500);
+            text-align: right;
+            max-width: 16rem;
         }
         .unit-reference-wrap {
             overflow-x: auto;
@@ -2135,10 +2167,10 @@
         }
         .unit-reference-table th,
         .unit-reference-table td {
-            padding: 0.5rem 0.65rem;
+            padding: 0.42rem 0.55rem;
             border-bottom: 1px solid #e2e8f0;
             text-align: left;
-            font-size: 0.73rem;
+            font-size: 0.7rem;
             white-space: normal;
         }
         .unit-reference-table th {
@@ -2150,6 +2182,9 @@
         }
         .unit-reference-table tr:last-child td {
             border-bottom: none;
+        }
+        .unit-reference-table tbody tr:nth-child(even) td {
+            background: rgba(248, 250, 252, 0.8);
         }
         .unit-reference-table td:first-child {
             font-weight: 700;
@@ -2435,6 +2470,7 @@
                 min-height: 300px;
             }
             .air-route-grid { grid-template-columns: 1fr; }
+            .air-route-head { flex-direction: column; }
             .air-dap-card .route-info {
                 margin-top: 0.75rem;
                 border-radius: var(--radius);
@@ -2818,7 +2854,13 @@
                 <div class="layout-right">
                     <div class="air-dap-top-panel">
                         <div class="air-route-panel">
-                            <div class="form-section-title">&#9992; Ruta</div>
+                            <div class="air-route-head">
+                                <div>
+                                    <div class="form-section-title">&#9992; Ruta</div>
+                                    <div class="air-route-copy">Selecciona el aeropuerto en México y la ciudad destino final para calcular kilómetros, tránsito y filtrar la operación.</div>
+                                </div>
+                                <div class="air-route-step-badge">Paso 1</div>
+                            </div>
                             <div class="air-route-grid">
                                 <div class="form-group">
                                     <label>Aeropuerto en México</label>
