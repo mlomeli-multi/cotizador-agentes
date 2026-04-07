@@ -1716,13 +1716,18 @@
             display: inline-flex;
             align-items: center;
             gap: 0.25rem;
-            flex-wrap: wrap;
+            flex-wrap: nowrap;
+            white-space: nowrap;
         }
         .mub-air-sales-row-label span.inline-note strong {
             display: inline;
             font-size: inherit;
             color: var(--gray-700);
             font-weight: 800;
+        }
+        .mub-air-sales-row-label span.inline-note span {
+            display: inline;
+            margin-top: 0;
         }
         .mub-air-sales-row-value {
             font-size: 0.86rem;
@@ -2158,12 +2163,14 @@
             align-items: start;
         }
         .air-provider-card.best {
+            position: relative;
+        }
+        .air-provider-card.best:not(.selected) {
             border-color: #86efac;
             background: linear-gradient(180deg, #f8fffb 0%, #ffffff 100%);
             box-shadow: 0 8px 20px rgba(34, 197, 94, 0.08);
-            position: relative;
         }
-        .air-provider-card.best::before {
+        .air-provider-card.best:not(.selected)::before {
             content: '';
             position: absolute;
             inset: 0 auto 0 0;
