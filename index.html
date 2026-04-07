@@ -1575,6 +1575,166 @@
         .air-dap-card .quote-grid {
             grid-template-columns: repeat(3, minmax(240px, 1fr));
         }
+        .air-provider-layout {
+            display: grid;
+            grid-template-columns: minmax(0, 1.55fr) minmax(300px, 0.95fr);
+            gap: 0.85rem;
+            align-items: start;
+        }
+        .air-provider-list {
+            display: grid;
+            gap: 0.55rem;
+        }
+        .air-provider-card {
+            border: 1px solid var(--gray-200);
+            border-radius: 14px;
+            background: #fff;
+            padding: 0.7rem 0.8rem;
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 0.75rem;
+            align-items: center;
+        }
+        .air-provider-card.best {
+            border-color: #86efac;
+            background: linear-gradient(180deg, #f8fffb 0%, #ffffff 100%);
+            box-shadow: 0 8px 20px rgba(34, 197, 94, 0.08);
+        }
+        .air-provider-main {
+            min-width: 0;
+        }
+        .air-provider-rank {
+            font-size: 0.64rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-weight: 800;
+            color: var(--gray-500);
+            margin-bottom: 0.2rem;
+        }
+        .air-provider-name {
+            font-size: 0.92rem;
+            font-weight: 800;
+            color: var(--navy);
+            line-height: 1.25;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .air-provider-unit {
+            margin-top: 0.18rem;
+            font-size: 0.74rem;
+            color: var(--gray-500);
+        }
+        .air-provider-price {
+            font-size: 1.45rem;
+            font-weight: 900;
+            color: var(--blue);
+            line-height: 1;
+            text-align: right;
+        }
+        .air-provider-price-label {
+            margin-top: 0.2rem;
+            font-size: 0.66rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            text-align: right;
+        }
+        .air-provider-actions {
+            grid-column: 1 / -1;
+            display: flex;
+            justify-content: flex-end;
+        }
+        .air-provider-card .btn-venta {
+            margin-top: 0;
+            width: auto;
+            min-width: 170px;
+            padding: 0.45rem 0.85rem;
+        }
+        .air-cost-summary {
+            border: 1px solid #dbeafe;
+            border-radius: 16px;
+            background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
+            padding: 0.85rem 0.95rem;
+        }
+        .air-cost-summary-head {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            gap: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .air-cost-summary-title {
+            font-size: 0.82rem;
+            font-weight: 900;
+            color: #1e3a8a;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .air-cost-summary-note {
+            font-size: 0.7rem;
+            color: var(--gray-500);
+        }
+        .air-cost-summary-provider {
+            padding: 0.7rem 0.75rem;
+            border-radius: 12px;
+            background: rgba(255,255,255,0.9);
+            border: 1px solid #dbeafe;
+            margin-bottom: 0.75rem;
+        }
+        .air-cost-summary-provider strong {
+            display: block;
+            font-size: 0.88rem;
+            color: var(--navy);
+        }
+        .air-cost-summary-provider span {
+            display: block;
+            margin-top: 0.18rem;
+            font-size: 0.73rem;
+            color: var(--gray-500);
+        }
+        .air-cost-summary-list {
+            display: grid;
+            gap: 0.42rem;
+        }
+        .air-cost-summary-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 0.8rem;
+            padding: 0.55rem 0.65rem;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.85);
+            border: 1px solid #e5eefb;
+        }
+        .air-cost-summary-row-label {
+            display: flex;
+            flex-direction: column;
+            gap: 0.15rem;
+            min-width: 0;
+        }
+        .air-cost-summary-row-label strong {
+            font-size: 0.77rem;
+            color: var(--gray-800);
+        }
+        .air-cost-summary-row-label span {
+            font-size: 0.68rem;
+            color: var(--gray-500);
+        }
+        .air-cost-summary-row-value {
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: var(--navy);
+            white-space: nowrap;
+        }
+        .air-cost-summary-foot {
+            margin-top: 0.7rem;
+            padding-top: 0.65rem;
+            border-top: 1px dashed #cbd5e1;
+            font-size: 0.7rem;
+            color: var(--gray-500);
+            line-height: 1.45;
+        }
         .unit-reference-card {
             margin-top: 0.9rem;
             margin-bottom: 0;
@@ -1932,6 +2092,12 @@
             .main { padding: 1rem; }
             .form-grid { grid-template-columns: 1fr !important; }
             .quote-grid { grid-template-columns: 1fr; }
+            .air-provider-layout { grid-template-columns: 1fr; }
+            .air-provider-card { grid-template-columns: 1fr; }
+            .air-provider-price,
+            .air-provider-price-label { text-align: left; }
+            .air-provider-actions { justify-content: stretch; }
+            .air-provider-card .btn-venta { width: 100%; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
             .maritime-combined-head { flex-direction: column; }
@@ -4168,6 +4334,40 @@ function saveConceptosFijos(data) {
     localStorage.setItem('conceptosFijos', JSON.stringify(data));
 }
 
+function getAirAirportFixedCharges(aeropuerto) {
+    const airport = String(aeropuerto || '').toUpperCase().trim();
+    if (airport === 'NLU' || airport === 'MEX') {
+        return [
+            {
+                nombre: 'Revalidacion',
+                monto: 1300,
+                impuestoRate: 0.16,
+                quoteSection: 'airport',
+                quoteLabel: 'Revalidacion'
+            },
+            {
+                nombre: 'Desconsolidacion',
+                monto: 500,
+                impuestoRate: 0.16,
+                quoteSection: 'airport',
+                quoteLabel: 'Desconsolidacion'
+            }
+        ];
+    }
+    if (airport === 'GDL' || airport === 'MTY') {
+        return [
+            {
+                nombre: 'Revalidacion',
+                monto: 1100,
+                impuestoRate: 0.16,
+                quoteSection: 'airport',
+                quoteLabel: 'Revalidacion'
+            }
+        ];
+    }
+    return [];
+}
+
 function renderConceptosTable() {
     const airport = document.getElementById('conceptos-airport').value;
     const wrap = document.getElementById('conceptos-table-wrap');
@@ -5509,8 +5709,7 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     }
 
     // Obtener conceptos fijos del aeropuerto
-    const allConceptos = getConceptosFijos();
-    const conceptos = allConceptos[aeropuerto] || [];
+    const conceptos = getAirAirportFixedCharges(aeropuerto);
     const totalConceptos = conceptos.reduce((s, c) => s + (parseFloat(c.monto) || 0), 0);
 
     // Mostrar TOP 3
@@ -5519,6 +5718,41 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
 
     const fmt = (n) => n.toLocaleString('es-MX', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
     const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opción', '&#x1F949; 3ra opción'];
+    const buildAirCostSummaryHtml = (selected) => `
+        <div class="air-cost-summary">
+            <div class="air-cost-summary-head">
+                <div class="air-cost-summary-title">Resumen de costos</div>
+                <div class="air-cost-summary-note">Vista rápida antes de pasar a venta.</div>
+            </div>
+            <div class="air-cost-summary-provider">
+                <strong>${escapeHtml(selected?.proveedor || top[0]?.proveedor || '')}</strong>
+                <span>${escapeHtml(selected?.tipoUnidad || tipoUnidad)} · ${escapeHtml(aeropuerto)} → ${escapeHtml(ciudad)}</span>
+            </div>
+            <div class="air-cost-summary-list">
+                <div class="air-cost-summary-row">
+                    <div class="air-cost-summary-row-label">
+                        <strong>Flete terrestre</strong>
+                        <span>${escapeHtml(selected?.tipoUnidad || tipoUnidad)}</span>
+                    </div>
+                    <div class="air-cost-summary-row-value">$${fmt(parseFloat(selected?.tarifaFlete) || 0)} MXN</div>
+                </div>
+                ${(selected?.conceptos || conceptos).map(c => `
+                    <div class="air-cost-summary-row">
+                        <div class="air-cost-summary-row-label">
+                            <strong>${escapeHtml(c.nombre)}</strong>
+                            <span>Se agrega con IVA 16% en calculadora</span>
+                        </div>
+                        <div class="air-cost-summary-row-value">$${fmt(parseFloat(c.monto) || 0)} MXN</div>
+                    </div>
+                `).join('')}
+            </div>
+            <div class="air-cost-summary-foot">
+                ${(selected?.conceptos || conceptos).length > 0
+                    ? 'Estos cargos aeroportuarios entran por separado en la calculadora y su impuesto se calcula con IVA 16%.'
+                    : 'No hay cargos aeroportuarios predeterminados para este aeropuerto.'}
+            </div>
+        </div>
+    `;
 
     resultsEl.innerHTML = `
         <div style="margin-top:0.75rem;margin-bottom:0.5rem;">
@@ -5526,15 +5760,21 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                 <strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong> · ${tipoUnidad} · ${resultados.length} proveedor${resultados.length > 1 ? 'es' : ''}
             </div>
         </div>
-        <div class="quote-grid">
+        <div class="air-provider-layout">
+        <div class="air-provider-list">
         ${top.map((r, i) => {
-            const total = r.tarifaFlete + totalConceptos;
             // Guardar datos en data attributes para la calculadora MUB
             const mubData = encodeURIComponent(JSON.stringify({
                 proveedor: r.proveedor,
                 tarifaFlete: r.tarifaFlete,
                 tipoUnidad: r.tipoUnidad,
-                conceptos: conceptos.map(c => ({ nombre: c.nombre, monto: parseFloat(c.monto) || 0 })),
+                conceptos: conceptos.map(c => ({
+                    nombre: c.nombre,
+                    monto: parseFloat(c.monto) || 0,
+                    impuestoRate: typeof c.impuestoRate === 'number' ? c.impuestoRate : 0,
+                    quoteSection: c.quoteSection || 'airport',
+                    quoteLabel: c.quoteLabel || c.nombre
+                })),
                 quoteMeta: {
                     mode: 'air',
                     aeropuerto: r.aeropuerto,
@@ -5542,27 +5782,39 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
                     tipoUnidad: r.tipoUnidad,
                     proveedor: r.proveedor,
                     providerNote: r.condicionesResumen || getAirProviderConditionsSummary(r.proveedor),
-                    airportCharges: conceptos.map(c => ({ nombre: c.nombre, monto: parseFloat(c.monto) || 0 }))
+                    airportCharges: conceptos.map(c => ({
+                        nombre: c.nombre,
+                        monto: parseFloat(c.monto) || 0,
+                        impuestoRate: typeof c.impuestoRate === 'number' ? c.impuestoRate : 0,
+                        quoteSection: c.quoteSection || 'airport'
+                    }))
                 },
             }));
             return `
-            <div class="quote-card ${i === 0 ? 'best' : ''}">
-                <div class="quote-rank">${rankLabels[i]}</div>
-                <div class="quote-provider" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
-                <div class="quote-price">$${fmt(total)}</div>
-                <div class="quote-breakdown">
-                    <table>
-                        <tr><td>Flete</td><td>$${fmt(r.tarifaFlete)}</td></tr>
-                        ${conceptos.length > 0 ? conceptos.map(c =>
-                            `<tr><td>${escapeHtml(c.nombre)}</td><td>$${fmt(parseFloat(c.monto) || 0)}</td></tr>`
-                        ).join('') : '<tr><td>Conceptos</td><td style="color:var(--gray-400);">—</td></tr>'}
-                        <tr class="total-row"><td>Total</td><td>$${fmt(total)}</td></tr>
-                    </table>
+            <div class="air-provider-card ${i === 0 ? 'best' : ''}">
+                <div class="air-provider-main">
+                    <div class="air-provider-rank">${rankLabels[i]}</div>
+                    <div class="air-provider-name" title="${escapeHtml(r.proveedor)}">${escapeHtml(r.proveedor)}</div>
+                    <div class="air-provider-unit">${escapeHtml(r.tipoUnidad)}</div>
                 </div>
-                ${(r.condicionesResumen || getAirProviderConditionsSummary(r.proveedor)) ? `<div class="quote-note">${escapeHtml(r.condicionesResumen || getAirProviderConditionsSummary(r.proveedor))}</div>` : ''}
-                <button class="btn-venta" data-mub="${mubData}">&#x1F4B0; Calcular Venta</button>
+                <div>
+                    <div class="air-provider-price">$${fmt(r.tarifaFlete)}</div>
+                    <div class="air-provider-price-label">Solo flete</div>
+                </div>
+                <div class="air-provider-actions">
+                    <button class="btn-venta" data-mub="${mubData}">&#x1F4B0; Calcular Venta</button>
+                </div>
             </div>`;
         }).join('')}
+        </div>
+        <div id="air-cost-summary-panel">
+            ${buildAirCostSummaryHtml({
+                proveedor: top[0]?.proveedor || '',
+                tipoUnidad: top[0]?.tipoUnidad || tipoUnidad,
+                tarifaFlete: top[0]?.tarifaFlete || 0,
+                conceptos
+            })}
+        </div>
         </div>
         <div id="mub-panel-container"></div>
     `;
@@ -5578,6 +5830,10 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     resultsEl.querySelectorAll('.btn-venta').forEach(btn => {
         btn.addEventListener('click', () => {
             const data = JSON.parse(decodeURIComponent(btn.dataset.mub));
+            const summaryPanel = document.getElementById('air-cost-summary-panel');
+            if (summaryPanel) {
+                summaryPanel.innerHTML = buildAirCostSummaryHtml(data);
+            }
             openMubPanel(data);
         });
     });
@@ -6331,6 +6587,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 costo: c.monto,
                 monedaCosto: 'MXN',
                 esFlete: false,
+                impuestoRate: typeof c.impuestoRate === 'number' ? c.impuestoRate : 0,
+                quoteSection: c.quoteSection || (isAirQuote ? 'airport' : 'destination'),
+                quoteLabel: c.quoteLabel || c.nombre,
                 mub: 15,
                 venta: 0,
                 editando: 'mub',
@@ -6382,7 +6641,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const lineTaxAmountMXN = l.monedaCosto === 'USD' && hayTC
             ? (l.costo * lineTaxRate * tc)
             : (l.costo * lineTaxRate);
-        const isDestinationCharge = (l.quoteSection || '') === 'destination';
+        const lineSection = (l.quoteSection || '');
+        const isDestinationCharge = lineSection === 'destination' || lineSection === 'airport';
         const costButton = isDestinationCharge
             ? `<span class="mub-quick-actions"><button type="button" class="mub-cost-btn${l.costMode ? ' active' : ''}" data-idx="${i}" title="Mandar este cargo al costo">Costo</button></span>`
             : '';
@@ -6416,7 +6676,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         .join('');
     const destinationRowsHtml = lineas
         .map((l, i) => ({ l, i }))
-        .filter(({ l }) => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'destination')
+        .filter(({ l }) => {
+            const section = (l.quoteSection || (l.esFlete ? 'inland' : 'destination'));
+            return section === 'destination' || section === 'airport';
+        })
         .map(({ l, i }) => renderLineRow(l, i, false))
         .join('');
 
@@ -6437,14 +6700,14 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const inlandBlockSubtitle = isAirQuote
         ? 'Base de venta del traslado terrestre para esta ruta y tipo de unidad.'
         : 'Base de venta por contenedor para single y full.';
-    const secondaryBlockTitle = isAirQuote ? 'Conceptos fijos del aeropuerto' : 'Destination Charges';
+    const secondaryBlockTitle = isAirQuote ? 'Costos aeroportuarios' : 'Destination Charges';
     const secondaryBlockSubtitle = isAirQuote
-        ? 'Ajusta cada concepto fijo del aeropuerto por separado o mándalo al costo.'
+        ? 'Ajusta revalidación y desconsolidación por separado o mándalos al costo.'
         : 'Ajusta cada cargo por separado o mándalo al costo.';
     const secondaryEmptyState = isAirQuote
-        ? 'Aún no hay conceptos fijos del aeropuerto para esta cotización.'
+        ? 'Aún no hay costos aeroportuarios para esta cotización.'
         : 'Aún no has agregado cargos en destino.';
-    const showSecondaryBlock = !isAirQuote;
+    const showSecondaryBlock = !isAirQuote || !!destinationRowsHtml;
 
     container.innerHTML = `
     <div class="mub-panel">
