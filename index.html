@@ -1015,7 +1015,7 @@
             padding: 0.85rem 1rem;
             border: 1px solid rgba(37,99,235,0.15);
             border-radius: 14px;
-            background: #f8fbff;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
         }
         .maritime-commercial-panel {
             padding: 1rem 1.05rem;
@@ -1023,6 +1023,110 @@
             border-radius: 14px;
             background: #ffffff;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+        }
+        .maritime-charge-meta {
+            margin-top: 0.8rem;
+            font-size: 0.76rem;
+            color: var(--gray-500);
+        }
+        .maritime-charge-meta strong {
+            color: var(--navy);
+        }
+        .maritime-selectable-box {
+            padding: 0.85rem 0.95rem;
+            border-radius: 14px;
+            background: white;
+            border: 1px solid rgba(37,99,235,0.12);
+        }
+        .maritime-selectable-head {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0.5rem;
+        }
+        .maritime-selectable-title {
+            font-size: 0.8rem;
+            font-weight: 800;
+            color: var(--gray-700);
+        }
+        .maritime-select-all-btn {
+            border-radius: 999px;
+            padding: 0.22rem 0.68rem;
+            font-size: 0.68rem;
+            font-weight: 800;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+        .maritime-concept-item {
+            display: flex;
+            gap: 0.65rem;
+            align-items: flex-start;
+            padding: 0.6rem 0.2rem;
+            border-bottom: 1px solid rgba(148,163,184,0.14);
+            cursor: pointer;
+        }
+        .maritime-concept-item:last-child {
+            border-bottom: none;
+            padding-bottom: 0.15rem;
+        }
+        .maritime-concept-body {
+            display: block;
+            font-size: 0.76rem;
+            color: var(--gray-600);
+            flex: 1 1 auto;
+            min-width: 0;
+        }
+        .maritime-concept-topline {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .maritime-concept-name {
+            color: var(--gray-800);
+            line-height: 1.35;
+        }
+        .maritime-concept-rate {
+            flex: 0 0 auto;
+            font-weight: 800;
+            color: #1d4ed8;
+            white-space: nowrap;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 999px;
+            padding: 0.22rem 0.6rem;
+        }
+        .maritime-concept-charge {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.24rem;
+        }
+        .maritime-concept-charge-label {
+            font-size: 0.69rem;
+            font-weight: 700;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .maritime-concept-charge-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.16rem 0.5rem;
+            border-radius: 999px;
+            background: #f1f5f9;
+            color: var(--gray-700);
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .maritime-concept-comment {
+            display: block;
+            margin-top: 0.22rem;
+            color: var(--gray-500);
+            font-size: 0.72rem;
+            line-height: 1.35;
         }
         .maritime-commercial-title {
             font-size: 0.9rem;
@@ -7178,13 +7282,13 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                             Piloto Fase 2: los cargos en destino se eligen por naviera y los depósitos o garantías se muestran aparte sin entrar al total DAP.
                         </div>
                     </div>
-                    <div id="${destinationMetaId}" style="margin-top:0.75rem;font-size:0.76rem;color:var(--gray-500);"></div>
+                    <div id="${destinationMetaId}" class="maritime-charge-meta"></div>
                     <div id="${destinationConceptsId}" style="margin-top:0.75rem;"></div>
                     <div id="${destinationExtrasId}" style="margin-top:0.75rem;"></div>
                 </div>
                 <div class="maritime-commercial-panel">
-                    <div class="maritime-commercial-title">Resumen de costos</div>
-                    <div class="maritime-commercial-subtitle">Vista rápida para decidir qué entra antes de pasar a venta.</div>
+                    <div class="maritime-commercial-title">Resumen comercial</div>
+                    <div class="maritime-commercial-subtitle">Vista rápida de destination charges e inland antes de pasar a venta.</div>
                     <div id="${commercialSummaryId}" class="maritime-commercial-sections"></div>
                 </div>
             </div>
@@ -7216,27 +7320,27 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
             if (destinationData.selectable.length) {
                 const allSelected = destinationData.selectable.every(item => item.selected);
                 destinationConcepts.innerHTML = `
-                    <div style="padding:0.8rem 0.9rem;border-radius:12px;background:white;border:1px solid rgba(37,99,235,0.12);">
-                        <div style="display:flex;justify-content:space-between;align-items:center;gap:0.75rem;margin-bottom:0.45rem;">
-                            <div style="font-size:0.78rem;font-weight:700;color:var(--gray-700);">Cargos a seleccionar</div>
-                            <button type="button" onclick="toggleAllMaritimeDestinationConcepts()" style="border:1px solid ${allSelected ? 'rgba(239,68,68,0.25)' : 'rgba(37,99,235,0.18)'};background:${allSelected ? '#fef2f2' : '#eff6ff'};color:${allSelected ? '#b91c1c' : '#1d4ed8'};border-radius:999px;padding:0.22rem 0.68rem;font-size:0.68rem;font-weight:800;cursor:pointer;white-space:nowrap;">
+                    <div class="maritime-selectable-box">
+                        <div class="maritime-selectable-head">
+                            <div class="maritime-selectable-title">Cargos a seleccionar</div>
+                            <button type="button" onclick="toggleAllMaritimeDestinationConcepts()" class="maritime-select-all-btn" style="border:1px solid ${allSelected ? 'rgba(239,68,68,0.25)' : 'rgba(37,99,235,0.18)'};background:${allSelected ? '#fef2f2' : '#eff6ff'};color:${allSelected ? '#b91c1c' : '#1d4ed8'};">
                                 ${allSelected ? 'Limpiar selección' : 'Seleccionar todo'}
                             </button>
                         </div>
                         <div style="display:flex;flex-direction:column;gap:0.45rem;">
                             ${destinationData.selectable.map(item => `
-                                <label style="display:flex;gap:0.65rem;align-items:flex-start;padding:0.55rem 0.2rem;border-bottom:1px solid rgba(148,163,184,0.14);cursor:pointer;">
+                                <label class="maritime-concept-item">
                                     <input type="checkbox" data-destination-concept="${escapeHtml(item.id)}"${item.selected ? ' checked' : ''} onchange="toggleMaritimeDestinationConcept(this)" style="margin-top:0.2rem;">
-                                    <span style="display:block;font-size:0.76rem;color:var(--gray-600);flex:1 1 auto;min-width:0;">
-                                        <span style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
-                                            <strong style="color:var(--gray-800);line-height:1.35;">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
-                                            <span style="flex:0 0 auto;font-weight:800;color:#1d4ed8;white-space:nowrap;background:#eff6ff;border:1px solid #bfdbfe;border-radius:999px;padding:0.22rem 0.6rem;">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
+                                    <span class="maritime-concept-body">
+                                        <span class="maritime-concept-topline">
+                                            <strong class="maritime-concept-name">${item.choiceLabel ? `${escapeHtml(item.choiceLabel)} · ` : ''}${escapeHtml(item.nombre)}</strong>
+                                            <span class="maritime-concept-rate">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
                                         </span>
-                                        <span style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-top:0.24rem;">
-                                            <span style="font-size:0.69rem;font-weight:700;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.04em;">Charge by:</span>
-                                            <span style="display:inline-flex;align-items:center;padding:0.16rem 0.5rem;border-radius:999px;background:#f1f5f9;color:var(--gray-700);font-size:0.7rem;font-weight:700;">${escapeHtml(item.baseCobro || 'N/A')}</span>
+                                        <span class="maritime-concept-charge">
+                                            <span class="maritime-concept-charge-label">Charge by:</span>
+                                            <span class="maritime-concept-charge-badge">${escapeHtml(item.baseCobro || 'N/A')}</span>
                                         </span>
-                                        ${getMaritimeConceptComment(item) ? `<span style="display:block;margin-top:0.22rem;color:var(--gray-500);font-size:0.72rem;line-height:1.35;">${escapeHtml(getMaritimeConceptComment(item))}</span>` : ''}
+                                        ${getMaritimeConceptComment(item) ? `<span class="maritime-concept-comment">${escapeHtml(getMaritimeConceptComment(item))}</span>` : ''}
                                     </span>
                                 </label>
                             `).join('')}
