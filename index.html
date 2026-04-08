@@ -799,21 +799,23 @@
             border-radius: 14px;
             background: #fff;
             overflow: hidden;
+            transition: box-shadow 0.18s ease, border-color 0.18s ease, transform 0.18s ease;
         }
-        .maritime-option-row.best {
+        .maritime-option-row.best:not(.selected) {
             border-color: rgba(16, 185, 129, 0.45);
             background: #f7fffb;
         }
         .maritime-option-row.selected {
             border-color: var(--blue);
-            box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+            box-shadow: 0 10px 24px rgba(37,99,235,0.12);
+            transform: translateY(-1px);
         }
         .maritime-option-summary {
             display: grid;
             grid-template-columns: auto minmax(0, 1fr) auto auto auto;
-            gap: 0.75rem;
+            gap: 0.85rem;
             align-items: center;
-            padding: 0.8rem 0.9rem;
+            padding: 0.9rem 1rem;
         }
         .maritime-option-rank {
             font-size: 0.65rem;
@@ -823,7 +825,7 @@
             color: var(--gray-400);
             white-space: nowrap;
         }
-        .maritime-option-row.best .maritime-option-rank {
+        .maritime-option-row.best:not(.selected) .maritime-option-rank {
             color: var(--green);
         }
         .maritime-option-provider {
@@ -831,7 +833,7 @@
         }
         .maritime-option-provider strong {
             display: block;
-            font-size: 0.83rem;
+            font-size: 0.92rem;
             color: var(--navy);
             white-space: nowrap;
             overflow: hidden;
@@ -839,20 +841,67 @@
         }
         .maritime-option-provider span {
             display: block;
-            font-size: 0.7rem;
-            color: var(--gray-400);
-            margin-top: 0.12rem;
+            font-size: 0.72rem;
+            color: var(--gray-500);
+            margin-top: 0.18rem;
+        }
+        .maritime-option-provider-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.35rem 0.6rem;
+            margin-top: 0.35rem;
+            font-size: 0.68rem;
+            color: var(--gray-500);
+        }
+        .maritime-option-provider-meta span {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.2rem;
+            margin-top: 0;
+            padding: 0.18rem 0.45rem;
+            border-radius: 999px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-100);
+            color: var(--gray-500);
+        }
+        .maritime-option-price-wrap {
+            display: grid;
+            justify-items: end;
+            gap: 0.2rem;
         }
         .maritime-option-price {
-            font-size: 1.05rem;
-            font-weight: 800;
+            font-size: 1.18rem;
+            font-weight: 900;
             color: var(--blue);
             white-space: nowrap;
+        }
+        .maritime-option-price-label {
+            font-size: 0.62rem;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .maritime-option-selected-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.2rem 0.5rem;
+            border-radius: 999px;
+            background: #dbeafe;
+            color: #1d4ed8;
+            font-size: 0.62rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+        }
+        .maritime-option-row.selected .maritime-option-price {
+            color: #1d4ed8;
         }
         .maritime-option-actions {
             display: flex;
             align-items: center;
             gap: 0.45rem;
+            justify-content: flex-end;
         }
         .maritime-expand-btn {
             border: 1px solid var(--gray-200);
@@ -870,9 +919,14 @@
         .maritime-option-row .btn-venta {
             margin-top: 0;
             width: auto;
-            min-width: 150px;
+            min-width: 168px;
             padding: 0.45rem 0.85rem;
             white-space: nowrap;
+        }
+        .maritime-option-row.selected .btn-venta {
+            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
+            border-color: #1d4ed8;
+            box-shadow: 0 8px 18px rgba(37,99,235,0.18);
         }
         .maritime-option-detail {
             display: none;
@@ -6946,6 +7000,9 @@ document.addEventListener('click', (e) => {
 function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
     const selected = maritimeSelection[tipo] && maritimeSelection[tipo].providerKey === option.providerKey;
     const expanded = maritimeExpanded[tipo] === option.providerKey;
+    const providerMeta = [];
+    if (option.vigencia) providerMeta.push(`<span>Vigencia: ${escapeHtml(option.vigencia)}</span>`);
+    if (option.horasLibres) providerMeta.push(`<span>Horas libres: ${escapeHtml(option.horasLibres)}</span>`);
     return `
         <div class="maritime-option-row ${index === 0 ? 'best' : ''} ${selected ? 'selected' : ''} ${expanded ? 'expanded' : ''}">
             <div class="maritime-option-summary">
@@ -6953,12 +7010,17 @@ function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
                 <div class="maritime-option-provider">
                     <strong title="${escapeHtml(option.proveedor)}">${escapeHtml(option.proveedor)}</strong>
                     <span>${tipo === 'single' ? 'Tarifa base Single' : 'Tarifa base Full'}</span>
+                    ${providerMeta.length ? `<div class="maritime-option-provider-meta">${providerMeta.join('')}</div>` : ''}
                 </div>
-                <div class="maritime-option-price">$${fmt(option[tipo])}</div>
+                <div class="maritime-option-price-wrap">
+                    ${selected ? `<span class="maritime-option-selected-badge">${tipo === 'single' ? 'Single seleccionado' : 'Full seleccionado'}</span>` : ''}
+                    <div class="maritime-option-price">$${fmt(option[tipo])}</div>
+                    <div class="maritime-option-price-label">Base ${tipo === 'single' ? 'Single' : 'Full'}</div>
+                </div>
                 <div class="maritime-option-actions">
                     <button class="maritime-expand-btn" type="button" data-expand-kind="${tipo}" data-expand-key="${escapeHtml(option.providerKey)}">${expanded ? 'Ocultar notas' : 'Expandir notas'}</button>
                 </div>
-                <button class="btn-venta maritime-pick-btn" data-kind="${tipo}" data-key="${escapeHtml(option.providerKey)}">${selected ? `Elegido como ${tipo === 'single' ? 'Single' : 'Full'}` : `Usar como ${tipo === 'single' ? 'Single' : 'Full'}`}</button>
+                <button class="btn-venta maritime-pick-btn" data-kind="${tipo}" data-key="${escapeHtml(option.providerKey)}">${selected ? `${tipo === 'single' ? 'Single' : 'Full'} listo` : `Usar como ${tipo === 'single' ? 'Single' : 'Full'}`}</button>
             </div>
             <div class="maritime-option-detail">
                 <div class="maritime-option-detail-grid">
