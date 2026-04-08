@@ -1,4 +1,4 @@
-# Cotizador Agentes
+﻿# Cotizador Agentes
 
 ## Proyecto
 Cotizador de transporte para operación de freight forwarding en México.
@@ -69,19 +69,52 @@ Stack actual:
 ## Estado actual del cotizador
 
 ### Aéreo
-- Flujo funcional
-- Login funcional
-- Historial / cotizaciones funcionales
+- Flujo DAP aéreo funcional de punta a punta
+- Nuevos proveedores integrados en la base compartida:
+  - `Birlesti Express`
+  - `Sandoval`
+  - `Ramce`
+  - `Raymon Pack`
+- Resumen de costos por aeropuerto ya integrado
+- Calculadora aérea ya contempla:
+  - flete terrestre aeroportuario
+  - costos aeroportuarios por aeropuerto
+  - resumen de venta
+  - resumen de cotización
+- Resumen de cotización aéreo con:
+  - tabs `EN / ES`
+  - estilos `Oficial / Brenda / Rodrigo`
+  - botón `Copiar correo`
+- Reglas comerciales activas:
+  - AWB Release:
+    - `NLU / MEX` = `USD 100`
+    - `MTY` = `USD 130`
+    - `GDL` = `USD 160`
+  - Entry to Airport = `USD 45`
+  - TT:
+    - más de `900 km` = `1-2 days transit`
+    - hasta `900 km` = `1 day transit`
+- UX/UI aérea ya migrada a flujo por pasos:
+  - `Ruta`
+  - `Carga`
+  - `Proveedor`
+  - `Venta`
+- `Resumen operativo` lateral sticky en desktop
 
 ### Marítimo
-- Flujo `DAP Marítimo` ya activo y aprobado visualmente
+- Flujo `DAP Marítimo` activo y funcional
 - Ranking `Top 3 Single` y `Top 3 Full`
 - Selección independiente de `Single` y `Full`
 - Mapa y calculadora marítima funcionando
 - Importación de tarifarios por Excel ya integrada
 - Corrección aplicada a vigencias raras de Excel tipo:
   - `1/1/46387`
-- La normalización de vigencias ya se reflejó también en la base compartida
+- La normalización de vigencias ya quedó reflejada también en la base compartida
+- UX/UI marítima ya alineada por pasos:
+  - `Ruta`
+  - `Comparador de opciones`
+  - `Cargos en destino por naviera`
+  - `Venta`
 
 ## Fase 2 marítima: cargos en destino por naviera
 
@@ -102,7 +135,7 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 ### Reglas implementadas
 - Los conceptos `BL` y `CONT` sí aparecen para selección
 - Depósitos / garantías no entran al total DAP
-- El impuesto de cada concepto ya respeta la columna `F` del Excel:
+- El impuesto de cada concepto respeta la columna `F` del Excel:
   - `más IVA 16` suma impuesto
   - `incluido / inc / N.A.` no suma extra
 
@@ -112,12 +145,12 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 - Lado izquierdo:
   - cargos destino por naviera
 - Lado derecho:
-  - resumen de costos
+  - resumen comercial
 - Bloque inferior:
-  - `Armado comercial marítimo`
+  - `Venta`
   - `Resumen de cotización`
 
-### Bloque de armado comercial
+### Bloque de venta
 - Ya no hace scroll automático al actualizar
 - `Selección base por contenedor` muestra la base `Single` y `Full`
 - `Destination Charges` se muestran en tabla
@@ -136,7 +169,7 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
   - utilidad en cero
 - Si el usuario vuelve a editar campos, se recupera el modo manual
 
-### Resumen de cotización
+### Resumen de cotización marítimo
 - Vive debajo de la calculadora
 - Está pensado para copy/paste a correo
 - Usa la venta actual de la calculadora, no sólo costos base
@@ -158,6 +191,7 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 - Errores de login más claros
 - Modo admin y modo tariff manager separados
 - Publicación de tipo de cambio compartido desde la app
+- DAP aéreo y DAP marítimo ya usan un lenguaje visual más consistente por pasos
 
 ## Archivos / datos clave para futuras iteraciones
 - `index.html` concentra casi toda la lógica
@@ -165,7 +199,9 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 - `data/tipo-cambio.json` es respaldo, no fuente primaria cuando Apps Script responde
 - `data/conceptos-destino-maritimos.json` seguirá creciendo por naviera
 
-## Recordatorios operativos
+## Riesgos / recordatorios técnicos
+- No hay suite automatizada de pruebas UI; después de cambios grandes conviene smoke test manual en navegador
+- `index.html` es monolítico; cualquier ajuste visual puede tocar lógica si no se edita con cuidado
 - GitHub Pages puede tardar en reflejar cambios
 - Un `Ctrl + F5` suele resolver la mayoría de efectos de caché
-- Los cambios de marítimo recientes son sensibles a UI y flujo, así que conviene validar siempre en navegador después de publicar
+- Los cambios recientes en aéreo y marítimo son sensibles a UI y flujo, así que conviene validar siempre en navegador después de publicar
