@@ -18,6 +18,7 @@ Stack actual:
 
 ## Estructura actual
 - `index.html` — app principal con HTML, CSS y JS embebidos
+- `index-lab.html` — copia de laboratorio para pruebas y futuras mejoras sin tocar el flujo estable
 - `google-apps-script.js` — referencia del Apps Script desplegado
 - `data/cotizador-base.json` — base compartida de tarifas
 - `data/tipo-cambio.json` — respaldo compartido de tipo de cambio
@@ -194,7 +195,8 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 - DAP aéreo y DAP marítimo ya usan un lenguaje visual más consistente por pasos
 
 ## Archivos / datos clave para futuras iteraciones
-- `index.html` concentra casi toda la lógica
+- `index.html` concentra casi toda la lógica y sigue siendo la versión estable publicada para el equipo
+- `index-lab.html` se usa como entorno de pruebas para iterar cambios grandes antes de llevarlos a `index.html`
 - `data/cotizador-base.json` es crítico y estable
 - `data/tipo-cambio.json` es respaldo, no fuente primaria cuando Apps Script responde
 - `data/conceptos-destino-maritimos.json` seguirá creciendo por naviera
@@ -202,6 +204,7 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 ## Riesgos / recordatorios técnicos
 - No hay suite automatizada de pruebas UI; después de cambios grandes conviene smoke test manual en navegador
 - `index.html` es monolítico; cualquier ajuste visual puede tocar lógica si no se edita con cuidado
+- Para cambios grandes de UX/UI o experimentos, trabajar primero en `index-lab.html` y sólo después promover a `index.html`
 - GitHub Pages puede tardar en reflejar cambios
 - Un `Ctrl + F5` suele resolver la mayoría de efectos de caché
 - Los cambios recientes en aéreo y marítimo son sensibles a UI y flujo, así que conviene validar siempre en navegador después de publicar
