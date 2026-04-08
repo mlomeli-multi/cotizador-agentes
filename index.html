@@ -950,19 +950,19 @@
             color: var(--gray-500);
         }
         .maritime-combined-shell {
-            margin-top: 0.25rem;
+            margin-top: 1.1rem;
             border: 1px solid #dbeafe;
-            border-radius: 12px;
+            border-radius: 16px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
-            padding: 1rem;
+            padding: 1.05rem;
         }
         .maritime-combined-head {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
             gap: 1rem;
-            margin-bottom: 0.9rem;
-            padding-bottom: 0.75rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.85rem;
             border-bottom: 1px solid #dbeafe;
         }
         .maritime-combined-title {
@@ -1233,8 +1233,8 @@
             line-height: 1.5;
         }
         .maritime-quote-panel {
-            margin-top: 1rem;
-            padding: 1rem;
+            margin-top: 1.05rem;
+            padding: 1.05rem;
             border: 1px solid rgba(15,23,42,0.1);
             border-radius: 16px;
             background: #ffffff;
@@ -7244,10 +7244,11 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         <div class="maritime-combined-shell">
             <div class="maritime-combined-head">
                 <div>
-                    <div class="maritime-combined-title">Armado comercial marítimo</div>
-                    <div class="maritime-combined-subtitle">Estas armando la venta final con una opcion Single y una opcion Full elegidas por separado.</div>
+                    <div class="maritime-combined-title">Venta</div>
+                    <div class="maritime-combined-subtitle">Ajusta la venta final del escenario marítimo con una opción Single y una Full elegidas por separado.</div>
                 </div>
                 <div class="maritime-combined-badges">
+                    <span class="maritime-step-badge">Paso 4</span>
                     <span class="maritime-combined-badge single">Single seleccionado</span>
                     <span class="maritime-combined-badge full">Full seleccionado</span>
                 </div>
@@ -8099,7 +8100,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 <h3>Resumen de cotización</h3>
                 <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
             </div>
-            ${isAirQuote ? '<div class="mub-step-badge">Paso 4</div>' : ''}
+            ${isAirQuote ? '<div class="mub-step-badge">Paso 4</div>' : '<div class="maritime-step-badge">Paso 4</div>'}
         </div>
         <div id="${quoteTabsId}" class="maritime-quote-tabs" style="margin:0 0 0.8rem auto;width:max-content;">
             <button type="button" class="maritime-quote-tab active" data-lang="en">EN</button>
