@@ -835,34 +835,16 @@
             display: block;
             font-size: 0.92rem;
             color: var(--navy);
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            white-space: normal;
+            overflow: visible;
+            text-overflow: clip;
+            line-height: 1.25;
         }
         .maritime-option-provider span {
             display: block;
             font-size: 0.72rem;
             color: var(--gray-500);
             margin-top: 0.18rem;
-        }
-        .maritime-option-provider-meta {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.35rem 0.6rem;
-            margin-top: 0.35rem;
-            font-size: 0.68rem;
-            color: var(--gray-500);
-        }
-        .maritime-option-provider-meta span {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.2rem;
-            margin-top: 0;
-            padding: 0.18rem 0.45rem;
-            border-radius: 999px;
-            background: var(--gray-50);
-            border: 1px solid var(--gray-100);
-            color: var(--gray-500);
         }
         .maritime-option-price-wrap {
             display: grid;
@@ -7000,9 +6982,6 @@ document.addEventListener('click', (e) => {
 function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
     const selected = maritimeSelection[tipo] && maritimeSelection[tipo].providerKey === option.providerKey;
     const expanded = maritimeExpanded[tipo] === option.providerKey;
-    const providerMeta = [];
-    if (option.vigencia) providerMeta.push(`<span>Vigencia: ${escapeHtml(option.vigencia)}</span>`);
-    if (option.horasLibres) providerMeta.push(`<span>Horas libres: ${escapeHtml(option.horasLibres)}</span>`);
     return `
         <div class="maritime-option-row ${index === 0 ? 'best' : ''} ${selected ? 'selected' : ''} ${expanded ? 'expanded' : ''}">
             <div class="maritime-option-summary">
@@ -7010,7 +6989,6 @@ function createMaritimeOptionMarkup(tipo, rankLabels, fmt, option, index) {
                 <div class="maritime-option-provider">
                     <strong title="${escapeHtml(option.proveedor)}">${escapeHtml(option.proveedor)}</strong>
                     <span>${tipo === 'single' ? 'Tarifa base Single' : 'Tarifa base Full'}</span>
-                    ${providerMeta.length ? `<div class="maritime-option-provider-meta">${providerMeta.join('')}</div>` : ''}
                 </div>
                 <div class="maritime-option-price-wrap">
                     ${selected ? `<span class="maritime-option-selected-badge">${tipo === 'single' ? 'Single seleccionado' : 'Full seleccionado'}</span>` : ''}
