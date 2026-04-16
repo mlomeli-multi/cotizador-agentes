@@ -3279,10 +3279,13 @@
         <span class="tab-icon">&#9992;</span>
         Aéreo Importación (DAP)
     </button>
+    <button class="tab-btn" data-tab="aereo-exp">
+        <span class="tab-icon">&#9992;</span>
+        Aéreo Exportación (EXW)
+    </button>
     <button class="tab-btn" data-tab="maritimo">
         <span class="tab-icon">&#x1F6A2;</span>
         Marítimo Importación (DAP)
-        <span class="tab-badge">Próximamente</span>
     </button>
 </nav>
 
@@ -3656,7 +3659,207 @@
 
     </section>
 
-    <!-- TAB: MARÍTIMO (placeholder) -->
+    <!-- TAB: AÉREO EXPORTACIÓN (EXW) -->
+    <section class="tab-content" id="tab-aereo-exp">
+
+        <div class="card air-dap-card">
+            <div class="card-header">
+                <div class="card-icon blue">&#x1F4CD;</div>
+                <h2>Cotizador Flete Terrestre — Exportación</h2>
+            </div>
+            <div class="air-dap-shell">
+                <aside class="air-dap-rail">
+                    <div class="air-stepper">
+                        <div class="air-stepper-title">Flujo EXW Aéreo</div>
+                        <div class="air-stepper-list">
+                            <div class="air-step is-active" data-exp-step="route">
+                                <div class="air-step-index">1</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Ruta</div>
+                                    <div class="air-step-desc">Ciudad de origen y aeropuerto de salida.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-exp-step="cargo">
+                                <div class="air-step-index">2</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Carga</div>
+                                    <div class="air-step-desc">Pallets, peso y condición de estiba.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-exp-step="providers">
+                                <div class="air-step-index">3</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Proveedores</div>
+                                    <div class="air-step-desc">Transporte, aerolínea y almacén.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-exp-step="sale">
+                                <div class="air-step-index">4</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Venta</div>
+                                    <div class="air-step-desc">Calculadora de venta y correo comercial.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <div class="air-dap-main">
+            <div class="layout-split">
+                <div class="layout-left">
+                    <div class="map-container" id="map-exp"></div>
+                    <div class="route-info" id="route-info-exp">
+                        <div class="route-info-grid">
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-km-exp">—</div>
+                                <div class="stat-label">Kilómetros aprox.</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-time-exp">—</div>
+                                <div class="stat-label" id="route-time-label-exp">Tiempo tránsito</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-unit-type-exp">—</div>
+                                <div class="stat-label">Tipo unidad</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="layout-right">
+                    <div class="air-dap-top-panel">
+                        <div class="air-route-panel">
+                            <div class="air-route-head">
+                                <div>
+                                    <div class="form-section-title">&#9992; Ruta</div>
+                                    <div class="air-route-copy">Selecciona la ciudad de origen donde se recoge la carga y el aeropuerto de salida en México.</div>
+                                </div>
+                                <div class="air-route-step-badge">Paso 1</div>
+                            </div>
+                            <div class="air-route-grid">
+                                <div class="form-group autocomplete-wrap">
+                                    <label>Ciudad de origen</label>
+                                    <input type="text" id="ciudad-origen-exp" placeholder="Ej: Querétaro" autocomplete="off">
+                                    <div class="autocomplete-list" id="autocomplete-list-exp"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Aeropuerto de salida</label>
+                                    <select id="aeropuerto-exp">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="NLU">NLU — AIFA</option>
+                                        <option value="MEX">MEX — Ciudad de México</option>
+                                        <option value="MTY">MTY — Monterrey</option>
+                                        <option value="GDL">GDL — Guadalajara</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="unit-reference-card">
+                            <div class="unit-reference-head">
+                                <div class="unit-reference-title">Medidas base por unidad</div>
+                                <div class="unit-reference-subtitle">Referencia comercial rápida de payload, dimensiones y cubicaje.</div>
+                            </div>
+                            <div class="unit-reference-wrap">
+                                <table class="unit-reference-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Unidad</th>
+                                            <th>Payload</th>
+                                            <th>Dimensiones base</th>
+                                            <th>CBM</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr><td>1 Ton Truck</td><td>900 kg</td><td>190 x 150 x 150 cm</td><td>4.275 cbm</td></tr>
+                                        <tr><td>3.5 Tons Truck</td><td>3,200 kg</td><td>315 x 225 x 180 cm</td><td>12.75 cbm</td></tr>
+                                        <tr><td>5 Ton (Rabón)</td><td>5,900 kg</td><td>600 x 240 x 215 cm</td><td>30.95 cbm</td></tr>
+                                        <tr><td>10 Ton (Tortón)</td><td>9,900 kg</td><td>700 x 250 x 245 cm</td><td>42.875 cbm</td></tr>
+                                        <tr><td>Caja Seca 53'</td><td>20,000 kg</td><td>1500 x 250 x 270 cm</td><td>101.25 cbm</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="air-dap-bottom">
+                    <div class="air-cargo-panel">
+                    <div class="carga-header">
+                        <div class="air-cargo-head-main">
+                            <div class="air-cargo-head-copy">
+                                <div class="form-section-title">&#x1F4E6; Carga</div>
+                                <div class="air-cargo-copy">Captura el peso total y las medidas reales de cada pallet para sugerir la unidad.</div>
+                            </div>
+                            <div class="air-cargo-step-badge">Paso 2</div>
+                        </div>
+                        <div class="carga-global">
+                            <div class="form-group">
+                                <label>Peso total (kg)</label>
+                                <input type="number" id="peso-exp" min="1" placeholder="1500">
+                            </div>
+                            <div class="form-group">
+                                <label>¿Estibable?</label>
+                                <div class="toggle-group">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="estibable-exp">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label" id="estibable-label-exp">No</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="air-cargo-body">
+                    <div class="air-cargo-lines">
+                    <div class="pallet-lines" id="pallet-lines-exp"></div>
+                    <button class="btn-add-pallet" id="btn-add-pallet-exp" type="button">+ Agregar pallet</button>
+                    </div>
+
+                    <div class="air-cargo-side">
+                    <div class="air-cargo-unit-card">
+                        <div class="air-cargo-unit-head">
+                            <div class="air-cargo-unit-title">Unidad sugerida</div>
+                            <div class="air-cargo-unit-note">Se actualiza en automático.</div>
+                        </div>
+                    <div class="unit-result" id="unit-result-exp">
+                        <div class="unit-name" id="unit-name-exp"></div>
+                        <div class="unit-detail" id="unit-detail-exp"></div>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+                    </div>
+
+                    <!-- Resultados (próximamente) -->
+                    <div class="quote-results" id="quote-results-exp"></div>
+            </div>
+                </div>
+                <aside class="air-dap-side">
+                    <div class="air-workspace-summary" id="air-workspace-summary-exp">
+                        <div class="air-workspace-summary-head">
+                            <div class="air-workspace-summary-title">Resumen operativo</div>
+                            <div class="air-workspace-summary-note">Siempre visible mientras armas la cotización.</div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Ruta</div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Origen</span><span class="air-workspace-value" id="ws-exp-origin">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Aeropuerto</span><span class="air-workspace-value" id="ws-exp-airport">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Distancia</span><span class="air-workspace-value" id="ws-exp-km">—</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Carga</div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Pallets</span><span class="air-workspace-value" id="ws-exp-pallets">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Peso total</span><span class="air-workspace-value" id="ws-exp-weight">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Unidad</span><span class="air-workspace-value" id="ws-exp-unit">—</span></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- TAB: MARÍTIMO -->
     <section class="tab-content" id="tab-maritimo">
         <div class="card maritime-ready">
             <div class="card-header">
@@ -3832,6 +4035,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'aereo') {
             setTimeout(() => map.invalidateSize(), 120);
+        }
+        if (btn.dataset.tab === 'aereo-exp' && expMap) {
+            setTimeout(() => expMap.invalidateSize(), 120);
         }
         if (btn.dataset.tab === 'maritimo' && maritimeMap) {
             setTimeout(() => maritimeMap.invalidateSize(), 120);
@@ -10069,6 +10275,299 @@ document.getElementById('import-file').addEventListener('change', (e) => {
     reader.readAsText(file);
     e.target.value = '';
 });
+
+// ===== AÉREO EXPORTACIÓN (EXW) =====
+
+// --- Mapa EXW ---
+let expMap = null;
+const expMarkers = {};
+let expRouteLine = null;
+let expDestMarker = null;
+let expRouteDebounce = null;
+let expGeoCache = { city: '', result: null };
+let expRouteKm = 0;
+
+function initExpMap() {
+    if (expMap) return;
+    expMap = L.map('map-exp', {
+        center: [23.5, -102],
+        zoom: 5,
+        scrollWheelZoom: false,
+        zoomControl: true,
+    });
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+    }).addTo(expMap);
+
+    const expAirportSelect = document.getElementById('aeropuerto-exp');
+    Object.entries(AIRPORTS).forEach(([code, ap]) => {
+        const marker = L.circleMarker([ap.lat, ap.lng], {
+            radius: 8,
+            fillColor: '#1e3a5f',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.9,
+        }).addTo(expMap);
+        marker.bindTooltip(ap.label, { permanent: true, direction: 'top', offset: [0, -10], className: 'airport-tooltip' });
+        marker.on('click', () => {
+            expAirportSelect.value = code;
+            expAirportSelect.dispatchEvent(new Event('change'));
+        });
+        expMarkers[code] = marker;
+    });
+}
+
+function updateExpMapMarkers() {
+    const selected = document.getElementById('aeropuerto-exp').value;
+    Object.entries(expMarkers).forEach(([code, marker]) => {
+        marker.setStyle({
+            fillColor: code === selected ? '#2563eb' : '#1e3a5f',
+            radius: code === selected ? 10 : 8,
+        });
+    });
+}
+
+async function updateExpRoute() {
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const apCode = document.getElementById('aeropuerto-exp').value;
+    if (!ciudad || !apCode) { clearExpRoute(); return; }
+
+    const ap = AIRPORTS[apCode];
+    if (!ap) return;
+
+    const geo = await geocodeCity(ciudad);
+    if (!geo) return;
+
+    if (expRouteLine) { expMap.removeLayer(expRouteLine); expRouteLine = null; }
+    if (expDestMarker) { expMap.removeLayer(expDestMarker); expDestMarker = null; }
+
+    // Línea: ciudad origen → aeropuerto (dirección de exportación)
+    expRouteLine = L.polyline([[geo.lat, geo.lng], [ap.lat, ap.lng]], {
+        color: '#2563eb', weight: 3, opacity: 0.7, dashArray: '8,6'
+    }).addTo(expMap);
+
+    expDestMarker = L.circleMarker([geo.lat, geo.lng], {
+        radius: 7, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 0.9
+    }).addTo(expMap);
+    expDestMarker.bindTooltip(ciudad, { permanent: false, direction: 'top' });
+
+    expMap.fitBounds(expRouteLine.getBounds(), { padding: [40, 40] });
+
+    expRouteKm = haversineKm(geo.lat, geo.lng, ap.lat, ap.lng) * 1.3;
+    document.getElementById('route-km-exp').textContent = Math.round(expRouteKm).toLocaleString() + ' km';
+    document.getElementById('route-info-exp').classList.add('show');
+    updateExpRouteStats();
+    updateExpWorkspace();
+}
+
+function clearExpRoute() {
+    if (expRouteLine) { expMap.removeLayer(expRouteLine); expRouteLine = null; }
+    if (expDestMarker) { expMap.removeLayer(expDestMarker); expDestMarker = null; }
+    document.getElementById('route-info-exp').classList.remove('show');
+    expRouteKm = 0;
+    updateExpWorkspace();
+}
+
+function updateExpRouteStats() {
+    if (expRouteKm <= 0) return;
+    const tipoUnidad = getExpUnidadCalculada();
+    const vel = VELOCIDADES[tipoUnidad] || 70;
+    const hours = expRouteKm / vel;
+    document.getElementById('route-time-exp').textContent = formatTime(hours);
+    document.getElementById('route-unit-type-exp').textContent = tipoUnidad || '—';
+    updateExpWorkspace();
+}
+
+function getExpUnidadCalculada() {
+    const unitText = document.getElementById('unit-name-exp').textContent || '';
+    for (const u of UNIDADES) {
+        if (unitText.includes(u.nombre)) return u.nombre;
+    }
+    return '';
+}
+
+function scheduleExpRouteUpdate() {
+    clearTimeout(expRouteDebounce);
+    expRouteDebounce = setTimeout(updateExpRoute, 400);
+}
+
+// --- Pallet Lines EXW ---
+let expPalletLineas = [];
+let expPalletCounter = 0;
+
+function addExpPalletLine() {
+    expPalletCounter++;
+    expPalletLineas.push({ id: expPalletCounter, qty: '', largo: '', ancho: '', alto: '' });
+    renderExpPalletLines();
+    autoCalcExpUnidad();
+}
+
+function removeExpPalletLine(id) {
+    expPalletLineas = expPalletLineas.filter(l => l.id !== id);
+    renderExpPalletLines();
+    autoCalcExpUnidad();
+}
+
+function renderExpPalletLines() {
+    const container = document.getElementById('pallet-lines-exp');
+    container.innerHTML = expPalletLineas.map((l, idx) => `
+        <div class="pallet-line" data-line-id="${l.id}">
+            <span class="pl-num">#${idx + 1}</span>
+            <div class="form-group"><label>Pallets</label><input type="number" class="pl-qty" data-id="${l.id}" min="1" placeholder="2" value="${l.qty}"></div>
+            <div class="form-group"><label>Largo (cm)</label><input type="number" class="pl-largo" data-id="${l.id}" min="1" placeholder="120" value="${l.largo}"></div>
+            <div class="form-group"><label>Ancho (cm)</label><input type="number" class="pl-ancho" data-id="${l.id}" min="1" placeholder="100" value="${l.ancho}"></div>
+            <div class="form-group"><label>Alto (cm)</label><input type="number" class="pl-alto" data-id="${l.id}" min="1" placeholder="150" value="${l.alto}"></div>
+            ${expPalletLineas.length > 1 ? `<button class="btn-remove-line" data-id="${l.id}" title="Eliminar">&#x2715;</button>` : '<span style="width:22px;"></span>'}
+        </div>
+    `).join('');
+
+    container.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => {
+            const id = parseInt(inp.dataset.id);
+            const linea = expPalletLineas.find(l => l.id === id);
+            if (!linea) return;
+            if (inp.classList.contains('pl-qty')) linea.qty = inp.value;
+            if (inp.classList.contains('pl-largo')) linea.largo = inp.value;
+            if (inp.classList.contains('pl-ancho')) linea.ancho = inp.value;
+            if (inp.classList.contains('pl-alto')) linea.alto = inp.value;
+            autoCalcExpUnidad();
+        });
+    });
+    container.querySelectorAll('.btn-remove-line').forEach(btn => {
+        btn.addEventListener('click', () => removeExpPalletLine(parseInt(btn.dataset.id)));
+    });
+}
+
+function getExpPalletLines() {
+    return expPalletLineas.map(l => ({
+        qty: parseInt(l.qty) || 0,
+        largo: parseFloat(l.largo) || 0,
+        ancho: parseFloat(l.ancho) || 0,
+        alto: parseFloat(l.alto) || 0
+    })).filter(l => l.qty > 0 && l.largo > 0 && l.ancho > 0 && l.alto > 0);
+}
+
+function autoCalcExpUnidad() {
+    const peso = parseFloat(document.getElementById('peso-exp').value);
+    const estibable = document.getElementById('estibable-exp').checked;
+    const lineas = getExpPalletLines();
+    const el = document.getElementById('unit-result-exp');
+    const nameEl = document.getElementById('unit-name-exp');
+    const detailEl = document.getElementById('unit-detail-exp');
+
+    if (!peso || lineas.length === 0) { el.classList.remove('show'); updateExpWorkspace(); return; }
+
+    const result = calcularUnidadMulti(lineas, peso, estibable);
+    el.classList.add('show');
+    if (result.error) {
+        el.classList.add('error'); el.classList.remove('success');
+        nameEl.textContent = result.error; detailEl.textContent = '';
+    } else {
+        el.classList.remove('error');
+        nameEl.innerHTML = '&#x2705; ' + result.unidad;
+        detailEl.textContent = result.detalle;
+    }
+    updateExpRouteStats();
+    updateExpWorkspace();
+}
+
+// --- Workspace summary EXW ---
+function updateExpWorkspace() {
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const ap = document.getElementById('aeropuerto-exp').value;
+    const peso = document.getElementById('peso-exp').value;
+    const lineas = getExpPalletLines();
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    const unidad = getExpUnidadCalculada();
+
+    document.getElementById('ws-exp-origin').textContent = ciudad || '—';
+    document.getElementById('ws-exp-airport').textContent = ap || '—';
+    document.getElementById('ws-exp-km').textContent = expRouteKm > 0 ? Math.round(expRouteKm).toLocaleString() + ' km' : '—';
+    document.getElementById('ws-exp-pallets').textContent = totalPallets > 0 ? totalPallets : '—';
+    document.getElementById('ws-exp-weight').textContent = peso ? parseFloat(peso).toLocaleString() + ' kg' : '—';
+    document.getElementById('ws-exp-unit').textContent = unidad || '—';
+}
+
+// --- Autocomplete EXW (reusa lógica del aéreo) ---
+const ciudadExpInput = document.getElementById('ciudad-origen-exp');
+
+ciudadExpInput.addEventListener('input', () => {
+    delete ciudadExpInput.dataset.variantes;
+    const acList = document.getElementById('autocomplete-list-exp');
+    const query = normalizarTexto(ciudadExpInput.value);
+    if (query.length < 2) { acList.innerHTML = ''; acList.style.display = 'none'; return; }
+
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const seen = new Map();
+    for (const p of proveedores) {
+        for (const t of p.tarifas) {
+            const key = normalizarCiudadMX(t.ciudad);
+            const baseCiudad = key.includes('|') ? key.split('|')[0] : key;
+            if (!seen.has(key)) seen.set(key, { base: baseCiudad, variantes: [t.ciudad] });
+            else {
+                const entry = seen.get(key);
+                if (!entry.variantes.includes(t.ciudad)) entry.variantes.push(t.ciudad);
+            }
+        }
+    }
+
+    const results = [];
+    for (const [key, val] of seen) {
+        const score = fuzzyMatch(val.base, query);
+        if (score > 0) results.push({ key, base: val.base, variantes: val.variantes, score });
+    }
+    results.sort((a, b) => b.score - a.score);
+    const top = results.slice(0, 8);
+
+    if (top.length === 0) { acList.innerHTML = ''; acList.style.display = 'none'; return; }
+
+    acList.innerHTML = top.map(r => {
+        const display = r.base.charAt(0).toUpperCase() + r.base.slice(1);
+        return `<div class="autocomplete-item" data-value="${escapeHtml(display)}" data-variantes="${escapeHtml(r.variantes.join('|||'))}">${escapeHtml(display)}</div>`;
+    }).join('');
+    acList.style.display = 'block';
+
+    acList.querySelectorAll('.autocomplete-item').forEach(item => {
+        item.addEventListener('click', () => {
+            ciudadExpInput.value = item.dataset.value;
+            ciudadExpInput.dataset.variantes = item.dataset.variantes || '';
+            acList.style.display = 'none';
+            scheduleExpRouteUpdate();
+        });
+    });
+});
+
+// --- Event listeners EXW ---
+document.getElementById('aeropuerto-exp').addEventListener('change', () => {
+    updateExpMapMarkers();
+    scheduleExpRouteUpdate();
+});
+ciudadExpInput.addEventListener('blur', () => {
+    setTimeout(() => { document.getElementById('autocomplete-list-exp').style.display = 'none'; }, 200);
+    scheduleExpRouteUpdate();
+});
+document.getElementById('peso-exp').addEventListener('input', () => { autoCalcExpUnidad(); updateExpRouteStats(); });
+document.getElementById('estibable-exp').addEventListener('change', function() {
+    document.getElementById('estibable-label-exp').textContent = this.checked ? 'Sí' : 'No';
+    autoCalcExpUnidad();
+});
+document.getElementById('btn-add-pallet-exp').addEventListener('click', () => addExpPalletLine());
+
+// Init primera línea de pallet EXW
+addExpPalletLine();
+
+// Init mapa EXW cuando se active la pestaña por primera vez
+const origTabHandler = document.querySelector('[data-tab="aereo-exp"]');
+if (origTabHandler) {
+    const observer = new MutationObserver(() => {
+        if (document.getElementById('tab-aereo-exp').classList.contains('active')) {
+            initExpMap();
+            observer.disconnect();
+        }
+    });
+    observer.observe(document.getElementById('tab-aereo-exp'), { attributes: true, attributeFilter: ['class'] });
+}
 
 // ===== INIT =====
 (async function initApp() {
