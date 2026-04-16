@@ -605,6 +605,143 @@
         .cw-badge.vol { background: var(--amber); color: white; }
         .cw-badge.real { background: var(--green); color: white; }
 
+        /* ===== EXW PROVIDER BLOCKS ===== */
+        .exp-block {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .exp-block-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.15rem;
+        }
+        .exp-block-note {
+            font-size: 0.65rem;
+            color: var(--gray-400);
+            margin-bottom: 0.5rem;
+        }
+        .exp-transport-card {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .exp-transport-card:hover { border-color: var(--blue); }
+        .exp-transport-card.selected {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+            background: #f0f7ff;
+        }
+        .exp-transport-card.best:not(.selected)::before {
+            content: '★ Mejor precio';
+            position: absolute;
+            top: -0.45rem;
+            left: 0.75rem;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: white;
+            background: var(--green);
+            padding: 0.05rem 0.4rem;
+            border-radius: 3px;
+        }
+        .exp-transport-card.best { position: relative; }
+        .exp-transport-name { font-weight: 600; font-size: 0.8rem; color: var(--navy); }
+        .exp-transport-route { font-size: 0.6rem; color: var(--gray-400); }
+        .exp-transport-price { font-weight: 700; font-size: 0.85rem; color: var(--blue); white-space: nowrap; }
+        .exp-transport-btn {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--blue);
+            background: white;
+            color: var(--blue);
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .exp-transport-card.selected .exp-transport-btn {
+            background: var(--blue);
+            color: white;
+        }
+        .exp-no-transport {
+            padding: 0.6rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--gray-400);
+        }
+        .exp-manual-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.5rem;
+        }
+        .exp-manual-row .form-group label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--gray-500);
+        }
+        .exp-manual-row .form-group input {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            font-size: 0.8rem;
+        }
+        .exp-checkbox-list { display: flex; flex-direction: column; gap: 0.3rem; }
+        .exp-empty-msg {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            text-align: center;
+            padding: 0.5rem;
+        }
+        .exp-cost-summary {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .exp-cost-summary-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+        .exp-cost-summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .exp-cost-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .exp-cost-row-label { color: var(--gray-600); }
+        .exp-cost-row-value { font-weight: 600; color: var(--navy); }
+        .exp-cost-summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 2px solid var(--navy);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+
         /* ===== COTIZAR ACTIONS ===== */
         .cotizar-actions {
             margin-top: 0.2rem;
@@ -3904,8 +4041,68 @@
                     </div>
                     </div>
 
-                    <!-- Resultados (próximamente) -->
-                    <div class="quote-results" id="quote-results-exp"></div>
+                    <!-- ====== PASO 3: PROVEEDORES EXW ====== -->
+                    <div class="air-provider-stage" id="exp-providers-panel" style="display:none;">
+                        <div class="air-provider-stage-head">
+                            <div>
+                                <div class="air-provider-stage-title">Proveedores EXW</div>
+                                <div class="air-provider-stage-note">Arma el costo completo: transporte + almacén + flete aéreo.</div>
+                            </div>
+                            <div class="air-provider-stage-badge">Paso 3</div>
+                        </div>
+
+                        <!-- Bloque 1: Transporte terrestre -->
+                        <div class="exp-block">
+                            <div class="exp-block-title">Transporte terrestre</div>
+                            <div class="exp-block-note">Origen → Almacén aeropuerto</div>
+                            <div id="exp-transport-results"></div>
+                        </div>
+
+                        <!-- Bloque 2: Almacén aeropuerto -->
+                        <div class="exp-block">
+                            <div class="exp-block-title">Almacén aeropuerto</div>
+                            <div class="exp-block-note">Selecciona los cargos que aplican</div>
+                            <div id="exp-warehouse-list" class="exp-checkbox-list">
+                                <div class="exp-empty-msg">Próximamente — cargos de almacén por aeropuerto.</div>
+                            </div>
+                        </div>
+
+                        <!-- Bloque 3: Ingreso aeropuerto + Flete aéreo -->
+                        <div class="exp-block">
+                            <div class="exp-block-title">Flete aéreo</div>
+                            <div class="exp-block-note">Costo por aerolínea / kg cargable</div>
+                            <div class="exp-manual-row">
+                                <div class="form-group">
+                                    <label>Aerolínea</label>
+                                    <input type="text" id="exp-airline-name" placeholder="Ej. Aeroméxico Cargo">
+                                </div>
+                                <div class="form-group">
+                                    <label>Tarifa por kg (USD)</label>
+                                    <input type="number" id="exp-airline-rate" min="0" step="0.01" placeholder="0.00">
+                                </div>
+                                <div class="form-group">
+                                    <label>Costo flete aéreo (USD)</label>
+                                    <input type="number" id="exp-airline-total" min="0" step="0.01" placeholder="0.00" readonly>
+                                </div>
+                            </div>
+                            <div class="exp-manual-row" style="margin-top:0.5rem;">
+                                <div class="form-group">
+                                    <label>Ingreso al aeropuerto (USD)</label>
+                                    <input type="number" id="exp-airport-entry" min="0" step="0.01" value="45" placeholder="45">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Resumen de costo EXW -->
+                        <div class="exp-cost-summary" id="exp-cost-summary">
+                            <div class="exp-cost-summary-title">Resumen de costo EXW</div>
+                            <div class="exp-cost-summary-list" id="exp-cost-summary-list"></div>
+                            <div class="exp-cost-summary-total">
+                                <span>Total costo</span>
+                                <strong id="exp-cost-total">$0.00 MXN</strong>
+                            </div>
+                        </div>
+                    </div>
             </div>
                 </div>
                 <aside class="air-dap-side">
@@ -10530,7 +10727,7 @@ function autoCalcExpUnidad() {
     const nameEl = document.getElementById('unit-name-exp');
     const detailEl = document.getElementById('unit-detail-exp');
 
-    if (!peso || lineas.length === 0) { el.classList.remove('show'); updateExpWorkspace(); return; }
+    if (!peso || lineas.length === 0) { el.classList.remove('show'); updateExpWorkspace(); searchExpTransport(); return; }
 
     const result = calcularUnidadMulti(lineas, peso, estibable);
     el.classList.add('show');
@@ -10545,6 +10742,7 @@ function autoCalcExpUnidad() {
     updateExpRouteStats();
     updateExpWorkspace();
     updateChargeableWeight();
+    searchExpTransport();
 }
 
 // --- Peso Cargable (Chargeable Weight) ---
@@ -10578,6 +10776,143 @@ function updateChargeableWeight() {
 
     card.style.display = '';
 }
+
+// --- Paso 3 EXW: Proveedores ---
+let expSelectedTransport = null;
+
+function searchExpTransport() {
+    const panel = document.getElementById('exp-providers-panel');
+    const resultsEl = document.getElementById('exp-transport-results');
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+
+    if (!ciudad || !aeropuerto) {
+        panel.style.display = 'none';
+        return;
+    }
+
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const unidad = getExpUnidadCalculada();
+    const ciudadNorm = normalizarCiudadMX(ciudad);
+
+    const matches = [];
+    for (const p of proveedores) {
+        if (p.aeropuerto !== aeropuerto) continue;
+        for (const t of p.tarifas) {
+            const tNorm = normalizarCiudadMX(t.ciudad);
+            if (tNorm === ciudadNorm || fuzzyMatch(normalizarTexto(ciudad), normalizarTexto(t.ciudad))) {
+                const tarifa = unidad ? (t[unidad] || 0) : 0;
+                if (tarifa > 0) {
+                    matches.push({
+                        proveedor: p.nombre,
+                        ciudad: t.ciudad,
+                        aeropuerto: p.aeropuerto,
+                        unidad: unidad,
+                        tarifa: tarifa
+                    });
+                }
+            }
+        }
+    }
+
+    matches.sort((a, b) => a.tarifa - b.tarifa);
+
+    panel.style.display = '';
+
+    if (matches.length === 0) {
+        resultsEl.innerHTML = '<div class="exp-no-transport">No hay proveedores con tarifa para esta ruta y unidad.</div>';
+        expSelectedTransport = null;
+        updateExpCostSummary();
+        return;
+    }
+
+    resultsEl.innerHTML = matches.map((m, i) => `
+        <div class="exp-transport-card ${i === 0 ? 'best' : ''} ${expSelectedTransport?.proveedor === m.proveedor ? 'selected' : ''}"
+             data-idx="${i}">
+            <div>
+                <div class="exp-transport-name">${escapeHtml(m.proveedor)}</div>
+                <div class="exp-transport-route">${escapeHtml(m.ciudad)} → ${escapeHtml(m.aeropuerto)} · ${escapeHtml(m.unidad)}</div>
+            </div>
+            <div class="exp-transport-price">$${m.tarifa.toLocaleString()} MXN</div>
+            <button class="exp-transport-btn">${expSelectedTransport?.proveedor === m.proveedor ? '✓ Elegido' : 'Elegir'}</button>
+        </div>
+    `).join('');
+
+    resultsEl.querySelectorAll('.exp-transport-card').forEach((card, idx) => {
+        card.addEventListener('click', () => {
+            expSelectedTransport = matches[idx];
+            searchExpTransport();
+            updateExpCostSummary();
+        });
+    });
+
+    if (!expSelectedTransport && matches.length > 0) {
+        expSelectedTransport = matches[0];
+        searchExpTransport();
+    }
+
+    updateExpCostSummary();
+}
+
+function getExpChargeableWeight() {
+    const lineas = getExpPalletLines();
+    const pesoReal = parseFloat(document.getElementById('peso-exp').value) || 0;
+    if (lineas.length === 0 || pesoReal <= 0) return 0;
+    let totalCBM = 0;
+    for (const l of lineas) {
+        totalCBM += l.qty * (l.largo / 100) * (l.ancho / 100) * (l.alto / 100);
+    }
+    return Math.max(pesoReal, totalCBM * 167);
+}
+
+function updateExpCostSummary() {
+    const listEl = document.getElementById('exp-cost-summary-list');
+    const totalEl = document.getElementById('exp-cost-total');
+    if (!listEl) return;
+
+    const tipoCambio = parseFloat(localStorage.getItem('tipoCambio')) || 17;
+    const transportMXN = expSelectedTransport ? expSelectedTransport.tarifa : 0;
+
+    const airlineRate = parseFloat(document.getElementById('exp-airline-rate')?.value) || 0;
+    const chargeableKg = getExpChargeableWeight();
+    const airlineUSD = airlineRate * chargeableKg;
+    const airlineMXN = airlineUSD * tipoCambio;
+
+    const airlineTotalField = document.getElementById('exp-airline-total');
+    if (airlineTotalField) airlineTotalField.value = airlineUSD > 0 ? airlineUSD.toFixed(2) : '';
+
+    const entryUSD = parseFloat(document.getElementById('exp-airport-entry')?.value) || 0;
+    const entryMXN = entryUSD * tipoCambio;
+
+    const rows = [];
+    if (transportMXN > 0) {
+        rows.push({ label: `Transporte · ${escapeHtml(expSelectedTransport.proveedor)}`, value: transportMXN, currency: 'MXN' });
+    }
+    if (airlineUSD > 0) {
+        const name = document.getElementById('exp-airline-name')?.value || 'Aerolínea';
+        rows.push({ label: `Flete aéreo · ${escapeHtml(name)} (${chargeableKg.toFixed(1)} kg × $${airlineRate})`, value: airlineUSD, currency: 'USD' });
+    }
+    if (entryUSD > 0) {
+        rows.push({ label: 'Ingreso al aeropuerto', value: entryUSD, currency: 'USD' });
+    }
+
+    const totalMXN = transportMXN + airlineMXN + entryMXN;
+
+    listEl.innerHTML = rows.map(r => `
+        <div class="exp-cost-row">
+            <span class="exp-cost-row-label">${r.label}</span>
+            <span class="exp-cost-row-value">$${r.value.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ${r.currency}</span>
+        </div>
+    `).join('');
+
+    totalEl.textContent = `$${totalMXN.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} MXN`;
+}
+
+// Wire airline inputs to cost summary
+['exp-airline-rate', 'exp-airline-name', 'exp-airport-entry'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateExpCostSummary);
+});
 
 // --- Workspace summary EXW ---
 function updateExpWorkspace() {
@@ -10649,6 +10984,7 @@ ciudadExpInput.addEventListener('input', () => {
 document.getElementById('aeropuerto-exp').addEventListener('change', () => {
     updateExpMapMarkers();
     scheduleExpRouteUpdate();
+    searchExpTransport();
 });
 ciudadExpInput.addEventListener('blur', () => {
     setTimeout(() => { document.getElementById('autocomplete-list-exp').style.display = 'none'; }, 200);
