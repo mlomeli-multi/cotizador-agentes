@@ -557,6 +557,54 @@
             margin-top: 0.75rem;
         }
 
+        /* ===== PESO CARGABLE ===== */
+        .cw-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .cw-item {
+            padding: 0.5rem 0.6rem;
+            border-radius: 8px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+        }
+        .cw-label {
+            font-size: 0.6rem;
+            font-weight: 700;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.15rem;
+        }
+        .cw-value {
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .cw-result {
+            grid-column: 1 / -1;
+            background: #eef6ff;
+            border-color: #bfdbfe;
+            position: relative;
+        }
+        .cw-highlight {
+            font-size: 1.1rem;
+            color: var(--blue);
+        }
+        .cw-badge {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.5rem;
+            font-size: 0.55rem;
+            font-weight: 700;
+            padding: 0.1rem 0.4rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .cw-badge.vol { background: var(--amber); color: white; }
+        .cw-badge.real { background: var(--green); color: white; }
+
         /* ===== COTIZAR ACTIONS ===== */
         .cotizar-actions {
             margin-top: 0.2rem;
@@ -3825,6 +3873,32 @@
                         <div class="unit-name" id="unit-name-exp"></div>
                         <div class="unit-detail" id="unit-detail-exp"></div>
                     </div>
+                    </div>
+
+                    <div class="air-cargo-unit-card" id="chargeable-weight-card" style="display:none;">
+                        <div class="air-cargo-unit-head">
+                            <div class="air-cargo-unit-title">Peso Cargable</div>
+                            <div class="air-cargo-unit-note">Factor aéreo: 1 CBM = 167 kg</div>
+                        </div>
+                        <div class="cw-grid">
+                            <div class="cw-item">
+                                <div class="cw-label">CBM total</div>
+                                <div class="cw-value" id="cw-cbm">—</div>
+                            </div>
+                            <div class="cw-item">
+                                <div class="cw-label">Peso real</div>
+                                <div class="cw-value" id="cw-real">—</div>
+                            </div>
+                            <div class="cw-item">
+                                <div class="cw-label">Peso volumétrico</div>
+                                <div class="cw-value" id="cw-vol">—</div>
+                            </div>
+                            <div class="cw-item cw-result">
+                                <div class="cw-label">Peso cargable</div>
+                                <div class="cw-value cw-highlight" id="cw-chargeable">—</div>
+                                <div class="cw-badge" id="cw-badge"></div>
+                            </div>
+                        </div>
                     </div>
                     </div>
                     </div>
@@ -10470,6 +10544,39 @@ function autoCalcExpUnidad() {
     }
     updateExpRouteStats();
     updateExpWorkspace();
+    updateChargeableWeight();
+}
+
+// --- Peso Cargable (Chargeable Weight) ---
+function updateChargeableWeight() {
+    const card = document.getElementById('chargeable-weight-card');
+    const lineas = getExpPalletLines();
+    const pesoReal = parseFloat(document.getElementById('peso-exp').value) || 0;
+
+    if (lineas.length === 0 || pesoReal <= 0) {
+        card.style.display = 'none';
+        return;
+    }
+
+    let totalCBM = 0;
+    for (const l of lineas) {
+        totalCBM += l.qty * (l.largo / 100) * (l.ancho / 100) * (l.alto / 100);
+    }
+
+    const pesoVol = totalCBM * 167;
+    const chargeable = Math.max(pesoReal, pesoVol);
+    const isVol = pesoVol > pesoReal;
+
+    document.getElementById('cw-cbm').textContent = totalCBM.toFixed(3) + ' m³';
+    document.getElementById('cw-real').textContent = pesoReal.toLocaleString() + ' kg';
+    document.getElementById('cw-vol').textContent = pesoVol.toFixed(1) + ' kg';
+    document.getElementById('cw-chargeable').textContent = chargeable.toFixed(1) + ' kg';
+
+    const badge = document.getElementById('cw-badge');
+    badge.className = 'cw-badge ' + (isVol ? 'vol' : 'real');
+    badge.textContent = isVol ? 'Volumétrico' : 'Peso real';
+
+    card.style.display = '';
 }
 
 // --- Workspace summary EXW ---
