@@ -1,0 +1,40 @@
+{
+  "nombre": "All In One (AIO)",
+  "aeropuertos": ["MEX", "NLU"],
+  "maniobras": {
+    "1 Tonelada":     { "nombre": "Nissan",       "referencia": "2 pallets",               "precio": 1000, "iva": true },
+    "3.5 Toneladas":  { "nombre": "3.5 ton",       "referencia": "4 pallets",               "precio": 1650, "iva": true },
+    "Rabón (5 Ton)":  { "nombre": "Rabón",         "referencia": "6 pallets",               "precio": 2650, "iva": true },
+    "Tortón (10 Ton)":{ "nombre": "Torthon",       "referencia": "8 pallets",               "precio": 2650, "iva": true },
+    "Caja Seca 53'":  { "nombre": "Caja de 53 ft", "referencia": "",                        "precio": 3800, "iva": true }
+  },
+  "ingresoAeropuerto": {
+    "MEX": {
+      "1 Tonelada":     { "nombre": "Nissan",  "precio": 2100, "iva": true, "retencion": true },
+      "3.5 Toneladas":  { "nombre": "3 1/2",   "precio": 2450, "iva": true, "retencion": true },
+      "Rabón (5 Ton)":  { "nombre": "Rabón",   "precio": 6100, "iva": true, "retencion": true },
+      "Tortón (10 Ton)":{ "nombre": "Torthon", "precio": 6200, "iva": true, "retencion": true }
+    },
+    "NLU": {
+      "1 Tonelada":     { "nombre": "Nissan",  "precio": 3750, "iva": true, "retencion": true },
+      "3.5 Toneladas":  { "nombre": "3 1/2",   "precio": 4600, "iva": true, "retencion": true },
+      "Rabón (5 Ton)":  { "nombre": "Rabón",   "precio": 8800, "iva": true, "retencion": true },
+      "Tortón (10 Ton)":{ "nombre": "Torthon", "precio": 9200, "iva": true, "retencion": true }
+    }
+  },
+  "almacenaje": [
+    { "periodo": "Día",       "precio": 100, "iva": true },
+    { "periodo": "Semanal",   "precio": 280, "iva": true },
+    { "periodo": "Quincenal", "precio": 350, "iva": true },
+    { "periodo": "Mensual",   "precio": 460, "iva": true }
+  ],
+  "materiales": [
+    { "concepto": "Fleje de plástico & playo", "precio": 95,  "iva": true, "unidad": "pieza", "autoQty": "pallets" },
+    { "concepto": "Fleje de metal x metro",    "precio": 55,  "iva": true, "unidad": "metro",  "autoQty": "manual" },
+    { "concepto": "Pallet de madera estándar", "precio": 520, "iva": true, "unidad": "pieza", "autoQty": "pallets" }
+  ],
+  "servicioExtraordinario": [
+    { "cobertura": "Lunes a viernes",         "precio": 1700, "iva": true },
+    { "cobertura": "Domingo y días festivos", "precio": 2700, "iva": true }
+  ]
+}
