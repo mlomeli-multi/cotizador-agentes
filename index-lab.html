@@ -10791,65 +10791,77 @@ function searchExpTransport() {
         return;
     }
 
+    panel.style.display = '';
+
     const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
     const unidad = getExpUnidadCalculada();
-    const ciudadNorm = normalizarCiudadMX(ciudad);
+
+    // Normalización simple: lowercase + sin acentos + solo la primera parte antes de la coma
+    const simpleNorm = s => String(s).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .split(',')[0].trim();
+
+    const ciudadSimple = simpleNorm(ciudad);
 
     const matches = [];
     for (const p of proveedores) {
         if (p.aeropuerto !== aeropuerto) continue;
         for (const t of p.tarifas) {
-            const tNorm = normalizarCiudadMX(t.ciudad);
-            if (tNorm === ciudadNorm || fuzzyMatch(normalizarTexto(ciudad), normalizarTexto(t.ciudad))) {
-                const tarifa = unidad ? (t[unidad] || 0) : 0;
-                if (tarifa > 0) {
-                    matches.push({
-                        proveedor: p.nombre,
-                        ciudad: t.ciudad,
-                        aeropuerto: p.aeropuerto,
-                        unidad: unidad,
-                        tarifa: tarifa
-                    });
-                }
+            const tSimple = simpleNorm(t.ciudad);
+            const hit = tSimple === ciudadSimple
+                || tSimple.startsWith(ciudadSimple)
+                || ciudadSimple.startsWith(tSimple);
+            if (!hit) continue;
+            const tarifa = unidad ? (t[unidad] || 0) : 0;
+            if (tarifa > 0) {
+                matches.push({
+                    proveedor: p.nombre,
+                    ciudad: t.ciudad,
+                    aeropuerto: p.aeropuerto,
+                    unidad: unidad || '—',
+                    tarifa: tarifa
+                });
             }
         }
     }
 
     matches.sort((a, b) => a.tarifa - b.tarifa);
 
-    panel.style.display = '';
-
     if (matches.length === 0) {
-        resultsEl.innerHTML = '<div class="exp-no-transport">No hay proveedores con tarifa para esta ruta y unidad.</div>';
+        const msg = unidad
+            ? `Sin tarifa para ${escapeHtml(ciudad)} → ${aeropuerto} · ${unidad}.`
+            : `Captura los datos de carga para ver tarifas.`;
+        resultsEl.innerHTML = `<div class="exp-no-transport">${msg}</div>`;
         expSelectedTransport = null;
         updateExpCostSummary();
         return;
     }
 
-    resultsEl.innerHTML = matches.map((m, i) => `
-        <div class="exp-transport-card ${i === 0 ? 'best' : ''} ${expSelectedTransport?.proveedor === m.proveedor ? 'selected' : ''}"
+    // Auto-seleccionar mejor precio si ninguno está elegido
+    if (!expSelectedTransport || !matches.find(m => m.proveedor === expSelectedTransport?.proveedor)) {
+        expSelectedTransport = matches[0];
+    }
+
+    resultsEl.innerHTML = matches.map((m, i) => {
+        const isSelected = expSelectedTransport?.proveedor === m.proveedor;
+        return `
+        <div class="exp-transport-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}"
              data-idx="${i}">
             <div>
                 <div class="exp-transport-name">${escapeHtml(m.proveedor)}</div>
                 <div class="exp-transport-route">${escapeHtml(m.ciudad)} → ${escapeHtml(m.aeropuerto)} · ${escapeHtml(m.unidad)}</div>
             </div>
             <div class="exp-transport-price">$${m.tarifa.toLocaleString()} MXN</div>
-            <button class="exp-transport-btn">${expSelectedTransport?.proveedor === m.proveedor ? '✓ Elegido' : 'Elegir'}</button>
-        </div>
-    `).join('');
+            <button class="exp-transport-btn">${isSelected ? '✓ Elegido' : 'Elegir'}</button>
+        </div>`;
+    }).join('');
 
     resultsEl.querySelectorAll('.exp-transport-card').forEach((card, idx) => {
         card.addEventListener('click', () => {
             expSelectedTransport = matches[idx];
             searchExpTransport();
-            updateExpCostSummary();
         });
     });
-
-    if (!expSelectedTransport && matches.length > 0) {
-        expSelectedTransport = matches[0];
-        searchExpTransport();
-    }
 
     updateExpCostSummary();
 }
@@ -10976,6 +10988,7 @@ ciudadExpInput.addEventListener('input', () => {
             ciudadExpInput.dataset.variantes = item.dataset.variantes || '';
             acList.style.display = 'none';
             scheduleExpRouteUpdate();
+            searchExpTransport();
         });
     });
 });
