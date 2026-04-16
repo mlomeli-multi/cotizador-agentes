@@ -10803,9 +10803,12 @@ function searchExpTransport() {
 
     const ciudadSimple = simpleNorm(ciudad);
 
+    const EXP_TRANSPORT_PROVIDERS = ['barajas'];
+
     const matches = [];
     for (const p of proveedores) {
         if (p.aeropuerto !== aeropuerto) continue;
+        if (!EXP_TRANSPORT_PROVIDERS.some(k => p.nombre.toLowerCase().includes(k))) continue;
         for (const t of p.tarifas) {
             const tSimple = simpleNorm(t.ciudad);
             const hit = tSimple === ciudadSimple
@@ -10946,51 +10949,84 @@ function updateExpWorkspace() {
 // --- Autocomplete EXW (reusa lógica del aéreo) ---
 const ciudadExpInput = document.getElementById('ciudad-origen-exp');
 
+let acExpIndex = -1;
+const acExpList = document.getElementById('autocomplete-list-exp');
+
 ciudadExpInput.addEventListener('input', () => {
     delete ciudadExpInput.dataset.variantes;
-    const acList = document.getElementById('autocomplete-list-exp');
     const query = normalizarTexto(ciudadExpInput.value);
-    if (query.length < 2) { acList.innerHTML = ''; acList.style.display = 'none'; return; }
+    if (query.length < 2) { acExpList.classList.remove('show'); return; }
 
-    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
-    const seen = new Map();
-    for (const p of proveedores) {
-        for (const t of p.tarifas) {
-            const key = normalizarCiudadMX(t.ciudad);
-            const baseCiudad = key.includes('|') ? key.split('|')[0] : key;
-            if (!seen.has(key)) seen.set(key, { base: baseCiudad, variantes: [t.ciudad] });
-            else {
-                const entry = seen.get(key);
-                if (!entry.variantes.includes(t.ciudad)) entry.variantes.push(t.ciudad);
-            }
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const grupos = getCiudadesDisponibles(aeropuerto);
+    const matches = [];
+
+    for (const [base, data] of grupos) {
+        const baseCiudad = base.includes('|') ? base.split('|')[0] : base;
+        if (fuzzyMatch(baseCiudad, query)) {
+            const variantes = [...data.variantes];
+            const displayCity = baseCiudad.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            matches.push({
+                base, baseCiudad, display: displayCity, variantes,
+                airports: data.airports,
+                score: matchScore(baseCiudad, query),
+            });
         }
     }
 
-    const results = [];
-    for (const [key, val] of seen) {
-        const score = fuzzyMatch(val.base, query);
-        if (score > 0) results.push({ key, base: val.base, variantes: val.variantes, score });
+    matches.sort((a, b) => b.score !== a.score ? b.score - a.score : a.base.localeCompare(b.base));
+
+    if (matches.length === 0) {
+        acExpList.innerHTML = '<div class="autocomplete-item" style="color:var(--gray-400);cursor:default;">No se encontraron ciudades</div>';
+        acExpList.classList.add('show');
+        return;
     }
-    results.sort((a, b) => b.score - a.score);
-    const top = results.slice(0, 8);
 
-    if (top.length === 0) { acList.innerHTML = ''; acList.style.display = 'none'; return; }
-
-    acList.innerHTML = top.map(r => {
-        const display = r.base.charAt(0).toUpperCase() + r.base.slice(1);
-        return `<div class="autocomplete-item" data-value="${escapeHtml(display)}" data-variantes="${escapeHtml(r.variantes.join('|||'))}">${escapeHtml(display)}</div>`;
+    acExpIndex = -1;
+    acExpList.innerHTML = matches.slice(0, 20).map((m, i) => {
+        const airportTags = [...m.airports].join(', ');
+        const variantesStr = m.variantes.map(v => escapeHtml(v)).join(' · ');
+        const variantesData = encodeURIComponent(JSON.stringify(m.variantes));
+        return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}" data-variantes="${variantesData}">
+            ${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span>
+            <span class="ac-variants">${variantesStr}</span>
+        </div>`;
     }).join('');
-    acList.style.display = 'block';
+    acExpList.classList.add('show');
 
-    acList.querySelectorAll('.autocomplete-item').forEach(item => {
+    acExpList.querySelectorAll('.autocomplete-item[data-value]').forEach(item => {
         item.addEventListener('click', () => {
             ciudadExpInput.value = item.dataset.value;
             ciudadExpInput.dataset.variantes = item.dataset.variantes || '';
-            acList.style.display = 'none';
+            acExpList.classList.remove('show');
             scheduleExpRouteUpdate();
             searchExpTransport();
         });
     });
+});
+
+ciudadExpInput.addEventListener('keydown', (e) => {
+    const items = acExpList.querySelectorAll('.autocomplete-item');
+    if (!items.length || !acExpList.classList.contains('show')) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        acExpIndex = Math.min(acExpIndex + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('selected', i === acExpIndex));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        acExpIndex = Math.max(acExpIndex - 1, 0);
+        items.forEach((it, i) => it.classList.toggle('selected', i === acExpIndex));
+    } else if (e.key === 'Enter' && acExpIndex >= 0) {
+        e.preventDefault();
+        ciudadExpInput.value = items[acExpIndex].dataset.value;
+        ciudadExpInput.dataset.variantes = items[acExpIndex].dataset.variantes || '';
+        acExpList.classList.remove('show');
+        scheduleExpRouteUpdate();
+        searchExpTransport();
+    } else if (e.key === 'Escape') {
+        acExpList.classList.remove('show');
+    }
 });
 
 // --- Event listeners EXW ---
@@ -11000,7 +11036,7 @@ document.getElementById('aeropuerto-exp').addEventListener('change', () => {
     searchExpTransport();
 });
 ciudadExpInput.addEventListener('blur', () => {
-    setTimeout(() => { document.getElementById('autocomplete-list-exp').style.display = 'none'; }, 200);
+    setTimeout(() => { acExpList.classList.remove('show'); }, 200);
     scheduleExpRouteUpdate();
 });
 document.getElementById('peso-exp').addEventListener('input', () => { autoCalcExpUnidad(); updateExpRouteStats(); });
