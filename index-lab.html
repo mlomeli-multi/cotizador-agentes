@@ -644,6 +644,17 @@
             font-size: 0.7rem; font-weight: 600; color: var(--blue);
             white-space: nowrap; text-align: right; min-width: 72px;
         }
+        .aio-ingreso-options { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.25rem; }
+        .aio-ingreso-option {
+            display: grid; grid-template-columns: 16px 1fr auto;
+            gap: 0.4rem; align-items: center;
+            background: white; border: 1px solid var(--gray-200);
+            border-radius: 6px; padding: 0.4rem 0.6rem; cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .aio-ingreso-option:hover { border-color: var(--blue); }
+        .aio-ingreso-option.selected { background: #f0f7ff; border-color: var(--blue); }
+        .aio-ingreso-radio { font-size: 0.8rem; color: var(--blue); }
 
         /* ===== EXW PROVIDER BLOCKS ===== */
         .exp-block {
@@ -10826,6 +10837,7 @@ async function loadAIOData() {
 }
 
 let expWarehouseChecks = {};
+let expIngresoProvider = null; // null = auto (cheapest)
 
 function renderExpWarehouse() {
     const container = document.getElementById('exp-warehouse-list');
@@ -10854,16 +10866,32 @@ function renderExpWarehouse() {
         html += `<div class="exp-empty-msg">Elige la unidad de transporte para ver maniobras.</div>`;
     }
 
-    // --- Ingreso aeropuerto (auto) ---
+    // --- Ingreso aeropuerto (selección AIO vs Barajas) ---
     const ingresosAp = aeropuerto ? aioData.ingresoAeropuerto[aeropuerto] : null;
-    const ingreso = ingresosAp && unidad ? ingresosAp[unidad] : null;
-    if (ingreso) {
-        html += `<div class="aio-auto-row">
-            <span class="aio-auto-check">✓</span>
-            <div><div class="aio-auto-name">Ingreso ${aeropuerto} · ${escapeHtml(ingreso.nombre)}</div>
-            <div class="aio-auto-note">+IVA · Retención</div></div>
-            <div class="aio-auto-price">$${ingreso.precio.toLocaleString()} MXN</div>
-        </div>`;
+    if (ingresosAp && unidad) {
+        const proveedoresIngreso = Object.keys(ingresosAp);
+        // Auto-select cheapest if not chosen
+        if (!expIngresoProvider || !ingresosAp[expIngresoProvider]) {
+            expIngresoProvider = proveedoresIngreso.reduce((best, p) =>
+                (ingresosAp[p][unidad]?.precio ?? Infinity) < (ingresosAp[best]?.[unidad]?.precio ?? Infinity) ? p : best,
+                proveedoresIngreso[0]);
+        }
+        html += `<div class="aio-section-title" style="margin-top:0.5rem;">Ingreso aeropuerto</div>`;
+        html += `<div class="aio-ingreso-options">`;
+        for (const prov of proveedoresIngreso) {
+            const t = ingresosAp[prov][unidad];
+            if (!t) continue;
+            const sel = expIngresoProvider === prov;
+            html += `<div class="aio-ingreso-option ${sel ? 'selected' : ''}" data-ingreso-prov="${escapeHtml(prov)}">
+                <div class="aio-ingreso-radio">${sel ? '●' : '○'}</div>
+                <div>
+                    <div class="aio-auto-name">${escapeHtml(prov)} · ${escapeHtml(t.nombre)}</div>
+                    <div class="aio-auto-note">+IVA${t.retencion ? ' · Retención' : ''}</div>
+                </div>
+                <div class="aio-auto-price">$${t.precio.toLocaleString()} MXN</div>
+            </div>`;
+        }
+        html += `</div>`;
     }
 
     // --- Almacenaje ---
@@ -10928,6 +10956,14 @@ function renderExpWarehouse() {
 
     container.innerHTML = html;
 
+    container.querySelectorAll('.aio-ingreso-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            expIngresoProvider = opt.dataset.ingresoProv;
+            renderExpWarehouse();
+            updateExpCostSummary();
+        });
+    });
+
     container.querySelectorAll('.aio-chk').forEach(chk => {
         chk.addEventListener('change', () => {
             const key = chk.dataset.key;
@@ -10961,8 +10997,10 @@ function getExpWarehouseCosts() {
     if (maniobra) costs.push({ label: `Maniobras AIO · ${maniobra.nombre}`, value: maniobra.precio });
 
     const ingresosAp = aeropuerto ? aioData.ingresoAeropuerto[aeropuerto] : null;
-    const ingreso = ingresosAp && unidad ? ingresosAp[unidad] : null;
-    if (ingreso) costs.push({ label: `Ingreso ${aeropuerto}`, value: ingreso.precio });
+    if (ingresosAp && unidad && expIngresoProvider) {
+        const ingreso = ingresosAp[expIngresoProvider]?.[unidad];
+        if (ingreso) costs.push({ label: `Ingreso ${aeropuerto} · ${expIngresoProvider}`, value: ingreso.precio });
+    }
 
     aioData.almacenaje.forEach((item, idx) => {
         const key = `almacenaje_${idx}`;
