@@ -709,6 +709,88 @@
             font-size: 0.72rem; color: var(--gray-400); text-align: center; padding: 0.75rem;
         }
 
+        /* ===== ROUTE DIAGRAM ===== */
+        .exp-route-diagram {
+            background: var(--navy);
+            border-radius: 12px;
+            padding: 0.75rem;
+            min-height: 200px;
+        }
+        .exp-route-diagram-title {
+            font-size: 0.7rem; font-weight: 700; color: white;
+            margin-bottom: 0.1rem;
+        }
+        .exp-route-diagram-note {
+            font-size: 0.58rem; color: rgba(255,255,255,0.45);
+            margin-bottom: 0.65rem;
+        }
+        .exp-origin-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .exp-origin-card {
+            background: rgba(255,255,255,0.07);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 8px;
+            padding: 0.5rem 0.6rem;
+            transition: border-color 0.15s;
+        }
+        .exp-origin-card.active {
+            border-color: rgba(96,165,250,0.7);
+            background: rgba(59,130,246,0.15);
+        }
+        .exp-origin-head {
+            display: flex; align-items: baseline; gap: 0.35rem;
+            margin-bottom: 0.4rem;
+        }
+        .exp-origin-code {
+            font-size: 0.85rem; font-weight: 800; color: white;
+        }
+        .exp-origin-name {
+            font-size: 0.58rem; color: rgba(255,255,255,0.5);
+        }
+        .exp-dest-list { display: flex; flex-direction: column; gap: 0.3rem; }
+        .exp-dest-item {
+            background: rgba(255,255,255,0.06);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 6px;
+            padding: 0.35rem 0.5rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+        .exp-dest-item:hover { border-color: rgba(96,165,250,0.5); background: rgba(59,130,246,0.1); }
+        .exp-dest-item.active {
+            border-color: #60a5fa;
+            background: rgba(59,130,246,0.25);
+        }
+        .exp-dest-header {
+            display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.2rem;
+        }
+        .exp-dest-code { font-size: 0.78rem; font-weight: 700; color: white; }
+        .exp-dest-city { font-size: 0.58rem; color: rgba(255,255,255,0.6); flex: 1; }
+        .exp-dest-airline-badge {
+            font-size: 0.55rem; font-weight: 700; padding: 0.05rem 0.3rem;
+            background: rgba(96,165,250,0.3); color: #93c5fd;
+            border-radius: 3px;
+        }
+        .exp-dest-meta { display: flex; align-items: center; gap: 0.4rem; }
+        .exp-dest-tt {
+            font-size: 0.58rem; color: #34d399; font-weight: 600;
+        }
+        .exp-day-dots { display: flex; gap: 2px; }
+        .exp-day-dot {
+            width: 13px; height: 13px; border-radius: 3px;
+            font-size: 0.45rem; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .exp-day-dot.on  { background: rgba(96,165,250,0.35); color: #93c5fd; }
+        .exp-day-dot.off { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); }
+        .exp-no-routes-msg {
+            font-size: 0.62rem; color: rgba(255,255,255,0.25);
+            font-style: italic; padding: 0.15rem 0;
+        }
+
         /* ===== EXW PROVIDER BLOCKS ===== */
         .exp-block {
             background: var(--gray-50);
@@ -3995,7 +4077,11 @@
                 <div class="air-dap-main">
             <div class="layout-split">
                 <div class="layout-left">
-                    <div class="map-container" id="map-exp"></div>
+                    <div class="exp-route-diagram" id="route-diagram-exp">
+                        <div class="exp-route-diagram-title">Rutas disponibles para cotizar</div>
+                        <div class="exp-route-diagram-note">Se actualiza con cada aerolínea que agregues al sistema.</div>
+                        <div class="exp-origin-grid" id="exp-origin-grid"></div>
+                    </div>
                     <div class="route-info" id="route-info-exp">
                         <div class="route-info-grid">
                             <div class="route-stat">
@@ -10641,55 +10727,13 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 
 // ===== AÉREO EXPORTACIÓN (EXW) =====
 
-// --- Mapa EXW ---
-let expMap = null;
-const expMarkers = {};
-let expRouteLine = null;
-let expDestMarker = null;
+// --- Ruta EXW ---
 let expRouteDebounce = null;
 let expGeoCache = { city: '', result: null };
 let expRouteKm = 0;
 
-function initExpMap() {
-    if (expMap) return;
-    expMap = L.map('map-exp', {
-        center: [23.5, -102],
-        zoom: 5,
-        scrollWheelZoom: false,
-        zoomControl: true,
-    });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
-        maxZoom: 18,
-    }).addTo(expMap);
-
-    const expAirportSelect = document.getElementById('aeropuerto-exp');
-    Object.entries(AIRPORTS).forEach(([code, ap]) => {
-        const marker = L.circleMarker([ap.lat, ap.lng], {
-            radius: 8,
-            fillColor: '#1e3a5f',
-            color: '#fff',
-            weight: 2,
-            fillOpacity: 0.9,
-        }).addTo(expMap);
-        marker.bindTooltip(ap.label, { permanent: true, direction: 'top', offset: [0, -10], className: 'airport-tooltip' });
-        marker.on('click', () => {
-            expAirportSelect.value = code;
-            expAirportSelect.dispatchEvent(new Event('change'));
-        });
-        expMarkers[code] = marker;
-    });
-}
-
-function updateExpMapMarkers() {
-    const selected = document.getElementById('aeropuerto-exp').value;
-    Object.entries(expMarkers).forEach(([code, marker]) => {
-        marker.setStyle({
-            fillColor: code === selected ? '#2563eb' : '#1e3a5f',
-            radius: code === selected ? 10 : 8,
-        });
-    });
-}
+function initExpMap() { /* no-op: map replaced by route diagram */ }
+function updateExpMapMarkers() { /* no-op */ }
 
 async function updateExpRoute() {
     const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
@@ -10702,21 +10746,6 @@ async function updateExpRoute() {
     const geo = await geocodeCity(ciudad);
     if (!geo) return;
 
-    if (expRouteLine) { expMap.removeLayer(expRouteLine); expRouteLine = null; }
-    if (expDestMarker) { expMap.removeLayer(expDestMarker); expDestMarker = null; }
-
-    // Línea: ciudad origen → aeropuerto (dirección de exportación)
-    expRouteLine = L.polyline([[geo.lat, geo.lng], [ap.lat, ap.lng]], {
-        color: '#2563eb', weight: 3, opacity: 0.7, dashArray: '8,6'
-    }).addTo(expMap);
-
-    expDestMarker = L.circleMarker([geo.lat, geo.lng], {
-        radius: 7, fillColor: '#10b981', color: '#fff', weight: 2, fillOpacity: 0.9
-    }).addTo(expMap);
-    expDestMarker.bindTooltip(ciudad, { permanent: false, direction: 'top' });
-
-    expMap.fitBounds(expRouteLine.getBounds(), { padding: [40, 40] });
-
     expRouteKm = haversineKm(geo.lat, geo.lng, ap.lat, ap.lng) * 1.3;
     document.getElementById('route-km-exp').textContent = Math.round(expRouteKm).toLocaleString() + ' km';
     document.getElementById('route-info-exp').classList.add('show');
@@ -10725,8 +10754,6 @@ async function updateExpRoute() {
 }
 
 function clearExpRoute() {
-    if (expRouteLine) { expMap.removeLayer(expRouteLine); expRouteLine = null; }
-    if (expDestMarker) { expMap.removeLayer(expDestMarker); expDestMarker = null; }
     document.getElementById('route-info-exp').classList.remove('show');
     expRouteKm = 0;
     updateExpWorkspace();
@@ -10882,6 +10909,7 @@ async function loadAirlineData() {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         airlineData = await res.json();
         updateExpDestinoOptions();
+        renderExpRouteDiagram();
     } catch(e) { console.warn('No se pudo cargar aerolíneas:', e); }
 }
 
@@ -10894,6 +10922,81 @@ function getExpRutasDisponibles(origen) {
         }
     }
     return rutas;
+}
+
+const EXP_AIRPORTS_META = {
+    NLU: 'AIFA', MEX: 'CDMX', MTY: 'Monterrey', GDL: 'Guadalajara'
+};
+const DAY_LABELS = ['L','M','X','J','V','S','D']; // index 0=Mon(1)..6=Sun(7)
+
+function renderExpRouteDiagram() {
+    const grid = document.getElementById('exp-origin-grid');
+    if (!grid) return;
+
+    const activeOrigin = document.getElementById('aeropuerto-exp').value;
+    const activeDestino = document.getElementById('destino-exp')?.value || '';
+
+    const airports = Object.keys(EXP_AIRPORTS_META);
+
+    grid.innerHTML = airports.map(ap => {
+        const rutas = airlineData
+            ? getExpRutasDisponibles(ap)
+            : [];
+
+        // Group destinations (multiple airlines can share a dest)
+        const destMap = new Map();
+        for (const o of rutas) {
+            const key = o.ruta.destino;
+            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [] });
+            destMap.get(key).airlines.push(o.aerolinea.codigo);
+        }
+
+        const isActiveOrigin = ap === activeOrigin;
+        const destsHtml = destMap.size === 0
+            ? `<div class="exp-no-routes-msg">Sin rutas configuradas</div>`
+            : [...destMap.entries()].map(([dest, info]) => {
+                const isActiveDest = isActiveOrigin && dest === activeDestino;
+                const dias = info.ruta.salidasDias || [];
+                const dotsHtml = DAY_LABELS.map((lbl, i) => {
+                    const dayNum = i + 1; // 1=Mon..7=Sun
+                    const on = dias.includes(dayNum);
+                    return `<span class="exp-day-dot ${on ? 'on' : 'off'}">${lbl}</span>`;
+                }).join('');
+                return `<div class="exp-dest-item ${isActiveDest ? 'active' : ''}"
+                            data-origin="${ap}" data-dest="${dest}">
+                    <div class="exp-dest-header">
+                        <span class="exp-dest-code">${dest}</span>
+                        <span class="exp-dest-city">${escapeHtml(info.ruta.destinoNombre)}</span>
+                        ${info.airlines.map(a => `<span class="exp-dest-airline-badge">${escapeHtml(a)}</span>`).join('')}
+                    </div>
+                    <div class="exp-dest-meta">
+                        <span class="exp-dest-tt">TT ${info.ruta.transitoHrs}h</span>
+                        <div class="exp-day-dots">${dotsHtml}</div>
+                    </div>
+                </div>`;
+            }).join('');
+
+        return `<div class="exp-origin-card ${isActiveOrigin ? 'active' : ''}">
+            <div class="exp-origin-head">
+                <span class="exp-origin-code">${ap}</span>
+                <span class="exp-origin-name">${EXP_AIRPORTS_META[ap]}</span>
+            </div>
+            <div class="exp-dest-list">${destsHtml}</div>
+        </div>`;
+    }).join('');
+
+    // Wire clicks: select origin + destination from diagram
+    grid.querySelectorAll('.exp-dest-item[data-dest]').forEach(item => {
+        item.addEventListener('click', () => {
+            const apSelect = document.getElementById('aeropuerto-exp');
+            const destSelect = document.getElementById('destino-exp');
+            if (apSelect) { apSelect.value = item.dataset.origin; apSelect.dispatchEvent(new Event('change')); }
+            setTimeout(() => {
+                if (destSelect) { destSelect.value = item.dataset.dest; destSelect.dispatchEvent(new Event('change')); }
+                renderExpRouteDiagram();
+            }, 50);
+        });
+    });
 }
 
 function updateExpDestinoOptions() {
@@ -11372,6 +11475,7 @@ function updateExpCostSummary() {
 document.getElementById('destino-exp')?.addEventListener('change', () => {
     expSelectedAirline = null;
     renderExpAirlines();
+    renderExpRouteDiagram();
 });
 
 // --- Workspace summary EXW ---
@@ -11483,6 +11587,7 @@ document.getElementById('aeropuerto-exp').addEventListener('change', () => {
     searchExpTransport();
     expSelectedAirline = null;
     updateExpDestinoOptions();
+    renderExpRouteDiagram();
 });
 ciudadExpInput.addEventListener('blur', () => {
     setTimeout(() => { acExpList.classList.remove('show'); }, 200);
@@ -11498,17 +11603,8 @@ document.getElementById('btn-add-pallet-exp').addEventListener('click', () => ad
 // Init primera línea de pallet EXW
 addExpPalletLine();
 
-// Init mapa EXW cuando se active la pestaña por primera vez
-const origTabHandler = document.querySelector('[data-tab="aereo-exp"]');
-if (origTabHandler) {
-    const observer = new MutationObserver(() => {
-        if (document.getElementById('tab-aereo-exp').classList.contains('active')) {
-            initExpMap();
-            observer.disconnect();
-        }
-    });
-    observer.observe(document.getElementById('tab-aereo-exp'), { attributes: true, attributeFilter: ['class'] });
-}
+// Render route diagram on load
+renderExpRouteDiagram();
 
 // ===== INIT =====
 (async function initApp() {
