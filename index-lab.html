@@ -656,6 +656,59 @@
         .aio-ingreso-option.selected { background: #f0f7ff; border-color: var(--blue); }
         .aio-ingreso-radio { font-size: 0.8rem; color: var(--blue); }
 
+        /* ===== AIRLINE CARDS ===== */
+        .exp-airline-card {
+            background: white; border: 1px solid var(--gray-200);
+            border-radius: 8px; padding: 0.6rem 0.75rem; margin-bottom: 0.4rem;
+            cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+            position: relative;
+        }
+        .exp-airline-card:hover { border-color: var(--blue); }
+        .exp-airline-card.selected {
+            border-color: var(--blue); background: #f0f7ff;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+        }
+        .exp-airline-card.best:not(.selected)::before {
+            content: '★ Mejor precio';
+            position: absolute; top: -0.4rem; left: 0.75rem;
+            font-size: 0.55rem; font-weight: 700; color: white;
+            background: var(--green); padding: 0.05rem 0.4rem; border-radius: 3px;
+        }
+        .exp-airline-head {
+            display: grid; grid-template-columns: 1fr auto; align-items: start;
+            margin-bottom: 0.35rem;
+        }
+        .exp-airline-code { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
+        .exp-airline-name { font-size: 0.65rem; color: var(--gray-400); }
+        .exp-airline-price { font-size: 0.95rem; font-weight: 700; color: var(--blue); text-align: right; }
+        .exp-airline-price-note { font-size: 0.58rem; color: var(--gray-400); text-align: right; }
+        .exp-airline-meta {
+            display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.3rem;
+        }
+        .exp-airline-tag {
+            font-size: 0.58rem; font-weight: 600; padding: 0.1rem 0.4rem;
+            border-radius: 3px; background: var(--gray-100); color: var(--gray-600);
+        }
+        .exp-airline-tag.tt { background: #dbeafe; color: var(--blue); }
+        .exp-airline-tag.dias { background: #d1fae5; color: #065f46; }
+        .exp-airline-tag.type { background: #fef3c7; color: #92400e; }
+        .exp-airline-tag.vigencia { background: #fce7f3; color: #9d174d; }
+        .exp-airline-breakdown {
+            font-size: 0.62rem; color: var(--gray-500);
+            margin-top: 0.25rem; padding-top: 0.25rem;
+            border-top: 1px solid var(--gray-100);
+        }
+        .exp-airline-btn {
+            float: right; margin-left: 0.5rem;
+            padding: 0.25rem 0.6rem; border-radius: 6px;
+            border: 1px solid var(--blue); background: white;
+            color: var(--blue); font-size: 0.62rem; font-weight: 600; cursor: pointer;
+        }
+        .exp-airline-card.selected .exp-airline-btn { background: var(--blue); color: white; }
+        .exp-airline-no-routes {
+            font-size: 0.72rem; color: var(--gray-400); text-align: center; padding: 0.75rem;
+        }
+
         /* ===== EXW PROVIDER BLOCKS ===== */
         .exp-block {
             background: var(--gray-50);
@@ -3966,7 +4019,7 @@
                             <div class="air-route-head">
                                 <div>
                                     <div class="form-section-title">&#9992; Ruta</div>
-                                    <div class="air-route-copy">Selecciona la ciudad de origen donde se recoge la carga y el aeropuerto de salida en México.</div>
+                                    <div class="air-route-copy">Selecciona ciudad origen, aeropuerto de salida y destino internacional.</div>
                                 </div>
                                 <div class="air-route-step-badge">Paso 1</div>
                             </div>
@@ -3984,6 +4037,12 @@
                                         <option value="MEX">MEX — Ciudad de México</option>
                                         <option value="MTY">MTY — Monterrey</option>
                                         <option value="GDL">GDL — Guadalajara</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="destino-exp-group" style="display:none;">
+                                    <label>Destino</label>
+                                    <select id="destino-exp">
+                                        <option value="">Seleccionar destino...</option>
                                     </select>
                                 </div>
                             </div>
@@ -4118,24 +4177,11 @@
                             </div>
                         </div>
 
-                        <!-- Bloque 3: Ingreso aeropuerto + Flete aéreo -->
+                        <!-- Bloque 3: Flete aéreo (aerolíneas) -->
                         <div class="exp-block">
                             <div class="exp-block-title">Flete aéreo</div>
-                            <div class="exp-block-note">Costo por aerolínea / kg cargable</div>
-                            <div class="exp-manual-row">
-                                <div class="form-group">
-                                    <label>Aerolínea</label>
-                                    <input type="text" id="exp-airline-name" placeholder="Ej. Aeroméxico Cargo">
-                                </div>
-                                <div class="form-group">
-                                    <label>Tarifa por kg (USD)</label>
-                                    <input type="number" id="exp-airline-rate" min="0" step="0.01" placeholder="0.00">
-                                </div>
-                                <div class="form-group">
-                                    <label>Costo flete aéreo (USD)</label>
-                                    <input type="number" id="exp-airline-total" min="0" step="0.01" placeholder="0.00" readonly>
-                                </div>
-                            </div>
+                            <div class="exp-block-note" id="exp-airline-block-note">Selecciona el destino en Paso 1 para ver aerolíneas disponibles.</div>
+                            <div id="exp-airline-results"></div>
                         </div>
 
                         <!-- Resumen de costo EXW -->
@@ -4160,6 +4206,7 @@
                             <div class="air-workspace-group-title">Ruta</div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Origen</span><span class="air-workspace-value" id="ws-exp-origin">—</span></div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Aeropuerto</span><span class="air-workspace-value" id="ws-exp-airport">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Destino</span><span class="air-workspace-value" id="ws-exp-destino">—</span></div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Distancia</span><span class="air-workspace-value" id="ws-exp-km">—</span></div>
                         </div>
                         <div class="air-workspace-group">
@@ -10823,6 +10870,159 @@ function updateChargeableWeight() {
     card.style.display = '';
 }
 
+// --- Airline Data ---
+let airlineData = null;
+let expSelectedAirline = null; // { aerolinea, ruta }
+
+const DAY_NAMES_EXP = {1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb',7:'Dom'};
+
+async function loadAirlineData() {
+    try {
+        const res = await fetch('./data/aerolineas-exp.json?v=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        airlineData = await res.json();
+        updateExpDestinoOptions();
+    } catch(e) { console.warn('No se pudo cargar aerolíneas:', e); }
+}
+
+function getExpRutasDisponibles(origen) {
+    if (!airlineData) return [];
+    const rutas = [];
+    for (const al of airlineData.aerolineas) {
+        for (const r of al.rutas) {
+            if (r.origen === origen) rutas.push({ aerolinea: al, ruta: r });
+        }
+    }
+    return rutas;
+}
+
+function updateExpDestinoOptions() {
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const sel = document.getElementById('destino-exp');
+    const group = document.getElementById('destino-exp-group');
+    if (!sel || !group) return;
+
+    const rutas = getExpRutasDisponibles(aeropuerto);
+    const destinos = [...new Map(rutas.map(r => [r.ruta.destino, r.ruta])).values()];
+
+    if (destinos.length === 0) { group.style.display = 'none'; sel.value = ''; return; }
+
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">Seleccionar destino...</option>' +
+        destinos.map(r => `<option value="${r.destino}">${r.destino} — ${escapeHtml(r.destinoNombre)}</option>`).join('');
+    if (prev && destinos.find(r => r.destino === prev)) sel.value = prev;
+    group.style.display = '';
+    renderExpAirlines();
+}
+
+function calcAirlineTierRate(tiers, kg) {
+    let rate = tiers[0].precio;
+    for (const t of tiers) { if (kg >= t.desde) rate = t.precio; }
+    return rate;
+}
+
+function calcAirlineCost(ruta, kg) {
+    if (kg <= 0) return { total: 0, flete: 0, cgc: 0, rate: 0, tipoCalc: '' };
+    const rate = calcAirlineTierRate(ruta.tiers, kg);
+    const flete = rate * kg;
+    const minimo = ruta.minimo || 0;
+    const cgc = (ruta.cgcMawb || 0) + (ruta.cgcHawb || 0);
+    const fletefinal = Math.max(flete, minimo);
+    return {
+        total: fletefinal + cgc,
+        flete: fletefinal,
+        cgc,
+        rate,
+        tipoCalc: flete < minimo ? `mínimo $${minimo}` : `${kg.toFixed(0)} kg × $${rate}`
+    };
+}
+
+function renderExpAirlines() {
+    const container = document.getElementById('exp-airline-results');
+    const note = document.getElementById('exp-airline-block-note');
+    if (!container) return;
+
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const destino = document.getElementById('destino-exp')?.value;
+    const cw = getExpChargeableWeight();
+
+    if (!aeropuerto || !destino) {
+        container.innerHTML = '';
+        if (note) note.textContent = 'Selecciona el destino en Paso 1 para ver aerolíneas disponibles.';
+        note.style.display = '';
+        return;
+    }
+    if (note) note.style.display = 'none';
+
+    const opciones = getExpRutasDisponibles(aeropuerto).filter(o => o.ruta.destino === destino);
+    if (opciones.length === 0) {
+        container.innerHTML = `<div class="exp-airline-no-routes">No hay aerolíneas configuradas para ${aeropuerto} → ${destino}.</div>`;
+        return;
+    }
+
+    // Sort by total cost (cheapest first)
+    opciones.sort((a, b) => calcAirlineCost(a.ruta, cw).total - calcAirlineCost(b.ruta, cw).total);
+
+    // Auto-select cheapest if none selected or current selection not in list
+    if (!expSelectedAirline || !opciones.find(o => o.aerolinea.codigo === expSelectedAirline.aerolinea.codigo && o.ruta.destino === expSelectedAirline.ruta.destino)) {
+        expSelectedAirline = opciones[0];
+    }
+
+    container.innerHTML = opciones.map((o, i) => {
+        const { total, flete, cgc, tipoCalc } = calcAirlineCost(o.ruta, cw);
+        const dias = o.ruta.salidasDias.map(d => DAY_NAMES_EXP[d] || d).join(' · ');
+        const isSelected = expSelectedAirline?.aerolinea.codigo === o.aerolinea.codigo && expSelectedAirline?.ruta.destino === o.ruta.destino;
+        const priceStr = cw > 0 ? `$${total.toFixed(2)} USD` : '—';
+        const breakdown = cw > 0
+            ? `Flete: ${tipoCalc} = $${flete.toFixed(2)} + CGC $${cgc.toFixed(2)}`
+            : 'Ingresa los datos de carga para ver el precio';
+        return `<div class="exp-airline-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}" data-idx="${i}">
+            <div class="exp-airline-head">
+                <div>
+                    <div class="exp-airline-code">${escapeHtml(o.aerolinea.codigo)}</div>
+                    <div class="exp-airline-name">${escapeHtml(o.aerolinea.nombre)}</div>
+                </div>
+                <div>
+                    <div class="exp-airline-price">${priceStr}</div>
+                    <div class="exp-airline-price-note">all in USD</div>
+                </div>
+            </div>
+            <div class="exp-airline-meta">
+                <span class="exp-airline-tag tt">TT ${o.ruta.transitoHrs}h</span>
+                <span class="exp-airline-tag dias">${dias}</span>
+                <span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>
+                <span class="exp-airline-tag type">${escapeHtml(o.ruta.tipoVuelo)}</span>
+                <span class="exp-airline-tag vigencia">${escapeHtml(o.ruta.vigencia)}</span>
+            </div>
+            <div class="exp-airline-breakdown">
+                <button class="exp-airline-btn">${isSelected ? '✓ Elegida' : 'Elegir'}</button>
+                ${escapeHtml(breakdown)}
+            </div>
+        </div>`;
+    }).join('');
+
+    container.querySelectorAll('.exp-airline-card').forEach((card, idx) => {
+        card.addEventListener('click', () => {
+            expSelectedAirline = opciones[idx];
+            renderExpAirlines();
+            updateExpCostSummary();
+        });
+    });
+
+    updateExpCostSummary();
+}
+
+function getExpAirlineCosts() {
+    if (!expSelectedAirline) return [];
+    const cw = getExpChargeableWeight();
+    const { total, flete, cgc, tipoCalc } = calcAirlineCost(expSelectedAirline.ruta, cw);
+    if (total <= 0) return [];
+    const costs = [];
+    costs.push({ label: `Flete aéreo · ${expSelectedAirline.aerolinea.codigo} (${tipoCalc})`, value: flete, currency: 'USD' });
+    if (cgc > 0) costs.push({ label: `CGC (MAWB + HAWB)`, value: cgc, currency: 'USD' });
+    return costs;
+}
+
 // --- AIO Warehouse Data ---
 let aioData = null;
 async function loadAIOData() {
@@ -11116,6 +11316,7 @@ function searchExpTransport() {
     });
 
     renderExpWarehouse();
+    renderExpAirlines();
     updateExpCostSummary();
 }
 
@@ -11152,15 +11353,9 @@ function updateExpCostSummary() {
     }
 
     // Flete aéreo
-    const airlineRate = parseFloat(document.getElementById('exp-airline-rate')?.value) || 0;
-    const chargeableKg = getExpChargeableWeight();
-    const airlineUSD = airlineRate * chargeableKg;
-    const airlineTotalField = document.getElementById('exp-airline-total');
-    if (airlineTotalField) airlineTotalField.value = airlineUSD > 0 ? airlineUSD.toFixed(2) : '';
-    if (airlineUSD > 0) {
-        const name = document.getElementById('exp-airline-name')?.value || 'Aerolínea';
-        rows.push({ label: `Flete aéreo · ${escapeHtml(name)} (${chargeableKg.toFixed(1)} kg × $${airlineRate})`, value: airlineUSD, currency: 'USD' });
-        totalMXN += airlineUSD * tipoCambio;
+    for (const c of getExpAirlineCosts()) {
+        rows.push({ label: c.label, value: c.value, currency: c.currency });
+        totalMXN += c.value * tipoCambio;
     }
 
     listEl.innerHTML = rows.map(r => `
@@ -11173,10 +11368,10 @@ function updateExpCostSummary() {
     totalEl.textContent = `$${totalMXN.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} MXN`;
 }
 
-// Wire airline inputs to cost summary
-['exp-airline-rate', 'exp-airline-name'].forEach(id => {
-    const el = document.getElementById(id);
-    if (el) el.addEventListener('input', updateExpCostSummary);
+// Wire destino-exp to update airlines
+document.getElementById('destino-exp')?.addEventListener('change', () => {
+    expSelectedAirline = null;
+    renderExpAirlines();
 });
 
 // --- Workspace summary EXW ---
@@ -11188,8 +11383,10 @@ function updateExpWorkspace() {
     const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
     const unidad = getExpUnidadCalculada();
 
+    const destino = document.getElementById('destino-exp')?.value || '';
     document.getElementById('ws-exp-origin').textContent = ciudad || '—';
     document.getElementById('ws-exp-airport').textContent = ap || '—';
+    document.getElementById('ws-exp-destino').textContent = destino || '—';
     document.getElementById('ws-exp-km').textContent = expRouteKm > 0 ? Math.round(expRouteKm).toLocaleString() + ' km' : '—';
     document.getElementById('ws-exp-pallets').textContent = totalPallets > 0 ? totalPallets : '—';
     document.getElementById('ws-exp-weight').textContent = peso ? parseFloat(peso).toLocaleString() + ' kg' : '—';
@@ -11284,6 +11481,8 @@ document.getElementById('aeropuerto-exp').addEventListener('change', () => {
     updateExpMapMarkers();
     scheduleExpRouteUpdate();
     searchExpTransport();
+    expSelectedAirline = null;
+    updateExpDestinoOptions();
 });
 ciudadExpInput.addEventListener('blur', () => {
     setTimeout(() => { acExpList.classList.remove('show'); }, 200);
@@ -11317,7 +11516,8 @@ if (origTabHandler) {
         loadSharedOfficialData(),
         loadSharedExchangeRate(),
         loadSharedMaritimeDestinationConcepts(),
-        loadAIOData()
+        loadAIOData(),
+        loadAirlineData()
     ]);
     renderProvidersList();
     updateCotizarBtn();

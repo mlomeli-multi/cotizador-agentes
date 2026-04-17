@@ -1,0 +1,31 @@
+{
+  "aerolineas": [
+    {
+      "codigo": "CZ",
+      "nombre": "China Southern",
+      "rutas": [
+        {
+          "origen": "NLU",
+          "destino": "PVG",
+          "destinoNombre": "Shanghai Pudong",
+          "tiers": [
+            { "desde": 45,   "precio": 7.00 },
+            { "desde": 100,  "precio": 2.30 },
+            { "desde": 300,  "precio": 1.85 },
+            { "desde": 500,  "precio": 1.65 },
+            { "desde": 1000, "precio": 1.30 }
+          ],
+          "minimo": 260,
+          "cgcMawb": 1.50,
+          "cgcHawb": 1.50,
+          "tipoCarga": ["general", "estibable"],
+          "salidasDias": [2,3,4,5,6,7],
+          "cutoff": "19:00 día anterior",
+          "tipoVuelo": "CAO",
+          "transitoHrs": 16,
+          "vigencia": "Abril 2026"
+        }
+      ]
+    }
+  ]
+}
