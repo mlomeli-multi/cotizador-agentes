@@ -350,112 +350,103 @@
             border: 1px solid #bfdbfe;
             border-radius: 14px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
-            padding: 0.65rem 0.75rem;
-            box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+            padding: 0.6rem 0.7rem;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
         }
         .carga-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 0;
-            margin-bottom: 0.5rem;
-            gap: 0.5rem;
-        }
-        .air-cargo-head-main {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.5rem;
-            min-width: 0;
-            flex: 1;
+            align-items: center;
+            margin-bottom: 0.45rem;
         }
         .carga-header .form-section-title {
             margin: 0;
             display: inline-flex;
             align-items: center;
             gap: 0.3rem;
-            padding: 0.3rem 0.6rem;
+            padding: 0.25rem 0.55rem;
             border: none;
             border-radius: 999px;
             background: #dbeafe;
             color: #1d4ed8;
-            font-size: 0.66rem;
+            font-size: 0.64rem;
             letter-spacing: 0.05em;
         }
-        .air-cargo-head-copy {
-            min-width: 0;
-            flex: 1;
-        }
+        .air-cargo-head-copy { min-width: 0; flex: 1; }
         .air-cargo-copy {
-            margin-top: 0.15rem;
-            font-size: 0.62rem;
+            margin-top: 0.1rem;
+            font-size: 0.58rem;
             color: var(--gray-500);
-            line-height: 1.35;
-            max-width: 28rem;
+            line-height: 1.3;
         }
         .air-cargo-step-badge {
             flex: 0 0 auto;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.25rem 0.5rem;
+            padding: 0.2rem 0.45rem;
             border-radius: 999px;
             background: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
-            font-size: 0.6rem;
+            font-size: 0.58rem;
             font-weight: 800;
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
-        .carga-global {
-            display: flex;
-            gap: 0.65rem;
-            align-items: end;
-            flex-wrap: wrap;
-            margin-bottom: 0;
-            padding: 0.4rem 0.6rem;
+        /* === 3-column cargo layout === */
+        .cargo-3col {
+            display: grid;
+            grid-template-columns: 170px minmax(0, 1fr) 240px;
+            gap: 0.5rem;
+            align-items: stretch;
+        }
+        .cargo-col {
             border: 1px solid #dbeafe;
             border-radius: 10px;
             background: rgba(255,255,255,0.92);
+            padding: 0.5rem 0.55rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
         }
-        .carga-global .form-group { margin-bottom: 0; }
-        .carga-global .form-group label {
-            font-size: 0.55rem;
+        .cargo-col-title {
+            font-size: 0.52rem;
             font-weight: 800;
-            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--gray-400);
+            padding-bottom: 0.2rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .cargo-col .form-group { margin-bottom: 0; }
+        .cargo-col .form-group label {
+            font-size: 0.52rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             color: var(--gray-500);
-            margin-bottom: 0.15rem;
+            margin-bottom: 0.12rem;
         }
-        .carga-global input {
-            height: 32px;
-            border-radius: 8px;
-            width: 100px;
+        .cargo-col input[type="number"] {
+            height: 30px;
+            border-radius: 7px;
+            width: 100%;
             font-size: 0.75rem;
+            box-sizing: border-box;
         }
-        .carga-global .toggle-group {
-            min-height: 32px;
+        .cargo-col .toggle-group {
+            min-height: 28px;
             display: flex;
             align-items: center;
-            gap: 0.35rem;
+            gap: 0.3rem;
         }
-        .air-cargo-body {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 260px;
-            gap: 0.6rem;
-            align-items: start;
+        .cargo-dg-section {
+            border-top: 1px dashed #fecaca;
+            padding-top: 0.4rem;
+            margin-top: 0.1rem;
         }
-        .air-cargo-lines {
-            display: grid;
-            gap: 0.5rem;
-            min-width: 0;
-        }
-        .air-cargo-side {
-            display: grid;
-            gap: 0.5rem;
-            min-width: 0;
-        }
+        /* Pallets column */
+        .cargo-col-pallets { min-width: 0; }
+        .cargo-col-pallets .pallet-lines { flex: 1; }
+        .cargo-col-pallets .btn-add-pallet { align-self: flex-start; }
         .pallet-lines { display: flex; flex-direction: column; gap: 0.35rem; }
         .pallet-line {
             display: grid;
@@ -3455,8 +3446,7 @@
             .air-provider-meta { flex-direction: column; align-items: flex-start; }
             .air-provider-card .btn-venta { width: 100%; }
             .carga-header { flex-direction: column; align-items: stretch; }
-            .air-cargo-head-main { align-items: flex-start; flex-direction: column; }
-            .carga-global { width: 100%; border-radius: 14px; grid-template-columns: 1fr 1fr; min-width: 0; }
+            .cargo-3col { grid-template-columns: 1fr; }
             .air-cargo-body { grid-template-columns: 1fr; }
             .pallet-line { grid-template-columns: 26px 1fr 1fr; }
             .pallet-line .btn-remove-line,
@@ -4244,15 +4234,19 @@
 
             <div class="air-dap-bottom">
                     <div class="air-cargo-panel">
+                    <!-- Header row -->
                     <div class="carga-header">
-                        <div class="air-cargo-head-main">
-                            <div class="air-cargo-head-copy">
-                                <div class="form-section-title">&#x1F4E6; Carga</div>
-                                <div class="air-cargo-copy">Captura el peso total y las medidas reales de cada pallet para sugerir la unidad.</div>
-                            </div>
-                            <div class="air-cargo-step-badge">Paso 2</div>
+                        <div class="air-cargo-head-copy">
+                            <div class="form-section-title">&#x1F4E6; Carga</div>
+                            <div class="air-cargo-copy">Captura peso, medidas y tipo de carga.</div>
                         </div>
-                        <div class="carga-global">
+                        <div class="air-cargo-step-badge">Paso 2</div>
+                    </div>
+                    <!-- 3 columns -->
+                    <div class="cargo-3col">
+                        <!-- COL 1: Controls -->
+                        <div class="cargo-col cargo-col-controls">
+                            <div class="cargo-col-title">Datos</div>
                             <div class="form-group">
                                 <label>Peso total (kg)</label>
                                 <input type="number" id="peso-exp" min="1" placeholder="1500">
@@ -4271,68 +4265,66 @@
                                 <label>Tipo de carga</label>
                                 <div class="cargo-type-toggle">
                                     <button class="cargo-type-btn active" id="tipo-general-btn" type="button" onclick="setExpTipoCarga('general')">General</button>
-                                    <button class="cargo-type-btn" id="tipo-dg-btn" type="button" onclick="setExpTipoCarga('dg')"><span class="dg-label-inline">DG</span> Mercancía Peligrosa</button>
+                                    <button class="cargo-type-btn" id="tipo-dg-btn" type="button" onclick="setExpTipoCarga('dg')"><span class="dg-label-inline">DG</span> Peligrosa</button>
+                                </div>
+                            </div>
+                            <!-- DG: UN numbers -->
+                            <div id="dg-un-card" class="cargo-dg-section" style="display:none;">
+                                <div class="form-group">
+                                    <label><span class="dg-label-inline">DG</span> Números UN</label>
+                                    <div class="un-search-wrap">
+                                        <input type="text" id="un-search-input" class="un-search-input" placeholder="Buscar UN..." autocomplete="off">
+                                        <div id="un-search-dropdown" class="un-dropdown" style="display:none;"></div>
+                                    </div>
+                                </div>
+                                <div id="un-selected-chips" class="un-chips"></div>
+                                <div class="un-empty-hint" id="un-empty-hint">Agrega UNs para calcular DG Fee.</div>
+                            </div>
+                        </div>
+                        <!-- COL 2: Pallets -->
+                        <div class="cargo-col cargo-col-pallets">
+                            <div class="cargo-col-title">Pallets</div>
+                            <div class="pallet-lines" id="pallet-lines-exp"></div>
+                            <button class="btn-add-pallet" id="btn-add-pallet-exp" type="button">+ Agregar pallet</button>
+                        </div>
+                        <!-- COL 3: Summary -->
+                        <div class="cargo-col cargo-col-summary">
+                            <div class="cargo-col-title">Resumen</div>
+                            <div class="air-cargo-unit-card">
+                                <div class="air-cargo-unit-head">
+                                    <div class="air-cargo-unit-title">Unidad sugerida</div>
+                                </div>
+                                <div class="unit-result" id="unit-result-exp">
+                                    <div class="unit-name" id="unit-name-exp"></div>
+                                    <div class="unit-detail" id="unit-detail-exp"></div>
+                                </div>
+                            </div>
+                            <div class="air-cargo-unit-card" id="chargeable-weight-card" style="display:none;">
+                                <div class="air-cargo-unit-head">
+                                    <div class="air-cargo-unit-title">Peso Cargable</div>
+                                    <div class="air-cargo-unit-note">1 CBM = 167 kg</div>
+                                </div>
+                                <div class="cw-grid">
+                                    <div class="cw-item">
+                                        <div class="cw-label">CBM total</div>
+                                        <div class="cw-value" id="cw-cbm">—</div>
+                                    </div>
+                                    <div class="cw-item">
+                                        <div class="cw-label">Peso real</div>
+                                        <div class="cw-value" id="cw-real">—</div>
+                                    </div>
+                                    <div class="cw-item">
+                                        <div class="cw-label">Peso volumétrico</div>
+                                        <div class="cw-value" id="cw-vol">—</div>
+                                    </div>
+                                    <div class="cw-item cw-result">
+                                        <div class="cw-label">Peso cargable</div>
+                                        <div class="cw-value cw-highlight" id="cw-chargeable">—</div>
+                                        <div class="cw-badge" id="cw-badge"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="air-cargo-body">
-                    <div class="air-cargo-lines">
-                    <div class="pallet-lines" id="pallet-lines-exp"></div>
-                    <button class="btn-add-pallet" id="btn-add-pallet-exp" type="button">+ Agregar pallet</button>
-                    </div>
-
-                    <div class="air-cargo-side">
-                    <div class="air-cargo-unit-card">
-                        <div class="air-cargo-unit-head">
-                            <div class="air-cargo-unit-title">Unidad sugerida</div>
-                            <div class="air-cargo-unit-note">Se actualiza en automático.</div>
-                        </div>
-                    <div class="unit-result" id="unit-result-exp">
-                        <div class="unit-name" id="unit-name-exp"></div>
-                        <div class="unit-detail" id="unit-detail-exp"></div>
-                    </div>
-                    </div>
-
-                    <div class="air-cargo-unit-card" id="chargeable-weight-card" style="display:none;">
-                        <div class="air-cargo-unit-head">
-                            <div class="air-cargo-unit-title">Peso Cargable</div>
-                            <div class="air-cargo-unit-note">Factor aéreo: 1 CBM = 167 kg</div>
-                        </div>
-                        <div class="cw-grid">
-                            <div class="cw-item">
-                                <div class="cw-label">CBM total</div>
-                                <div class="cw-value" id="cw-cbm">—</div>
-                            </div>
-                            <div class="cw-item">
-                                <div class="cw-label">Peso real</div>
-                                <div class="cw-value" id="cw-real">—</div>
-                            </div>
-                            <div class="cw-item">
-                                <div class="cw-label">Peso volumétrico</div>
-                                <div class="cw-value" id="cw-vol">—</div>
-                            </div>
-                            <div class="cw-item cw-result">
-                                <div class="cw-label">Peso cargable</div>
-                                <div class="cw-value cw-highlight" id="cw-chargeable">—</div>
-                                <div class="cw-badge" id="cw-badge"></div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- DG: UN numbers card -->
-                    <div class="air-cargo-unit-card" id="dg-un-card" style="display:none;">
-                        <div class="air-cargo-unit-head">
-                            <div class="air-cargo-unit-title"><span class="dg-label-inline">DG</span> Números UN</div>
-                            <div class="air-cargo-unit-note">Agrega los UNs de tu embarque</div>
-                        </div>
-                        <div class="un-search-wrap">
-                            <input type="text" id="un-search-input" class="un-search-input" placeholder="Buscar UN o descripción..." autocomplete="off">
-                            <div id="un-search-dropdown" class="un-dropdown" style="display:none;"></div>
-                        </div>
-                        <div id="un-selected-chips" class="un-chips"></div>
-                        <div class="un-empty-hint" id="un-empty-hint">Sin UNs seleccionados — el DG Fee no se calculará.</div>
-                    </div>
-                    </div>
                     </div>
                     </div>
 
