@@ -791,6 +791,84 @@
             font-style: italic; padding: 0.15rem 0;
         }
 
+        /* ===== DG / CARGO TYPE ===== */
+        .cargo-type-toggle { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+        .cargo-type-btn {
+            padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600;
+            border: 1px solid var(--gray-300); background: white; color: var(--gray-500);
+            cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 0.3rem;
+        }
+        .cargo-type-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .cargo-type-btn.active { background: var(--navy); border-color: var(--navy); color: white; }
+        .cargo-type-btn.active .dg-label-inline { background: rgba(255,255,255,0.2); color: white; }
+        .dg-label-inline {
+            display: inline-block; padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.6rem;
+            font-weight: 800; background: #dc2626; color: white; letter-spacing: 0.03em;
+        }
+        /* UN search */
+        .un-search-wrap { position: relative; margin-bottom: 0.5rem; }
+        .un-search-input {
+            width: 100%; padding: 0.4rem 0.6rem; font-size: 0.72rem;
+            border: 1px solid var(--gray-300); border-radius: 7px; outline: none;
+            box-sizing: border-box;
+        }
+        .un-search-input:focus { border-color: var(--blue); }
+        .un-dropdown {
+            position: absolute; top: calc(100% + 2px); left: 0; right: 0; z-index: 100;
+            background: white; border: 1px solid var(--gray-200); border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-height: 220px; overflow-y: auto;
+        }
+        .un-dropdown-item {
+            display: flex; align-items: baseline; gap: 0.4rem; padding: 0.45rem 0.65rem;
+            cursor: pointer; border-bottom: 1px solid var(--gray-100); font-size: 0.68rem;
+        }
+        .un-dropdown-item:last-child { border-bottom: none; }
+        .un-dropdown-item:hover { background: #f0f7ff; }
+        .un-dd-number { font-weight: 700; color: var(--navy); font-size: 0.7rem; white-space: nowrap; }
+        .un-dd-clase {
+            font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
+            background: #fee2e2; color: #dc2626; white-space: nowrap;
+        }
+        .un-dd-name { color: var(--gray-600); flex: 1; }
+        /* UN chips */
+        .un-chips { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.35rem; }
+        .un-chip {
+            display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.5rem;
+            background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; font-size: 0.65rem;
+        }
+        .un-chip-badge {
+            font-size: 0.55rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
+            background: #dc2626; color: white; white-space: nowrap;
+        }
+        .un-chip-name { flex: 1; color: var(--gray-700); }
+        .un-chip-remove {
+            background: none; border: none; cursor: pointer; color: var(--gray-400);
+            font-size: 0.8rem; line-height: 1; padding: 0; margin-left: auto;
+        }
+        .un-chip-remove:hover { color: #dc2626; }
+        .un-empty-hint { font-size: 0.62rem; color: var(--gray-400); font-style: italic; }
+        /* DG badge in airline card */
+        .exp-airline-dg-badge {
+            display: inline-block; padding: 0.05rem 0.3rem; border-radius: 3px;
+            font-size: 0.55rem; font-weight: 800; background: #dc2626; color: white;
+            vertical-align: middle; margin-left: 0.2rem;
+        }
+        /* tipo badge in route diagram */
+        .exp-tipo-badge {
+            font-size: 0.5rem; font-weight: 700; padding: 0.05rem 0.25rem; border-radius: 3px;
+        }
+        .exp-tipo-badge.gen { background: rgba(52,211,153,0.2); color: #34d399; }
+        .exp-tipo-badge.dg  { background: rgba(220,38,38,0.35); color: #fca5a5; }
+        .exp-airline-routing {
+            font-size: 0.6rem; color: var(--gray-400); font-weight: 500; margin-top: 0.1rem;
+        }
+        .exp-airline-avion {
+            font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
+            background: var(--gray-100); color: var(--gray-500);
+        }
+        .exp-fsc-note { font-size: 0.62rem; color: #7c3aed; font-weight: 600; }
+        .exp-dg-fee-note { font-size: 0.62rem; color: #dc2626; font-weight: 600; }
+
         /* ===== EXW PROVIDER BLOCKS ===== */
         .exp-block {
             background: var(--gray-50);
@@ -4188,6 +4266,13 @@
                                     <span class="toggle-label" id="estibable-label-exp">No</span>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label>Tipo de carga</label>
+                                <div class="cargo-type-toggle">
+                                    <button class="cargo-type-btn active" id="tipo-general-btn" type="button" onclick="setExpTipoCarga('general')">General</button>
+                                    <button class="cargo-type-btn" id="tipo-dg-btn" type="button" onclick="setExpTipoCarga('dg')"><span class="dg-label-inline">DG</span> Mercancía Peligrosa</button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="air-cargo-body">
@@ -4232,6 +4317,19 @@
                                 <div class="cw-badge" id="cw-badge"></div>
                             </div>
                         </div>
+                    </div>
+                    <!-- DG: UN numbers card -->
+                    <div class="air-cargo-unit-card" id="dg-un-card" style="display:none;">
+                        <div class="air-cargo-unit-head">
+                            <div class="air-cargo-unit-title"><span class="dg-label-inline">DG</span> Números UN</div>
+                            <div class="air-cargo-unit-note">Agrega los UNs de tu embarque</div>
+                        </div>
+                        <div class="un-search-wrap">
+                            <input type="text" id="un-search-input" class="un-search-input" placeholder="Buscar UN o descripción..." autocomplete="off">
+                            <div id="un-search-dropdown" class="un-dropdown" style="display:none;"></div>
+                        </div>
+                        <div id="un-selected-chips" class="un-chips"></div>
+                        <div class="un-empty-hint" id="un-empty-hint">Sin UNs seleccionados — el DG Fee no se calculará.</div>
                     </div>
                     </div>
                     </div>
@@ -4300,6 +4398,7 @@
                             <div class="air-workspace-row"><span class="air-workspace-label">Pallets</span><span class="air-workspace-value" id="ws-exp-pallets">—</span></div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Peso total</span><span class="air-workspace-value" id="ws-exp-weight">—</span></div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Unidad</span><span class="air-workspace-value" id="ws-exp-unit">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Tipo carga</span><span class="air-workspace-value" id="ws-exp-tipocarga">General</span></div>
                         </div>
                     </div>
                 </aside>
@@ -10900,6 +10999,60 @@ function updateChargeableWeight() {
 // --- Airline Data ---
 let airlineData = null;
 let expSelectedAirline = null; // { aerolinea, ruta }
+let expTipoCarga = 'general';  // 'general' | 'dg'
+let expSelectedUNs = [];       // array of selected UN objects
+
+// --- UN Numbers Data ---
+let unData = null;
+async function loadUNData() {
+    try {
+        const res = await fetch('./data/un-numbers.json?v=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        unData = await res.json();
+    } catch(e) { console.warn('No se pudo cargar UN numbers:', e); }
+}
+
+function setExpTipoCarga(tipo) {
+    expTipoCarga = tipo;
+    const btnGen = document.getElementById('tipo-general-btn');
+    const btnDG  = document.getElementById('tipo-dg-btn');
+    const dgCard = document.getElementById('dg-un-card');
+    if (btnGen) btnGen.classList.toggle('active', tipo === 'general');
+    if (btnDG)  btnDG.classList.toggle('active',  tipo === 'dg');
+    if (dgCard) dgCard.style.display = tipo === 'dg' ? '' : 'none';
+    const wsEl = document.getElementById('ws-exp-tipocarga');
+    if (wsEl) wsEl.textContent = tipo === 'dg' ? '⚠ DG' : 'General';
+    expSelectedAirline = null; // reset so cheapest for this type is auto-selected
+    renderExpAirlines();
+    updateExpCostSummary();
+}
+
+function renderUNChips() {
+    const el = document.getElementById('un-selected-chips');
+    const hint = document.getElementById('un-empty-hint');
+    if (!el) return;
+    el.innerHTML = expSelectedUNs.map((u, i) =>
+        `<div class="un-chip">
+            <span class="un-chip-badge">Clase ${escapeHtml(u.clase)}</span>
+            <span class="un-chip-name">${escapeHtml(u.un)} · ${escapeHtml(u.nombre)}</span>
+            <button class="un-chip-remove" type="button" onclick="removeExpUN(${i})">×</button>
+        </div>`
+    ).join('');
+    if (hint) hint.style.display = expSelectedUNs.length === 0 ? '' : 'none';
+    updateExpCostSummary();
+}
+
+function addExpUN(unObj) {
+    if (!expSelectedUNs.find(u => u.un === unObj.un)) {
+        expSelectedUNs.push(unObj);
+        renderUNChips();
+    }
+}
+
+function removeExpUN(idx) {
+    expSelectedUNs.splice(idx, 1);
+    renderUNChips();
+}
 
 const DAY_NAMES_EXP = {1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb',7:'Dom'};
 
@@ -10943,12 +11096,15 @@ function renderExpRouteDiagram() {
             ? getExpRutasDisponibles(ap)
             : [];
 
-        // Group destinations (multiple airlines can share a dest)
+        // Group destinations by dest code; collect unique airlines and capabilities
         const destMap = new Map();
         for (const o of rutas) {
             const key = o.ruta.destino;
-            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [] });
-            destMap.get(key).airlines.push(o.aerolinea.codigo);
+            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: new Set(), hasDG: false, count: 0 });
+            const entry = destMap.get(key);
+            entry.airlines.add(o.aerolinea.codigo);
+            entry.count++;
+            if (o.ruta.tipoCarga?.includes('dg') || o.ruta.tarifas?.dg) entry.hasDG = true;
         }
 
         const isActiveOrigin = ap === activeOrigin;
@@ -10958,19 +11114,24 @@ function renderExpRouteDiagram() {
                 const isActiveDest = isActiveOrigin && dest === activeDestino;
                 const dias = info.ruta.salidasDias || [];
                 const dotsHtml = DAY_LABELS.map((lbl, i) => {
-                    const dayNum = i + 1; // 1=Mon..7=Sun
+                    const dayNum = i + 1;
                     const on = dias.includes(dayNum);
                     return `<span class="exp-day-dot ${on ? 'on' : 'off'}">${lbl}</span>`;
                 }).join('');
+                const airlineBadges = [...info.airlines].map(a =>
+                    `<span class="exp-dest-airline-badge">${escapeHtml(a)}</span>`).join('');
+                const countBadge = info.count > 1 ? `<span class="exp-dest-airline-badge" style="background:rgba(52,211,153,0.25);color:#34d399;">${info.count} opciones</span>` : '';
+                const dgBadgeHtml = info.hasDG ? `<span class="exp-tipo-badge dg">DG</span>` : '';
+                const ttHtml = info.ruta.transitoHrs != null ? `<span class="exp-dest-tt">TT ${info.ruta.transitoHrs}h</span>` : '';
                 return `<div class="exp-dest-item ${isActiveDest ? 'active' : ''}"
                             data-origin="${ap}" data-dest="${dest}">
                     <div class="exp-dest-header">
                         <span class="exp-dest-code">${dest}</span>
                         <span class="exp-dest-city">${escapeHtml(info.ruta.destinoNombre)}</span>
-                        ${info.airlines.map(a => `<span class="exp-dest-airline-badge">${escapeHtml(a)}</span>`).join('')}
+                        ${airlineBadges}${countBadge}${dgBadgeHtml}
                     </div>
                     <div class="exp-dest-meta">
-                        <span class="exp-dest-tt">TT ${info.ruta.transitoHrs}h</span>
+                        ${ttHtml}
                         <div class="exp-day-dots">${dotsHtml}</div>
                     </div>
                 </div>`;
@@ -11024,19 +11185,62 @@ function calcAirlineTierRate(tiers, kg) {
     return rate;
 }
 
-function calcAirlineCost(ruta, kg) {
-    if (kg <= 0) return { total: 0, flete: 0, cgc: 0, rate: 0, tipoCalc: '' };
-    const rate = calcAirlineTierRate(ruta.tiers, kg);
-    const flete = rate * kg;
-    const minimo = ruta.minimo || 0;
+function calcAirlineCost(ruta, kg, tipoCarga) {
+    if (tipoCarga === undefined) tipoCarga = expTipoCarga;
+    if (kg <= 0) return { total: 0, flete: 0, fsc: 0, cgc: 0, dgFeeTotal: 0, rate: 0, tipoCalc: '' };
+
+    let tiers, minimo, dgFeeUN = 0;
+
+    if (ruta.tarifas) {
+        // New multi-tariff structure (LATAM-style)
+        const tarifa = ruta.tarifas[tipoCarga];
+        if (!tarifa) return null; // cargo type not supported
+        tiers  = tarifa.tiers;
+        minimo = tarifa.minimo || 0;
+        if (tipoCarga === 'dg') dgFeeUN = tarifa.dgFeeUN || 0;
+    } else {
+        // Legacy single-tariff structure (CZ-style)
+        tiers  = ruta.tiers;
+        minimo = ruta.minimo || 0;
+    }
+
+    const rate = calcAirlineTierRate(tiers, kg);
+
+    // Non-stackable surcharge
+    const estibable = document.getElementById('estibable-exp')?.checked ?? true;
+    const surcharge = (!estibable && ruta.noEstibable) ? (1 + ruta.noEstibable) : 1;
+    const fletefinal = Math.max(rate * kg * surcharge, minimo * surcharge);
+
+    // FSC per kg
+    const fsc = (ruta.fsc || 0) * kg;
+
+    // CGC flat charges (legacy)
     const cgc = (ruta.cgcMawb || 0) + (ruta.cgcHawb || 0);
-    const fletefinal = Math.max(flete, minimo);
+
+    // DG Fee per UN (class-based for CAO, flat for PAX)
+    let dgFeeTotal = 0;
+    if (tipoCarga === 'dg' && dgFeeUN && expSelectedUNs.length > 0) {
+        for (const un of expSelectedUNs) {
+            if (typeof dgFeeUN === 'object') {
+                const clase = parseInt(un.clase);
+                dgFeeTotal += (clase === 1 || clase === 7)
+                    ? (dgFeeUN.clases_1_7 || 0)
+                    : (dgFeeUN.otras || 0);
+            } else {
+                dgFeeTotal += dgFeeUN;
+            }
+        }
+    }
+
+    const usedMinimo = (rate * kg * surcharge) < (minimo * surcharge);
     return {
-        total: fletefinal + cgc,
+        total: fletefinal + fsc + cgc + dgFeeTotal,
         flete: fletefinal,
+        fsc,
         cgc,
+        dgFeeTotal,
         rate,
-        tipoCalc: flete < minimo ? `mínimo $${minimo}` : `${kg.toFixed(0)} kg × $${rate}`
+        tipoCalc: usedMinimo ? `mínimo $${(minimo * surcharge).toFixed(0)}` : `${kg.toFixed(0)} kg × $${rate}`
     };
 }
 
@@ -11057,33 +11261,62 @@ function renderExpAirlines() {
     }
     if (note) note.style.display = 'none';
 
-    const opciones = getExpRutasDisponibles(aeropuerto).filter(o => o.ruta.destino === destino);
+    // Filter by destination AND tipoCarga support
+    const opciones = getExpRutasDisponibles(aeropuerto).filter(o => {
+        if (o.ruta.destino !== destino) return false;
+        if (o.ruta.tarifas) return o.ruta.tarifas[expTipoCarga] != null;
+        // Legacy: check tipoCarga array; if no array, allow 'general' only
+        if (expTipoCarga === 'dg') return o.ruta.tipoCarga?.includes('dg') ?? false;
+        return true;
+    });
+
     if (opciones.length === 0) {
-        container.innerHTML = `<div class="exp-airline-no-routes">No hay aerolíneas configuradas para ${aeropuerto} → ${destino}.</div>`;
+        container.innerHTML = `<div class="exp-airline-no-routes">No hay aerolíneas con tarifa ${expTipoCarga === 'dg' ? 'DG' : 'General'} para ${aeropuerto} → ${destino}.</div>`;
         return;
     }
 
-    // Sort by total cost (cheapest first)
-    opciones.sort((a, b) => calcAirlineCost(a.ruta, cw).total - calcAirlineCost(b.ruta, cw).total);
+    // Sort by total cost (cheapest first); null result = type unsupported → push to bottom
+    opciones.sort((a, b) => {
+        const ca = calcAirlineCost(a.ruta, cw);
+        const cb = calcAirlineCost(b.ruta, cw);
+        return (ca?.total ?? Infinity) - (cb?.total ?? Infinity);
+    });
 
-    // Auto-select cheapest if none selected or current selection not in list
-    if (!expSelectedAirline || !opciones.find(o => o.aerolinea.codigo === expSelectedAirline.aerolinea.codigo && o.ruta.destino === expSelectedAirline.ruta.destino)) {
+    // Auto-select cheapest using reference equality (handles multiple routes per airline)
+    if (!expSelectedAirline || !opciones.find(o => o.ruta === expSelectedAirline.ruta)) {
         expSelectedAirline = opciones[0];
     }
 
     container.innerHTML = opciones.map((o, i) => {
-        const { total, flete, cgc, tipoCalc } = calcAirlineCost(o.ruta, cw);
+        const result = calcAirlineCost(o.ruta, cw);
+        if (!result) return '';
+        const { total, flete, fsc, cgc, dgFeeTotal, tipoCalc } = result;
         const dias = o.ruta.salidasDias.map(d => DAY_NAMES_EXP[d] || d).join(' · ');
-        const isSelected = expSelectedAirline?.aerolinea.codigo === o.aerolinea.codigo && expSelectedAirline?.ruta.destino === o.ruta.destino;
+        const isSelected = expSelectedAirline?.ruta === o.ruta;
         const priceStr = cw > 0 ? `$${total.toFixed(2)} USD` : '—';
-        const breakdown = cw > 0
-            ? `Flete: ${tipoCalc} = $${flete.toFixed(2)} + CGC $${cgc.toFixed(2)}`
-            : 'Ingresa los datos de carga para ver el precio';
+        const isDG = expTipoCarga === 'dg';
+
+        let breakdownParts = [];
+        if (cw > 0) {
+            breakdownParts.push(`Flete: ${tipoCalc}`);
+            if (fsc > 0)        breakdownParts.push(`<span class="exp-fsc-note">FSC $${fsc.toFixed(2)}</span>`);
+            if (cgc > 0)        breakdownParts.push(`CGC $${cgc.toFixed(2)}`);
+            if (dgFeeTotal > 0) breakdownParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
+            else if (isDG && expSelectedUNs.length === 0) breakdownParts.push(`<span class="exp-dg-fee-note">Agrega UNs para calcular DG Fee</span>`);
+        } else {
+            breakdownParts.push('Ingresa los datos de carga para ver el precio');
+        }
+
+        const routingLabel = o.ruta.descripcion ? `<div class="exp-airline-routing">${escapeHtml(o.ruta.descripcion)}</div>` : '';
+        const avionBadge = o.ruta.tipoAvion ? `<span class="exp-airline-avion">${escapeHtml(o.ruta.tipoAvion)}</span>` : '';
+        const dgBadge = isDG ? `<span class="exp-airline-dg-badge">DG</span>` : '';
+
         return `<div class="exp-airline-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}" data-idx="${i}">
             <div class="exp-airline-head">
                 <div>
-                    <div class="exp-airline-code">${escapeHtml(o.aerolinea.codigo)}</div>
+                    <div class="exp-airline-code">${escapeHtml(o.aerolinea.codigo)}${dgBadge}</div>
                     <div class="exp-airline-name">${escapeHtml(o.aerolinea.nombre)}</div>
+                    ${routingLabel}
                 </div>
                 <div>
                     <div class="exp-airline-price">${priceStr}</div>
@@ -11091,15 +11324,15 @@ function renderExpAirlines() {
                 </div>
             </div>
             <div class="exp-airline-meta">
-                <span class="exp-airline-tag tt">TT ${o.ruta.transitoHrs}h</span>
+                ${o.ruta.transitoHrs != null ? `<span class="exp-airline-tag tt">TT ${o.ruta.transitoHrs}h</span>` : ''}
                 <span class="exp-airline-tag dias">${dias}</span>
-                <span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>
-                <span class="exp-airline-tag type">${escapeHtml(o.ruta.tipoVuelo)}</span>
+                ${o.ruta.cutoff ? `<span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>` : ''}
+                ${avionBadge}
                 <span class="exp-airline-tag vigencia">${escapeHtml(o.ruta.vigencia)}</span>
             </div>
             <div class="exp-airline-breakdown">
                 <button class="exp-airline-btn">${isSelected ? '✓ Elegida' : 'Elegir'}</button>
-                ${escapeHtml(breakdown)}
+                ${breakdownParts.join(' + ')}
             </div>
         </div>`;
     }).join('');
@@ -11118,11 +11351,15 @@ function renderExpAirlines() {
 function getExpAirlineCosts() {
     if (!expSelectedAirline) return [];
     const cw = getExpChargeableWeight();
-    const { total, flete, cgc, tipoCalc } = calcAirlineCost(expSelectedAirline.ruta, cw);
-    if (total <= 0) return [];
+    const result = calcAirlineCost(expSelectedAirline.ruta, cw);
+    if (!result || result.total <= 0) return [];
+    const { flete, fsc, cgc, dgFeeTotal, tipoCalc } = result;
+    const code = expSelectedAirline.aerolinea.codigo;
     const costs = [];
-    costs.push({ label: `Flete aéreo · ${expSelectedAirline.aerolinea.codigo} (${tipoCalc})`, value: flete, currency: 'USD' });
-    if (cgc > 0) costs.push({ label: `CGC (MAWB + HAWB)`, value: cgc, currency: 'USD' });
+    costs.push({ label: `Flete aéreo · ${code} (${tipoCalc})`, value: flete, currency: 'USD' });
+    if (fsc > 0)        costs.push({ label: `FSC · ${code}`, value: fsc, currency: 'USD' });
+    if (cgc > 0)        costs.push({ label: `CGC (MAWB + HAWB)`, value: cgc, currency: 'USD' });
+    if (dgFeeTotal > 0) costs.push({ label: `DG Fee · ${expSelectedUNs.length} UN`, value: dgFeeTotal, currency: 'USD' });
     return costs;
 }
 
@@ -11495,6 +11732,8 @@ function updateExpWorkspace() {
     document.getElementById('ws-exp-pallets').textContent = totalPallets > 0 ? totalPallets : '—';
     document.getElementById('ws-exp-weight').textContent = peso ? parseFloat(peso).toLocaleString() + ' kg' : '—';
     document.getElementById('ws-exp-unit').textContent = unidad || '—';
+    const wsTC = document.getElementById('ws-exp-tipocarga');
+    if (wsTC) wsTC.textContent = expTipoCarga === 'dg' ? '⚠ DG' : 'General';
 }
 
 // --- Autocomplete EXW (reusa lógica del aéreo) ---
@@ -11597,6 +11836,43 @@ document.getElementById('peso-exp').addEventListener('input', () => { autoCalcEx
 document.getElementById('estibable-exp').addEventListener('change', function() {
     document.getElementById('estibable-label-exp').textContent = this.checked ? 'Sí' : 'No';
     autoCalcExpUnidad();
+    renderExpAirlines(); // recalc non-stackable surcharge
+});
+
+// UN number search
+document.addEventListener('input', function(e) {
+    if (e.target.id !== 'un-search-input') return;
+    const query = e.target.value.toLowerCase().trim();
+    const dropdown = document.getElementById('un-search-dropdown');
+    if (!dropdown) return;
+    if (!unData || query.length < 2) { dropdown.style.display = 'none'; return; }
+    const matches = unData.unNumbers.filter(u =>
+        u.un.toLowerCase().includes(query) || u.nombre.toLowerCase().includes(query)
+    ).slice(0, 15);
+    if (matches.length === 0) { dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = matches.map(u =>
+        `<div class="un-dropdown-item">
+            <span class="un-dd-number">${escapeHtml(u.un)}</span>
+            <span class="un-dd-clase">Cl ${escapeHtml(u.clase)}</span>
+            <span class="un-dd-name">${escapeHtml(u.nombre)}</span>
+        </div>`
+    ).join('');
+    dropdown.style.display = '';
+    dropdown.querySelectorAll('.un-dropdown-item').forEach((item, idx) => {
+        item.addEventListener('click', () => {
+            addExpUN(matches[idx]);
+            e.target.value = '';
+            dropdown.style.display = 'none';
+        });
+    });
+});
+
+// Close UN dropdown on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('#dg-un-card')) {
+        const dd = document.getElementById('un-search-dropdown');
+        if (dd) dd.style.display = 'none';
+    }
 });
 document.getElementById('btn-add-pallet-exp').addEventListener('click', () => addExpPalletLine());
 
@@ -11613,7 +11889,8 @@ renderExpRouteDiagram();
         loadSharedExchangeRate(),
         loadSharedMaritimeDestinationConcepts(),
         loadAIOData(),
-        loadAirlineData()
+        loadAirlineData(),
+        loadUNData()
     ]);
     renderProvidersList();
     updateCotizarBtn();

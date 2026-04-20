@@ -26,6 +26,180 @@
           "vigencia": "Abril 2026"
         }
       ]
+    },
+    {
+      "codigo": "LA",
+      "nombre": "LATAM Airlines",
+      "rutas": [
+        {
+          "origen": "MEX",
+          "destino": "GRU",
+          "destinoNombre": "São Paulo Guarulhos",
+          "descripcion": "DIRECTO",
+          "fsc": 2.4,
+          "tipoAvion": "PAX",
+          "noEstibable": 0.10,
+          "cgcMawb": 0,
+          "cgcHawb": 0,
+          "tipoCarga": ["general", "dg"],
+          "tarifas": {
+            "general": {
+              "tiers": [
+                { "desde": 0,    "precio": 3.30 },
+                { "desde": 45,   "precio": 3.10 },
+                { "desde": 100,  "precio": 3.00 },
+                { "desde": 300,  "precio": 2.80 },
+                { "desde": 500,  "precio": 2.60 },
+                { "desde": 1000, "precio": 2.50 }
+              ],
+              "minimo": 135
+            },
+            "dg": {
+              "tiers": [
+                { "desde": 0,    "precio": 5.30 },
+                { "desde": 45,   "precio": 4.60 },
+                { "desde": 100,  "precio": 3.10 },
+                { "desde": 300,  "precio": 3.10 },
+                { "desde": 500,  "precio": 3.10 },
+                { "desde": 1000, "precio": 3.10 }
+              ],
+              "minimo": 150,
+              "dgFeeUN": 135
+            }
+          },
+          "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "",
+          "tipoVuelo": "PAX",
+          "transitoHrs": null,
+          "vigencia": "Abril 2026"
+        },
+        {
+          "origen": "MEX",
+          "destino": "GRU",
+          "destinoNombre": "São Paulo Guarulhos",
+          "descripcion": "VIA SCL",
+          "fsc": 2.4,
+          "tipoAvion": "PAX",
+          "noEstibable": 0.10,
+          "cgcMawb": 0,
+          "cgcHawb": 0,
+          "tipoCarga": ["general", "dg"],
+          "tarifas": {
+            "general": {
+              "tiers": [
+                { "desde": 0,    "precio": 4.30 },
+                { "desde": 45,   "precio": 3.75 },
+                { "desde": 100,  "precio": 2.77 },
+                { "desde": 300,  "precio": 2.60 },
+                { "desde": 500,  "precio": 2.45 },
+                { "desde": 1000, "precio": 2.30 }
+              ],
+              "minimo": 135
+            },
+            "dg": {
+              "tiers": [
+                { "desde": 0,    "precio": 4.90 },
+                { "desde": 45,   "precio": 4.30 },
+                { "desde": 100,  "precio": 3.63 },
+                { "desde": 300,  "precio": 3.42 },
+                { "desde": 500,  "precio": 3.23 },
+                { "desde": 1000, "precio": 3.05 }
+              ],
+              "minimo": 150,
+              "dgFeeUN": 135
+            }
+          },
+          "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "",
+          "tipoVuelo": "PAX",
+          "transitoHrs": null,
+          "vigencia": "Abril 2026"
+        },
+        {
+          "origen": "MEX",
+          "destino": "GRU",
+          "destinoNombre": "São Paulo Guarulhos",
+          "descripcion": "DIRECTO - Premium",
+          "fsc": 2.4,
+          "tipoAvion": "PAX",
+          "noEstibable": 0.10,
+          "cgcMawb": 0,
+          "cgcHawb": 0,
+          "tipoCarga": ["general", "dg"],
+          "tarifas": {
+            "general": {
+              "tiers": [
+                { "desde": 0,    "precio": 6.98 },
+                { "desde": 45,   "precio": 6.18 },
+                { "desde": 100,  "precio": 4.50 },
+                { "desde": 300,  "precio": 4.25 },
+                { "desde": 500,  "precio": 4.02 },
+                { "desde": 1000, "precio": 3.80 }
+              ],
+              "minimo": 200
+            },
+            "dg": {
+              "tiers": [
+                { "desde": 0,    "precio": 8.90 },
+                { "desde": 45,   "precio": 7.90 },
+                { "desde": 100,  "precio": 5.81 },
+                { "desde": 300,  "precio": 5.50 },
+                { "desde": 500,  "precio": 5.20 },
+                { "desde": 1000, "precio": 4.92 }
+              ],
+              "minimo": 250,
+              "dgFeeUN": 135
+            }
+          },
+          "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "",
+          "tipoVuelo": "PAX",
+          "transitoHrs": null,
+          "vigencia": "Abril 2026"
+        },
+        {
+          "origen": "NLU",
+          "destino": "GRU",
+          "destinoNombre": "São Paulo Guarulhos",
+          "descripcion": "VIA MIA",
+          "fsc": 2.4,
+          "tipoAvion": "CAO",
+          "noEstibable": 0.10,
+          "cgcMawb": 0,
+          "cgcHawb": 0,
+          "tipoCarga": ["general", "dg"],
+          "tarifas": {
+            "general": {
+              "tiers": [
+                { "desde": 0,    "precio": 10.20 },
+                { "desde": 45,   "precio": 9.72  },
+                { "desde": 100,  "precio": 8.10  },
+                { "desde": 300,  "precio": 7.71  },
+                { "desde": 500,  "precio": 7.35  },
+                { "desde": 1000, "precio": 7.00  }
+              ],
+              "minimo": 250
+            },
+            "dg": {
+              "tiers": [
+                { "desde": 0,    "precio": 12.75 },
+                { "desde": 45,   "precio": 12.14 },
+                { "desde": 100,  "precio": 10.12 },
+                { "desde": 300,  "precio": 9.64  },
+                { "desde": 500,  "precio": 9.18  },
+                { "desde": 1000, "precio": 8.75  }
+              ],
+              "minimo": 350,
+              "dgFeeUN": { "clases_1_7": 635, "otras": 335 }
+            }
+          },
+          "salidasDias": [3],
+          "cutoff": "",
+          "tipoVuelo": "CAO",
+          "transitoHrs": null,
+          "vigencia": "Abril 2026"
+        }
+      ]
     }
   ]
 }
