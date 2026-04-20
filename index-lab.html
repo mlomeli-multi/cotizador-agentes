@@ -394,7 +394,7 @@
         /* === 3-column cargo layout === */
         .cargo-3col {
             display: grid;
-            grid-template-columns: 148px minmax(0, 360px) minmax(240px, 1fr);
+            grid-template-columns: auto minmax(0, 1fr) auto;
             gap: 0.5rem;
             align-items: stretch;
         }
@@ -443,10 +443,11 @@
             padding-top: 0.4rem;
             margin-top: 0.1rem;
         }
-        /* Pallets column */
-        .cargo-col-pallets { min-width: 0; }
+        .cargo-col-controls { width: 140px; flex-shrink: 0; }
+        .cargo-col-pallets { min-width: 200px; }
         .cargo-col-pallets .pallet-lines { flex: 1; }
         .cargo-col-pallets .btn-add-pallet { align-self: flex-start; }
+        .cargo-col-summary { width: 230px; flex-shrink: 0; }
         .pallet-lines { display: flex; flex-direction: column; gap: 0.35rem; }
         .pallet-line {
             display: grid;
