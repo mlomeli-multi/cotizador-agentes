@@ -200,6 +200,807 @@
           "vigencia": "Abril 2026"
         }
       ]
+    },
+    {
+      "codigo": "NH",
+      "nombre": "ANA Cargo",
+      "rutas": [
+        { "origen": "MEX", "destino": "NRT", "destinoNombre": "Tokyo Narita",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 12.30 },
+            { "desde": 45,   "precio": 5.65 },
+            { "desde": 100,  "precio": 2.40 },
+            { "desde": 300,  "precio": 2.25 },
+            { "desde": 500,  "precio": 2.10 },
+            { "desde": 1000, "precio": 2.00 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "FUK", "destinoNombre": "Fukuoka",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.74 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.00 },
+            { "desde": 300,  "precio": 2.75 },
+            { "desde": 500,  "precio": 2.55 },
+            { "desde": 1000, "precio": 2.50 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "HND", "destinoNombre": "Tokyo Haneda",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 12.30 },
+            { "desde": 45,   "precio": 5.65 },
+            { "desde": 100,  "precio": 2.40 },
+            { "desde": 300,  "precio": 2.30 },
+            { "desde": 500,  "precio": 2.20 },
+            { "desde": 1000, "precio": 2.10 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "NGO", "destinoNombre": "Nagoya",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 12.93 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.50 },
+            { "desde": 300,  "precio": 2.50 },
+            { "desde": 500,  "precio": 2.30 },
+            { "desde": 1000, "precio": 2.20 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "KIX", "destinoNombre": "Osaka Kansai",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 12.94 },
+            { "desde": 45,   "precio": 5.65 },
+            { "desde": 100,  "precio": 2.40 },
+            { "desde": 300,  "precio": 2.30 },
+            { "desde": 500,  "precio": 2.20 },
+            { "desde": 1000, "precio": 2.10 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "CTS", "destinoNombre": "Sapporo Chitose",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 15.71 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.00 },
+            { "desde": 300,  "precio": 2.75 },
+            { "desde": 500,  "precio": 2.45 },
+            { "desde": 1000, "precio": 2.50 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "OKA", "destinoNombre": "Okinawa",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.49 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.50 },
+            { "desde": 300,  "precio": 3.25 },
+            { "desde": 500,  "precio": 3.05 },
+            { "desde": 1000, "precio": 3.00 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "BKK", "destinoNombre": "Bangkok Suvarnabhumi",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.19 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.70 },
+            { "desde": 300,  "precio": 2.25 },
+            { "desde": 500,  "precio": 2.20 },
+            { "desde": 1000, "precio": 2.10 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "PEK", "destinoNombre": "Beijing Capital",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 12.80 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.20 },
+            { "desde": 300,  "precio": 2.15 },
+            { "desde": 500,  "precio": 2.05 },
+            { "desde": 1000, "precio": 2.00 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "CAN", "destinoNombre": "Guangzhou Baiyun",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.36 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.50 },
+            { "desde": 300,  "precio": 2.35 },
+            { "desde": 500,  "precio": 2.20 },
+            { "desde": 1000, "precio": 2.10 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "DLC", "destinoNombre": "Dalian",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 19.29 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.80 },
+            { "desde": 300,  "precio": 3.70 },
+            { "desde": 500,  "precio": 3.50 },
+            { "desde": 1000, "precio": 3.35 }
+          ],
+          "minimo": 190.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "DEL", "destinoNombre": "Delhi Indira Gandhi",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.59 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.45 },
+            { "desde": 300,  "precio": 2.40 },
+            { "desde": 500,  "precio": 2.35 },
+            { "desde": 1000, "precio": 2.30 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "HAN", "destinoNombre": "Hanoi Noi Bai",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 16.58 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.10 },
+            { "desde": 300,  "precio": 2.80 },
+            { "desde": 500,  "precio": 2.55 },
+            { "desde": 1000, "precio": 2.30 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SGN", "destinoNombre": "Ho Chi Minh City",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 16.58 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.50 },
+            { "desde": 300,  "precio": 2.35 },
+            { "desde": 500,  "precio": 2.25 },
+            { "desde": 1000, "precio": 2.20 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "HKG", "destinoNombre": "Hong Kong",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.16 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.20 },
+            { "desde": 300,  "precio": 2.15 },
+            { "desde": 500,  "precio": 2.05 },
+            { "desde": 1000, "precio": 2.00 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "CGK", "destinoNombre": "Jakarta Soekarno-Hatta",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.48 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.00 },
+            { "desde": 300,  "precio": 2.70 },
+            { "desde": 500,  "precio": 2.50 },
+            { "desde": 1000, "precio": 2.60 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "KUL", "destinoNombre": "Kuala Lumpur",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 16.58 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.00 },
+            { "desde": 300,  "precio": 2.80 },
+            { "desde": 500,  "precio": 2.60 },
+            { "desde": 1000, "precio": 2.00 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "MNL", "destinoNombre": "Manila Ninoy Aquino",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 12.55 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.90 },
+            { "desde": 300,  "precio": 2.80 },
+            { "desde": 500,  "precio": 2.75 },
+            { "desde": 1000, "precio": 2.70 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "BOM", "destinoNombre": "Mumbai Chhatrapati",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.59 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.00 },
+            { "desde": 300,  "precio": 2.85 },
+            { "desde": 500,  "precio": 2.70 },
+            { "desde": 1000, "precio": 2.60 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "PEN", "destinoNombre": "Penang",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 16.56 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.20 },
+            { "desde": 300,  "precio": 3.05 },
+            { "desde": 500,  "precio": 2.95 },
+            { "desde": 1000, "precio": 2.85 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "TAO", "destinoNombre": "Qingdao",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 19.16 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.00 },
+            { "desde": 300,  "precio": 2.90 },
+            { "desde": 500,  "precio": 2.80 },
+            { "desde": 1000, "precio": 2.70 }
+          ],
+          "minimo": 190.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "PVG", "destinoNombre": "Shanghai Pudong",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 11.85 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.20 },
+            { "desde": 300,  "precio": 2.15 },
+            { "desde": 500,  "precio": 2.05 },
+            { "desde": 1000, "precio": 2.00 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SZX", "destinoNombre": "Shenzhen",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.76 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 3.20 },
+            { "desde": 300,  "precio": 3.00 },
+            { "desde": 500,  "precio": 2.85 },
+            { "desde": 1000, "precio": 2.70 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SYD", "destinoNombre": "Sydney",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 22.20 },
+            { "desde": 45,   "precio": 12.20 },
+            { "desde": 100,  "precio": 6.20 },
+            { "desde": 300,  "precio": 6.20 },
+            { "desde": 500,  "precio": 6.20 },
+            { "desde": 1000, "precio": 6.20 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SIN", "destinoNombre": "Singapore Changi",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.19 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.80 },
+            { "desde": 300,  "precio": 2.65 },
+            { "desde": 500,  "precio": 2.55 },
+            { "desde": 1000, "precio": 2.45 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "TPE", "destinoNombre": "Taipei Taoyuan",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.13 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.60 },
+            { "desde": 300,  "precio": 2.50 },
+            { "desde": 500,  "precio": 2.35 },
+            { "desde": 1000, "precio": 2.20 }
+          ],
+          "minimo": 125.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "XMN", "destinoNombre": "Xiamen",
+          "descripcion": "Estándar · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 19.76 },
+            { "desde": 45,   "precio": 5.85 },
+            { "desde": 100,  "precio": 2.80 },
+            { "desde": 300,  "precio": 2.60 },
+            { "desde": 500,  "precio": 2.50 },
+            { "desde": 1000, "precio": 2.40 }
+          ],
+          "minimo": 190.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "NRT", "destinoNombre": "Tokyo Narita",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.10 },
+            { "desde": 45,   "precio": 8.40 },
+            { "desde": 100,  "precio": 4.60 },
+            { "desde": 300,  "precio": 4.30 },
+            { "desde": 500,  "precio": 4.00 },
+            { "desde": 1000, "precio": 3.80 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "FUK", "destinoNombre": "Fukuoka",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 15.65 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.80 },
+            { "desde": 300,  "precio": 5.30 },
+            { "desde": 500,  "precio": 4.90 },
+            { "desde": 1000, "precio": 4.80 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "HND", "destinoNombre": "Tokyo Haneda",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.20 },
+            { "desde": 45,   "precio": 8.40 },
+            { "desde": 100,  "precio": 4.60 },
+            { "desde": 300,  "precio": 4.40 },
+            { "desde": 500,  "precio": 4.20 },
+            { "desde": 1000, "precio": 4.00 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "NGO", "destinoNombre": "Nagoya",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.80 },
+            { "desde": 45,   "precio": 8.40 },
+            { "desde": 100,  "precio": 4.80 },
+            { "desde": 300,  "precio": 4.60 },
+            { "desde": 500,  "precio": 4.40 },
+            { "desde": 1000, "precio": 4.20 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "KIX", "destinoNombre": "Osaka Kansai",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.05 },
+            { "desde": 45,   "precio": 8.40 },
+            { "desde": 100,  "precio": 4.60 },
+            { "desde": 300,  "precio": 4.40 },
+            { "desde": 500,  "precio": 4.20 },
+            { "desde": 1000, "precio": 4.00 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "BKK", "destinoNombre": "Bangkok Suvarnabhumi",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 14.90 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 4.80 },
+            { "desde": 300,  "precio": 4.50 },
+            { "desde": 500,  "precio": 4.20 },
+            { "desde": 1000, "precio": 4.00 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "PEK", "destinoNombre": "Beijing Capital",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.50 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 4.20 },
+            { "desde": 300,  "precio": 4.10 },
+            { "desde": 500,  "precio": 3.90 },
+            { "desde": 1000, "precio": 3.80 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "CAN", "destinoNombre": "Guangzhou Baiyun",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 15.10 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 4.80 },
+            { "desde": 300,  "precio": 4.50 },
+            { "desde": 500,  "precio": 4.20 },
+            { "desde": 1000, "precio": 4.00 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "DLC", "destinoNombre": "Dalian",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 20.00 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 7.40 },
+            { "desde": 300,  "precio": 7.20 },
+            { "desde": 500,  "precio": 6.80 },
+            { "desde": 1000, "precio": 6.50 }
+          ],
+          "minimo": 310.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "DEL", "destinoNombre": "Delhi Indira Gandhi",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 18.30 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 4.70 },
+            { "desde": 300,  "precio": 4.60 },
+            { "desde": 500,  "precio": 4.50 },
+            { "desde": 1000, "precio": 4.40 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "HAN", "destinoNombre": "Hanoi Noi Bai",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.30 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 6.00 },
+            { "desde": 300,  "precio": 5.40 },
+            { "desde": 500,  "precio": 4.90 },
+            { "desde": 1000, "precio": 4.20 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SGN", "destinoNombre": "Ho Chi Minh City",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.30 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.00 },
+            { "desde": 300,  "precio": 4.80 },
+            { "desde": 500,  "precio": 4.50 },
+            { "desde": 1000, "precio": 4.20 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "HKG", "destinoNombre": "Hong Kong",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.90 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 4.20 },
+            { "desde": 300,  "precio": 4.10 },
+            { "desde": 500,  "precio": 3.90 },
+            { "desde": 1000, "precio": 3.80 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "CGK", "destinoNombre": "Jakarta Soekarno-Hatta",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 15.20 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.80 },
+            { "desde": 300,  "precio": 5.20 },
+            { "desde": 500,  "precio": 4.80 },
+            { "desde": 1000, "precio": 4.60 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "KUL", "destinoNombre": "Kuala Lumpur",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.30 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.80 },
+            { "desde": 300,  "precio": 5.40 },
+            { "desde": 500,  "precio": 5.00 },
+            { "desde": 1000, "precio": 4.60 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "MNL", "destinoNombre": "Manila Ninoy Aquino",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.25 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.60 },
+            { "desde": 300,  "precio": 5.40 },
+            { "desde": 500,  "precio": 5.30 },
+            { "desde": 1000, "precio": 5.20 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "BOM", "destinoNombre": "Mumbai Chhatrapati",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 18.30 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.80 },
+            { "desde": 300,  "precio": 5.50 },
+            { "desde": 500,  "precio": 5.20 },
+            { "desde": 1000, "precio": 5.00 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "TAO", "destinoNombre": "Qingdao",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 19.85 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.80 },
+            { "desde": 300,  "precio": 5.60 },
+            { "desde": 500,  "precio": 5.40 },
+            { "desde": 1000, "precio": 5.20 }
+          ],
+          "minimo": 310.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "PVG", "destinoNombre": "Shanghai Pudong",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 17.70 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 4.20 },
+            { "desde": 300,  "precio": 4.10 },
+            { "desde": 500,  "precio": 3.90 },
+            { "desde": 1000, "precio": 3.80 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SZX", "destinoNombre": "Shenzhen",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 22.10 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 6.20 },
+            { "desde": 300,  "precio": 5.80 },
+            { "desde": 500,  "precio": 5.50 },
+            { "desde": 1000, "precio": 5.20 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "SIN", "destinoNombre": "Singapore Changi",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 21.20 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.40 },
+            { "desde": 300,  "precio": 5.10 },
+            { "desde": 500,  "precio": 4.90 },
+            { "desde": 1000, "precio": 4.70 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "TPE", "destinoNombre": "Taipei Taoyuan",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 13.90 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.00 },
+            { "desde": 300,  "precio": 4.80 },
+            { "desde": 500,  "precio": 4.50 },
+            { "desde": 1000, "precio": 4.20 }
+          ],
+          "minimo": 280.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "MEX", "destino": "XMN", "destinoNombre": "Xiamen",
+          "descripcion": "Prioritario · via LAX", "fsc": 0.32, "cgcMawb": 10, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 20.50 },
+            { "desde": 45,   "precio": 8.70 },
+            { "desde": 100,  "precio": 5.80 },
+            { "desde": 300,  "precio": 5.40 },
+            { "desde": 500,  "precio": 5.00 },
+            { "desde": 1000, "precio": 4.60 }
+          ],
+          "minimo": 310.20, "salidasDias": [1,2,3,4,5,6,7],
+          "cutoff": "18:00 día anterior", "tipoVuelo": "PAX", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "NRT", "destinoNombre": "Tokyo Narita",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.85 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "HND", "destinoNombre": "Tokyo Haneda",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.95 } ],
+          "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "SIN", "destinoNombre": "Singapore Changi",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.35 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "BKK", "destinoNombre": "Bangkok Suvarnabhumi",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.35 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "HKG", "destinoNombre": "Hong Kong",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.98 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "PVG", "destinoNombre": "Shanghai Pudong",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.98 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "TPE", "destinoNombre": "Taipei Taoyuan",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.05 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "NGO", "destinoNombre": "Nagoya",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.98 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "KIX", "destinoNombre": "Osaka Kansai",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.98 } ],
+          "minimo": 250, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "ICN", "destinoNombre": "Incheon Seoul",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.10 } ],
+          "minimo": 270, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "CAN", "destinoNombre": "Guangzhou Baiyun",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.35 } ],
+          "minimo": 270, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "SGN", "destinoNombre": "Ho Chi Minh City",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 1.95 } ],
+          "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "CGK", "destinoNombre": "Jakarta Soekarno-Hatta",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.10 } ],
+          "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "MNL", "destinoNombre": "Manila Ninoy Aquino",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.10 } ],
+          "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "KUL", "destinoNombre": "Kuala Lumpur",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.05 } ],
+          "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "PEK", "destinoNombre": "Beijing Capital",
+          "descripcion": "NCA · via LAX",
+          "tiers": [ { "desde": 0, "precio": 2.30 } ],
+          "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
+          "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" }
+      ]
     }
   ]
 }
