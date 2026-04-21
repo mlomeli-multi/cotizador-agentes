@@ -845,6 +845,24 @@
         .exp-fsc-note { font-size: 0.62rem; color: #7c3aed; font-weight: 600; }
         .exp-dg-fee-note { font-size: 0.62rem; color: #dc2626; font-weight: 600; }
 
+        /* Breakdown pills */
+        .bk-pills {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 0.2rem;
+            margin-bottom: 0.2rem; font-size: 0.65rem; color: var(--gray-500);
+        }
+        .bk-pill {
+            display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px;
+            font-weight: 700; font-size: 0.65rem;
+            background: #e0f2fe; color: #0369a1;
+        }
+        .bk-pill.ssc { background: #fef3c7; color: #92400e; }
+        .bk-pill.fsc { background: #ede9fe; color: #6d28d9; }
+        .bk-plus { font-size: 0.6rem; color: var(--gray-400); font-weight: 600; }
+        .bk-calc {
+            font-size: 0.65rem; color: var(--gray-600); line-height: 1.4;
+        }
+        .bk-calc strong { color: var(--navy); }
+
         /* ===== PASO 3 — 3-column grid ===== */
         .p3-grid {
             display: grid;
@@ -11189,7 +11207,7 @@ function calcAirlineTierRate(tiers, kg) {
 
 function calcAirlineCost(ruta, kg, tipoCarga) {
     if (tipoCarga === undefined) tipoCarga = expTipoCarga;
-    if (kg <= 0) return { total: 0, flete: 0, fsc: 0, cgc: 0, dgFeeTotal: 0, rate: 0, tipoCalc: '' };
+    if (kg <= 0) return { total: 0, flete: 0, fsc: 0, fscRate: 0, ssc: 0, sscRate: 0, cgc: 0, dgFeeTotal: 0, rate: 0, usedMinimo: false, minimo: 0, tipoCalc: '' };
 
     let tiers, minimo, dgFeeUN = 0;
 
@@ -11214,9 +11232,14 @@ function calcAirlineCost(ruta, kg, tipoCarga) {
     const fletefinal = Math.max(rate * kg * surcharge, minimo * surcharge);
 
     // FSC per kg
-    const fsc = (ruta.fsc || 0) * kg;
+    const fscRate = ruta.fsc || 0;
+    const fsc = fscRate * kg;
 
-    // CGC flat charges (legacy)
+    // SSC per kg (ANA Cargo)
+    const sscRate = ruta.ssc || 0;
+    const ssc = sscRate * kg;
+
+    // CGC flat charges
     const cgc = (ruta.cgcMawb || 0) + (ruta.cgcHawb || 0);
 
     // DG Fee per UN (class-based for CAO, flat for PAX)
@@ -11236,12 +11259,15 @@ function calcAirlineCost(ruta, kg, tipoCarga) {
 
     const usedMinimo = (rate * kg * surcharge) < (minimo * surcharge);
     return {
-        total: fletefinal + fsc + cgc + dgFeeTotal,
+        total: fletefinal + fsc + ssc + cgc + dgFeeTotal,
         flete: fletefinal,
-        fsc,
+        fsc, fscRate,
+        ssc, sscRate,
         cgc,
         dgFeeTotal,
         rate,
+        usedMinimo,
+        minimo,
         tipoCalc: usedMinimo ? `mínimo $${(minimo * surcharge).toFixed(0)}` : `${kg.toFixed(0)} kg × $${rate}`
     };
 }
@@ -11292,25 +11318,42 @@ function renderExpAirlines() {
     container.innerHTML = opciones.map((o, i) => {
         const result = calcAirlineCost(o.ruta, cw);
         if (!result) return '';
-        const { total, flete, fsc, cgc, dgFeeTotal, tipoCalc } = result;
+        const { total, flete, fsc, fscRate, ssc, sscRate, cgc, dgFeeTotal, rate, usedMinimo, minimo } = result;
         const dias = o.ruta.salidasDias.map(d => DAY_NAMES_EXP[d] || d).join(' · ');
         const isSelected = expSelectedAirline?.ruta === o.ruta;
         const priceStr = cw > 0 ? `$${total.toFixed(2)} USD` : '—';
         const isDG = expTipoCarga === 'dg';
 
-        let breakdownParts = [];
+        let breakdownHtml = '';
         if (cw > 0) {
-            breakdownParts.push(`Flete: ${tipoCalc}`);
-            if (fsc > 0)        breakdownParts.push(`<span class="exp-fsc-note">FSC $${fsc.toFixed(2)}</span>`);
-            if (cgc > 0)        breakdownParts.push(`CGC $${cgc.toFixed(2)}`);
-            if (dgFeeTotal > 0) breakdownParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
-            else if (isDG && expSelectedUNs.length === 0) breakdownParts.push(`<span class="exp-dg-fee-note">Agrega UNs para calcular DG Fee</span>`);
+            // Per-kg rate pills
+            let pills = [`<span class="bk-pill">Rate $${rate.toFixed(2)}</span>`];
+            if (sscRate > 0) pills.push(`<span class="bk-pill ssc">SSC $${sscRate.toFixed(2)}</span>`);
+            if (fscRate > 0) pills.push(`<span class="bk-pill fsc">FSC $${fscRate.toFixed(2)}</span>`);
+            const allInRate = rate + sscRate + fscRate;
+            const allInLabel = pills.length > 1 ? `= <strong>$${allInRate.toFixed(2)}/kg</strong>` : `<strong>$${rate.toFixed(2)}/kg</strong>`;
+
+            // Flete line
+            let fleteLine;
+            if (usedMinimo) {
+                fleteLine = `Mínimo <strong>$${minimo.toFixed(2)}</strong>`;
+            } else {
+                fleteLine = `${cw.toFixed(0)} kg × $${allInRate.toFixed(2)} = <strong>$${flete + fsc + ssc > 0 ? (flete + fsc + ssc).toFixed(2) : flete.toFixed(2)}</strong>`;
+            }
+
+            // Flat charges
+            let flatParts = [];
+            if (cgc > 0) flatParts.push(`CC $${cgc.toFixed(2)}`);
+            if (dgFeeTotal > 0) flatParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
+            else if (isDG && expSelectedUNs.length === 0) flatParts.push(`<span class="exp-dg-fee-note">Agrega UNs</span>`);
+
+            breakdownHtml = `<div class="bk-pills">${pills.join('<span class="bk-plus">+</span>')} ${allInLabel}</div>
+                <div class="bk-calc">${fleteLine}${flatParts.length ? ' + ' + flatParts.join(' + ') : ''}</div>`;
         } else {
-            breakdownParts.push('Ingresa los datos de carga para ver el precio');
+            breakdownHtml = `<div class="bk-calc">Ingresa datos de carga para ver precio</div>`;
         }
 
         const routingLabel = o.ruta.descripcion ? `<div class="exp-airline-routing">${escapeHtml(o.ruta.descripcion)}</div>` : '';
-        const avionBadge = o.ruta.tipoAvion ? `<span class="exp-airline-avion">${escapeHtml(o.ruta.tipoAvion)}</span>` : '';
         const dgBadge = isDG ? `<span class="exp-airline-dg-badge">DG</span>` : '';
 
         return `<div class="exp-airline-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}" data-idx="${i}">
@@ -11329,12 +11372,11 @@ function renderExpAirlines() {
                 ${o.ruta.transitoHrs != null ? `<span class="exp-airline-tag tt">TT ${o.ruta.transitoHrs}h</span>` : ''}
                 <span class="exp-airline-tag dias">${dias}</span>
                 ${o.ruta.cutoff ? `<span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>` : ''}
-                ${avionBadge}
                 <span class="exp-airline-tag vigencia">${escapeHtml(o.ruta.vigencia)}</span>
             </div>
             <div class="exp-airline-breakdown">
+                ${breakdownHtml}
                 <button class="exp-airline-btn">${isSelected ? '✓ Elegida' : 'Elegir'}</button>
-                ${breakdownParts.join(' + ')}
             </div>
         </div>`;
     }).join('');
@@ -11355,12 +11397,13 @@ function getExpAirlineCosts() {
     const cw = getExpChargeableWeight();
     const result = calcAirlineCost(expSelectedAirline.ruta, cw);
     if (!result || result.total <= 0) return [];
-    const { flete, fsc, cgc, dgFeeTotal, tipoCalc } = result;
+    const { flete, fsc, ssc, cgc, dgFeeTotal, tipoCalc } = result;
     const code = expSelectedAirline.aerolinea.codigo;
     const costs = [];
     costs.push({ label: `Flete aéreo · ${code} (${tipoCalc})`, value: flete, currency: 'USD' });
+    if (ssc > 0)        costs.push({ label: `SSC · ${code}`, value: ssc, currency: 'USD' });
     if (fsc > 0)        costs.push({ label: `FSC · ${code}`, value: fsc, currency: 'USD' });
-    if (cgc > 0)        costs.push({ label: `CGC (MAWB + HAWB)`, value: cgc, currency: 'USD' });
+    if (cgc > 0)        costs.push({ label: `CC (MAWB)`, value: cgc, currency: 'USD' });
     if (dgFeeTotal > 0) costs.push({ label: `DG Fee · ${expSelectedUNs.length} UN`, value: dgFeeTotal, currency: 'USD' });
     return costs;
 }
