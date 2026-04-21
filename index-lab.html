@@ -862,6 +862,54 @@
         .exp-fsc-note { font-size: 0.62rem; color: #7c3aed; font-weight: 600; }
         .exp-dg-fee-note { font-size: 0.62rem; color: #dc2626; font-weight: 600; }
 
+        /* ===== PASO 3 — 3-column grid ===== */
+        .p3-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+        .p3-col {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.65rem 0.7rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .p3-col-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .p3-col-note {
+            font-size: 0.6rem;
+            color: var(--gray-400);
+            margin-bottom: 0.2rem;
+        }
+        .p3-opt-item {
+            display: grid;
+            grid-template-columns: 16px 1fr auto;
+            gap: 0.3rem;
+            align-items: center;
+            padding: 0.28rem 0.1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .p3-opt-item:last-child { border-bottom: none; }
+        .p3-opt-label { cursor: pointer; }
+        .p3-opt-name { font-size: 0.68rem; font-weight: 600; color: var(--gray-700); line-height: 1.2; }
+        .p3-opt-note { font-size: 0.58rem; color: var(--gray-400); }
+        .p3-opt-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+        .p3-opt-price { font-size: 0.7rem; font-weight: 700; color: var(--navy); white-space: nowrap; }
+        .p3-opt-qty-row { display: flex; align-items: center; gap: 0.2rem; }
+        .p3-opt-qty {
+            width: 38px; height: 22px; border: 1px solid var(--gray-300);
+            border-radius: 5px; padding: 0 4px; font-size: 0.65rem;
+            text-align: center;
+        }
+        .p3-opt-qty-lbl { font-size: 0.58rem; color: var(--gray-500); }
+
         /* ===== EXW PROVIDER BLOCKS ===== */
         .exp-block {
             background: var(--gray-50);
@@ -4339,23 +4387,26 @@
                             <div class="air-provider-stage-badge">Paso 3</div>
                         </div>
 
-                        <!-- Bloque 1: Transporte terrestre -->
-                        <div class="exp-block">
-                            <div class="exp-block-title">Transporte terrestre</div>
-                            <div class="exp-block-note">Origen → Almacén aeropuerto</div>
-                            <div id="exp-transport-results"></div>
-                        </div>
-
-                        <!-- Bloque 2: Almacén aeropuerto -->
-                        <div class="exp-block">
-                            <div class="exp-block-title">Almacén aeropuerto</div>
-                            <div class="exp-block-note">Selecciona los cargos que aplican</div>
-                            <div id="exp-warehouse-list" class="exp-checkbox-list">
-                                <div class="exp-empty-msg">Próximamente — cargos de almacén por aeropuerto.</div>
+                        <!-- 3 columnas: transporte | almacén auto | opcionales -->
+                        <div class="p3-grid">
+                            <div class="p3-col">
+                                <div class="p3-col-title">Transporte terrestre</div>
+                                <div class="p3-col-note">Origen → Almacén aeropuerto</div>
+                                <div id="exp-transport-results"></div>
+                            </div>
+                            <div class="p3-col">
+                                <div class="p3-col-title">Almacén aeropuerto</div>
+                                <div class="p3-col-note">Maniobras e ingreso</div>
+                                <div id="exp-warehouse-auto"></div>
+                            </div>
+                            <div class="p3-col">
+                                <div class="p3-col-title">Opcionales</div>
+                                <div class="p3-col-note">Selecciona los que aplican</div>
+                                <div id="exp-warehouse-optional"></div>
                             </div>
                         </div>
 
-                        <!-- Bloque 3: Flete aéreo (aerolíneas) -->
+                        <!-- Flete aéreo (full width) -->
                         <div class="exp-block">
                             <div class="exp-block-title">Flete aéreo</div>
                             <div class="exp-block-note" id="exp-airline-block-note">Selecciona el destino en Paso 1 para ver aerolíneas disponibles.</div>
@@ -11374,37 +11425,38 @@ let expWarehouseChecks = {};
 let expIngresoProvider = null; // null = auto (cheapest)
 
 function renderExpWarehouse() {
-    const container = document.getElementById('exp-warehouse-list');
+    renderExpWarehouseAuto();
+    renderExpWarehouseOptional();
+}
+
+function renderExpWarehouseAuto() {
+    const container = document.getElementById('exp-warehouse-auto');
     if (!container) return;
     if (!aioData) { container.innerHTML = '<div class="exp-empty-msg">Cargando tarifas…</div>'; return; }
 
     const aeropuerto = document.getElementById('aeropuerto-exp').value;
     const unidad = getExpUnidadCalculada();
-    const lineas = getExpPalletLines();
-    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
-    const totalM2 = lineas.reduce((s, l) => s + l.qty * (l.largo / 100) * (l.ancho / 100), 0);
 
     let html = '';
 
     // --- Maniobras (auto) ---
     const maniobra = unidad ? aioData.maniobras[unidad] : null;
-    html += `<div class="aio-section-title">Maniobras y acceso</div>`;
+    html += `<div class="aio-section-title">Maniobras</div>`;
     if (maniobra) {
         html += `<div class="aio-auto-row">
             <span class="aio-auto-check">✓</span>
-            <div><div class="aio-auto-name">Maniobras AIO · ${escapeHtml(maniobra.nombre)}</div>
+            <div><div class="aio-auto-name">AIO · ${escapeHtml(maniobra.nombre)}</div>
             <div class="aio-auto-note">${escapeHtml(maniobra.referencia)}</div></div>
             <div class="aio-auto-price">$${maniobra.precio.toLocaleString()} MXN</div>
         </div>`;
     } else {
-        html += `<div class="exp-empty-msg">Elige la unidad de transporte para ver maniobras.</div>`;
+        html += `<div class="exp-empty-msg">Elige la unidad de transporte.</div>`;
     }
 
-    // --- Ingreso aeropuerto (selección AIO vs Barajas) ---
+    // --- Ingreso aeropuerto ---
     const ingresosAp = aeropuerto ? aioData.ingresoAeropuerto[aeropuerto] : null;
     if (ingresosAp && unidad) {
         const proveedoresIngreso = Object.keys(ingresosAp);
-        // Auto-select cheapest if not chosen
         if (!expIngresoProvider || !ingresosAp[expIngresoProvider]) {
             expIngresoProvider = proveedoresIngreso.reduce((best, p) =>
                 (ingresosAp[p][unidad]?.precio ?? Infinity) < (ingresosAp[best]?.[unidad]?.precio ?? Infinity) ? p : best,
@@ -11428,82 +11480,85 @@ function renderExpWarehouse() {
         html += `</div>`;
     }
 
-    // --- Almacenaje ---
-    html += `<div class="aio-section-title" style="margin-top:0.6rem;">Almacenaje</div>`;
-    if (totalM2 > 0) html += `<div class="aio-section-note">${totalM2.toFixed(2)} m² calculados de los pallets</div>`;
-    aioData.almacenaje.forEach((item, idx) => {
-        const key = `almacenaje_${idx}`;
-        const state = expWarehouseChecks[key] || { checked: false, qty: 1 };
-        const subtotal = totalM2 > 0 ? item.precio * state.qty * totalM2 : item.precio * state.qty;
-        html += `<div class="aio-check-row">
-            <input type="checkbox" class="aio-chk" id="aio-${key}" data-key="${key}" ${state.checked ? 'checked' : ''}>
-            <label for="aio-${key}" class="aio-check-label">
-                <span class="aio-check-name">Almacenaje ${escapeHtml(item.periodo)}</span>
-                <span class="aio-check-note">$${item.precio.toLocaleString()} × m²${totalM2 > 0 ? ' × ' + totalM2.toFixed(2) + ' m²' : ''}</span>
-            </label>
-            <div class="aio-check-qty ${state.checked ? '' : 'hidden'}">
-                <input type="number" class="aio-qty" data-key="${key}" min="1" value="${state.qty}" placeholder="1">
-                <span class="aio-qty-label">${item.periodo.toLowerCase()}(s)</span>
-            </div>
-            <div class="aio-check-price">${state.checked ? '$' + Math.round(subtotal).toLocaleString() + ' MXN' : ''}</div>
-        </div>`;
-    });
-
-    // --- Materiales ---
-    html += `<div class="aio-section-title" style="margin-top:0.6rem;">Materiales y consumibles</div>`;
-    aioData.materiales.forEach((item, idx) => {
-        const key = `material_${idx}`;
-        const autoQty = item.autoQty === 'pallets' ? Math.max(totalPallets, 1) : 1;
-        const state = expWarehouseChecks[key] || { checked: false, qty: autoQty };
-        html += `<div class="aio-check-row">
-            <input type="checkbox" class="aio-chk" id="aio-${key}" data-key="${key}" ${state.checked ? 'checked' : ''}>
-            <label for="aio-${key}" class="aio-check-label">
-                <span class="aio-check-name">${escapeHtml(item.concepto)}</span>
-                <span class="aio-check-note">$${item.precio.toLocaleString()} × ${item.unidad}</span>
-            </label>
-            <div class="aio-check-qty ${state.checked ? '' : 'hidden'}">
-                <input type="number" class="aio-qty" data-key="${key}" min="1" value="${state.qty}" placeholder="${autoQty}">
-                <span class="aio-qty-label">${item.unidad}(s)</span>
-            </div>
-            <div class="aio-check-price">${state.checked ? '$' + (item.precio * state.qty).toLocaleString() + ' MXN' : ''}</div>
-        </div>`;
-    });
-
-    // --- Servicio extraordinario ---
-    html += `<div class="aio-section-title" style="margin-top:0.6rem;">Servicio extraordinario</div>`;
-    aioData.servicioExtraordinario.forEach((item, idx) => {
-        const key = `servext_${idx}`;
-        const state = expWarehouseChecks[key] || { checked: false, qty: 1 };
-        html += `<div class="aio-check-row">
-            <input type="checkbox" class="aio-chk" id="aio-${key}" data-key="${key}" ${state.checked ? 'checked' : ''}>
-            <label for="aio-${key}" class="aio-check-label">
-                <span class="aio-check-name">Serv. extraordinario · ${escapeHtml(item.cobertura)}</span>
-                <span class="aio-check-note">$${item.precio.toLocaleString()} MXN</span>
-            </label>
-            <div class="aio-check-qty ${state.checked ? '' : 'hidden'}">
-                <input type="number" class="aio-qty" data-key="${key}" min="1" value="${state.qty}" placeholder="1">
-                <span class="aio-qty-label">vez(ces)</span>
-            </div>
-            <div class="aio-check-price">${state.checked ? '$' + (item.precio * state.qty).toLocaleString() + ' MXN' : ''}</div>
-        </div>`;
-    });
-
     container.innerHTML = html;
 
     container.querySelectorAll('.aio-ingreso-option').forEach(opt => {
         opt.addEventListener('click', () => {
             expIngresoProvider = opt.dataset.ingresoProv;
-            renderExpWarehouse();
+            renderExpWarehouseAuto();
             updateExpCostSummary();
         });
     });
+}
+
+function _renderOptItem(key, nameHtml, noteHtml, state, priceHtml) {
+    return `<div class="p3-opt-item">
+        <input type="checkbox" class="aio-chk" id="aio-${key}" data-key="${key}" ${state.checked ? 'checked' : ''}>
+        <label for="aio-${key}" class="p3-opt-label">
+            <div class="p3-opt-name">${nameHtml}</div>
+            <div class="p3-opt-note">${noteHtml}</div>
+        </label>
+        <div class="p3-opt-right">
+            ${state.checked ? `<div class="p3-opt-price">${priceHtml}</div>` : ''}
+            <div class="p3-opt-qty-row ${state.checked ? '' : 'hidden'}">
+                <input type="number" class="aio-qty p3-opt-qty" data-key="${key}" min="1" value="${state.qty}" placeholder="1">
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderExpWarehouseOptional() {
+    const container = document.getElementById('exp-warehouse-optional');
+    if (!container) return;
+    if (!aioData) { container.innerHTML = '<div class="exp-empty-msg">Cargando tarifas…</div>'; return; }
+
+    const lineas = getExpPalletLines();
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    const totalM2 = lineas.reduce((s, l) => s + l.qty * (l.largo / 100) * (l.ancho / 100), 0);
+
+    let html = '';
+
+    // --- Almacenaje ---
+    html += `<div class="aio-section-title">Almacenaje</div>`;
+    if (totalM2 > 0) html += `<div class="aio-section-note">${totalM2.toFixed(2)} m²</div>`;
+    aioData.almacenaje.forEach((item, idx) => {
+        const key = `almacenaje_${idx}`;
+        const state = expWarehouseChecks[key] || { checked: false, qty: 1 };
+        const subtotal = totalM2 > 0 ? item.precio * state.qty * totalM2 : item.precio * state.qty;
+        const noteStr = `$${item.precio.toLocaleString()} × m²${totalM2 > 0 ? ' × ' + totalM2.toFixed(1) + ' m²' : ''}`;
+        const priceStr = '$' + Math.round(subtotal).toLocaleString() + ' MXN';
+        html += _renderOptItem(key, `Almacenaje ${escapeHtml(item.periodo)}`, noteStr, state, priceStr);
+    });
+
+    // --- Materiales ---
+    html += `<div class="aio-section-title" style="margin-top:0.5rem;">Materiales</div>`;
+    aioData.materiales.forEach((item, idx) => {
+        const key = `material_${idx}`;
+        const autoQty = item.autoQty === 'pallets' ? Math.max(totalPallets, 1) : 1;
+        const state = expWarehouseChecks[key] || { checked: false, qty: autoQty };
+        const noteStr = `$${item.precio.toLocaleString()} × ${item.unidad}`;
+        const priceStr = '$' + (item.precio * state.qty).toLocaleString() + ' MXN';
+        html += _renderOptItem(key, escapeHtml(item.concepto), noteStr, state, priceStr);
+    });
+
+    // --- Servicio extraordinario ---
+    html += `<div class="aio-section-title" style="margin-top:0.5rem;">Serv. extraordinario</div>`;
+    aioData.servicioExtraordinario.forEach((item, idx) => {
+        const key = `servext_${idx}`;
+        const state = expWarehouseChecks[key] || { checked: false, qty: 1 };
+        const noteStr = `$${item.precio.toLocaleString()} MXN`;
+        const priceStr = '$' + (item.precio * state.qty).toLocaleString() + ' MXN';
+        html += _renderOptItem(key, escapeHtml(item.cobertura), noteStr, state, priceStr);
+    });
+
+    container.innerHTML = html;
 
     container.querySelectorAll('.aio-chk').forEach(chk => {
         chk.addEventListener('change', () => {
             const key = chk.dataset.key;
             if (!expWarehouseChecks[key]) expWarehouseChecks[key] = { checked: false, qty: 1 };
             expWarehouseChecks[key].checked = chk.checked;
-            renderExpWarehouse();
+            renderExpWarehouseOptional();
             updateExpCostSummary();
         });
     });
@@ -11512,7 +11567,7 @@ function renderExpWarehouse() {
             const key = inp.dataset.key;
             if (!expWarehouseChecks[key]) expWarehouseChecks[key] = { checked: true, qty: 1 };
             expWarehouseChecks[key].qty = Math.max(1, parseInt(inp.value) || 1);
-            renderExpWarehouse();
+            renderExpWarehouseOptional();
             updateExpCostSummary();
         });
     });
