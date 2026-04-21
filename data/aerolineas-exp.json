@@ -1001,6 +1001,151 @@
           "minimo": 280, "cgcMawb": 10, "cgcHawb": 0, "tipoCarga": ["general"],
           "salidasDias": [1,2,4,6,7], "cutoff": "", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" }
       ]
+    },
+    {
+      "codigo": "M7",
+      "nombre": "Masair",
+      "rutas": [
+        { "origen": "NLU", "destino": "BOG", "destinoNombre": "Bogotá El Dorado",
+          "descripcion": "Directo", "fsc": 0.35, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 4.10 },
+            { "desde": 45,   "precio": 3.80 },
+            { "desde": 100,  "precio": 1.55 },
+            { "desde": 300,  "precio": 0.70 },
+            { "desde": 500,  "precio": 0.65 },
+            { "desde": 1000, "precio": 0.60 }
+          ],
+          "minimo": 155, "salidasDias": [3,6],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "LAX", "destinoNombre": "Los Angeles",
+          "descripcion": "Directo", "fsc": 0.35, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 4.10 },
+            { "desde": 45,   "precio": 3.80 },
+            { "desde": 100,  "precio": 1.55 },
+            { "desde": 300,  "precio": 0.80 },
+            { "desde": 500,  "precio": 0.75 },
+            { "desde": 1000, "precio": 0.75 }
+          ],
+          "minimo": 155, "salidasDias": [1,3,5],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "SJO", "destinoNombre": "San José Costa Rica",
+          "descripcion": "vía BOG · interlineal", "fsc": 0.35, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 6.94 },
+            { "desde": 45,   "precio": 6.80 },
+            { "desde": 100,  "precio": 2.80 },
+            { "desde": 300,  "precio": 1.50 },
+            { "desde": 500,  "precio": 1.50 },
+            { "desde": 1000, "precio": 1.50 }
+          ],
+          "minimo": 305, "salidasDias": [3,6],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "UIO", "destinoNombre": "Quito",
+          "descripcion": "Directo", "fsc": 0.35, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 4.10 },
+            { "desde": 45,   "precio": 3.80 },
+            { "desde": 100,  "precio": 2.20 },
+            { "desde": 300,  "precio": 1.90 },
+            { "desde": 500,  "precio": 1.90 },
+            { "desde": 1000, "precio": 1.90 }
+          ],
+          "minimo": 155, "salidasDias": [2,4],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "PTY", "destinoNombre": "Ciudad de Panamá",
+          "descripcion": "Directo", "fsc": 0.35, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 4.10 },
+            { "desde": 45,   "precio": 3.80 },
+            { "desde": 100,  "precio": 1.55 },
+            { "desde": 300,  "precio": 1.40 },
+            { "desde": 500,  "precio": 1.30 },
+            { "desde": 1000, "precio": 1.30 }
+          ],
+          "minimo": 155, "salidasDias": [6],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "LIM", "destinoNombre": "Lima",
+          "descripcion": "Directo", "fsc": 0.55, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 4.10 },
+            { "desde": 45,   "precio": 3.80 },
+            { "desde": 100,  "precio": 2.30 },
+            { "desde": 300,  "precio": 2.00 },
+            { "desde": 500,  "precio": 2.00 },
+            { "desde": 1000, "precio": 2.00 }
+          ],
+          "minimo": 230, "salidasDias": [4],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "VCP", "destinoNombre": "São Paulo Viracopos",
+          "descripcion": "Directo", "fsc": 0.55, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 5.80 },
+            { "desde": 45,   "precio": 5.60 },
+            { "desde": 100,  "precio": 3.10 },
+            { "desde": 300,  "precio": 2.90 },
+            { "desde": 500,  "precio": 2.90 },
+            { "desde": 1000, "precio": 2.90 }
+          ],
+          "minimo": 250, "salidasDias": [4,7],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "SCL", "destinoNombre": "Santiago de Chile",
+          "descripcion": "Directo", "fsc": 0.55, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 5.80 },
+            { "desde": 45,   "precio": 5.60 },
+            { "desde": 100,  "precio": 2.80 },
+            { "desde": 300,  "precio": 2.80 },
+            { "desde": 500,  "precio": 2.70 },
+            { "desde": 1000, "precio": 2.50 }
+          ],
+          "minimo": 250, "salidasDias": [7],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "WUX", "destinoNombre": "Wuxi",
+          "descripcion": "Escala en LAX", "fsc": 0.55, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 6.00 },
+            { "desde": 45,   "precio": 5.80 },
+            { "desde": 100,  "precio": 2.60 },
+            { "desde": 300,  "precio": 1.90 },
+            { "desde": 500,  "precio": 1.90 },
+            { "desde": 1000, "precio": 1.90 }
+          ],
+          "minimo": 260, "salidasDias": [1,3,5],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" },
+
+        { "origen": "NLU", "destino": "ICN", "destinoNombre": "Seoul Incheon",
+          "descripcion": "Escala en LAX · nueva abr-26", "fsc": 0.55, "cgcMawb": 0, "cgcHawb": 0,
+          "tipoCarga": ["general"],
+          "tiers": [
+            { "desde": 0,    "precio": 6.00 },
+            { "desde": 45,   "precio": 5.80 },
+            { "desde": 100,  "precio": 2.60 },
+            { "desde": 300,  "precio": 1.15 },
+            { "desde": 500,  "precio": 1.15 },
+            { "desde": 1000, "precio": 1.15 }
+          ],
+          "minimo": 260, "salidasDias": [1,3,7],
+          "cutoff": "12hrs antes de ETD", "tipoVuelo": "CAO", "transitoHrs": null, "vigencia": "Abril 2026" }
+      ]
     }
   ]
 }
