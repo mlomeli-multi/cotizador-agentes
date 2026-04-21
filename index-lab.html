@@ -702,12 +702,23 @@
             font-size: 0.72rem; color: var(--gray-400); text-align: center; padding: 0.75rem;
         }
 
-        /* ===== ROUTE DIAGRAM ===== */
+        /* ===== PASO 1 GRID (form + medidas side by side) ===== */
+        .paso1-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+        .paso1-left { display: flex; flex-direction: column; gap: 0.5rem; }
+        .paso1-right { display: flex; flex-direction: column; }
+
+        /* ===== ROUTE DIAGRAM (badge layout) ===== */
         .exp-route-diagram {
             background: var(--navy);
             border-radius: 12px;
-            padding: 0.75rem;
-            min-height: 200px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
         }
         .exp-route-diagram-title {
             font-size: 0.7rem; font-weight: 700; color: white;
@@ -715,70 +726,42 @@
         }
         .exp-route-diagram-note {
             font-size: 0.58rem; color: rgba(255,255,255,0.45);
-            margin-bottom: 0.65rem;
+            margin-bottom: 0.5rem;
         }
         .exp-origin-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 0.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
         }
-        .exp-origin-card {
-            background: rgba(255,255,255,0.07);
-            border: 1px solid rgba(255,255,255,0.12);
-            border-radius: 8px;
-            padding: 0.5rem 0.6rem;
-            transition: border-color 0.15s;
+        .exp-origin-row {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem;
         }
-        .exp-origin-card.active {
-            border-color: rgba(96,165,250,0.7);
-            background: rgba(59,130,246,0.15);
+        .exp-origin-label {
+            font-size: 0.72rem; font-weight: 800; color: #60a5fa;
+            min-width: 38px; margin-right: 0.15rem;
         }
-        .exp-origin-head {
-            display: flex; align-items: baseline; gap: 0.35rem;
-            margin-bottom: 0.4rem;
+        .exp-dest-badge {
+            position: relative;
+            font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px; padding: 0.18rem 0.45rem; cursor: pointer;
+            transition: background 0.12s, border-color 0.12s;
         }
-        .exp-origin-code {
-            font-size: 0.85rem; font-weight: 800; color: white;
+        .exp-dest-badge:hover {
+            background: rgba(96,165,250,0.25); border-color: rgba(96,165,250,0.6);
         }
-        .exp-origin-name {
-            font-size: 0.58rem; color: rgba(255,255,255,0.5);
+        .exp-dest-badge.active {
+            background: rgba(59,130,246,0.35); border-color: #60a5fa; color: white;
         }
-        .exp-dest-list { display: flex; flex-direction: column; gap: 0.3rem; }
-        .exp-dest-item {
-            background: rgba(255,255,255,0.06);
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 6px;
-            padding: 0.35rem 0.5rem;
-            cursor: pointer;
-            transition: border-color 0.15s, background 0.15s;
+        .exp-dest-badge .badge-tip {
+            display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
+            transform: translateX(-50%); background: #1e293b; border: 1px solid rgba(96,165,250,0.4);
+            border-radius: 8px; padding: 0.4rem 0.6rem; min-width: 160px; z-index: 50;
+            white-space: nowrap; pointer-events: none;
         }
-        .exp-dest-item:hover { border-color: rgba(96,165,250,0.5); background: rgba(59,130,246,0.1); }
-        .exp-dest-item.active {
-            border-color: #60a5fa;
-            background: rgba(59,130,246,0.25);
-        }
-        .exp-dest-header {
-            display: flex; align-items: center; gap: 0.3rem; margin-bottom: 0.2rem;
-        }
-        .exp-dest-code { font-size: 0.78rem; font-weight: 700; color: white; }
-        .exp-dest-city { font-size: 0.58rem; color: rgba(255,255,255,0.6); flex: 1; }
-        .exp-dest-airline-badge {
-            font-size: 0.55rem; font-weight: 700; padding: 0.05rem 0.3rem;
-            background: rgba(96,165,250,0.3); color: #93c5fd;
-            border-radius: 3px;
-        }
-        .exp-dest-meta { display: flex; align-items: center; gap: 0.4rem; }
-        .exp-dest-tt {
-            font-size: 0.58rem; color: #34d399; font-weight: 600;
-        }
-        .exp-day-dots { display: flex; gap: 2px; }
-        .exp-day-dot {
-            width: 13px; height: 13px; border-radius: 3px;
-            font-size: 0.45rem; font-weight: 700;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .exp-day-dot.on  { background: rgba(96,165,250,0.35); color: #93c5fd; }
-        .exp-day-dot.off { background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.2); }
+        .exp-dest-badge:hover .badge-tip { display: block; }
+        .badge-tip-name { font-size: 0.68rem; font-weight: 700; color: white; margin-bottom: 0.15rem; }
+        .badge-tip-airline { font-size: 0.6rem; color: rgba(255,255,255,0.6); }
         .exp-no-routes-msg {
             font-size: 0.62rem; color: rgba(255,255,255,0.25);
             font-style: italic; padding: 0.15rem 0;
@@ -4193,33 +4176,16 @@
                     </div>
                 </aside>
                 <div class="air-dap-main">
-            <div class="layout-split">
-                <div class="layout-left">
-                    <div class="exp-route-diagram" id="route-diagram-exp">
-                        <div class="exp-route-diagram-title">Rutas disponibles para cotizar</div>
-                        <div class="exp-route-diagram-note">Se actualiza con cada aerolínea que agregues al sistema.</div>
-                        <div class="exp-origin-grid" id="exp-origin-grid"></div>
-                    </div>
-                    <div class="route-info" id="route-info-exp">
-                        <div class="route-info-grid">
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-km-exp">—</div>
-                                <div class="stat-label">Kilómetros aprox.</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-time-exp">—</div>
-                                <div class="stat-label" id="route-time-label-exp">Tiempo tránsito</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-unit-type-exp">—</div>
-                                <div class="stat-label">Tipo unidad</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="layout-right">
-                    <div class="air-dap-top-panel">
-                        <div class="air-route-panel">
+            <!-- Rutas panel — full width on top -->
+            <div class="exp-route-diagram" id="route-diagram-exp">
+                <div class="exp-route-diagram-title">Rutas disponibles para cotizar</div>
+                <div class="exp-route-diagram-note">Se actualiza con cada aerolínea que agregues al sistema.</div>
+                <div class="exp-origin-grid" id="exp-origin-grid"></div>
+            </div>
+
+            <div class="paso1-grid">
+                <div class="paso1-left">
+                    <div class="air-route-panel">
                             <div class="air-route-head">
                                 <div>
                                     <div class="form-section-title">&#9992; Ruta</div>
@@ -4252,30 +4218,47 @@
                             </div>
                         </div>
 
-                        <div class="unit-reference-card">
-                            <div class="unit-reference-head">
-                                <div class="unit-reference-title">Medidas base por unidad</div>
-                                <div class="unit-reference-subtitle">Referencia comercial rápida de payload, dimensiones y cubicaje.</div>
+                    <div class="route-info" id="route-info-exp">
+                        <div class="route-info-grid">
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-km-exp">—</div>
+                                <div class="stat-label">Kilómetros aprox.</div>
                             </div>
-                            <div class="unit-reference-wrap">
-                                <table class="unit-reference-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Unidad</th>
-                                            <th>Payload</th>
-                                            <th>Dimensiones base</th>
-                                            <th>CBM</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr><td>1 Ton Truck</td><td>900 kg</td><td>190 x 150 x 150 cm</td><td>4.275 cbm</td></tr>
-                                        <tr><td>3.5 Tons Truck</td><td>3,200 kg</td><td>315 x 225 x 180 cm</td><td>12.75 cbm</td></tr>
-                                        <tr><td>5 Ton (Rabón)</td><td>5,900 kg</td><td>600 x 240 x 215 cm</td><td>30.95 cbm</td></tr>
-                                        <tr><td>10 Ton (Tortón)</td><td>9,900 kg</td><td>700 x 250 x 245 cm</td><td>42.875 cbm</td></tr>
-                                        <tr><td>Caja Seca 53'</td><td>20,000 kg</td><td>1500 x 250 x 270 cm</td><td>101.25 cbm</td></tr>
-                                    </tbody>
-                                </table>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-time-exp">—</div>
+                                <div class="stat-label" id="route-time-label-exp">Tiempo tránsito</div>
                             </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-unit-type-exp">—</div>
+                                <div class="stat-label">Tipo unidad</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="paso1-right">
+                    <div class="unit-reference-card">
+                        <div class="unit-reference-head">
+                            <div class="unit-reference-title">Medidas base por unidad</div>
+                            <div class="unit-reference-subtitle">Referencia comercial rápida de payload, dimensiones y cubicaje.</div>
+                        </div>
+                        <div class="unit-reference-wrap">
+                            <table class="unit-reference-table">
+                                <thead>
+                                    <tr>
+                                        <th>Unidad</th>
+                                        <th>Payload</th>
+                                        <th>Dimensiones base</th>
+                                        <th>CBM</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>1 Ton Truck</td><td>900 kg</td><td>190 x 150 x 150 cm</td><td>4.275 cbm</td></tr>
+                                    <tr><td>3.5 Tons Truck</td><td>3,200 kg</td><td>315 x 225 x 180 cm</td><td>12.75 cbm</td></tr>
+                                    <tr><td>5 Ton (Rabón)</td><td>5,900 kg</td><td>600 x 240 x 215 cm</td><td>30.95 cbm</td></tr>
+                                    <tr><td>10 Ton (Tortón)</td><td>9,900 kg</td><td>700 x 250 x 245 cm</td><td>42.875 cbm</td></tr>
+                                    <tr><td>Caja Seca 53'</td><td>20,000 kg</td><td>1500 x 250 x 270 cm</td><td>101.25 cbm</td></tr>
+                                </tbody>
+                            </table>
                         </div>
                     </div>
                 </div>
@@ -11130,69 +11113,43 @@ const DAY_LABELS = ['L','M','X','J','V','S','D']; // index 0=Mon(1)..6=Sun(7)
 function renderExpRouteDiagram() {
     const grid = document.getElementById('exp-origin-grid');
     if (!grid) return;
-
     const activeOrigin = document.getElementById('aeropuerto-exp').value;
     const activeDestino = document.getElementById('destino-exp')?.value || '';
-
     const airports = Object.keys(EXP_AIRPORTS_META);
 
     grid.innerHTML = airports.map(ap => {
-        const rutas = airlineData
-            ? getExpRutasDisponibles(ap)
-            : [];
-
-        // Group destinations by dest code; collect unique airlines and capabilities
+        const rutas = airlineData ? getExpRutasDisponibles(ap) : [];
         const destMap = new Map();
         for (const o of rutas) {
             const key = o.ruta.destino;
-            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: new Set(), hasDG: false, count: 0 });
+            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [], count: 0, hasDG: false });
             const entry = destMap.get(key);
-            entry.airlines.add(o.aerolinea.codigo);
+            const aName = o.aerolinea.nombre;
+            if (!entry.airlines.find(a => a.code === o.aerolinea.codigo))
+                entry.airlines.push({ code: o.aerolinea.codigo, name: aName });
             entry.count++;
             if (o.ruta.tipoCarga?.includes('dg') || o.ruta.tarifas?.dg) entry.hasDG = true;
         }
+        if (destMap.size === 0) return `<div class="exp-origin-row"><span class="exp-origin-label">${ap}</span><span class="exp-no-routes-msg">Sin rutas</span></div>`;
 
-        const isActiveOrigin = ap === activeOrigin;
-        const destsHtml = destMap.size === 0
-            ? `<div class="exp-no-routes-msg">Sin rutas configuradas</div>`
-            : [...destMap.entries()].map(([dest, info]) => {
-                const isActiveDest = isActiveOrigin && dest === activeDestino;
-                const dias = info.ruta.salidasDias || [];
-                const dotsHtml = DAY_LABELS.map((lbl, i) => {
-                    const dayNum = i + 1;
-                    const on = dias.includes(dayNum);
-                    return `<span class="exp-day-dot ${on ? 'on' : 'off'}">${lbl}</span>`;
-                }).join('');
-                const airlineBadges = [...info.airlines].map(a =>
-                    `<span class="exp-dest-airline-badge">${escapeHtml(a)}</span>`).join('');
-                const countBadge = info.count > 1 ? `<span class="exp-dest-airline-badge" style="background:rgba(52,211,153,0.25);color:#34d399;">${info.count} opciones</span>` : '';
-                const dgBadgeHtml = info.hasDG ? `<span class="exp-tipo-badge dg">DG</span>` : '';
-                const ttHtml = info.ruta.transitoHrs != null ? `<span class="exp-dest-tt">TT ${info.ruta.transitoHrs}h</span>` : '';
-                return `<div class="exp-dest-item ${isActiveDest ? 'active' : ''}"
-                            data-origin="${ap}" data-dest="${dest}">
-                    <div class="exp-dest-header">
-                        <span class="exp-dest-code">${dest}</span>
-                        <span class="exp-dest-city">${escapeHtml(info.ruta.destinoNombre)}</span>
-                        ${airlineBadges}${countBadge}${dgBadgeHtml}
-                    </div>
-                    <div class="exp-dest-meta">
-                        ${ttHtml}
-                        <div class="exp-day-dots">${dotsHtml}</div>
-                    </div>
-                </div>`;
-            }).join('');
+        const badges = [...destMap.entries()].map(([dest, info]) => {
+            const isActive = ap === activeOrigin && dest === activeDestino;
+            const tipLines = info.airlines.map(a => `<div class="badge-tip-airline">${escapeHtml(a.code)} ${escapeHtml(a.name)}</div>`).join('');
+            const countTxt = info.count > 1 ? ` · ${info.count} opc` : '';
+            const dgTxt = info.hasDG ? ' · DG' : '';
+            return `<span class="exp-dest-badge ${isActive ? 'active' : ''}" data-origin="${ap}" data-dest="${dest}">
+                ${dest}
+                <span class="badge-tip">
+                    <div class="badge-tip-name">${escapeHtml(info.ruta.destinoNombre)}${countTxt}${dgTxt}</div>
+                    ${tipLines}
+                </span>
+            </span>`;
+        }).join('');
 
-        return `<div class="exp-origin-card ${isActiveOrigin ? 'active' : ''}">
-            <div class="exp-origin-head">
-                <span class="exp-origin-code">${ap}</span>
-                <span class="exp-origin-name">${EXP_AIRPORTS_META[ap]}</span>
-            </div>
-            <div class="exp-dest-list">${destsHtml}</div>
-        </div>`;
+        return `<div class="exp-origin-row"><span class="exp-origin-label">${ap}</span>${badges}</div>`;
     }).join('');
 
-    // Wire clicks: select origin + destination from diagram
-    grid.querySelectorAll('.exp-dest-item[data-dest]').forEach(item => {
+    grid.querySelectorAll('.exp-dest-badge[data-dest]').forEach(item => {
         item.addEventListener('click', () => {
             const apSelect = document.getElementById('aeropuerto-exp');
             const destSelect = document.getElementById('destino-exp');
