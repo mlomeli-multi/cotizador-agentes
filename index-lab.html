@@ -11920,17 +11920,22 @@ function openExpMubPanel() {
         });
     }
 
-    for (const c of getExpAirlineCosts()) {
-        lineas.push({
-            nombre: c.label,
-            costo: c.value,
-            monedaCosto: c.currency,
-            esFlete: true,
-            impuestoRate: 0,
-            mub: 15,
-            quoteSection: 'inland',
-            quoteLabel: c.label
-        });
+    if (expSelectedAirline) {
+        const cw = getExpChargeableWeight();
+        const result = calcAirlineCost(expSelectedAirline.ruta, cw);
+        if (result && result.total > 0) {
+            const code = expSelectedAirline.aerolinea.codigo;
+            lineas.push({
+                nombre: `Flete aéreo · ${code} (${cw.toFixed(0)} kg × $${(result.total / cw).toFixed(2)})`,
+                costo: result.total,
+                monedaCosto: 'USD',
+                esFlete: true,
+                impuestoRate: 0,
+                mub: 15,
+                quoteSection: 'inland',
+                quoteLabel: `Air Freight · ${code}`
+            });
+        }
     }
 
     for (const c of getExpWarehouseCosts()) {
@@ -11941,7 +11946,7 @@ function openExpMubPanel() {
             esFlete: false,
             impuestoRate: 0.16,
             mub: 15,
-            quoteSection: 'airport',
+            quoteSection: 'inland',
             quoteLabel: c.label
         });
     }
