@@ -4458,7 +4458,7 @@
                                 <span>Total costo</span>
                                 <strong id="exp-cost-total">$0.00 MXN</strong>
                             </div>
-                            <button class="btn btn-primary btn-sm" id="exp-open-mub" style="width:100%;margin-top:0.5rem;display:none;">&#x1F4B0; Abrir calculadora de venta</button>
+
                         </div>
                     </div>
 
@@ -11896,12 +11896,11 @@ function updateExpCostSummary() {
 
     totalEl.textContent = `$${totalMXN.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} MXN`;
 
-    const mubBtn = document.getElementById('exp-open-mub');
-    if (mubBtn) mubBtn.style.display = rows.length > 0 ? '' : 'none';
+    // Auto-open Paso 4 calculator when there are costs
+    if (rows.length > 0) openExpMubPanel();
 }
 
 function openExpMubPanel() {
-    const tc = getTipoCambio();
     const aeropuerto = document.getElementById('aeropuerto-exp').value;
     const destino = document.getElementById('destino-exp')?.value || '';
     const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
@@ -11921,6 +11920,19 @@ function openExpMubPanel() {
         });
     }
 
+    for (const c of getExpAirlineCosts()) {
+        lineas.push({
+            nombre: c.label,
+            costo: c.value,
+            monedaCosto: c.currency,
+            esFlete: true,
+            impuestoRate: 0,
+            mub: 15,
+            quoteSection: 'inland',
+            quoteLabel: c.label
+        });
+    }
+
     for (const c of getExpWarehouseCosts()) {
         lineas.push({
             nombre: c.label,
@@ -11928,28 +11940,17 @@ function openExpMubPanel() {
             monedaCosto: 'MXN',
             esFlete: false,
             impuestoRate: 0.16,
-            mub: 0,
-            costMode: true,
+            mub: 15,
             quoteSection: 'airport',
             quoteLabel: c.label
         });
     }
 
-    for (const c of getExpAirlineCosts()) {
-        lineas.push({
-            nombre: c.label,
-            costo: c.value,
-            monedaCosto: c.currency,
-            esFlete: false,
-            impuestoRate: 0,
-            mub: 0,
-            costMode: true,
-            quoteSection: 'airline',
-            quoteLabel: c.label
-        });
+    if (lineas.length === 0) {
+        const container = document.getElementById('exp-mub-container');
+        container.style.display = 'none';
+        return;
     }
-
-    if (lineas.length === 0) return;
 
     const container = document.getElementById('exp-mub-container');
     container.style.display = '';
@@ -11979,11 +11980,7 @@ function openExpMubPanel() {
     document.querySelectorAll('[data-exp-step]').forEach(el => el.classList.remove('is-active'));
     document.querySelector('[data-exp-step="sale"]')?.classList.add('is-active');
     document.getElementById('ws-exp-sale-status').textContent = 'Abierta';
-
-    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
-
-document.getElementById('exp-open-mub')?.addEventListener('click', openExpMubPanel);
 
 // Wire destino-exp to update airlines
 document.getElementById('destino-exp')?.addEventListener('change', () => {
