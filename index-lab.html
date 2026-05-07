@@ -729,16 +729,14 @@
             margin-bottom: 0.5rem;
         }
         .exp-airline-summary-table {
-            width: 100%; border-collapse: collapse; margin-bottom: 0.6rem;
-            font-size: 0.62rem;
+            width: 100%; border-collapse: collapse; margin-bottom: 0.6rem; font-size: 0.62rem;
         }
         .exp-airline-summary-table th {
-            text-align: left; color: rgba(255,255,255,0.5); font-weight: 600;
-            padding: 0.2rem 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.12);
+            text-align: left; padding: 0.2rem 0.4rem; color: rgba(255,255,255,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
         }
         .exp-airline-summary-table td {
-            color: rgba(255,255,255,0.8); padding: 0.2rem 0.4rem;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+            padding: 0.18rem 0.4rem; color: rgba(255,255,255,0.75);
         }
         .exp-airline-summary-table .code-cell { font-weight: 700; color: #60a5fa; }
         .exp-origin-grid {
@@ -11154,24 +11152,52 @@ function renderExpAirlineSummary() {
     const el = document.getElementById('exp-airline-summary');
     if (!el || !airlineData) return;
     const rows = airlineData.aerolineas.map(al => {
+        const activas = al.rutas.filter(r => isVigenciaActiva(r.vigencia)).length;
         const origenes = [...new Set(al.rutas.map(r => r.origen))].join(', ');
         const vigencias = [...new Set(al.rutas.map(r => r.vigencia).filter(Boolean))].join(', ');
-        return `<tr><td class="code-cell">${escapeHtml(al.codigo)}</td><td>${escapeHtml(al.nombre)}</td><td>${escapeHtml(origenes)}</td><td>${al.rutas.length}</td><td>${escapeHtml(vigencias)}</td></tr>`;
+        const rutasLabel = activas < al.rutas.length ? `${activas} / ${al.rutas.length}` : `${al.rutas.length}`;
+        return `<tr><td class="code-cell">${escapeHtml(al.codigo)}</td><td>${escapeHtml(al.nombre)}</td><td>${escapeHtml(origenes)}</td><td>${rutasLabel}</td><td>${escapeHtml(vigencias)}</td></tr>`;
     });
-    const total = airlineData.aerolineas.reduce((s, a) => s + a.rutas.length, 0);
+    const totalActivas = airlineData.aerolineas.reduce((s, a) => s + a.rutas.filter(r => isVigenciaActiva(r.vigencia)).length, 0);
+    const totalAll = airlineData.aerolineas.reduce((s, a) => s + a.rutas.length, 0);
+    const totalLabel = totalActivas < totalAll ? `${totalActivas} / ${totalAll}` : `${totalAll}`;
     el.innerHTML = `<table class="exp-airline-summary-table">
         <thead><tr><th>Código</th><th>Aerolínea</th><th>Orígenes</th><th>Rutas</th><th>Vigencia</th></tr></thead>
         <tbody>${rows.join('')}</tbody>
-        <tfoot><tr><td colspan="3" style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${airlineData.aerolineas.length} aerolíneas</td><td style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${total}</td><td></td></tr></tfoot>
+        <tfoot><tr><td colspan="3" style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${airlineData.aerolineas.length} aerolíneas</td><td style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${totalLabel}</td><td></td></tr></tfoot>
     </table>`;
 }
+
+const EXP_MESES = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
+function isVigenciaActiva(vigencia) {
+    if (!vigencia) return false;
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
+    const v = vigencia.trim().toLowerCase();
+    const rng = v.match(/^(\w+)\s*[-–]\s*(\w+)\s+(\d{4})$/);
+    if (rng) {
+        const m1 = EXP_MESES[rng[1]], m2 = EXP_MESES[rng[2]], a = parseInt(rng[3]);
+        if (m1 == null || m2 == null) return true;
+        if (anioActual !== a) return anioActual < a;
+        return mesActual >= m1 && mesActual <= m2;
+    }
+    const sng = v.match(/^(\w+)\s+(\d{4})$/);
+    if (sng) {
+        const m = EXP_MESES[sng[1]], a = parseInt(sng[2]);
+        if (m == null) return true;
+        return anioActual === a && mesActual === m;
+    }
+    return true;
+}
+
 
 function getExpRutasDisponibles(origen) {
     if (!airlineData) return [];
     const rutas = [];
     for (const al of airlineData.aerolineas) {
         for (const r of al.rutas) {
-            if (r.origen === origen) rutas.push({ aerolinea: al, ruta: r });
+            if (r.origen === origen && isVigenciaActiva(r.vigencia)) rutas.push({ aerolinea: al, ruta: r });
         }
     }
     return rutas;
