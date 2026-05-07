@@ -8945,7 +8945,26 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             `
             ) : ''}
         </div>
-    </div>
+    ${isAirQuote ? `
+        <div class="mub-air-sales-totals" id="${containerId}-allin-totals" style="margin-top:0.75rem;">
+            <div class="mub-air-total-pill">
+                <label>Total costo all-in</label>
+                <strong id="${containerId}-allin-cost">${simbolo}${fmt(totalCostoBaseVenta)}</strong>
+            </div>
+            <div class="mub-air-total-pill">
+                <label>Total venta all-in</label>
+                <strong id="${containerId}-allin-sale">${simbolo}${fmt(totalVenta)}</strong>
+            </div>
+            <div class="mub-air-total-pill">
+                <label>Utilidad</label>
+                <strong id="${containerId}-allin-profit" class="${(totalVenta - totalCostoBaseVenta) >= 0 ? 'positive' : 'negative'}">${simbolo}${fmt(totalVenta - totalCostoBaseVenta)}</strong>
+            </div>
+            <div class="mub-air-total-pill">
+                <label>MUB total %</label>
+                <strong id="${containerId}-allin-mub">${fmtShort(totalVenta > 0 ? ((totalVenta - totalCostoBaseVenta) / totalVenta * 100) : 0)}%</strong>
+            </div>
+        </div>
+    ` : ''}
     </div>
     <div class="maritime-quote-panel">
         <div class="mub-stage-head" style="margin-bottom:0.95rem;">
@@ -9808,6 +9827,23 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 const totalProfit = currentFreightProfit + currentAirportProfit;
                 totalMubEl.textContent = `${fmtShort(totalSale > 0 ? (totalProfit / totalSale) * 100 : 0)}%`;
             }
+
+            // All-in totals (EXW)
+            const allCost = lineas.reduce((s, l) => s + costoBaseVenta(l), 0);
+            const allSale = lineas.reduce((s, l) => s + (l.costMode ? costoBaseVenta(l) : (parseFloat(l.venta) || 0)), 0);
+            const allProfit = allSale - allCost;
+            const allinCostEl = document.getElementById(`${containerId}-allin-cost`);
+            const allinSaleEl = document.getElementById(`${containerId}-allin-sale`);
+            const allinProfitEl = document.getElementById(`${containerId}-allin-profit`);
+            const allinMubEl = document.getElementById(`${containerId}-allin-mub`);
+            if (allinCostEl) allinCostEl.textContent = `${simbolo}${fmt(allCost)}`;
+            if (allinSaleEl) allinSaleEl.textContent = `${simbolo}${fmt(allSale)}`;
+            if (allinProfitEl) {
+                allinProfitEl.textContent = `${simbolo}${fmt(allProfit)}`;
+                allinProfitEl.classList.toggle('positive', allProfit >= 0);
+                allinProfitEl.classList.toggle('negative', allProfit < 0);
+            }
+            if (allinMubEl) allinMubEl.textContent = `${fmtShort(allSale > 0 ? (allProfit / allSale * 100) : 0)}%`;
         }
 
         renderQuoteSummary();
