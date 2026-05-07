@@ -4458,8 +4458,12 @@
                                 <span>Total costo</span>
                                 <strong id="exp-cost-total">$0.00 MXN</strong>
                             </div>
+                            <button class="btn btn-primary btn-sm" id="exp-open-mub" style="width:100%;margin-top:0.5rem;display:none;">&#x1F4B0; Abrir calculadora de venta</button>
                         </div>
                     </div>
+
+                    <!-- ====== PASO 4: VENTA EXW ====== -->
+                    <div id="exp-mub-container" style="display:none;"></div>
             </div>
                 </div>
                 <aside class="air-dap-side">
@@ -4481,6 +4485,10 @@
                             <div class="air-workspace-row"><span class="air-workspace-label">Peso total</span><span class="air-workspace-value" id="ws-exp-weight">—</span></div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Unidad</span><span class="air-workspace-value" id="ws-exp-unit">—</span></div>
                             <div class="air-workspace-row"><span class="air-workspace-label">Tipo carga</span><span class="air-workspace-value" id="ws-exp-tipocarga">General</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Venta</div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Calculadora</span><span class="air-workspace-value" id="ws-exp-sale-status">Pendiente</span></div>
                         </div>
                     </div>
                 </aside>
@@ -11887,7 +11895,95 @@ function updateExpCostSummary() {
     `).join('');
 
     totalEl.textContent = `$${totalMXN.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} MXN`;
+
+    const mubBtn = document.getElementById('exp-open-mub');
+    if (mubBtn) mubBtn.style.display = rows.length > 0 ? '' : 'none';
 }
+
+function openExpMubPanel() {
+    const tc = getTipoCambio();
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const destino = document.getElementById('destino-exp')?.value || '';
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const unidad = getExpUnidadCalculada() || '';
+
+    const lineas = [];
+
+    if (expSelectedTransport) {
+        lineas.push({
+            nombre: `Transporte · ${expSelectedTransport.proveedor} · ${unidad}`,
+            costo: expSelectedTransport.tarifa,
+            monedaCosto: 'MXN',
+            esFlete: true,
+            mub: 15,
+            quoteSection: 'inland',
+            quoteLabel: `Inland Freight (${unidad})`
+        });
+    }
+
+    for (const c of getExpWarehouseCosts()) {
+        lineas.push({
+            nombre: c.label,
+            costo: c.value,
+            monedaCosto: 'MXN',
+            esFlete: false,
+            impuestoRate: 0.16,
+            mub: 0,
+            costMode: true,
+            quoteSection: 'airport',
+            quoteLabel: c.label
+        });
+    }
+
+    for (const c of getExpAirlineCosts()) {
+        lineas.push({
+            nombre: c.label,
+            costo: c.value,
+            monedaCosto: c.currency,
+            esFlete: false,
+            impuestoRate: 0,
+            mub: 0,
+            costMode: true,
+            quoteSection: 'airline',
+            quoteLabel: c.label
+        });
+    }
+
+    if (lineas.length === 0) return;
+
+    const container = document.getElementById('exp-mub-container');
+    container.style.display = '';
+
+    openMubPanel({
+        proveedor: expSelectedTransport?.proveedor || 'Transporte',
+        tipoUnidad: unidad,
+        tarifaFlete: expSelectedTransport?.tarifa || 0,
+        lineas,
+        quoteMeta: {
+            mode: 'air',
+            aeropuerto,
+            ciudad: destino ? `${destino}` : ciudad
+        }
+    }, 'exp-mub-container');
+
+    const closeBtn = container.querySelector('.mub-panel-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            container.style.display = 'none';
+            document.querySelectorAll('[data-exp-step]').forEach(el => el.classList.remove('is-active'));
+            document.querySelector('[data-exp-step="providers"]')?.classList.add('is-active');
+            document.getElementById('ws-exp-sale-status').textContent = 'Pendiente';
+        });
+    }
+
+    document.querySelectorAll('[data-exp-step]').forEach(el => el.classList.remove('is-active'));
+    document.querySelector('[data-exp-step="sale"]')?.classList.add('is-active');
+    document.getElementById('ws-exp-sale-status').textContent = 'Abierta';
+
+    container.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+document.getElementById('exp-open-mub')?.addEventListener('click', openExpMubPanel);
 
 // Wire destino-exp to update airlines
 document.getElementById('destino-exp')?.addEventListener('change', () => {
