@@ -8636,17 +8636,23 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const displayMub = l.costMode ? 0 : (Math.round(l.mub * 10) / 10);
         const displayVenta = l.costMode ? 0 : (Math.round(l.venta * 100) / 100);
 
+        const isUsdLine = l.monedaCosto === 'USD';
+        const lineBaseCost = isUsdLine ? l.costo : costoSinImpMXN(l);
+        const lineTaxAmount = isUsdLine ? l.costo * lineTaxRate : lineTaxAmountMXN;
+        const lineCostoConImp = isUsdLine ? l.costo * (1 + lineTaxRate) : cbMXN;
+        const currLabel = isUsdLine ? '<span style="color:#2563eb;font-weight:700;font-size:0.6rem;"> USD</span>' : '';
+
         const impCol = lineTaxRate > 0
-            ? `<td>$${fmt(lineTaxAmountMXN)}</td>`
-            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl./N/A</td>`;
-        const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
+            ? `<td>$${fmt(lineTaxAmount)}${currLabel}</td>`
+            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">N/A</td>`;
+        const costoImpCell = `<td>$${fmt(lineCostoConImp)}${currLabel}</td>`;
         const usdCell = hayTC
             ? `<td class="mub-usd-cell" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</td>`
             : '';
 
-        return `<tr class="${isDestinationCharge ? 'row-destination' : 'row-flete'}">
-            <td>${escapeHtml(l.nombre)}${l.quoteChargeBy ? `<div style="margin-top:0.22rem;font-size:0.68rem;color:var(--gray-500);">Charge by: ${escapeHtml(l.quoteChargeBy)}${l.quoteContainerLabel ? ` · ${escapeHtml(l.quoteContainerLabel)}` : ''}</div>` : ''}${l.quoteComment ? `<div style="margin-top:0.22rem;font-size:0.72rem;color:var(--gray-500);line-height:1.4;">${escapeHtml(l.quoteComment)}</div>` : ''}</td>
-            <td>$${fmt(costoSinImpMXN(l))}</td>
+        return `<tr class="${isDestinationCharge ? 'row-destination' : 'row-flete'}" ${isUsdLine ? 'style="background:rgba(37,99,235,0.04);"' : ''}>
+            <td>${escapeHtml(l.nombre)}${isUsdLine ? ' <span style="background:#2563eb;color:white;font-size:0.55rem;font-weight:700;padding:0.08rem 0.3rem;border-radius:3px;vertical-align:middle;">USD</span>' : ''}${l.quoteChargeBy ? `<div style="margin-top:0.22rem;font-size:0.68rem;color:var(--gray-500);">Charge by: ${escapeHtml(l.quoteChargeBy)}${l.quoteContainerLabel ? ` · ${escapeHtml(l.quoteContainerLabel)}` : ''}</div>` : ''}${l.quoteComment ? `<div style="margin-top:0.22rem;font-size:0.72rem;color:var(--gray-500);line-height:1.4;">${escapeHtml(l.quoteComment)}</div>` : ''}</td>
+            <td>$${fmt(lineBaseCost)}${currLabel}</td>
             ${impCol}
             ${costoImpCell}
             ${usdCell}
