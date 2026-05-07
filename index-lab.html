@@ -8998,6 +8998,210 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const serviceDetails = data.quoteMeta?.serviceDetails || {};
         const ratesCurrency = moneda || 'USD';
 
+        if (data.quoteMeta?.isEXW) {
+            const m = data.quoteMeta;
+            if (styleTabsEl) {
+                styleTabsEl.style.display = 'inline-flex';
+                styleTabsEl.querySelectorAll('.maritime-quote-style-tab').forEach(btn => {
+                    const show = btn.dataset.style === 'official' || btn.dataset.style === 'rodrigo';
+                    btn.style.display = show ? '' : 'none';
+                    btn.classList.toggle('active', btn.dataset.style === quoteSummaryStyle);
+                });
+            }
+            const allInTotal = lineas.reduce((s, l) => s + (l.costMode ? costoBaseVenta(l) : (parseFloat(l.venta) || 0)), 0);
+            const palletLine = Array.isArray(m.palletLines) && m.palletLines.length
+                ? m.palletLines.filter(p => (parseInt(p.qty) || 0) > 0)
+                    .map(p => `${p.qty} @ ${p.largo} x ${p.ancho} x ${p.alto} cms`).join(' | ')
+                : '[cargo dimensions]';
+            const stackLabel = m.estibable ? 'stackable' : 'non-stackable';
+            const stackLabelEs = m.estibable ? 'estibable' : 'no estibable';
+            const wt = m.pesoTotal > 0 ? `${fmt(m.pesoTotal)} kgs` : '[weight]';
+            const cw = m.chargeableWeight > 0 ? `${fmt(m.chargeableWeight)} kgs` : '[CW]';
+            const desc = m.descripcion || '';
+            const viaMatch = desc.match(/via\s+(\w+)/i) || desc.match(/escala\s+en\s+(\w+)/i);
+            const viaCode = viaMatch ? viaMatch[1] : '';
+            const svcType = desc.replace(/\s*[-·]\s*(via|escala).*$/i, '').trim() || '';
+            const routeStr = viaCode ? `${m.aeropuerto}-${viaCode}-${m.ciudad}` : `${m.aeropuerto}-${m.ciudad}`;
+            const daysEn = (m.salidasDias || []).join(', ') || 'Daily';
+            const dayMap = {Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb',Sun:'Dom'};
+            const daysEs = (m.salidasDias || []).map(d => dayMap[d] || d).join(', ') || 'Diario';
+            let scheduleEn = '', scheduleEs = '';
+            if (viaCode) {
+                scheduleEn = `${m.aeropuerto}-${viaCode} ${daysEn}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${viaCode}-${m.ciudad}`;
+                scheduleEs = `${m.aeropuerto}-${viaCode} ${daysEs}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${viaCode}-${m.ciudad}`;
+            } else {
+                scheduleEn = `${m.aeropuerto}-${m.ciudad} ${daysEn}`;
+                scheduleEs = `${m.aeropuerto}-${m.ciudad} ${daysEs}`;
+            }
+
+            const rodrigoExwEn = `
+                <div class="maritime-quote-greeting">
+                    Dear team,<br>
+                    Hope you are doing well!<br><br>
+                    For the ${escapeHtml(palletLine)} (${stackLabel}) with a total weight of ${wt} picking up in ${escapeHtml(m.ciudadOrigen || '[Origin City]')} and delivering to ${escapeHtml(m.ciudad || '[Destination]')} we can do the following:
+                </div>
+                <div class="maritime-quote-section">
+                    <p style="margin:0.5rem 0;"><strong>ALL IN............$${fmt(allInTotal)} USD</strong></p>
+                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType)}</p>
+                    <p style="margin:0.3rem 0;">CW: ${cw}</p>
+                    <p style="margin:0.3rem 0;">Schedule:</p>
+                    <p style="margin:0.1rem 0 0.1rem 1rem;">${routeStr}</p>
+                    <p style="margin:0.1rem 0 0.1rem 2rem;">${scheduleEn}</p>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>* Remarks</h4>
+                    <ul class="maritime-quote-list">
+                        <li>**Shipper must have broker in ${escapeHtml(m.aeropuerto || 'MEX')}</li>
+                        <li>** Possible flight is subject to acceptance from airline, it could change.</li>
+                        <li>** Subject to final cargo dimensions.</li>
+                        <li>** Final cost could change during the shipment.</li>
+                        <li>** Customs clearance and THC are not included, in case you need we would have to quote directly with shipper's broker in order to not lose time in the registration of the shipper with our broker (approx. 5 working days).</li>
+                        <li>** Weekends and after hours from carrier: 95.00 USD (if needed only).</li>
+                        <li>** In case you need an approx. for clearance please consider $400.00 USD per export file (subject to broker's final invoice) + THC (this is charged completely net-net price directly from broker and terminal).</li>
+                        <li>** Pallets must be palletized, strapped, wrapped and must have 4 straps with this form "#" in order to get the acceptance from airline, in case pallets are not provided like that there would be extra charges at warehouse (loading/unloading per pallet + storages).</li>
+                        <li>** SHIPPER must provide correct dims and weight, otherwise airline won't accept the cargo and will be extra charges.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Let us know if this option works for you!<br>
+                    Best Regards!
+                </div>`;
+
+            const rodrigoExwEs = `
+                <div class="maritime-quote-greeting">
+                    Estimado equipo,<br>
+                    Espero que se encuentren bien.<br><br>
+                    Para ${escapeHtml(palletLine)} (${stackLabelEs}) con un peso total de ${wt} recogiendo en ${escapeHtml(m.ciudadOrigen || '[Ciudad origen]')} y entregando en ${escapeHtml(m.ciudad || '[Destino]')} podemos ofrecer lo siguiente:
+                </div>
+                <div class="maritime-quote-section">
+                    <p style="margin:0.5rem 0;"><strong>ALL IN............$${fmt(allInTotal)} USD</strong></p>
+                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType)}</p>
+                    <p style="margin:0.3rem 0;">CW: ${cw}</p>
+                    <p style="margin:0.3rem 0;">Itinerario:</p>
+                    <p style="margin:0.1rem 0 0.1rem 1rem;">${routeStr}</p>
+                    <p style="margin:0.1rem 0 0.1rem 2rem;">${scheduleEs}</p>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>* Observaciones</h4>
+                    <ul class="maritime-quote-list">
+                        <li>**El embarcador debe contar con agente aduanal en ${escapeHtml(m.aeropuerto || 'MEX')}</li>
+                        <li>** El vuelo está sujeto a aceptación por parte de la aerolínea, podría cambiar.</li>
+                        <li>** Sujeto a dimensiones finales de la carga.</li>
+                        <li>** El costo final podría cambiar durante el embarque.</li>
+                        <li>** Despacho aduanal y THC no están incluidos, en caso de requerirlo tendríamos que cotizar directamente con el agente aduanal del embarcador para no perder tiempo en el alta del embarcador con nuestro agente (aprox. 5 días hábiles).</li>
+                        <li>** Fines de semana y horario extendido del carrier: 95.00 USD (solo si se requiere).</li>
+                        <li>** En caso de necesitar un aproximado para despacho considerar $400.00 USD por expediente de exportación (sujeto a factura final del agente) + THC (este cargo se cobra completamente net-net directamente del agente y la terminal).</li>
+                        <li>** Los pallets deben estar paletizados, flejados, emplayados y con 4 flejes en forma de "#" para obtener la aceptación de la aerolínea. De no cumplir, habrá cargos extra en almacén (carga/descarga por pallet + almacenaje).</li>
+                        <li>** El EMBARCADOR debe proporcionar dimensiones y peso correctos, de lo contrario la aerolínea no aceptará la carga y habrá cargos extra.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Quedamos atentos para confirmar si esta opción les funciona.<br>
+                    Saludos!
+                </div>`;
+
+            const officialExwEn = `
+                <div class="maritime-quote-greeting">
+                    Dear [Client Name],<br>
+                    I hope you are doing well.<br><br>
+                    Based on the cargo details provided, please find below our EXW air export proposal:
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Cargo Details</h4>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Dimensions:</strong> ${escapeHtml(palletLine)} (${stackLabel})</li>
+                        <li><strong>Total Weight:</strong> ${wt}</li>
+                        <li><strong>Chargeable Weight:</strong> ${cw}</li>
+                        <li><strong>Origin:</strong> ${escapeHtml(m.ciudadOrigen || '[Origin]')}</li>
+                        <li><strong>Destination:</strong> ${escapeHtml(m.ciudad || '[Destination]')}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Rate</h4>
+                    <p style="margin:0.5rem 0;font-size:1.1em;"><strong>ALL IN: $${fmt(allInTotal)} USD</strong></p>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Airline:</strong> ${escapeHtml(m.airlineCode)} — ${escapeHtml(m.airlineName)}</li>
+                        <li><strong>Service:</strong> ${escapeHtml(svcType || 'Standard')}</li>
+                        <li><strong>Route:</strong> ${escapeHtml(routeStr)}</li>
+                        <li><strong>Schedule:</strong> ${scheduleEn}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Remarks &amp; Conditions</h4>
+                    <ul class="maritime-quote-list">
+                        <li>Shipper must have customs broker at ${escapeHtml(m.aeropuerto || 'MEX')}.</li>
+                        <li>Flight subject to acceptance from airline; schedule may change.</li>
+                        <li>Subject to final cargo dimensions and weight.</li>
+                        <li>Customs clearance and THC are not included.</li>
+                        <li>Weekends and after hours from carrier: USD 95.00 (if needed).</li>
+                        <li>Approx. clearance: USD 400.00 per export file (subject to broker's final invoice) + THC (net-net from broker and terminal).</li>
+                        <li>Pallets must be palletized, strapped, wrapped with 4 straps in "#" form for airline acceptance.</li>
+                        <li>Shipper must provide correct dims and weight; otherwise extra charges may apply.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Please let us know if this option works for you or if you have a target rate we can review together.
+                </div>`;
+
+            const officialExwEs = `
+                <div class="maritime-quote-greeting">
+                    Estimado(a) [Nombre del cliente],<br>
+                    Espero que se encuentre muy bien.<br><br>
+                    Con base en los detalles de carga proporcionados, comparto nuestra propuesta de exportación aérea EXW:
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Detalles de la carga</h4>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Dimensiones:</strong> ${escapeHtml(palletLine)} (${stackLabelEs})</li>
+                        <li><strong>Peso total:</strong> ${wt}</li>
+                        <li><strong>Peso cobrable:</strong> ${cw}</li>
+                        <li><strong>Origen:</strong> ${escapeHtml(m.ciudadOrigen || '[Origen]')}</li>
+                        <li><strong>Destino:</strong> ${escapeHtml(m.ciudad || '[Destino]')}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Tarifa</h4>
+                    <p style="margin:0.5rem 0;font-size:1.1em;"><strong>ALL IN: $${fmt(allInTotal)} USD</strong></p>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Aerolínea:</strong> ${escapeHtml(m.airlineCode)} — ${escapeHtml(m.airlineName)}</li>
+                        <li><strong>Servicio:</strong> ${escapeHtml(svcType || 'Estándar')}</li>
+                        <li><strong>Ruta:</strong> ${escapeHtml(routeStr)}</li>
+                        <li><strong>Itinerario:</strong> ${scheduleEs}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Observaciones y condiciones</h4>
+                    <ul class="maritime-quote-list">
+                        <li>El embarcador debe contar con agente aduanal en ${escapeHtml(m.aeropuerto || 'MEX')}.</li>
+                        <li>Vuelo sujeto a aceptación por parte de la aerolínea; el itinerario puede cambiar.</li>
+                        <li>Sujeto a dimensiones y peso final de la carga.</li>
+                        <li>Despacho aduanal y THC no están incluidos.</li>
+                        <li>Fines de semana y horario extendido del carrier: USD 95.00 (si se requiere).</li>
+                        <li>Aprox. despacho: USD 400.00 por expediente de exportación (sujeto a factura final del agente) + THC (net-net del agente y terminal).</li>
+                        <li>Los pallets deben estar paletizados, flejados, emplayados con 4 flejes en forma de "#" para aceptación de la aerolínea.</li>
+                        <li>El embarcador debe proporcionar dimensiones y peso correctos; de lo contrario podrían aplicar cargos extra.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Quedamos atentos para confirmar si esta opción les funciona o si tienen una tarifa objetivo que podamos revisar en conjunto.
+                </div>`;
+
+            const exwStyles = {
+                official: { en: officialExwEn, es: officialExwEs },
+                rodrigo: { en: rodrigoExwEn, es: rodrigoExwEs }
+            };
+            const activeExw = exwStyles[quoteSummaryStyle] || exwStyles.official;
+            quoteClipboardPayload = {
+                en: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeExw.en}</div>`, text: htmlToPlainText(activeExw.en) },
+                es: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeExw.es}</div>`, text: htmlToPlainText(activeExw.es) }
+            };
+            quoteSummary.innerHTML = quoteSummaryLang === 'es' ? activeExw.es : activeExw.en;
+            document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
+            });
+            return;
+        }
+
         if (data.quoteMeta?.mode === 'air') {
             const airMeta = data.quoteMeta || {};
             const airportCharges = Array.isArray(airMeta.airportCharges) ? airMeta.airportCharges : [];
@@ -12003,6 +12207,15 @@ function openExpMubPanel() {
     const container = document.getElementById('exp-mub-container');
     container.style.display = '';
 
+    const expPalletLines = getExpPalletLines();
+    const expPesoTotal = parseFloat(document.getElementById('peso-exp').value) || 0;
+    const expCW = getExpChargeableWeight();
+    const expEstibable = !!document.getElementById('estibable-exp')?.checked;
+    const expAirlineCode = expSelectedAirline?.aerolinea?.codigo || '';
+    const expAirlineName = expSelectedAirline?.aerolinea?.nombre || '';
+    const expRuta = expSelectedAirline?.ruta || {};
+    const expDias = (expRuta.salidasDias || []).map(d => (['','Mon','Tue','Wed','Thu','Fri','Sat','Sun'])[d] || d);
+
     openMubPanel({
         proveedor: expSelectedTransport?.proveedor || 'Transporte',
         tipoUnidad: unidad,
@@ -12010,8 +12223,21 @@ function openExpMubPanel() {
         lineas,
         quoteMeta: {
             mode: 'air',
+            isEXW: true,
             aeropuerto,
-            ciudad: destino ? `${destino}` : ciudad
+            ciudad: destino ? `${destino}` : ciudad,
+            ciudadOrigen: ciudad,
+            destinoNombre: expRuta.destinoNombre || destino,
+            airlineCode: expAirlineCode,
+            airlineName: expAirlineName,
+            descripcion: expRuta.descripcion || '',
+            salidasDias: expDias,
+            transitoHrs: expRuta.transitoHrs,
+            cutoff: expRuta.cutoff || '',
+            palletLines: expPalletLines,
+            pesoTotal: expPesoTotal,
+            chargeableWeight: expCW,
+            estibable: expEstibable
         }
     }, 'exp-mub-container');
 
