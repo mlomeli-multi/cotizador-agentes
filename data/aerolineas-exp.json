@@ -3580,7 +3580,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3628,7 +3628,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3675,7 +3675,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3722,7 +3722,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3768,7 +3768,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3814,7 +3814,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3861,7 +3861,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
@@ -3907,14 +3907,14 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
           "destino": "WUX",
           "destinoNombre": "Wuxi",
           "descripcion": "Escala en LAX",
-          "fsc": 0.55,
+          "fsc": 0.83,
           "cgcMawb": 0,
           "cgcHawb": 0,
           "tipoCarga": [
@@ -3955,14 +3955,14 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         },
         {
           "origen": "NLU",
           "destino": "ICN",
           "destinoNombre": "Seoul Incheon",
           "descripcion": "Escala en LAX · nueva abr-26",
-          "fsc": 0.55,
+          "fsc": 0.83,
           "cgcMawb": 0,
           "cgcHawb": 0,
           "tipoCarga": [
@@ -4003,7 +4003,7 @@
           "cutoff": "12hrs antes de ETD",
           "tipoVuelo": "CAO",
           "transitoHrs": null,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         }
       ]
     },
