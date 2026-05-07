@@ -11723,12 +11723,12 @@ function getExpWarehouseCosts() {
     const costs = [];
 
     const maniobra = unidad ? aioData.maniobras[unidad] : null;
-    if (maniobra) costs.push({ label: `Maniobras AIO · ${maniobra.nombre}`, value: maniobra.precio });
+    if (maniobra) costs.push({ label: `Maniobras AIO · ${maniobra.nombre}`, value: maniobra.precio, taxType: 'iva' });
 
     const ingresosAp = aeropuerto ? aioData.ingresoAeropuerto[aeropuerto] : null;
     if (ingresosAp && unidad && expIngresoProvider) {
         const ingreso = ingresosAp[expIngresoProvider]?.[unidad];
-        if (ingreso) costs.push({ label: `Ingreso ${aeropuerto} · ${expIngresoProvider}`, value: ingreso.precio });
+        if (ingreso) costs.push({ label: `Ingreso ${aeropuerto} · ${expIngresoProvider}`, value: ingreso.precio, taxType: 'iva-ret' });
     }
 
     aioData.almacenaje.forEach((item, idx) => {
@@ -11736,20 +11736,20 @@ function getExpWarehouseCosts() {
         const state = expWarehouseChecks[key];
         if (state?.checked) {
             const m2 = totalM2 > 0 ? totalM2 : 1;
-            costs.push({ label: `Almacenaje ${item.periodo} × ${state.qty||1} × ${m2.toFixed(2)}m²`, value: Math.round(item.precio * (state.qty||1) * m2) });
+            costs.push({ label: `Almacenaje ${item.periodo} × ${state.qty||1} × ${m2.toFixed(2)}m²`, value: Math.round(item.precio * (state.qty||1) * m2), taxType: 'iva' });
         }
     });
 
     aioData.materiales.forEach((item, idx) => {
         const key = `material_${idx}`;
         const state = expWarehouseChecks[key];
-        if (state?.checked) costs.push({ label: `${item.concepto} × ${state.qty||1}`, value: item.precio * (state.qty||1) });
+        if (state?.checked) costs.push({ label: `${item.concepto} × ${state.qty||1}`, value: item.precio * (state.qty||1), taxType: 'iva' });
     });
 
     aioData.servicioExtraordinario.forEach((item, idx) => {
         const key = `servext_${idx}`;
         const state = expWarehouseChecks[key];
-        if (state?.checked) costs.push({ label: `Serv. extra · ${item.cobertura} × ${state.qty||1}`, value: item.precio * (state.qty||1) });
+        if (state?.checked) costs.push({ label: `Serv. extra · ${item.cobertura} × ${state.qty||1}`, value: item.precio * (state.qty||1), taxType: 'iva' });
     });
 
     return costs;
@@ -11929,8 +11929,8 @@ function openExpMubPanel() {
                 nombre: `Flete aéreo · ${code} (${cw.toFixed(0)} kg × $${(result.total / cw).toFixed(2)})`,
                 costo: result.total,
                 monedaCosto: 'USD',
-                esFlete: true,
-                impuestoRate: 0,
+                esFlete: false,
+                impuestoRate: 0.04,
                 mub: 15,
                 quoteSection: 'inland',
                 quoteLabel: `Air Freight · ${code}`
@@ -11939,12 +11939,13 @@ function openExpMubPanel() {
     }
 
     for (const c of getExpWarehouseCosts()) {
+        const rate = c.taxType === 'iva-ret' ? 0.12 : 0.16;
         lineas.push({
             nombre: c.label,
             costo: c.value,
             monedaCosto: 'MXN',
             esFlete: false,
-            impuestoRate: 0.16,
+            impuestoRate: rate,
             mub: 15,
             quoteSection: 'inland',
             quoteLabel: c.label
