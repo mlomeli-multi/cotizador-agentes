@@ -728,6 +728,19 @@
             font-size: 0.58rem; color: rgba(255,255,255,0.45);
             margin-bottom: 0.5rem;
         }
+        .exp-airline-summary-table {
+            width: 100%; border-collapse: collapse; margin-bottom: 0.6rem;
+            font-size: 0.62rem;
+        }
+        .exp-airline-summary-table th {
+            text-align: left; color: rgba(255,255,255,0.5); font-weight: 600;
+            padding: 0.2rem 0.4rem; border-bottom: 1px solid rgba(255,255,255,0.12);
+        }
+        .exp-airline-summary-table td {
+            color: rgba(255,255,255,0.8); padding: 0.2rem 0.4rem;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .exp-airline-summary-table .code-cell { font-weight: 700; color: #60a5fa; }
         .exp-origin-grid {
             display: flex;
             flex-direction: column;
@@ -4221,6 +4234,7 @@
             <div class="exp-route-diagram" id="route-diagram-exp">
                 <div class="exp-route-diagram-title">Rutas disponibles para cotizar</div>
                 <div class="exp-route-diagram-note">Se actualiza con cada aerolínea que agregues al sistema.</div>
+                <div id="exp-airline-summary"></div>
                 <div class="exp-origin-grid" id="exp-origin-grid"></div>
             </div>
 
@@ -11131,8 +11145,25 @@ async function loadAirlineData() {
         if (!res.ok) throw new Error('HTTP ' + res.status);
         airlineData = await res.json();
         updateExpDestinoOptions();
+        renderExpAirlineSummary();
         renderExpRouteDiagram();
     } catch(e) { console.warn('No se pudo cargar aerolíneas:', e); }
+}
+
+function renderExpAirlineSummary() {
+    const el = document.getElementById('exp-airline-summary');
+    if (!el || !airlineData) return;
+    const rows = airlineData.aerolineas.map(al => {
+        const origenes = [...new Set(al.rutas.map(r => r.origen))].join(', ');
+        const vigencias = [...new Set(al.rutas.map(r => r.vigencia).filter(Boolean))].join(', ');
+        return `<tr><td class="code-cell">${escapeHtml(al.codigo)}</td><td>${escapeHtml(al.nombre)}</td><td>${escapeHtml(origenes)}</td><td>${al.rutas.length}</td><td>${escapeHtml(vigencias)}</td></tr>`;
+    });
+    const total = airlineData.aerolineas.reduce((s, a) => s + a.rutas.length, 0);
+    el.innerHTML = `<table class="exp-airline-summary-table">
+        <thead><tr><th>Código</th><th>Aerolínea</th><th>Orígenes</th><th>Rutas</th><th>Vigencia</th></tr></thead>
+        <tbody>${rows.join('')}</tbody>
+        <tfoot><tr><td colspan="3" style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${airlineData.aerolineas.length} aerolíneas</td><td style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${total}</td><td></td></tr></tfoot>
+    </table>`;
 }
 
 function getExpRutasDisponibles(origen) {
