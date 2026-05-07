@@ -15,7 +15,7 @@
             },
             {
               "desde": 100,
-              "precio": 2.3
+              "precio": 2.4
             },
             {
               "desde": 300,
@@ -48,7 +48,7 @@
           "cutoff": "19:00 día anterior",
           "tipoVuelo": "CAO",
           "transitoHrs": 16,
-          "vigencia": "Abril 2026"
+          "vigencia": "Mayo 2026"
         }
       ]
     },
