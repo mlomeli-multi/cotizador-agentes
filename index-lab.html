@@ -731,15 +731,38 @@
         .exp-origin-grid {
             display: flex;
             flex-direction: column;
-            gap: 0.45rem;
+            gap: 0.5rem;
         }
-        .exp-origin-row {
+        .exp-origin-block {
+            display: flex; flex-direction: column; gap: 0.25rem;
+        }
+        .exp-origin-header {
             display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem;
         }
         .exp-origin-label {
             font-size: 0.72rem; font-weight: 800; color: #60a5fa;
             min-width: 38px; margin-right: 0.15rem;
         }
+        .exp-region-chip {
+            font-size: 0.62rem; font-weight: 700; padding: 0.15rem 0.5rem;
+            border-radius: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.7);
+            transition: background 0.12s, border-color 0.12s;
+        }
+        .exp-region-chip:hover {
+            background: rgba(96,165,250,0.2); border-color: rgba(96,165,250,0.5);
+        }
+        .exp-region-chip.open {
+            background: rgba(59,130,246,0.3); border-color: #60a5fa; color: white;
+        }
+        .exp-region-chip .region-count {
+            font-weight: 400; opacity: 0.55; margin-left: 0.2rem; font-size: 0.56rem;
+        }
+        .exp-region-badges {
+            display: none; flex-wrap: wrap; gap: 0.3rem;
+            padding-left: 52px;
+        }
+        .exp-region-badges.open { display: flex; }
         .exp-dest-badge {
             position: relative;
             font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.85);
@@ -11128,6 +11151,27 @@ const EXP_AIRPORTS_META = {
 };
 const DAY_LABELS = ['L','M','X','J','V','S','D']; // index 0=Mon(1)..6=Sun(7)
 
+const EXP_REGION_MAP = {
+    // Asia
+    PVG:'Asia',NRT:'Asia',HND:'Asia',ICN:'Asia',BKK:'Asia',HKG:'Asia',SIN:'Asia',TPE:'Asia',
+    NGO:'Asia',KIX:'Asia',FUK:'Asia',CTS:'Asia',OKA:'Asia',CAN:'Asia',SZX:'Asia',PEK:'Asia',
+    DLC:'Asia',TAO:'Asia',XMN:'Asia',KUL:'Asia',MNL:'Asia',CGK:'Asia',SGN:'Asia',HAN:'Asia',
+    DEL:'Asia',BOM:'Asia',PEN:'Asia',SYD:'Asia',WUX:'Asia',
+    // Europe
+    AMS:'EUR',BCN:'EUR',CDG:'EUR',FCO:'EUR',LHR:'EUR',MAD:'EUR',MXP:'EUR',
+    // North America
+    LAX:'NA',JFK:'NA',MIA:'NA',ORD:'NA',EWR:'NA',IAH:'NA',SFO:'NA',SEA:'NA',
+    YUL:'NA',YVR:'NA',YYZ:'NA',
+    // Central America & Caribbean
+    GUA:'CAM',SAL:'CAM',SJO:'CAM',SDQ:'CAM',PTY:'CAM',
+    // South America
+    BOG:'LATAM',CLO:'LATAM',MDE:'LATAM',UIO:'LATAM',LIM:'LATAM',GRU:'LATAM',VCP:'LATAM',
+    GIG:'LATAM',EZE:'LATAM',SCL:'LATAM',ASU:'LATAM',MVD:'LATAM',
+};
+const EXP_REGION_ORDER = ['Asia','EUR','NA','CAM','LATAM'];
+const EXP_REGION_LABELS = { Asia:'Asia', EUR:'Europa', NA:'Norteamérica', CAM:'C. América', LATAM:'Sudamérica' };
+let expOpenRegions = {};
+
 function renderExpRouteDiagram() {
     const grid = document.getElementById('exp-origin-grid');
     if (!grid) return;
@@ -11142,30 +11186,60 @@ function renderExpRouteDiagram() {
             const key = o.ruta.destino;
             if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [], count: 0, hasDG: false });
             const entry = destMap.get(key);
-            const aName = o.aerolinea.nombre;
             if (!entry.airlines.find(a => a.code === o.aerolinea.codigo))
-                entry.airlines.push({ code: o.aerolinea.codigo, name: aName });
+                entry.airlines.push({ code: o.aerolinea.codigo, name: o.aerolinea.nombre });
             entry.count++;
             if (o.ruta.tipoCarga?.includes('dg') || o.ruta.tarifas?.dg) entry.hasDG = true;
         }
-        if (destMap.size === 0) return `<div class="exp-origin-row"><span class="exp-origin-label">${ap}</span><span class="exp-no-routes-msg">Sin rutas</span></div>`;
+        if (destMap.size === 0) return `<div class="exp-origin-block"><div class="exp-origin-header"><span class="exp-origin-label">${ap}</span><span class="exp-no-routes-msg">Sin rutas</span></div></div>`;
 
-        const badges = [...destMap.entries()].map(([dest, info]) => {
-            const isActive = ap === activeOrigin && dest === activeDestino;
-            const tipLines = info.airlines.map(a => `<div class="badge-tip-airline">${escapeHtml(a.code)} ${escapeHtml(a.name)}</div>`).join('');
-            const countTxt = info.count > 1 ? ` · ${info.count} opc` : '';
-            const dgTxt = info.hasDG ? ' · DG' : '';
-            return `<span class="exp-dest-badge ${isActive ? 'active' : ''}" data-origin="${ap}" data-dest="${dest}">
-                ${dest}
-                <span class="badge-tip">
-                    <div class="badge-tip-name">${escapeHtml(info.ruta.destinoNombre)}${countTxt}${dgTxt}</div>
-                    ${tipLines}
-                </span>
-            </span>`;
+        const regionGroups = new Map();
+        for (const [dest, info] of destMap) {
+            const reg = EXP_REGION_MAP[dest] || 'Otros';
+            if (!regionGroups.has(reg)) regionGroups.set(reg, []);
+            regionGroups.get(reg).push([dest, info]);
+        }
+
+        const activeRegion = expOpenRegions[ap] || (activeDestino ? EXP_REGION_MAP[activeDestino] : null);
+
+        const chips = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
+            const isOpen = activeRegion === reg;
+            const cnt = regionGroups.get(reg).length;
+            return `<span class="exp-region-chip ${isOpen ? 'open' : ''}" data-origin="${ap}" data-region="${reg}">${EXP_REGION_LABELS[reg]}<span class="region-count">${cnt}</span></span>`;
         }).join('');
 
-        return `<div class="exp-origin-row"><span class="exp-origin-label">${ap}</span>${badges}</div>`;
+        const panels = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
+            const isOpen = activeRegion === reg;
+            const badges = regionGroups.get(reg).map(([dest, info]) => {
+                const isActive = ap === activeOrigin && dest === activeDestino;
+                const tipLines = info.airlines.map(a => `<div class="badge-tip-airline">${escapeHtml(a.code)} ${escapeHtml(a.name)}</div>`).join('');
+                const countTxt = info.count > 1 ? ` · ${info.count} opc` : '';
+                const dgTxt = info.hasDG ? ' · DG' : '';
+                return `<span class="exp-dest-badge ${isActive ? 'active' : ''}" data-origin="${ap}" data-dest="${dest}">
+                    ${dest}
+                    <span class="badge-tip">
+                        <div class="badge-tip-name">${escapeHtml(info.ruta.destinoNombre)}${countTxt}${dgTxt}</div>
+                        ${tipLines}
+                    </span>
+                </span>`;
+            }).join('');
+            return `<div class="exp-region-badges ${isOpen ? 'open' : ''}" data-origin="${ap}" data-region="${reg}">${badges}</div>`;
+        }).join('');
+
+        return `<div class="exp-origin-block">
+            <div class="exp-origin-header"><span class="exp-origin-label">${ap}</span>${chips}</div>
+            ${panels}
+        </div>`;
     }).join('');
+
+    grid.querySelectorAll('.exp-region-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const ap = chip.dataset.origin;
+            const reg = chip.dataset.region;
+            expOpenRegions[ap] = expOpenRegions[ap] === reg ? null : reg;
+            renderExpRouteDiagram();
+        });
+    });
 
     grid.querySelectorAll('.exp-dest-badge[data-dest]').forEach(item => {
         item.addEventListener('click', () => {
