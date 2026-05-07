@@ -11257,7 +11257,7 @@ function renderExpRouteDiagram() {
             regionGroups.get(reg).push([dest, info]);
         }
 
-        const activeRegion = expOpenRegions[ap] || (activeDestino ? EXP_REGION_MAP[activeDestino] : null);
+        const activeRegion = expOpenRegions[ap] || (activeDestino && ap === activeOrigin ? EXP_REGION_MAP[activeDestino] : null);
 
         const chips = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
             const isOpen = activeRegion === reg;
