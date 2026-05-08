@@ -8992,7 +8992,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <p style="margin:0.5rem 0;"><strong>ALL IN............$${fmt(allInTotal)} USD</strong></p>
-                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType)}</p>
+                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType || 'Standard')}</p>
                     <p style="margin:0.3rem 0;">CW: ${cw}</p>
                     <p style="margin:0.3rem 0;">Schedule:</p>
                     <p style="margin:0.1rem 0 0.1rem 1rem;">${routeStrRodrigo}</p>
@@ -9025,7 +9025,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 </div>
                 <div class="maritime-quote-section">
                     <p style="margin:0.5rem 0;"><strong>ALL IN............$${fmt(allInTotal)} USD</strong></p>
-                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType)}</p>
+                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType || 'Estándar')}</p>
                     <p style="margin:0.3rem 0;">CW: ${cw}</p>
                     <p style="margin:0.3rem 0;">Itinerario:</p>
                     <p style="margin:0.1rem 0 0.1rem 1rem;">${routeStrRodrigo}</p>
