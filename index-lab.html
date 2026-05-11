@@ -9916,8 +9916,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
             const mubInput = container.querySelector(`.mub-field[data-idx="${i}"]`);
             const ventaInput = container.querySelector(`.venta-field[data-idx="${i}"]`);
-            const utilEl = document.getElementById(`mub-util-${i}`);
-            const usdEl = document.getElementById(`mub-usd-${i}`);
+            const utilEl = container.querySelector(`#mub-util-${i}`);
+            const usdEl = container.querySelector(`#mub-usd-${i}`);
             const costBtn = container.querySelector(`.mub-cost-btn[data-idx="${i}"]`);
 
             if (l.costMode) {
@@ -9951,16 +9951,16 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const currentAirportCost = currentAirportLines.reduce((sum, l) => sum + costoBaseVenta(l), 0);
             const currentAirportProfit = (airAwbRate + airEntryRate) - currentAirportCost;
 
-            const freightCostEl = document.getElementById('air-summary-freight-cost');
-            const freightSaleEl = document.getElementById('air-summary-freight-sale');
-            const freightProfitEl = document.getElementById('air-summary-freight-profit');
-            const freightMubEl = document.getElementById('air-summary-freight-mub');
-            const airportCostEl = document.getElementById('air-summary-airport-cost');
-            const airportProfitEl = document.getElementById('air-summary-airport-profit');
-            const totalCostEl = document.getElementById('air-summary-total-cost');
-            const totalSaleEl = document.getElementById('air-summary-total-sale');
-            const totalProfitEl = document.getElementById('air-summary-total-profit');
-            const totalMubEl = document.getElementById('air-summary-total-mub');
+            const freightCostEl = container.querySelector('#air-summary-freight-cost');
+            const freightSaleEl = container.querySelector('#air-summary-freight-sale');
+            const freightProfitEl = container.querySelector('#air-summary-freight-profit');
+            const freightMubEl = container.querySelector('#air-summary-freight-mub');
+            const airportCostEl = container.querySelector('#air-summary-airport-cost');
+            const airportProfitEl = container.querySelector('#air-summary-airport-profit');
+            const totalCostEl = container.querySelector('#air-summary-total-cost');
+            const totalSaleEl = container.querySelector('#air-summary-total-sale');
+            const totalProfitEl = container.querySelector('#air-summary-total-profit');
+            const totalMubEl = container.querySelector('#air-summary-total-mub');
 
             if (freightCostEl) freightCostEl.textContent = fmt(currentFreightCost);
             if (freightSaleEl) freightSaleEl.textContent = fmt(currentFreightSale);
@@ -10007,7 +10007,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             lineas[idx].editando = input.dataset.field;
             updateValues();
         });
-        input.addEventListener('input', () => {
+        const handleEdit = () => {
             const idx = parseInt(input.dataset.idx);
             const field = input.dataset.field;
             const val = parseFloat(input.value) || 0;
@@ -10023,7 +10023,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 lineas[idx].lastCustomVenta = val;
             }
             updateValues();
-        });
+        };
+        input.addEventListener('input', handleEdit);
+        input.addEventListener('change', handleEdit);
     });
 
     container.querySelectorAll('.mub-cost-btn').forEach(button => {
@@ -10041,7 +10043,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         });
     });
 
-    document.getElementById('mub-close').addEventListener('click', () => {
+    container.querySelector('#mub-close')?.addEventListener('click', () => {
         container.innerHTML = '';
         renderAirWorkspaceSummary();
     });
