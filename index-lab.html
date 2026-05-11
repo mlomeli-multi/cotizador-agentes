@@ -8931,9 +8931,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     </div>`;
 
     function renderQuoteSummary() {
-        const quoteSummary = document.getElementById(quoteSummaryId);
+        const quoteSummary = container.querySelector(`#${quoteSummaryId}`);
         if (!quoteSummary) return;
-        const styleTabsEl = document.getElementById(quoteStyleTabsId);
+        const styleTabsEl = container.querySelector(`#${quoteStyleTabsId}`);
 
         const destinationLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'destination');
         const inlandLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland');
@@ -9154,7 +9154,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 es: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeExw.es}</div>`, text: htmlToPlainText(activeExw.es) }
             };
             quoteSummary.innerHTML = quoteSummaryLang === 'es' ? activeExw.es : activeExw.en;
-            document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+            container.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
             });
             return;
@@ -9512,7 +9512,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 es: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeStylePayload.es}</div>`, text: htmlToPlainText(activeStylePayload.es) }
             };
             quoteSummary.innerHTML = quoteSummaryLang === 'es' ? activeStylePayload.es : activeStylePayload.en;
-            document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+            container.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
             });
             return;
@@ -9837,7 +9837,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         `;
     }
 
-    const quoteTabsEl = document.getElementById(quoteTabsId);
+    const quoteTabsEl = container.querySelector(`#${quoteTabsId}`);
     if (quoteTabsEl) {
         quoteTabsEl.querySelectorAll('.maritime-quote-tab').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -9846,7 +9846,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             });
         });
     }
-    const quoteStyleTabsEl = document.getElementById(quoteStyleTabsId);
+    const quoteStyleTabsEl = container.querySelector(`#${quoteStyleTabsId}`);
     if (quoteStyleTabsEl) {
         quoteStyleTabsEl.querySelectorAll('.maritime-quote-style-tab').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -9856,12 +9856,12 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         });
     }
 
-    const quoteCopyBtn = document.getElementById(quoteCopyBtnId);
+    const quoteCopyBtn = container.querySelector(`#${quoteCopyBtnId}`);
     if (quoteCopyBtn) {
         quoteCopyBtn.addEventListener('click', async () => {
             const payload = quoteClipboardPayload[quoteSummaryLang] || {};
             const htmlToCopy = payload.html || '';
-            const textToCopy = payload.text || document.getElementById(quoteSummaryId)?.innerText?.trim() || '';
+            const textToCopy = payload.text || container.querySelector(`#${quoteSummaryId}`)?.innerText?.trim() || '';
             if (!htmlToCopy && !textToCopy) return;
             try {
                 if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined' && htmlToCopy) {
@@ -9989,6 +9989,23 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 const totalProfit = currentFreightProfit + currentAirportProfit;
                 totalMubEl.textContent = `${fmtShort(totalSale > 0 ? (totalProfit / totalSale) * 100 : 0)}%`;
             }
+
+            // All-in totals (EXW)
+            const allCost = lineas.reduce((s, l) => s + costoBaseVenta(l), 0);
+            const allSale = lineas.reduce((s, l) => s + (l.costMode ? costoBaseVenta(l) : (parseFloat(l.venta) || 0)), 0);
+            const allProfit = allSale - allCost;
+            const allinCostEl = container.querySelector(`#${containerId}-allin-cost`);
+            const allinSaleEl = container.querySelector(`#${containerId}-allin-sale`);
+            const allinProfitEl = container.querySelector(`#${containerId}-allin-profit`);
+            const allinMubEl = container.querySelector(`#${containerId}-allin-mub`);
+            if (allinCostEl) allinCostEl.textContent = `${simbolo}${fmt(allCost)}`;
+            if (allinSaleEl) allinSaleEl.textContent = `${simbolo}${fmt(allSale)}`;
+            if (allinProfitEl) {
+                allinProfitEl.textContent = `${simbolo}${fmt(allProfit)}`;
+                allinProfitEl.classList.toggle('positive', allProfit >= 0);
+                allinProfitEl.classList.toggle('negative', allProfit < 0);
+            }
+            if (allinMubEl) allinMubEl.textContent = `${fmtShort(allSale > 0 ? (allProfit / allSale * 100) : 0)}%`;
         }
 
         renderQuoteSummary();
