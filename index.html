@@ -319,23 +319,23 @@
         .unit-result {
             display: none;
             margin-top: 0;
-            padding: 0.8rem 0.9rem;
+            padding: 0.45rem 0.6rem;
             background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 100%);
-            border-radius: 12px;
+            border-radius: 8px;
             border: 1px solid #bfdbfe;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
         }
         .unit-result.show { display: block; }
         .unit-result .unit-name {
-            font-size: 0.92rem;
+            font-size: 0.78rem;
             font-weight: 800;
             color: var(--navy);
         }
         .unit-result .unit-detail {
-            font-size: 0.72rem;
+            font-size: 0.62rem;
             color: var(--gray-500);
-            margin-top: 0.18rem;
-            line-height: 1.45;
+            margin-top: 0.1rem;
+            line-height: 1.35;
         }
         .unit-result.error {
             background: #fef2f2;
@@ -348,131 +348,123 @@
         /* ===== CARGA MULTI-PALLET ===== */
         .air-cargo-panel {
             border: 1px solid #bfdbfe;
-            border-radius: 16px;
+            border-radius: 14px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
-            padding: 0.95rem;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
+            padding: 0.6rem 0.7rem;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
         }
         .carga-header {
             display: flex;
             justify-content: space-between;
-            align-items: flex-start;
-            margin-top: 0;
-            margin-bottom: 0.9rem;
-            gap: 1rem;
-        }
-        .air-cargo-head-main {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.9rem;
-            min-width: 0;
-            flex: 1;
+            align-items: center;
+            margin-bottom: 0.45rem;
         }
         .carga-header .form-section-title {
             margin: 0;
             display: inline-flex;
             align-items: center;
-            gap: 0.4rem;
-            padding: 0.42rem 0.72rem;
+            gap: 0.3rem;
+            padding: 0.25rem 0.55rem;
             border: none;
             border-radius: 999px;
             background: #dbeafe;
             color: #1d4ed8;
-            font-size: 0.72rem;
-            letter-spacing: 0.06em;
+            font-size: 0.64rem;
+            letter-spacing: 0.05em;
         }
-        .air-cargo-head-copy {
-            min-width: 0;
-            flex: 1;
-        }
+        .air-cargo-head-copy { min-width: 0; flex: 1; }
         .air-cargo-copy {
-            margin-top: 0.2rem;
-            font-size: 0.72rem;
+            margin-top: 0.1rem;
+            font-size: 0.58rem;
             color: var(--gray-500);
-            line-height: 1.45;
-            max-width: 32rem;
+            line-height: 1.3;
         }
         .air-cargo-step-badge {
             flex: 0 0 auto;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.35rem 0.6rem;
+            padding: 0.2rem 0.45rem;
             border-radius: 999px;
             background: #eff6ff;
             color: #1d4ed8;
             border: 1px solid #bfdbfe;
-            font-size: 0.66rem;
+            font-size: 0.58rem;
             font-weight: 800;
             letter-spacing: 0.05em;
             text-transform: uppercase;
         }
-        .carga-global {
+        /* === 3-column cargo layout === */
+        .cargo-3col {
             display: grid;
-            grid-template-columns: 132px auto;
-            gap: 0.75rem;
-            align-items: end;
-            margin-bottom: 0;
-            padding: 0.7rem 0.8rem;
-            border: 1px solid #dbeafe;
-            border-radius: 14px;
-            background: rgba(255,255,255,0.92);
-            min-width: 260px;
+            grid-template-columns: auto minmax(0, 1fr) auto;
+            gap: 0.5rem;
+            align-items: stretch;
         }
-        .carga-global .form-group { margin-bottom: 0; }
-        .carga-global .form-group label {
-            font-size: 0.6rem;
+        .cargo-col {
+            border: 1px solid #dbeafe;
+            border-radius: 10px;
+            background: rgba(255,255,255,0.92);
+            padding: 0.5rem 0.55rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+        .cargo-col-title {
+            font-size: 0.52rem;
             font-weight: 800;
-            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--gray-400);
+            padding-bottom: 0.2rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .cargo-col .form-group { margin-bottom: 0; }
+        .cargo-col .form-group label {
+            font-size: 0.52rem;
+            font-weight: 800;
+            letter-spacing: 0.04em;
             text-transform: uppercase;
             color: var(--gray-500);
-            margin-bottom: 0.2rem;
+            margin-bottom: 0.12rem;
         }
-        .carga-global input {
-            height: 36px;
-            border-radius: 10px;
+        .cargo-col input[type="number"] {
+            height: 30px;
+            border-radius: 7px;
             width: 100%;
+            font-size: 0.75rem;
+            box-sizing: border-box;
         }
-        .carga-global .toggle-group {
-            min-height: 36px;
+        .cargo-col .toggle-group {
+            min-height: 28px;
             display: flex;
             align-items: center;
-            gap: 0.45rem;
+            gap: 0.3rem;
         }
-        .air-cargo-body {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) 340px;
-            gap: 0.9rem;
-            align-items: start;
+        .cargo-dg-section {
+            border-top: 1px dashed #fecaca;
+            padding-top: 0.4rem;
+            margin-top: 0.1rem;
         }
-        .air-cargo-lines {
-            display: grid;
-            gap: 0.75rem;
-            min-width: 0;
-        }
-        .air-cargo-side {
-            display: grid;
-            gap: 0.75rem;
-            min-width: 0;
-        }
-        .pallet-lines { display: flex; flex-direction: column; gap: 0.5rem; }
+        .cargo-col-controls { width: 140px; flex-shrink: 0; }
+        .cargo-col-pallets { min-width: 200px; }
+        .cargo-col-pallets .pallet-lines { flex: 1; }
+        .cargo-col-pallets .btn-add-pallet { align-self: flex-start; }
+        .cargo-col-summary { width: 230px; flex-shrink: 0; }
+        .pallet-lines { display: flex; flex-direction: column; gap: 0.35rem; }
         .pallet-line {
             display: grid;
-            grid-template-columns: 26px repeat(4, minmax(0, 1fr)) 18px;
+            grid-template-columns: 22px repeat(4, minmax(0, 1fr)) 16px;
             align-items: start;
-            gap: 0.5rem;
-            padding: 0.65rem 0.75rem;
+            gap: 0.35rem;
+            padding: 0.4rem 0.5rem;
             background: rgba(255,255,255,0.96);
             border: 1px solid #dbeafe;
-            border-radius: 12px;
+            border-radius: 8px;
         }
         .pallet-line .pl-num {
-            font-size: 0.65rem;
+            font-size: 0.6rem;
             font-weight: 700;
             color: #1d4ed8;
-            min-width: 22px;
-            padding-top: 1.25rem;
+            min-width: 20px;
+            padding-top: 1.1rem;
         }
         .pallet-line .form-group {
             margin-bottom: 0;
@@ -480,20 +472,21 @@
             min-width: 0;
         }
         .pallet-line label {
-            font-size: 0.6rem;
-            margin-bottom: 0.15rem;
+            font-size: 0.55rem;
+            margin-bottom: 0.1rem;
         }
         .pallet-line input {
-            padding: 0.35rem 0.5rem;
-            font-size: 0.8rem;
+            padding: 0.3rem 0.4rem;
+            font-size: 0.75rem;
+            height: 30px;
         }
         .pallet-line .btn-remove-line {
             background: none;
             border: none;
             color: var(--gray-300);
-            font-size: 1rem;
+            font-size: 0.85rem;
             cursor: pointer;
-            padding: 0.2rem;
+            padding: 0.1rem;
             line-height: 1;
             align-self: center;
         }
@@ -501,13 +494,13 @@
         .btn-add-pallet {
             display: inline-flex;
             align-items: center;
-            gap: 0.3rem;
+            gap: 0.25rem;
             background: white;
             border: 1px dashed #93c5fd;
             border-radius: 999px;
-            padding: 0.5rem 0.85rem;
+            padding: 0.35rem 0.7rem;
             color: var(--blue);
-            font-size: 0.75rem;
+            font-size: 0.65rem;
             font-weight: 700;
             cursor: pointer;
             margin-top: 0;
@@ -515,26 +508,26 @@
         .btn-add-pallet:hover { border-color: var(--blue); background: #f0f7ff; }
         .air-cargo-unit-card {
             border: 1px solid #dbeafe;
-            border-radius: 14px;
+            border-radius: 10px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
-            padding: 0.8rem;
+            padding: 0.5rem 0.6rem;
         }
         .air-cargo-unit-head {
             display: flex;
             align-items: baseline;
             justify-content: space-between;
-            gap: 0.6rem;
-            margin-bottom: 0.65rem;
+            gap: 0.4rem;
+            margin-bottom: 0.35rem;
         }
         .air-cargo-unit-title {
-            font-size: 0.74rem;
+            font-size: 0.62rem;
             font-weight: 900;
             color: #1e3a8a;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
+            letter-spacing: 0.04em;
         }
         .air-cargo-unit-note {
-            font-size: 0.66rem;
+            font-size: 0.55rem;
             color: var(--gray-500);
         }
         .air-cargo-unit-card .unit-result {
@@ -554,7 +547,540 @@
             color: var(--gray-400);
         }
         .air-cargo-unit-card .cotizar-actions {
-            margin-top: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        /* ===== PESO CARGABLE ===== */
+        .cw-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.3rem;
+        }
+        .cw-item {
+            padding: 0.3rem 0.45rem;
+            border-radius: 6px;
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+        }
+        .cw-label {
+            font-size: 0.5rem;
+            font-weight: 700;
+            color: var(--gray-400);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            margin-bottom: 0.15rem;
+        }
+        .cw-value {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .cw-result {
+            grid-column: 1 / -1;
+            background: #eef6ff;
+            border-color: #bfdbfe;
+            position: relative;
+        }
+        .cw-highlight {
+            font-size: 0.92rem;
+            color: var(--blue);
+        }
+        .cw-badge {
+            position: absolute;
+            top: 0.25rem;
+            right: 0.35rem;
+            font-size: 0.48rem;
+            font-weight: 700;
+            padding: 0.08rem 0.3rem;
+            border-radius: 3px;
+            text-transform: uppercase;
+        }
+        .cw-badge.vol { background: var(--amber); color: white; }
+        .cw-badge.real { background: var(--green); color: white; }
+
+        /* ===== AIO WAREHOUSE UI ===== */
+        .aio-section-title {
+            font-size: 0.6rem; font-weight: 700; color: var(--gray-500);
+            text-transform: uppercase; letter-spacing: 0.05em;
+            margin: 0.5rem 0 0.2rem;
+        }
+        .aio-section-note { font-size: 0.6rem; color: var(--gray-400); margin-bottom: 0.25rem; }
+        .aio-auto-row {
+            display: grid; grid-template-columns: 18px 1fr auto;
+            gap: 0.4rem; align-items: center;
+            background: #f0fdf4; border: 1px solid #86efac;
+            border-radius: 6px; padding: 0.4rem 0.6rem; margin-bottom: 0.25rem;
+        }
+        .aio-auto-check { color: var(--green); font-weight: 700; font-size: 0.8rem; }
+        .aio-auto-name { font-size: 0.72rem; font-weight: 600; color: var(--navy); }
+        .aio-auto-note { font-size: 0.58rem; color: var(--gray-400); }
+        .aio-auto-price { font-size: 0.75rem; font-weight: 700; color: var(--navy); white-space: nowrap; }
+        .aio-check-row {
+            display: grid; grid-template-columns: 16px 1fr auto auto;
+            gap: 0.35rem; align-items: center;
+            padding: 0.3rem 0.1rem; border-bottom: 1px solid var(--gray-100);
+        }
+        .aio-check-row:last-child { border-bottom: none; }
+        .aio-chk { cursor: pointer; accent-color: var(--blue); }
+        .aio-check-label { cursor: pointer; }
+        .aio-check-name { font-size: 0.72rem; font-weight: 500; color: var(--navy); display: block; }
+        .aio-check-note { font-size: 0.58rem; color: var(--gray-400); display: block; }
+        .aio-check-qty { display: flex; align-items: center; gap: 0.2rem; }
+        .aio-check-qty.hidden { visibility: hidden; pointer-events: none; }
+        .aio-qty {
+            width: 48px; padding: 0.18rem 0.25rem;
+            border: 1px solid var(--gray-300); border-radius: 4px;
+            font-size: 0.7rem; text-align: center;
+        }
+        .aio-qty-label { font-size: 0.58rem; color: var(--gray-500); white-space: nowrap; }
+        .aio-check-price {
+            font-size: 0.7rem; font-weight: 600; color: var(--blue);
+            white-space: nowrap; text-align: right; min-width: 72px;
+        }
+        .aio-ingreso-options { display: flex; flex-direction: column; gap: 0.25rem; margin-bottom: 0.25rem; }
+        .aio-ingreso-option {
+            display: grid; grid-template-columns: 16px 1fr auto;
+            gap: 0.4rem; align-items: center;
+            background: white; border: 1px solid var(--gray-200);
+            border-radius: 6px; padding: 0.4rem 0.6rem; cursor: pointer;
+            transition: border-color 0.15s;
+        }
+        .aio-ingreso-option:hover { border-color: var(--blue); }
+        .aio-ingreso-option.selected { background: #f0f7ff; border-color: var(--blue); }
+        .aio-ingreso-radio { font-size: 0.8rem; color: var(--blue); }
+
+        /* ===== AIRLINE CARDS ===== */
+        .exp-airline-card {
+            background: white; border: 1px solid var(--gray-200);
+            border-radius: 8px; padding: 0.6rem 0.75rem; margin-bottom: 0.4rem;
+            cursor: pointer; transition: border-color 0.15s, box-shadow 0.15s;
+            position: relative;
+        }
+        .exp-airline-card:hover { border-color: var(--blue); }
+        .exp-airline-card.selected {
+            border-color: var(--blue); background: #f0f7ff;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
+        }
+        .exp-airline-card.best:not(.selected)::before {
+            content: '★ Mejor precio';
+            position: absolute; top: -0.4rem; left: 0.75rem;
+            font-size: 0.55rem; font-weight: 700; color: white;
+            background: var(--green); padding: 0.05rem 0.4rem; border-radius: 3px;
+        }
+        .exp-airline-head {
+            display: grid; grid-template-columns: 1fr auto; align-items: start;
+            margin-bottom: 0.35rem;
+        }
+        .exp-airline-code { font-size: 0.9rem; font-weight: 700; color: var(--navy); }
+        .exp-airline-name { font-size: 0.65rem; color: var(--gray-400); }
+        .exp-airline-price { font-size: 0.95rem; font-weight: 700; color: var(--blue); text-align: right; }
+        .exp-airline-price-note { font-size: 0.58rem; color: var(--gray-400); text-align: right; }
+        .exp-airline-meta {
+            display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.3rem;
+        }
+        .exp-airline-tag {
+            font-size: 0.58rem; font-weight: 600; padding: 0.1rem 0.4rem;
+            border-radius: 3px; background: var(--gray-100); color: var(--gray-600);
+        }
+        .exp-airline-tag.tt { background: #dbeafe; color: var(--blue); }
+        .exp-airline-tag.dias { background: #d1fae5; color: #065f46; }
+        .exp-airline-tag.type { background: #fef3c7; color: #92400e; }
+        .exp-airline-tag.vigencia { background: #fce7f3; color: #9d174d; }
+        .exp-airline-breakdown {
+            font-size: 0.62rem; color: var(--gray-500);
+            margin-top: 0.25rem; padding-top: 0.25rem;
+            border-top: 1px solid var(--gray-100);
+            display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.2rem 0.5rem;
+        }
+        .exp-airline-btn {
+            margin-left: auto;
+            padding: 0.25rem 0.6rem; border-radius: 6px;
+            border: 1px solid var(--blue); background: white;
+            color: var(--blue); font-size: 0.62rem; font-weight: 600; cursor: pointer;
+        }
+        .exp-airline-card.selected .exp-airline-btn { background: var(--blue); color: white; }
+        .exp-airline-no-routes {
+            font-size: 0.72rem; color: var(--gray-400); text-align: center; padding: 0.75rem;
+        }
+
+        /* ===== PASO 1 GRID (form + medidas side by side) ===== */
+        .paso1-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            align-items: start;
+            margin-bottom: 0.5rem;
+        }
+        .paso1-left { display: flex; flex-direction: column; gap: 0.5rem; }
+        .paso1-right { display: flex; flex-direction: column; }
+
+        /* ===== ROUTE DIAGRAM (badge layout) ===== */
+        .exp-route-diagram {
+            background: var(--navy);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.75rem;
+        }
+        .exp-route-diagram-title {
+            font-size: 0.7rem; font-weight: 700; color: white;
+            margin-bottom: 0.1rem;
+        }
+        .exp-route-diagram-note {
+            font-size: 0.58rem; color: rgba(255,255,255,0.45);
+            margin-bottom: 0.5rem;
+        }
+        .exp-airline-summary-table {
+            width: 100%; border-collapse: collapse; margin-bottom: 0.6rem; font-size: 0.62rem;
+        }
+        .exp-airline-summary-table th {
+            text-align: left; padding: 0.2rem 0.4rem; color: rgba(255,255,255,0.5);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        .exp-airline-summary-table td {
+            padding: 0.18rem 0.4rem; color: rgba(255,255,255,0.75);
+        }
+        .exp-airline-summary-table .code-cell { font-weight: 700; color: #60a5fa; }
+        .exp-origin-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+        .exp-origin-block {
+            display: flex; flex-direction: column; gap: 0.25rem;
+        }
+        .exp-origin-header {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem;
+        }
+        .exp-origin-label {
+            font-size: 0.72rem; font-weight: 800; color: #60a5fa;
+            min-width: 38px; margin-right: 0.15rem;
+        }
+        .exp-region-chip {
+            font-size: 0.62rem; font-weight: 700; padding: 0.15rem 0.5rem;
+            border-radius: 10px; cursor: pointer; border: 1px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.7);
+            transition: background 0.12s, border-color 0.12s;
+        }
+        .exp-region-chip:hover {
+            background: rgba(96,165,250,0.2); border-color: rgba(96,165,250,0.5);
+        }
+        .exp-region-chip.open {
+            background: rgba(59,130,246,0.3); border-color: #60a5fa; color: white;
+        }
+        .exp-region-chip .region-count {
+            font-weight: 400; opacity: 0.55; margin-left: 0.2rem; font-size: 0.56rem;
+        }
+        .exp-region-badges {
+            display: none; flex-wrap: wrap; gap: 0.3rem;
+            padding-left: 52px;
+        }
+        .exp-region-badges.open { display: flex; }
+        .exp-dest-badge {
+            position: relative;
+            font-size: 0.68rem; font-weight: 700; color: rgba(255,255,255,0.85);
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18);
+            border-radius: 6px; padding: 0.18rem 0.45rem; cursor: pointer;
+            transition: background 0.12s, border-color 0.12s;
+        }
+        .exp-dest-badge:hover {
+            background: rgba(96,165,250,0.25); border-color: rgba(96,165,250,0.6);
+        }
+        .exp-dest-badge.active {
+            background: rgba(59,130,246,0.35); border-color: #60a5fa; color: white;
+        }
+        .exp-dest-badge .badge-tip {
+            display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
+            transform: translateX(-50%); background: #1e293b; border: 1px solid rgba(96,165,250,0.4);
+            border-radius: 8px; padding: 0.4rem 0.6rem; min-width: 160px; z-index: 50;
+            white-space: nowrap; pointer-events: none;
+        }
+        .exp-dest-badge:hover .badge-tip { display: block; }
+        .badge-tip-name { font-size: 0.68rem; font-weight: 700; color: white; margin-bottom: 0.15rem; }
+        .badge-tip-airline { font-size: 0.6rem; color: rgba(255,255,255,0.6); }
+        .exp-no-routes-msg {
+            font-size: 0.62rem; color: rgba(255,255,255,0.25);
+            font-style: italic; padding: 0.15rem 0;
+        }
+
+        /* ===== DG / CARGO TYPE ===== */
+        .cargo-type-toggle { display: flex; gap: 0.35rem; flex-wrap: wrap; }
+        .cargo-type-btn {
+            padding: 0.3rem 0.75rem; border-radius: 20px; font-size: 0.68rem; font-weight: 600;
+            border: 1px solid var(--gray-300); background: white; color: var(--gray-500);
+            cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 0.3rem;
+        }
+        .cargo-type-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .cargo-type-btn.active { background: var(--navy); border-color: var(--navy); color: white; }
+        .cargo-type-btn.active .dg-label-inline { background: rgba(255,255,255,0.2); color: white; }
+        .dg-label-inline {
+            display: inline-block; padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.6rem;
+            font-weight: 800; background: #dc2626; color: white; letter-spacing: 0.03em;
+        }
+        /* UN search */
+        .un-search-wrap { position: relative; margin-bottom: 0.5rem; }
+        .un-search-input {
+            width: 100%; padding: 0.4rem 0.6rem; font-size: 0.72rem;
+            border: 1px solid var(--gray-300); border-radius: 7px; outline: none;
+            box-sizing: border-box;
+        }
+        .un-search-input:focus { border-color: var(--blue); }
+        .un-dropdown {
+            position: absolute; top: calc(100% + 2px); left: 0; right: 0; z-index: 100;
+            background: white; border: 1px solid var(--gray-200); border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.12); max-height: 220px; overflow-y: auto;
+        }
+        .un-dropdown-item {
+            display: flex; align-items: baseline; gap: 0.4rem; padding: 0.45rem 0.65rem;
+            cursor: pointer; border-bottom: 1px solid var(--gray-100); font-size: 0.68rem;
+        }
+        .un-dropdown-item:last-child { border-bottom: none; }
+        .un-dropdown-item:hover { background: #f0f7ff; }
+        .un-dd-number { font-weight: 700; color: var(--navy); font-size: 0.7rem; white-space: nowrap; }
+        .un-dd-clase {
+            font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
+            background: #fee2e2; color: #dc2626; white-space: nowrap;
+        }
+        .un-dd-name { color: var(--gray-600); flex: 1; }
+        /* UN chips */
+        .un-chips { display: flex; flex-direction: column; gap: 0.3rem; margin-bottom: 0.35rem; }
+        .un-chip {
+            display: flex; align-items: center; gap: 0.35rem; padding: 0.3rem 0.5rem;
+            background: #fef2f2; border: 1px solid #fecaca; border-radius: 6px; font-size: 0.65rem;
+        }
+        .un-chip-badge {
+            font-size: 0.55rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
+            background: #dc2626; color: white; white-space: nowrap;
+        }
+        .un-chip-name { flex: 1; color: var(--gray-700); }
+        .un-chip-remove {
+            background: none; border: none; cursor: pointer; color: var(--gray-400);
+            font-size: 0.8rem; line-height: 1; padding: 0; margin-left: auto;
+        }
+        .un-chip-remove:hover { color: #dc2626; }
+        .un-empty-hint { font-size: 0.62rem; color: var(--gray-400); font-style: italic; }
+        /* DG badge in airline card */
+        .exp-airline-dg-badge {
+            display: inline-block; padding: 0.05rem 0.3rem; border-radius: 3px;
+            font-size: 0.55rem; font-weight: 800; background: #dc2626; color: white;
+            vertical-align: middle; margin-left: 0.2rem;
+        }
+        /* tipo badge in route diagram */
+        .exp-tipo-badge {
+            font-size: 0.5rem; font-weight: 700; padding: 0.05rem 0.25rem; border-radius: 3px;
+        }
+        .exp-tipo-badge.gen { background: rgba(52,211,153,0.2); color: #34d399; }
+        .exp-tipo-badge.dg  { background: rgba(220,38,38,0.35); color: #fca5a5; }
+        .exp-airline-routing {
+            font-size: 0.6rem; color: var(--gray-400); font-weight: 500; margin-top: 0.1rem;
+        }
+        .exp-airline-avion {
+            font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
+            background: var(--gray-100); color: var(--gray-500);
+        }
+        .exp-fsc-note { font-size: 0.62rem; color: #7c3aed; font-weight: 600; }
+        .exp-dg-fee-note { font-size: 0.62rem; color: #dc2626; font-weight: 600; }
+
+        /* Breakdown pills */
+        .bk-pills {
+            display: flex; align-items: center; flex-wrap: wrap; gap: 0.2rem;
+            margin-bottom: 0.2rem; font-size: 0.65rem; color: var(--gray-500);
+        }
+        .bk-pill {
+            display: inline-block; padding: 0.1rem 0.4rem; border-radius: 4px;
+            font-weight: 700; font-size: 0.65rem;
+            background: #e0f2fe; color: #0369a1;
+        }
+        .bk-pill.ssc { background: #fef3c7; color: #92400e; }
+        .bk-pill.fsc { background: #ede9fe; color: #6d28d9; }
+        .bk-plus { font-size: 0.6rem; color: var(--gray-400); font-weight: 600; }
+        .bk-calc {
+            font-size: 0.65rem; color: var(--gray-600); line-height: 1.4;
+        }
+        .bk-calc strong { color: var(--navy); }
+
+        /* ===== PASO 3 — 3-column grid ===== */
+        .p3-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 0.6rem;
+            margin-bottom: 0.75rem;
+        }
+        .p3-col {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.65rem 0.7rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+        .p3-col-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--navy);
+        }
+        .p3-col-note {
+            font-size: 0.6rem;
+            color: var(--gray-400);
+            margin-bottom: 0.2rem;
+        }
+        .p3-opt-item {
+            display: grid;
+            grid-template-columns: 16px 1fr auto;
+            gap: 0.3rem;
+            align-items: center;
+            padding: 0.28rem 0.1rem;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .p3-opt-item:last-child { border-bottom: none; }
+        .p3-opt-label { cursor: pointer; }
+        .p3-opt-name { font-size: 0.68rem; font-weight: 600; color: var(--gray-700); line-height: 1.2; }
+        .p3-opt-note { font-size: 0.58rem; color: var(--gray-400); }
+        .p3-opt-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.1rem; }
+        .p3-opt-price { font-size: 0.7rem; font-weight: 700; color: var(--navy); white-space: nowrap; }
+        .p3-opt-qty-row { display: flex; align-items: center; gap: 0.2rem; }
+        .p3-opt-qty {
+            width: 38px; height: 22px; border: 1px solid var(--gray-300);
+            border-radius: 5px; padding: 0 4px; font-size: 0.65rem;
+            text-align: center;
+        }
+        .p3-opt-qty-lbl { font-size: 0.58rem; color: var(--gray-500); }
+
+        /* ===== EXW PROVIDER BLOCKS ===== */
+        .exp-block {
+            background: var(--gray-50);
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-bottom: 0.75rem;
+        }
+        .exp-block-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.15rem;
+        }
+        .exp-block-note {
+            font-size: 0.65rem;
+            color: var(--gray-400);
+            margin-bottom: 0.5rem;
+        }
+        .exp-transport-card {
+            display: grid;
+            grid-template-columns: 1fr auto auto;
+            align-items: center;
+            gap: 0.5rem;
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 8px;
+            padding: 0.6rem 0.75rem;
+            margin-bottom: 0.4rem;
+            cursor: pointer;
+            transition: border-color 0.15s, box-shadow 0.15s;
+        }
+        .exp-transport-card:hover { border-color: var(--blue); }
+        .exp-transport-card.selected {
+            border-color: var(--blue);
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+            background: #f0f7ff;
+        }
+        .exp-transport-card.best:not(.selected)::before {
+            content: '★ Mejor precio';
+            position: absolute;
+            top: -0.45rem;
+            left: 0.75rem;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: white;
+            background: var(--green);
+            padding: 0.05rem 0.4rem;
+            border-radius: 3px;
+        }
+        .exp-transport-card.best { position: relative; }
+        .exp-transport-name { font-weight: 600; font-size: 0.8rem; color: var(--navy); }
+        .exp-transport-route { font-size: 0.6rem; color: var(--gray-400); }
+        .exp-transport-price { font-weight: 700; font-size: 0.85rem; color: var(--blue); white-space: nowrap; }
+        .exp-transport-btn {
+            padding: 0.3rem 0.6rem;
+            border-radius: 6px;
+            border: 1px solid var(--blue);
+            background: white;
+            color: var(--blue);
+            font-size: 0.65rem;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        .exp-transport-card.selected .exp-transport-btn {
+            background: var(--blue);
+            color: white;
+        }
+        .exp-no-transport {
+            padding: 0.6rem;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--gray-400);
+        }
+        .exp-manual-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.5rem;
+        }
+        .exp-manual-row .form-group label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: var(--gray-500);
+        }
+        .exp-manual-row .form-group input {
+            width: 100%;
+            padding: 0.4rem 0.5rem;
+            border-radius: 6px;
+            border: 1px solid var(--gray-300);
+            font-size: 0.8rem;
+        }
+        .exp-checkbox-list { display: flex; flex-direction: column; gap: 0.3rem; }
+        .exp-empty-msg {
+            font-size: 0.7rem;
+            color: var(--gray-400);
+            text-align: center;
+            padding: 0.5rem;
+        }
+        .exp-cost-summary {
+            background: white;
+            border: 1px solid var(--gray-200);
+            border-radius: 10px;
+            padding: 0.75rem;
+            margin-top: 0.5rem;
+        }
+        .exp-cost-summary-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--navy);
+            margin-bottom: 0.5rem;
+        }
+        .exp-cost-summary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+        .exp-cost-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            padding: 0.3rem 0;
+            border-bottom: 1px solid var(--gray-100);
+        }
+        .exp-cost-row-label { color: var(--gray-600); }
+        .exp-cost-row-value { font-weight: 600; color: var(--navy); }
+        .exp-cost-summary-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 0.5rem;
+            padding-top: 0.5rem;
+            border-top: 2px solid var(--navy);
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--navy);
         }
 
         /* ===== COTIZAR ACTIONS ===== */
@@ -3005,8 +3531,7 @@
             .air-provider-meta { flex-direction: column; align-items: flex-start; }
             .air-provider-card .btn-venta { width: 100%; }
             .carga-header { flex-direction: column; align-items: stretch; }
-            .air-cargo-head-main { align-items: flex-start; flex-direction: column; }
-            .carga-global { width: 100%; border-radius: 14px; grid-template-columns: 1fr 1fr; min-width: 0; }
+            .cargo-3col { grid-template-columns: 1fr; }
             .air-cargo-body { grid-template-columns: 1fr; }
             .pallet-line { grid-template-columns: 26px 1fr 1fr; }
             .pallet-line .btn-remove-line,
@@ -3279,10 +3804,13 @@
         <span class="tab-icon">&#9992;</span>
         Aéreo Importación (DAP)
     </button>
+    <button class="tab-btn" data-tab="aereo-exp">
+        <span class="tab-icon">&#9992;</span>
+        Aéreo Exportación (EXW)
+    </button>
     <button class="tab-btn" data-tab="maritimo">
         <span class="tab-icon">&#x1F6A2;</span>
         Marítimo Importación (DAP)
-        <span class="tab-badge">Próximamente</span>
     </button>
 </nav>
 
@@ -3656,7 +4184,320 @@
 
     </section>
 
-    <!-- TAB: MARÍTIMO (placeholder) -->
+    <!-- TAB: AÉREO EXPORTACIÓN (EXW) -->
+    <section class="tab-content" id="tab-aereo-exp">
+
+        <div class="card air-dap-card">
+            <div class="card-header">
+                <div class="card-icon blue">&#x1F4CD;</div>
+                <h2>Cotizador Flete Terrestre — Exportación</h2>
+            </div>
+            <div class="air-dap-shell">
+                <aside class="air-dap-rail">
+                    <div class="air-stepper">
+                        <div class="air-stepper-title">Flujo EXW Aéreo</div>
+                        <div class="air-stepper-list">
+                            <div class="air-step is-active" data-exp-step="route">
+                                <div class="air-step-index">1</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Ruta</div>
+                                    <div class="air-step-desc">Ciudad de origen y aeropuerto de salida.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-exp-step="cargo">
+                                <div class="air-step-index">2</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Carga</div>
+                                    <div class="air-step-desc">Pallets, peso y condición de estiba.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-exp-step="providers">
+                                <div class="air-step-index">3</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Proveedores</div>
+                                    <div class="air-step-desc">Transporte, aerolínea y almacén.</div>
+                                </div>
+                            </div>
+                            <div class="air-step" data-exp-step="sale">
+                                <div class="air-step-index">4</div>
+                                <div class="air-step-copy">
+                                    <div class="air-step-title">Venta</div>
+                                    <div class="air-step-desc">Calculadora de venta y correo comercial.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </aside>
+                <div class="air-dap-main">
+            <!-- Rutas panel — full width on top -->
+            <div class="exp-route-diagram" id="route-diagram-exp">
+                <div class="exp-route-diagram-title">Rutas disponibles para cotizar</div>
+                <div class="exp-route-diagram-note">Se actualiza con cada aerolínea que agregues al sistema.</div>
+                <div id="exp-airline-summary"></div>
+                <div class="exp-origin-grid" id="exp-origin-grid"></div>
+            </div>
+
+            <div class="paso1-grid">
+                <div class="paso1-left">
+                    <div class="air-route-panel">
+                            <div class="air-route-head">
+                                <div>
+                                    <div class="form-section-title">&#9992; Ruta</div>
+                                    <div class="air-route-copy">Selecciona ciudad origen, aeropuerto de salida y destino internacional.</div>
+                                </div>
+                                <div class="air-route-step-badge">Paso 1</div>
+                            </div>
+                            <div class="air-route-grid">
+                                <div class="form-group autocomplete-wrap">
+                                    <label>Ciudad de origen</label>
+                                    <input type="text" id="ciudad-origen-exp" placeholder="Ej: Querétaro" autocomplete="off">
+                                    <div class="autocomplete-list" id="autocomplete-list-exp"></div>
+                                </div>
+                                <div class="form-group">
+                                    <label>Aeropuerto de salida</label>
+                                    <select id="aeropuerto-exp">
+                                        <option value="">Seleccionar...</option>
+                                        <option value="NLU">NLU — AIFA</option>
+                                        <option value="MEX">MEX — Ciudad de México</option>
+                                        <option value="MTY">MTY — Monterrey</option>
+                                        <option value="GDL">GDL — Guadalajara</option>
+                                    </select>
+                                </div>
+                                <div class="form-group" id="destino-exp-group" style="display:none;">
+                                    <label>Destino</label>
+                                    <select id="destino-exp">
+                                        <option value="">Seleccionar destino...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    <div class="route-info" id="route-info-exp">
+                        <div class="route-info-grid">
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-km-exp">—</div>
+                                <div class="stat-label">Kilómetros aprox.</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-time-exp">—</div>
+                                <div class="stat-label" id="route-time-label-exp">Tiempo tránsito</div>
+                            </div>
+                            <div class="route-stat">
+                                <div class="stat-value" id="route-unit-type-exp">—</div>
+                                <div class="stat-label">Tipo unidad</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="paso1-right">
+                    <div class="unit-reference-card">
+                        <div class="unit-reference-head">
+                            <div class="unit-reference-title">Medidas base por unidad</div>
+                            <div class="unit-reference-subtitle">Referencia comercial rápida de payload, dimensiones y cubicaje.</div>
+                        </div>
+                        <div class="unit-reference-wrap">
+                            <table class="unit-reference-table">
+                                <thead>
+                                    <tr>
+                                        <th>Unidad</th>
+                                        <th>Payload</th>
+                                        <th>Dimensiones base</th>
+                                        <th>CBM</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr><td>1 Ton Truck</td><td>900 kg</td><td>190 x 150 x 150 cm</td><td>4.275 cbm</td></tr>
+                                    <tr><td>3.5 Tons Truck</td><td>3,200 kg</td><td>315 x 225 x 180 cm</td><td>12.75 cbm</td></tr>
+                                    <tr><td>5 Ton (Rabón)</td><td>5,900 kg</td><td>600 x 240 x 215 cm</td><td>30.95 cbm</td></tr>
+                                    <tr><td>10 Ton (Tortón)</td><td>9,900 kg</td><td>700 x 250 x 245 cm</td><td>42.875 cbm</td></tr>
+                                    <tr><td>Caja Seca 53'</td><td>20,000 kg</td><td>1500 x 250 x 270 cm</td><td>101.25 cbm</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="air-dap-bottom">
+                    <div class="air-cargo-panel">
+                    <!-- Header row -->
+                    <div class="carga-header">
+                        <div class="air-cargo-head-copy">
+                            <div class="form-section-title">&#x1F4E6; Carga</div>
+                            <div class="air-cargo-copy">Captura peso, medidas y tipo de carga.</div>
+                        </div>
+                        <div class="air-cargo-step-badge">Paso 2</div>
+                    </div>
+                    <!-- 3 columns -->
+                    <div class="cargo-3col">
+                        <!-- COL 1: Controls -->
+                        <div class="cargo-col cargo-col-controls">
+                            <div class="cargo-col-title">Datos</div>
+                            <div class="form-group">
+                                <label>Peso total (kg)</label>
+                                <input type="number" id="peso-exp" min="1" placeholder="1500">
+                            </div>
+                            <div class="form-group">
+                                <label>¿Estibable?</label>
+                                <div class="toggle-group">
+                                    <label class="toggle">
+                                        <input type="checkbox" id="estibable-exp">
+                                        <span class="toggle-slider"></span>
+                                    </label>
+                                    <span class="toggle-label" id="estibable-label-exp">No</span>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Tipo de carga</label>
+                                <div class="cargo-type-toggle">
+                                    <button class="cargo-type-btn active" id="tipo-general-btn" type="button" onclick="setExpTipoCarga('general')">General</button>
+                                    <button class="cargo-type-btn" id="tipo-dg-btn" type="button" onclick="setExpTipoCarga('dg')"><span class="dg-label-inline">DG</span> Peligrosa</button>
+                                </div>
+                            </div>
+                            <!-- DG: UN numbers -->
+                            <div id="dg-un-card" class="cargo-dg-section" style="display:none;">
+                                <div class="form-group">
+                                    <label><span class="dg-label-inline">DG</span> Números UN</label>
+                                    <div class="un-search-wrap">
+                                        <input type="text" id="un-search-input" class="un-search-input" placeholder="Buscar UN..." autocomplete="off">
+                                        <div id="un-search-dropdown" class="un-dropdown" style="display:none;"></div>
+                                    </div>
+                                </div>
+                                <div id="un-selected-chips" class="un-chips"></div>
+                                <div class="un-empty-hint" id="un-empty-hint">Agrega UNs para calcular DG Fee.</div>
+                            </div>
+                        </div>
+                        <!-- COL 2: Pallets -->
+                        <div class="cargo-col cargo-col-pallets">
+                            <div class="cargo-col-title">Pallets</div>
+                            <div class="pallet-lines" id="pallet-lines-exp"></div>
+                            <button class="btn-add-pallet" id="btn-add-pallet-exp" type="button">+ Agregar pallet</button>
+                        </div>
+                        <!-- COL 3: Summary -->
+                        <div class="cargo-col cargo-col-summary">
+                            <div class="cargo-col-title">Resumen</div>
+                            <div class="air-cargo-unit-card">
+                                <div class="air-cargo-unit-head">
+                                    <div class="air-cargo-unit-title">Unidad sugerida</div>
+                                </div>
+                                <div class="unit-result" id="unit-result-exp">
+                                    <div class="unit-name" id="unit-name-exp"></div>
+                                    <div class="unit-detail" id="unit-detail-exp"></div>
+                                </div>
+                            </div>
+                            <div class="air-cargo-unit-card" id="chargeable-weight-card" style="display:none;">
+                                <div class="air-cargo-unit-head">
+                                    <div class="air-cargo-unit-title">Peso Cargable</div>
+                                    <div class="air-cargo-unit-note">1 CBM = 167 kg</div>
+                                </div>
+                                <div class="cw-grid">
+                                    <div class="cw-item">
+                                        <div class="cw-label">CBM total</div>
+                                        <div class="cw-value" id="cw-cbm">—</div>
+                                    </div>
+                                    <div class="cw-item">
+                                        <div class="cw-label">Peso real</div>
+                                        <div class="cw-value" id="cw-real">—</div>
+                                    </div>
+                                    <div class="cw-item">
+                                        <div class="cw-label">Peso volumétrico</div>
+                                        <div class="cw-value" id="cw-vol">—</div>
+                                    </div>
+                                    <div class="cw-item cw-result">
+                                        <div class="cw-label">Peso cargable</div>
+                                        <div class="cw-value cw-highlight" id="cw-chargeable">—</div>
+                                        <div class="cw-badge" id="cw-badge"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+
+                    <!-- ====== PASO 3: PROVEEDORES EXW ====== -->
+                    <div class="air-provider-stage" id="exp-providers-panel" style="display:none;">
+                        <div class="air-provider-stage-head">
+                            <div>
+                                <div class="air-provider-stage-title">Proveedores EXW</div>
+                                <div class="air-provider-stage-note">Arma el costo completo: transporte + almacén + flete aéreo.</div>
+                            </div>
+                            <div class="air-provider-stage-badge">Paso 3</div>
+                        </div>
+
+                        <!-- 3 columnas: transporte | almacén auto | opcionales -->
+                        <div class="p3-grid">
+                            <div class="p3-col">
+                                <div class="p3-col-title">Transporte terrestre</div>
+                                <div class="p3-col-note">Origen → Almacén aeropuerto</div>
+                                <div id="exp-transport-results"></div>
+                            </div>
+                            <div class="p3-col">
+                                <div class="p3-col-title">Almacén aeropuerto</div>
+                                <div class="p3-col-note">Maniobras e ingreso</div>
+                                <div id="exp-warehouse-auto"></div>
+                            </div>
+                            <div class="p3-col">
+                                <div class="p3-col-title">Opcionales</div>
+                                <div class="p3-col-note">Selecciona los que aplican</div>
+                                <div id="exp-warehouse-optional"></div>
+                            </div>
+                        </div>
+
+                        <!-- Flete aéreo (full width) -->
+                        <div class="exp-block">
+                            <div class="exp-block-title">Flete aéreo</div>
+                            <div class="exp-block-note" id="exp-airline-block-note">Selecciona el destino en Paso 1 para ver aerolíneas disponibles.</div>
+                            <div id="exp-airline-results"></div>
+                        </div>
+
+                        <!-- Resumen de costo EXW -->
+                        <div class="exp-cost-summary" id="exp-cost-summary">
+                            <div class="exp-cost-summary-title">Resumen de costo EXW</div>
+                            <div class="exp-cost-summary-list" id="exp-cost-summary-list"></div>
+                            <div class="exp-cost-summary-total">
+                                <span>Total costo</span>
+                                <strong id="exp-cost-total">$0.00 MXN</strong>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- ====== PASO 4: VENTA EXW ====== -->
+                    <div id="exp-mub-container" style="display:none;"></div>
+            </div>
+                </div>
+                <aside class="air-dap-side">
+                    <div class="air-workspace-summary" id="air-workspace-summary-exp">
+                        <div class="air-workspace-summary-head">
+                            <div class="air-workspace-summary-title">Resumen operativo</div>
+                            <div class="air-workspace-summary-note">Siempre visible mientras armas la cotización.</div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Ruta</div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Origen</span><span class="air-workspace-value" id="ws-exp-origin">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Aeropuerto</span><span class="air-workspace-value" id="ws-exp-airport">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Destino</span><span class="air-workspace-value" id="ws-exp-destino">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Distancia</span><span class="air-workspace-value" id="ws-exp-km">—</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Carga</div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Pallets</span><span class="air-workspace-value" id="ws-exp-pallets">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Peso total</span><span class="air-workspace-value" id="ws-exp-weight">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Unidad</span><span class="air-workspace-value" id="ws-exp-unit">—</span></div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Tipo carga</span><span class="air-workspace-value" id="ws-exp-tipocarga">General</span></div>
+                        </div>
+                        <div class="air-workspace-group">
+                            <div class="air-workspace-group-title">Venta</div>
+                            <div class="air-workspace-row"><span class="air-workspace-label">Calculadora</span><span class="air-workspace-value" id="ws-exp-sale-status">Pendiente</span></div>
+                        </div>
+                    </div>
+                </aside>
+            </div>
+        </div>
+
+    </section>
+
+    <!-- TAB: MARÍTIMO -->
     <section class="tab-content" id="tab-maritimo">
         <div class="card maritime-ready">
             <div class="card-header">
@@ -3832,6 +4673,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         document.getElementById('tab-' + btn.dataset.tab).classList.add('active');
         if (btn.dataset.tab === 'aereo') {
             setTimeout(() => map.invalidateSize(), 120);
+        }
+        if (btn.dataset.tab === 'aereo-exp' && expMap) {
+            setTimeout(() => expMap.invalidateSize(), 120);
         }
         if (btn.dataset.tab === 'maritimo' && maritimeMap) {
             setTimeout(() => maritimeMap.invalidateSize(), 120);
@@ -7792,17 +8636,23 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const displayMub = l.costMode ? 0 : (Math.round(l.mub * 10) / 10);
         const displayVenta = l.costMode ? 0 : (Math.round(l.venta * 100) / 100);
 
+        const isUsdLine = l.monedaCosto === 'USD';
+        const lineBaseCost = isUsdLine ? l.costo : costoSinImpMXN(l);
+        const lineTaxAmount = isUsdLine ? l.costo * lineTaxRate : lineTaxAmountMXN;
+        const lineCostoConImp = isUsdLine ? l.costo * (1 + lineTaxRate) : cbMXN;
+        const currLabel = isUsdLine ? '<span style="color:#2563eb;font-weight:700;font-size:0.6rem;"> USD</span>' : '';
+
         const impCol = lineTaxRate > 0
-            ? `<td>$${fmt(lineTaxAmountMXN)}</td>`
-            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">IVA incl./N/A</td>`;
-        const costoImpCell = `<td>$${fmt(cbMXN)}</td>`;
+            ? `<td>$${fmt(lineTaxAmount)}${currLabel}</td>`
+            : `<td style="font-size:0.6rem;color:var(--gray-400);text-align:center;">N/A</td>`;
+        const costoImpCell = `<td>$${fmt(lineCostoConImp)}${currLabel}</td>`;
         const usdCell = hayTC
             ? `<td class="mub-usd-cell" id="mub-usd-${i}">${simbolo}${fmt(cbVenta)}</td>`
             : '';
 
-        return `<tr class="${isDestinationCharge ? 'row-destination' : 'row-flete'}">
-            <td>${escapeHtml(l.nombre)}${l.quoteChargeBy ? `<div style="margin-top:0.22rem;font-size:0.68rem;color:var(--gray-500);">Charge by: ${escapeHtml(l.quoteChargeBy)}${l.quoteContainerLabel ? ` · ${escapeHtml(l.quoteContainerLabel)}` : ''}</div>` : ''}${l.quoteComment ? `<div style="margin-top:0.22rem;font-size:0.72rem;color:var(--gray-500);line-height:1.4;">${escapeHtml(l.quoteComment)}</div>` : ''}</td>
-            <td>$${fmt(costoSinImpMXN(l))}</td>
+        return `<tr class="${isDestinationCharge ? 'row-destination' : 'row-flete'}" ${isUsdLine ? 'style="background:rgba(37,99,235,0.04);"' : ''}>
+            <td>${escapeHtml(l.nombre)}${isUsdLine ? ' <span style="background:#2563eb;color:white;font-size:0.55rem;font-weight:700;padding:0.08rem 0.3rem;border-radius:3px;vertical-align:middle;">USD</span>' : ''}${l.quoteChargeBy ? `<div style="margin-top:0.22rem;font-size:0.68rem;color:var(--gray-500);">Charge by: ${escapeHtml(l.quoteChargeBy)}${l.quoteContainerLabel ? ` · ${escapeHtml(l.quoteContainerLabel)}` : ''}</div>` : ''}${l.quoteComment ? `<div style="margin-top:0.22rem;font-size:0.72rem;color:var(--gray-500);line-height:1.4;">${escapeHtml(l.quoteComment)}</div>` : ''}</td>
+            <td>$${fmt(lineBaseCost)}${currLabel}</td>
             ${impCol}
             ${costoImpCell}
             ${usdCell}
@@ -8095,7 +8945,26 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             `
             ) : ''}
         </div>
-    </div>
+    ${isAirQuote ? `
+        <div class="mub-air-sales-totals" id="${containerId}-allin-totals" style="margin-top:0.75rem;">
+            <div class="mub-air-total-pill">
+                <label>Total costo all-in</label>
+                <strong id="${containerId}-allin-cost">${simbolo}${fmt(totalCostoBaseVenta)}</strong>
+            </div>
+            <div class="mub-air-total-pill">
+                <label>Total venta all-in</label>
+                <strong id="${containerId}-allin-sale">${simbolo}${fmt(totalVenta)}</strong>
+            </div>
+            <div class="mub-air-total-pill">
+                <label>Utilidad</label>
+                <strong id="${containerId}-allin-profit" class="${(totalVenta - totalCostoBaseVenta) >= 0 ? 'positive' : 'negative'}">${simbolo}${fmt(totalVenta - totalCostoBaseVenta)}</strong>
+            </div>
+            <div class="mub-air-total-pill">
+                <label>MUB total %</label>
+                <strong id="${containerId}-allin-mub">${fmtShort(totalVenta > 0 ? ((totalVenta - totalCostoBaseVenta) / totalVenta * 100) : 0)}%</strong>
+            </div>
+        </div>
+    ` : ''}
     </div>
     <div class="maritime-quote-panel">
         <div class="mub-stage-head" style="margin-bottom:0.95rem;">
@@ -8128,6 +8997,210 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         const totalDestinationVenta = destinationLines.reduce((sum, l) => sum + (parseFloat(l.venta) || 0), 0);
         const serviceDetails = data.quoteMeta?.serviceDetails || {};
         const ratesCurrency = moneda || 'USD';
+
+        if (data.quoteMeta?.isEXW) {
+            const m = data.quoteMeta;
+            if (styleTabsEl) {
+                styleTabsEl.style.display = 'inline-flex';
+                styleTabsEl.querySelectorAll('.maritime-quote-style-tab').forEach(btn => {
+                    const show = btn.dataset.style === 'official' || btn.dataset.style === 'rodrigo';
+                    btn.style.display = show ? '' : 'none';
+                    btn.classList.toggle('active', btn.dataset.style === quoteSummaryStyle);
+                });
+            }
+            const allInTotal = lineas.reduce((s, l) => s + (l.costMode ? costoBaseVenta(l) : (parseFloat(l.venta) || 0)), 0);
+            const palletLine = Array.isArray(m.palletLines) && m.palletLines.length
+                ? m.palletLines.filter(p => (parseInt(p.qty) || 0) > 0)
+                    .map(p => `${p.qty} @ ${p.largo} x ${p.ancho} x ${p.alto} cms`).join(' | ')
+                : '[cargo dimensions]';
+            const stackLabel = m.estibable ? 'stackable' : 'non-stackable';
+            const stackLabelEs = m.estibable ? 'estibable' : 'no estibable';
+            const wt = m.pesoTotal > 0 ? `${fmt(m.pesoTotal)} kgs` : '[weight]';
+            const cw = m.chargeableWeight > 0 ? `${fmt(m.chargeableWeight)} kgs` : '[CW]';
+            const desc = m.descripcion || '';
+            const viaMatch = desc.match(/via\s+(\w+)/i) || desc.match(/escala\s+en\s+(\w+)/i);
+            const viaCode = viaMatch ? viaMatch[1] : '';
+            const svcType = desc.replace(/\s*[-·]\s*(via|escala).*$/i, '').trim() || '';
+            const routeStr = viaCode ? `${m.aeropuerto}-${viaCode}-${m.ciudad}` : `${m.aeropuerto}-${m.ciudad}`;
+            const daysEn = (m.salidasDias || []).join(', ') || 'Daily';
+            const dayMap = {Mon:'Lun',Tue:'Mar',Wed:'Mié',Thu:'Jue',Fri:'Vie',Sat:'Sáb',Sun:'Dom'};
+            const daysEs = (m.salidasDias || []).map(d => dayMap[d] || d).join(', ') || 'Diario';
+            let scheduleEn = '', scheduleEs = '';
+            if (viaCode) {
+                scheduleEn = `${m.aeropuerto}-${viaCode} ${daysEn}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${viaCode}-${m.ciudad}`;
+                scheduleEs = `${m.aeropuerto}-${viaCode} ${daysEs}<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;${viaCode}-${m.ciudad}`;
+            } else {
+                scheduleEn = `${m.aeropuerto}-${m.ciudad} ${daysEn}`;
+                scheduleEs = `${m.aeropuerto}-${m.ciudad} ${daysEs}`;
+            }
+
+            const rodrigoExwEn = `
+                <div class="maritime-quote-greeting">
+                    Dear team,<br>
+                    Hope you are doing well!<br><br>
+                    For the ${escapeHtml(palletLine)} (${stackLabel}) with a total weight of ${wt} picking up in ${escapeHtml(m.ciudadOrigen || '[Origin City]')} and delivering to ${escapeHtml(m.ciudad || '[Destination]')} we can do the following:
+                </div>
+                <div class="maritime-quote-section">
+                    <p style="margin:0.5rem 0;"><strong>ALL IN............$${fmt(allInTotal)} USD</strong></p>
+                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType)}</p>
+                    <p style="margin:0.3rem 0;">CW: ${cw}</p>
+                    <p style="margin:0.3rem 0;">Schedule:</p>
+                    <p style="margin:0.1rem 0 0.1rem 1rem;">${routeStr}</p>
+                    <p style="margin:0.1rem 0 0.1rem 2rem;">${scheduleEn}</p>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>* Remarks</h4>
+                    <ul class="maritime-quote-list">
+                        <li>**Shipper must have broker in ${escapeHtml(m.aeropuerto || 'MEX')}</li>
+                        <li>** Possible flight is subject to acceptance from airline, it could change.</li>
+                        <li>** Subject to final cargo dimensions.</li>
+                        <li>** Final cost could change during the shipment.</li>
+                        <li>** Customs clearance and THC are not included, in case you need we would have to quote directly with shipper's broker in order to not lose time in the registration of the shipper with our broker (approx. 5 working days).</li>
+                        <li>** Weekends and after hours from carrier: 95.00 USD (if needed only).</li>
+                        <li>** In case you need an approx. for clearance please consider $400.00 USD per export file (subject to broker's final invoice) + THC (this is charged completely net-net price directly from broker and terminal).</li>
+                        <li>** Pallets must be palletized, strapped, wrapped and must have 4 straps with this form "#" in order to get the acceptance from airline, in case pallets are not provided like that there would be extra charges at warehouse (loading/unloading per pallet + storages).</li>
+                        <li>** SHIPPER must provide correct dims and weight, otherwise airline won't accept the cargo and will be extra charges.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Let us know if this option works for you!<br>
+                    Best Regards!
+                </div>`;
+
+            const rodrigoExwEs = `
+                <div class="maritime-quote-greeting">
+                    Estimado equipo,<br>
+                    Espero que se encuentren bien.<br><br>
+                    Para ${escapeHtml(palletLine)} (${stackLabelEs}) con un peso total de ${wt} recogiendo en ${escapeHtml(m.ciudadOrigen || '[Ciudad origen]')} y entregando en ${escapeHtml(m.ciudad || '[Destino]')} podemos ofrecer lo siguiente:
+                </div>
+                <div class="maritime-quote-section">
+                    <p style="margin:0.5rem 0;"><strong>ALL IN............$${fmt(allInTotal)} USD</strong></p>
+                    <p style="margin:0.3rem 0;">${escapeHtml(m.airlineCode)} ${escapeHtml(svcType)}</p>
+                    <p style="margin:0.3rem 0;">CW: ${cw}</p>
+                    <p style="margin:0.3rem 0;">Itinerario:</p>
+                    <p style="margin:0.1rem 0 0.1rem 1rem;">${routeStr}</p>
+                    <p style="margin:0.1rem 0 0.1rem 2rem;">${scheduleEs}</p>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>* Observaciones</h4>
+                    <ul class="maritime-quote-list">
+                        <li>**El embarcador debe contar con agente aduanal en ${escapeHtml(m.aeropuerto || 'MEX')}</li>
+                        <li>** El vuelo está sujeto a aceptación por parte de la aerolínea, podría cambiar.</li>
+                        <li>** Sujeto a dimensiones finales de la carga.</li>
+                        <li>** El costo final podría cambiar durante el embarque.</li>
+                        <li>** Despacho aduanal y THC no están incluidos, en caso de requerirlo tendríamos que cotizar directamente con el agente aduanal del embarcador para no perder tiempo en el alta del embarcador con nuestro agente (aprox. 5 días hábiles).</li>
+                        <li>** Fines de semana y horario extendido del carrier: 95.00 USD (solo si se requiere).</li>
+                        <li>** En caso de necesitar un aproximado para despacho considerar $400.00 USD por expediente de exportación (sujeto a factura final del agente) + THC (este cargo se cobra completamente net-net directamente del agente y la terminal).</li>
+                        <li>** Los pallets deben estar paletizados, flejados, emplayados y con 4 flejes en forma de "#" para obtener la aceptación de la aerolínea. De no cumplir, habrá cargos extra en almacén (carga/descarga por pallet + almacenaje).</li>
+                        <li>** El EMBARCADOR debe proporcionar dimensiones y peso correctos, de lo contrario la aerolínea no aceptará la carga y habrá cargos extra.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Quedamos atentos para confirmar si esta opción les funciona.<br>
+                    Saludos!
+                </div>`;
+
+            const officialExwEn = `
+                <div class="maritime-quote-greeting">
+                    Dear [Client Name],<br>
+                    I hope you are doing well.<br><br>
+                    Based on the cargo details provided, please find below our EXW air export proposal:
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Cargo Details</h4>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Dimensions:</strong> ${escapeHtml(palletLine)} (${stackLabel})</li>
+                        <li><strong>Total Weight:</strong> ${wt}</li>
+                        <li><strong>Chargeable Weight:</strong> ${cw}</li>
+                        <li><strong>Origin:</strong> ${escapeHtml(m.ciudadOrigen || '[Origin]')}</li>
+                        <li><strong>Destination:</strong> ${escapeHtml(m.ciudad || '[Destination]')}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Rate</h4>
+                    <p style="margin:0.5rem 0;font-size:1.1em;"><strong>ALL IN: $${fmt(allInTotal)} USD</strong></p>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Airline:</strong> ${escapeHtml(m.airlineCode)} — ${escapeHtml(m.airlineName)}</li>
+                        <li><strong>Service:</strong> ${escapeHtml(svcType || 'Standard')}</li>
+                        <li><strong>Route:</strong> ${escapeHtml(routeStr)}</li>
+                        <li><strong>Schedule:</strong> ${scheduleEn}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Remarks &amp; Conditions</h4>
+                    <ul class="maritime-quote-list">
+                        <li>Shipper must have customs broker at ${escapeHtml(m.aeropuerto || 'MEX')}.</li>
+                        <li>Flight subject to acceptance from airline; schedule may change.</li>
+                        <li>Subject to final cargo dimensions and weight.</li>
+                        <li>Customs clearance and THC are not included.</li>
+                        <li>Weekends and after hours from carrier: USD 95.00 (if needed).</li>
+                        <li>Approx. clearance: USD 400.00 per export file (subject to broker's final invoice) + THC (net-net from broker and terminal).</li>
+                        <li>Pallets must be palletized, strapped, wrapped with 4 straps in "#" form for airline acceptance.</li>
+                        <li>Shipper must provide correct dims and weight; otherwise extra charges may apply.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Please let us know if this option works for you or if you have a target rate we can review together.
+                </div>`;
+
+            const officialExwEs = `
+                <div class="maritime-quote-greeting">
+                    Estimado(a) [Nombre del cliente],<br>
+                    Espero que se encuentre muy bien.<br><br>
+                    Con base en los detalles de carga proporcionados, comparto nuestra propuesta de exportación aérea EXW:
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Detalles de la carga</h4>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Dimensiones:</strong> ${escapeHtml(palletLine)} (${stackLabelEs})</li>
+                        <li><strong>Peso total:</strong> ${wt}</li>
+                        <li><strong>Peso cobrable:</strong> ${cw}</li>
+                        <li><strong>Origen:</strong> ${escapeHtml(m.ciudadOrigen || '[Origen]')}</li>
+                        <li><strong>Destino:</strong> ${escapeHtml(m.ciudad || '[Destino]')}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Tarifa</h4>
+                    <p style="margin:0.5rem 0;font-size:1.1em;"><strong>ALL IN: $${fmt(allInTotal)} USD</strong></p>
+                    <ul class="maritime-quote-list">
+                        <li><strong>Aerolínea:</strong> ${escapeHtml(m.airlineCode)} — ${escapeHtml(m.airlineName)}</li>
+                        <li><strong>Servicio:</strong> ${escapeHtml(svcType || 'Estándar')}</li>
+                        <li><strong>Ruta:</strong> ${escapeHtml(routeStr)}</li>
+                        <li><strong>Itinerario:</strong> ${scheduleEs}</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-section">
+                    <h4>Observaciones y condiciones</h4>
+                    <ul class="maritime-quote-list">
+                        <li>El embarcador debe contar con agente aduanal en ${escapeHtml(m.aeropuerto || 'MEX')}.</li>
+                        <li>Vuelo sujeto a aceptación por parte de la aerolínea; el itinerario puede cambiar.</li>
+                        <li>Sujeto a dimensiones y peso final de la carga.</li>
+                        <li>Despacho aduanal y THC no están incluidos.</li>
+                        <li>Fines de semana y horario extendido del carrier: USD 95.00 (si se requiere).</li>
+                        <li>Aprox. despacho: USD 400.00 por expediente de exportación (sujeto a factura final del agente) + THC (net-net del agente y terminal).</li>
+                        <li>Los pallets deben estar paletizados, flejados, emplayados con 4 flejes en forma de "#" para aceptación de la aerolínea.</li>
+                        <li>El embarcador debe proporcionar dimensiones y peso correctos; de lo contrario podrían aplicar cargos extra.</li>
+                    </ul>
+                </div>
+                <div class="maritime-quote-note">
+                    Quedamos atentos para confirmar si esta opción les funciona o si tienen una tarifa objetivo que podamos revisar en conjunto.
+                </div>`;
+
+            const exwStyles = {
+                official: { en: officialExwEn, es: officialExwEs },
+                rodrigo: { en: rodrigoExwEn, es: rodrigoExwEs }
+            };
+            const activeExw = exwStyles[quoteSummaryStyle] || exwStyles.official;
+            quoteClipboardPayload = {
+                en: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeExw.en}</div>`, text: htmlToPlainText(activeExw.en) },
+                es: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeExw.es}</div>`, text: htmlToPlainText(activeExw.es) }
+            };
+            quoteSummary.innerHTML = quoteSummaryLang === 'es' ? activeExw.es : activeExw.en;
+            container.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
+            });
+            return;
+        }
 
         if (data.quoteMeta?.mode === 'air') {
             const airMeta = data.quoteMeta || {};
@@ -8958,6 +10031,23 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 const totalProfit = currentFreightProfit + currentAirportProfit;
                 totalMubEl.textContent = `${fmtShort(totalSale > 0 ? (totalProfit / totalSale) * 100 : 0)}%`;
             }
+
+            // All-in totals (EXW)
+            const allCost = lineas.reduce((s, l) => s + costoBaseVenta(l), 0);
+            const allSale = lineas.reduce((s, l) => s + (l.costMode ? costoBaseVenta(l) : (parseFloat(l.venta) || 0)), 0);
+            const allProfit = allSale - allCost;
+            const allinCostEl = container.querySelector(`#${containerId}-allin-cost`);
+            const allinSaleEl = container.querySelector(`#${containerId}-allin-sale`);
+            const allinProfitEl = container.querySelector(`#${containerId}-allin-profit`);
+            const allinMubEl = container.querySelector(`#${containerId}-allin-mub`);
+            if (allinCostEl) allinCostEl.textContent = `${simbolo}${fmt(allCost)}`;
+            if (allinSaleEl) allinSaleEl.textContent = `${simbolo}${fmt(allSale)}`;
+            if (allinProfitEl) {
+                allinProfitEl.textContent = `${simbolo}${fmt(allProfit)}`;
+                allinProfitEl.classList.toggle('positive', allProfit >= 0);
+                allinProfitEl.classList.toggle('negative', allProfit < 0);
+            }
+            if (allinMubEl) allinMubEl.textContent = `${fmtShort(allSale > 0 ? (allProfit / allSale * 100) : 0)}%`;
         }
 
         renderQuoteSummary();
@@ -10072,12 +11162,1285 @@ document.getElementById('import-file').addEventListener('change', (e) => {
     e.target.value = '';
 });
 
+// ===== AÉREO EXPORTACIÓN (EXW) =====
+
+// --- Ruta EXW ---
+let expRouteDebounce = null;
+let expGeoCache = { city: '', result: null };
+let expRouteKm = 0;
+
+function initExpMap() { /* no-op: map replaced by route diagram */ }
+function updateExpMapMarkers() { /* no-op */ }
+
+async function updateExpRoute() {
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const apCode = document.getElementById('aeropuerto-exp').value;
+    if (!ciudad || !apCode) { clearExpRoute(); return; }
+
+    const ap = AIRPORTS[apCode];
+    if (!ap) return;
+
+    const geo = await geocodeCity(ciudad);
+    if (!geo) return;
+
+    expRouteKm = haversineKm(geo.lat, geo.lng, ap.lat, ap.lng) * 1.3;
+    document.getElementById('route-km-exp').textContent = Math.round(expRouteKm).toLocaleString() + ' km';
+    document.getElementById('route-info-exp').classList.add('show');
+    updateExpRouteStats();
+    updateExpWorkspace();
+}
+
+function clearExpRoute() {
+    document.getElementById('route-info-exp').classList.remove('show');
+    expRouteKm = 0;
+    updateExpWorkspace();
+}
+
+function updateExpRouteStats() {
+    if (expRouteKm <= 0) return;
+    const tipoUnidad = getExpUnidadCalculada();
+    const vel = VELOCIDADES[tipoUnidad] || 70;
+    const hours = expRouteKm / vel;
+    document.getElementById('route-time-exp').textContent = formatTime(hours);
+    document.getElementById('route-unit-type-exp').textContent = tipoUnidad || '—';
+    updateExpWorkspace();
+}
+
+function getExpUnidadCalculada() {
+    const unitText = document.getElementById('unit-name-exp').textContent || '';
+    for (const u of UNIDADES) {
+        if (unitText.includes(u.nombre)) return u.nombre;
+    }
+    return '';
+}
+
+function scheduleExpRouteUpdate() {
+    clearTimeout(expRouteDebounce);
+    expRouteDebounce = setTimeout(updateExpRoute, 400);
+}
+
+// --- Pallet Lines EXW ---
+let expPalletLineas = [];
+let expPalletCounter = 0;
+
+function addExpPalletLine() {
+    expPalletCounter++;
+    expPalletLineas.push({ id: expPalletCounter, qty: '', largo: '', ancho: '', alto: '' });
+    renderExpPalletLines();
+    autoCalcExpUnidad();
+}
+
+function removeExpPalletLine(id) {
+    expPalletLineas = expPalletLineas.filter(l => l.id !== id);
+    renderExpPalletLines();
+    autoCalcExpUnidad();
+}
+
+function renderExpPalletLines() {
+    const container = document.getElementById('pallet-lines-exp');
+    container.innerHTML = expPalletLineas.map((l, idx) => `
+        <div class="pallet-line" data-line-id="${l.id}">
+            <span class="pl-num">#${idx + 1}</span>
+            <div class="form-group"><label>Pallets</label><input type="number" class="pl-qty" data-id="${l.id}" min="1" placeholder="2" value="${l.qty}"></div>
+            <div class="form-group"><label>Largo (cm)</label><input type="number" class="pl-largo" data-id="${l.id}" min="1" placeholder="120" value="${l.largo}"></div>
+            <div class="form-group"><label>Ancho (cm)</label><input type="number" class="pl-ancho" data-id="${l.id}" min="1" placeholder="100" value="${l.ancho}"></div>
+            <div class="form-group"><label>Alto (cm)</label><input type="number" class="pl-alto" data-id="${l.id}" min="1" placeholder="150" value="${l.alto}"></div>
+            ${expPalletLineas.length > 1 ? `<button class="btn-remove-line" data-id="${l.id}" title="Eliminar">&#x2715;</button>` : '<span style="width:22px;"></span>'}
+        </div>
+    `).join('');
+
+    container.querySelectorAll('input').forEach(inp => {
+        inp.addEventListener('input', () => {
+            const id = parseInt(inp.dataset.id);
+            const linea = expPalletLineas.find(l => l.id === id);
+            if (!linea) return;
+            if (inp.classList.contains('pl-qty')) linea.qty = inp.value;
+            if (inp.classList.contains('pl-largo')) linea.largo = inp.value;
+            if (inp.classList.contains('pl-ancho')) linea.ancho = inp.value;
+            if (inp.classList.contains('pl-alto')) linea.alto = inp.value;
+            autoCalcExpUnidad();
+        });
+    });
+    container.querySelectorAll('.btn-remove-line').forEach(btn => {
+        btn.addEventListener('click', () => removeExpPalletLine(parseInt(btn.dataset.id)));
+    });
+}
+
+function getExpPalletLines() {
+    return expPalletLineas.map(l => ({
+        qty: parseInt(l.qty) || 0,
+        largo: parseFloat(l.largo) || 0,
+        ancho: parseFloat(l.ancho) || 0,
+        alto: parseFloat(l.alto) || 0
+    })).filter(l => l.qty > 0 && l.largo > 0 && l.ancho > 0 && l.alto > 0);
+}
+
+function autoCalcExpUnidad() {
+    const peso = parseFloat(document.getElementById('peso-exp').value);
+    const estibable = document.getElementById('estibable-exp').checked;
+    const lineas = getExpPalletLines();
+    const el = document.getElementById('unit-result-exp');
+    const nameEl = document.getElementById('unit-name-exp');
+    const detailEl = document.getElementById('unit-detail-exp');
+
+    if (!peso || lineas.length === 0) { el.classList.remove('show'); updateExpWorkspace(); searchExpTransport(); return; }
+
+    const result = calcularUnidadMulti(lineas, peso, estibable);
+    el.classList.add('show');
+    if (result.error) {
+        el.classList.add('error'); el.classList.remove('success');
+        nameEl.textContent = result.error; detailEl.textContent = '';
+    } else {
+        el.classList.remove('error');
+        nameEl.innerHTML = '&#x2705; ' + result.unidad;
+        detailEl.textContent = result.detalle;
+    }
+    updateExpRouteStats();
+    updateExpWorkspace();
+    updateChargeableWeight();
+    searchExpTransport();
+    renderExpWarehouse();
+}
+
+// --- Peso Cargable (Chargeable Weight) ---
+function updateChargeableWeight() {
+    const card = document.getElementById('chargeable-weight-card');
+    const lineas = getExpPalletLines();
+    const pesoReal = parseFloat(document.getElementById('peso-exp').value) || 0;
+
+    if (lineas.length === 0 || pesoReal <= 0) {
+        card.style.display = 'none';
+        return;
+    }
+
+    let totalCBM = 0;
+    for (const l of lineas) {
+        totalCBM += l.qty * (l.largo / 100) * (l.ancho / 100) * (l.alto / 100);
+    }
+
+    const pesoVol = totalCBM * 167;
+    const chargeable = Math.max(pesoReal, pesoVol);
+    const isVol = pesoVol > pesoReal;
+
+    document.getElementById('cw-cbm').textContent = totalCBM.toFixed(3) + ' m³';
+    document.getElementById('cw-real').textContent = pesoReal.toLocaleString() + ' kg';
+    document.getElementById('cw-vol').textContent = pesoVol.toFixed(1) + ' kg';
+    document.getElementById('cw-chargeable').textContent = chargeable.toFixed(1) + ' kg';
+
+    const badge = document.getElementById('cw-badge');
+    badge.className = 'cw-badge ' + (isVol ? 'vol' : 'real');
+    badge.textContent = isVol ? 'Volumétrico' : 'Peso real';
+
+    card.style.display = '';
+}
+
+// --- Airline Data ---
+let airlineData = null;
+let expSelectedAirline = null; // { aerolinea, ruta }
+let expTipoCarga = 'general';  // 'general' | 'dg'
+let expSelectedUNs = [];       // array of selected UN objects
+
+// --- UN Numbers Data ---
+let unData = null;
+async function loadUNData() {
+    try {
+        const res = await fetch('./data/un-numbers.json?v=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        unData = await res.json();
+    } catch(e) { console.warn('No se pudo cargar UN numbers:', e); }
+}
+
+function setExpTipoCarga(tipo) {
+    expTipoCarga = tipo;
+    const btnGen = document.getElementById('tipo-general-btn');
+    const btnDG  = document.getElementById('tipo-dg-btn');
+    const dgCard = document.getElementById('dg-un-card');
+    if (btnGen) btnGen.classList.toggle('active', tipo === 'general');
+    if (btnDG)  btnDG.classList.toggle('active',  tipo === 'dg');
+    if (dgCard) dgCard.style.display = tipo === 'dg' ? '' : 'none';
+    const wsEl = document.getElementById('ws-exp-tipocarga');
+    if (wsEl) wsEl.textContent = tipo === 'dg' ? '⚠ DG' : 'General';
+    expSelectedAirline = null; // reset so cheapest for this type is auto-selected
+    renderExpAirlines();
+    updateExpCostSummary();
+}
+
+function renderUNChips() {
+    const el = document.getElementById('un-selected-chips');
+    const hint = document.getElementById('un-empty-hint');
+    if (!el) return;
+    el.innerHTML = expSelectedUNs.map((u, i) =>
+        `<div class="un-chip">
+            <span class="un-chip-badge">Clase ${escapeHtml(u.clase)}</span>
+            <span class="un-chip-name">${escapeHtml(u.un)} · ${escapeHtml(u.nombre)}</span>
+            <button class="un-chip-remove" type="button" onclick="removeExpUN(${i})">×</button>
+        </div>`
+    ).join('');
+    if (hint) hint.style.display = expSelectedUNs.length === 0 ? '' : 'none';
+    updateExpCostSummary();
+}
+
+function addExpUN(unObj) {
+    if (!expSelectedUNs.find(u => u.un === unObj.un)) {
+        expSelectedUNs.push(unObj);
+        renderUNChips();
+    }
+}
+
+function removeExpUN(idx) {
+    expSelectedUNs.splice(idx, 1);
+    renderUNChips();
+}
+
+const DAY_NAMES_EXP = {1:'Lun',2:'Mar',3:'Mié',4:'Jue',5:'Vie',6:'Sáb',7:'Dom'};
+
+async function loadAirlineData() {
+    try {
+        const res = await fetch('./data/aerolineas-exp.json?v=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        airlineData = await res.json();
+        updateExpDestinoOptions();
+        renderExpAirlineSummary();
+        renderExpRouteDiagram();
+    } catch(e) { console.warn('No se pudo cargar aerolíneas:', e); }
+}
+
+function renderExpAirlineSummary() {
+    const el = document.getElementById('exp-airline-summary');
+    if (!el || !airlineData) return;
+    const rows = airlineData.aerolineas.map(al => {
+        const activas = al.rutas.filter(r => isVigenciaActiva(r.vigencia)).length;
+        const origenes = [...new Set(al.rutas.map(r => r.origen))].join(', ');
+        const vigencias = [...new Set(al.rutas.map(r => r.vigencia).filter(Boolean))].join(', ');
+        const rutasLabel = activas < al.rutas.length ? `${activas} / ${al.rutas.length}` : `${al.rutas.length}`;
+        return `<tr><td class="code-cell">${escapeHtml(al.codigo)}</td><td>${escapeHtml(al.nombre)}</td><td>${escapeHtml(origenes)}</td><td>${rutasLabel}</td><td>${escapeHtml(vigencias)}</td></tr>`;
+    });
+    const totalActivas = airlineData.aerolineas.reduce((s, a) => s + a.rutas.filter(r => isVigenciaActiva(r.vigencia)).length, 0);
+    const totalAll = airlineData.aerolineas.reduce((s, a) => s + a.rutas.length, 0);
+    const totalLabel = totalActivas < totalAll ? `${totalActivas} / ${totalAll}` : `${totalAll}`;
+    el.innerHTML = `<table class="exp-airline-summary-table">
+        <thead><tr><th>Código</th><th>Aerolínea</th><th>Orígenes</th><th>Rutas</th><th>Vigencia</th></tr></thead>
+        <tbody>${rows.join('')}</tbody>
+        <tfoot><tr><td colspan="3" style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${airlineData.aerolineas.length} aerolíneas</td><td style="color:rgba(255,255,255,0.4);padding-top:0.3rem">${totalLabel}</td><td></td></tr></tfoot>
+    </table>`;
+}
+
+const EXP_MESES = {enero:0,febrero:1,marzo:2,abril:3,mayo:4,junio:5,julio:6,agosto:7,septiembre:8,octubre:9,noviembre:10,diciembre:11};
+function isVigenciaActiva(vigencia) {
+    if (!vigencia) return false;
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
+    const v = vigencia.trim().toLowerCase();
+    const rng = v.match(/^(\w+)\s*[-–]\s*(\w+)\s+(\d{4})$/);
+    if (rng) {
+        const m1 = EXP_MESES[rng[1]], m2 = EXP_MESES[rng[2]], a = parseInt(rng[3]);
+        if (m1 == null || m2 == null) return true;
+        if (anioActual !== a) return anioActual < a;
+        return mesActual >= m1 && mesActual <= m2;
+    }
+    const sng = v.match(/^(\w+)\s+(\d{4})$/);
+    if (sng) {
+        const m = EXP_MESES[sng[1]], a = parseInt(sng[2]);
+        if (m == null) return true;
+        return anioActual === a && mesActual === m;
+    }
+    return true;
+}
+
+
+function getExpRutasDisponibles(origen) {
+    if (!airlineData) return [];
+    const rutas = [];
+    for (const al of airlineData.aerolineas) {
+        for (const r of al.rutas) {
+            if (r.origen === origen && isVigenciaActiva(r.vigencia)) rutas.push({ aerolinea: al, ruta: r });
+        }
+    }
+    return rutas;
+}
+
+const EXP_AIRPORTS_META = {
+    NLU: 'AIFA', MEX: 'CDMX', MTY: 'Monterrey', GDL: 'Guadalajara'
+};
+const DAY_LABELS = ['L','M','X','J','V','S','D']; // index 0=Mon(1)..6=Sun(7)
+
+const EXP_REGION_MAP = {
+    // Asia
+    PVG:'Asia',NRT:'Asia',HND:'Asia',ICN:'Asia',BKK:'Asia',HKG:'Asia',SIN:'Asia',TPE:'Asia',
+    NGO:'Asia',KIX:'Asia',FUK:'Asia',CTS:'Asia',OKA:'Asia',CAN:'Asia',SZX:'Asia',PEK:'Asia',
+    DLC:'Asia',TAO:'Asia',XMN:'Asia',KUL:'Asia',MNL:'Asia',CGK:'Asia',SGN:'Asia',HAN:'Asia',
+    DEL:'Asia',BOM:'Asia',PEN:'Asia',SYD:'Asia',WUX:'Asia',
+    // Europe
+    AMS:'EUR',BCN:'EUR',CDG:'EUR',FCO:'EUR',LHR:'EUR',MAD:'EUR',MXP:'EUR',
+    // North America
+    LAX:'NA',JFK:'NA',MIA:'NA',ORD:'NA',EWR:'NA',IAH:'NA',SFO:'NA',SEA:'NA',
+    YUL:'NA',YVR:'NA',YYZ:'NA',
+    // Central America & Caribbean
+    GUA:'CAM',SAL:'CAM',SJO:'CAM',SDQ:'CAM',PTY:'CAM',
+    // South America
+    BOG:'LATAM',CLO:'LATAM',MDE:'LATAM',UIO:'LATAM',LIM:'LATAM',GRU:'LATAM',VCP:'LATAM',
+    GIG:'LATAM',EZE:'LATAM',SCL:'LATAM',ASU:'LATAM',MVD:'LATAM',
+};
+const EXP_REGION_ORDER = ['Asia','EUR','NA','CAM','LATAM'];
+const EXP_REGION_LABELS = { Asia:'Asia', EUR:'Europa', NA:'Norteamérica', CAM:'C. América', LATAM:'Sudamérica' };
+let expOpenRegions = {};
+
+function renderExpRouteDiagram() {
+    const grid = document.getElementById('exp-origin-grid');
+    if (!grid) return;
+    const activeOrigin = document.getElementById('aeropuerto-exp').value;
+    const activeDestino = document.getElementById('destino-exp')?.value || '';
+    const airports = Object.keys(EXP_AIRPORTS_META);
+
+    grid.innerHTML = airports.map(ap => {
+        const rutas = airlineData ? getExpRutasDisponibles(ap) : [];
+        const destMap = new Map();
+        for (const o of rutas) {
+            const key = o.ruta.destino;
+            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [], count: 0, hasDG: false });
+            const entry = destMap.get(key);
+            if (!entry.airlines.find(a => a.code === o.aerolinea.codigo))
+                entry.airlines.push({ code: o.aerolinea.codigo, name: o.aerolinea.nombre });
+            entry.count++;
+            if (o.ruta.tipoCarga?.includes('dg') || o.ruta.tarifas?.dg) entry.hasDG = true;
+        }
+        if (destMap.size === 0) return `<div class="exp-origin-block"><div class="exp-origin-header"><span class="exp-origin-label">${ap}</span><span class="exp-no-routes-msg">Sin rutas</span></div></div>`;
+
+        const regionGroups = new Map();
+        for (const [dest, info] of destMap) {
+            const reg = EXP_REGION_MAP[dest] || 'Otros';
+            if (!regionGroups.has(reg)) regionGroups.set(reg, []);
+            regionGroups.get(reg).push([dest, info]);
+        }
+
+        const activeRegion = expOpenRegions[ap] || (activeDestino && ap === activeOrigin ? EXP_REGION_MAP[activeDestino] : null);
+
+        const chips = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
+            const isOpen = activeRegion === reg;
+            const cnt = regionGroups.get(reg).length;
+            return `<span class="exp-region-chip ${isOpen ? 'open' : ''}" data-origin="${ap}" data-region="${reg}">${EXP_REGION_LABELS[reg]}<span class="region-count">${cnt}</span></span>`;
+        }).join('');
+
+        const panels = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
+            const isOpen = activeRegion === reg;
+            const badges = regionGroups.get(reg).map(([dest, info]) => {
+                const isActive = ap === activeOrigin && dest === activeDestino;
+                const tipLines = info.airlines.map(a => `<div class="badge-tip-airline">${escapeHtml(a.code)} ${escapeHtml(a.name)}</div>`).join('');
+                const countTxt = info.count > 1 ? ` · ${info.count} opc` : '';
+                const dgTxt = info.hasDG ? ' · DG' : '';
+                return `<span class="exp-dest-badge ${isActive ? 'active' : ''}" data-origin="${ap}" data-dest="${dest}">
+                    ${dest}
+                    <span class="badge-tip">
+                        <div class="badge-tip-name">${escapeHtml(info.ruta.destinoNombre)}${countTxt}${dgTxt}</div>
+                        ${tipLines}
+                    </span>
+                </span>`;
+            }).join('');
+            return `<div class="exp-region-badges ${isOpen ? 'open' : ''}" data-origin="${ap}" data-region="${reg}">${badges}</div>`;
+        }).join('');
+
+        return `<div class="exp-origin-block">
+            <div class="exp-origin-header"><span class="exp-origin-label">${ap}</span>${chips}</div>
+            ${panels}
+        </div>`;
+    }).join('');
+
+    grid.querySelectorAll('.exp-region-chip').forEach(chip => {
+        chip.addEventListener('click', () => {
+            const ap = chip.dataset.origin;
+            const reg = chip.dataset.region;
+            expOpenRegions[ap] = expOpenRegions[ap] === reg ? null : reg;
+            renderExpRouteDiagram();
+        });
+    });
+
+    grid.querySelectorAll('.exp-dest-badge[data-dest]').forEach(item => {
+        item.addEventListener('click', () => {
+            const apSelect = document.getElementById('aeropuerto-exp');
+            const destSelect = document.getElementById('destino-exp');
+            if (apSelect) { apSelect.value = item.dataset.origin; apSelect.dispatchEvent(new Event('change')); }
+            setTimeout(() => {
+                if (destSelect) { destSelect.value = item.dataset.dest; destSelect.dispatchEvent(new Event('change')); }
+                renderExpRouteDiagram();
+            }, 50);
+        });
+    });
+}
+
+function updateExpDestinoOptions() {
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const sel = document.getElementById('destino-exp');
+    const group = document.getElementById('destino-exp-group');
+    if (!sel || !group) return;
+
+    const rutas = getExpRutasDisponibles(aeropuerto);
+    const destinos = [...new Map(rutas.map(r => [r.ruta.destino, r.ruta])).values()];
+
+    if (destinos.length === 0) { group.style.display = 'none'; sel.value = ''; return; }
+
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">Seleccionar destino...</option>' +
+        destinos.map(r => `<option value="${r.destino}">${r.destino} — ${escapeHtml(r.destinoNombre)}</option>`).join('');
+    if (prev && destinos.find(r => r.destino === prev)) sel.value = prev;
+    group.style.display = '';
+    renderExpAirlines();
+}
+
+function calcAirlineTierRate(tiers, kg) {
+    let rate = tiers[0].precio;
+    for (const t of tiers) { if (kg >= t.desde) rate = t.precio; }
+    return rate;
+}
+
+function calcAirlineCost(ruta, kg, tipoCarga) {
+    if (tipoCarga === undefined) tipoCarga = expTipoCarga;
+    if (kg <= 0) return { total: 0, flete: 0, fsc: 0, fscRate: 0, ssc: 0, sscRate: 0, cgc: 0, dgFeeTotal: 0, rate: 0, usedMinimo: false, minimo: 0, tipoCalc: '' };
+
+    let tiers, minimo, dgFeeUN = 0;
+
+    if (ruta.tarifas) {
+        // New multi-tariff structure (LATAM-style)
+        const tarifa = ruta.tarifas[tipoCarga];
+        if (!tarifa) return null; // cargo type not supported
+        tiers  = tarifa.tiers;
+        minimo = tarifa.minimo || 0;
+        if (tipoCarga === 'dg') dgFeeUN = tarifa.dgFeeUN || 0;
+    } else {
+        // Legacy single-tariff structure (CZ-style)
+        tiers  = ruta.tiers;
+        minimo = ruta.minimo || 0;
+    }
+
+    const rate = calcAirlineTierRate(tiers, kg);
+
+    // Non-stackable surcharge
+    const estibable = document.getElementById('estibable-exp')?.checked ?? true;
+    const surcharge = (!estibable && ruta.noEstibable) ? (1 + ruta.noEstibable) : 1;
+    const fletefinal = Math.max(rate * kg * surcharge, minimo * surcharge);
+
+    // FSC per kg
+    const fscRate = ruta.fsc || 0;
+    const fsc = fscRate * kg;
+
+    // SSC per kg (ANA Cargo)
+    const sscRate = ruta.ssc || 0;
+    const ssc = sscRate * kg;
+
+    // CGC flat charges
+    const cgc = (ruta.cgcMawb || 0) + (ruta.cgcHawb || 0);
+
+    // DG Fee per UN (class-based for CAO, flat for PAX)
+    let dgFeeTotal = 0;
+    if (tipoCarga === 'dg' && dgFeeUN && expSelectedUNs.length > 0) {
+        for (const un of expSelectedUNs) {
+            if (typeof dgFeeUN === 'object') {
+                const clase = parseInt(un.clase);
+                dgFeeTotal += (clase === 1 || clase === 7)
+                    ? (dgFeeUN.clases_1_7 || 0)
+                    : (dgFeeUN.otras || 0);
+            } else {
+                dgFeeTotal += dgFeeUN;
+            }
+        }
+    }
+
+    const usedMinimo = (rate * kg * surcharge) < (minimo * surcharge);
+    return {
+        total: fletefinal + fsc + ssc + cgc + dgFeeTotal,
+        flete: fletefinal,
+        fsc, fscRate,
+        ssc, sscRate,
+        cgc,
+        dgFeeTotal,
+        rate,
+        usedMinimo,
+        minimo,
+        tipoCalc: usedMinimo ? `mínimo $${(minimo * surcharge).toFixed(0)}` : `${kg.toFixed(0)} kg × $${rate}`
+    };
+}
+
+function renderExpAirlines() {
+    const container = document.getElementById('exp-airline-results');
+    const note = document.getElementById('exp-airline-block-note');
+    if (!container) return;
+
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const destino = document.getElementById('destino-exp')?.value;
+    const cw = getExpChargeableWeight();
+
+    if (!aeropuerto || !destino) {
+        container.innerHTML = '';
+        if (note) note.textContent = 'Selecciona el destino en Paso 1 para ver aerolíneas disponibles.';
+        note.style.display = '';
+        return;
+    }
+    if (note) note.style.display = 'none';
+
+    // Filter by destination AND tipoCarga support
+    const opciones = getExpRutasDisponibles(aeropuerto).filter(o => {
+        if (o.ruta.destino !== destino) return false;
+        if (o.ruta.tarifas) return o.ruta.tarifas[expTipoCarga] != null;
+        // Legacy: check tipoCarga array; if no array, allow 'general' only
+        if (expTipoCarga === 'dg') return o.ruta.tipoCarga?.includes('dg') ?? false;
+        return true;
+    });
+
+    if (opciones.length === 0) {
+        container.innerHTML = `<div class="exp-airline-no-routes">No hay aerolíneas con tarifa ${expTipoCarga === 'dg' ? 'DG' : 'General'} para ${aeropuerto} → ${destino}.</div>`;
+        return;
+    }
+
+    // Sort by total cost (cheapest first); null result = type unsupported → push to bottom
+    opciones.sort((a, b) => {
+        const ca = calcAirlineCost(a.ruta, cw);
+        const cb = calcAirlineCost(b.ruta, cw);
+        return (ca?.total ?? Infinity) - (cb?.total ?? Infinity);
+    });
+
+    // Auto-select cheapest using reference equality (handles multiple routes per airline)
+    if (!expSelectedAirline || !opciones.find(o => o.ruta === expSelectedAirline.ruta)) {
+        expSelectedAirline = opciones[0];
+    }
+
+    container.innerHTML = opciones.map((o, i) => {
+        const result = calcAirlineCost(o.ruta, cw);
+        if (!result) return '';
+        const { total, flete, fsc, fscRate, ssc, sscRate, cgc, dgFeeTotal, rate, usedMinimo, minimo } = result;
+        const dias = o.ruta.salidasDias.map(d => DAY_NAMES_EXP[d] || d).join(' · ');
+        const isSelected = expSelectedAirline?.ruta === o.ruta;
+        const priceStr = cw > 0 ? `$${total.toFixed(2)} USD` : '—';
+        const isDG = expTipoCarga === 'dg';
+
+        let breakdownHtml = '';
+        if (cw > 0) {
+            // Per-kg rate pills
+            let pills = [`<span class="bk-pill">Rate $${rate.toFixed(2)}</span>`];
+            if (sscRate > 0) pills.push(`<span class="bk-pill ssc">SSC $${sscRate.toFixed(2)}</span>`);
+            if (fscRate > 0) pills.push(`<span class="bk-pill fsc">FSC $${fscRate.toFixed(2)}</span>`);
+            const allInRate = rate + sscRate + fscRate;
+            const allInLabel = pills.length > 1 ? `= <strong>$${allInRate.toFixed(2)}/kg</strong>` : `<strong>$${rate.toFixed(2)}/kg</strong>`;
+
+            // Flete line
+            let fleteLine;
+            if (usedMinimo) {
+                fleteLine = `Mínimo <strong>$${minimo.toFixed(2)}</strong>`;
+            } else {
+                fleteLine = `${cw.toFixed(0)} kg × $${allInRate.toFixed(2)} = <strong>$${flete + fsc + ssc > 0 ? (flete + fsc + ssc).toFixed(2) : flete.toFixed(2)}</strong>`;
+            }
+
+            // Flat charges
+            let flatParts = [];
+            if (cgc > 0) flatParts.push(`CC $${cgc.toFixed(2)}`);
+            if (dgFeeTotal > 0) flatParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
+            else if (isDG && expSelectedUNs.length === 0) flatParts.push(`<span class="exp-dg-fee-note">Agrega UNs</span>`);
+
+            breakdownHtml = `<div class="bk-pills">${pills.join('<span class="bk-plus">+</span>')} ${allInLabel}</div>
+                <div class="bk-calc">${fleteLine}${flatParts.length ? ' + ' + flatParts.join(' + ') : ''}</div>`;
+        } else {
+            breakdownHtml = `<div class="bk-calc">Ingresa datos de carga para ver precio</div>`;
+        }
+
+        const routingLabel = o.ruta.descripcion ? `<div class="exp-airline-routing">${escapeHtml(o.ruta.descripcion)}</div>` : '';
+        const dgBadge = isDG ? `<span class="exp-airline-dg-badge">DG</span>` : '';
+
+        return `<div class="exp-airline-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}" data-idx="${i}">
+            <div class="exp-airline-head">
+                <div>
+                    <div class="exp-airline-code">${escapeHtml(o.aerolinea.codigo)}${dgBadge}</div>
+                    <div class="exp-airline-name">${escapeHtml(o.aerolinea.nombre)}</div>
+                    ${routingLabel}
+                </div>
+                <div>
+                    <div class="exp-airline-price">${priceStr}</div>
+                    <div class="exp-airline-price-note">all in USD</div>
+                </div>
+            </div>
+            <div class="exp-airline-meta">
+                ${o.ruta.transitoHrs != null ? `<span class="exp-airline-tag tt">TT ${o.ruta.transitoHrs}h</span>` : ''}
+                <span class="exp-airline-tag dias">${dias}</span>
+                ${o.ruta.cutoff ? `<span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>` : ''}
+                <span class="exp-airline-tag vigencia">${escapeHtml(o.ruta.vigencia)}</span>
+            </div>
+            <div class="exp-airline-breakdown">
+                ${breakdownHtml}
+                <button class="exp-airline-btn">${isSelected ? '✓ Elegida' : 'Elegir'}</button>
+            </div>
+        </div>`;
+    }).join('');
+
+    container.querySelectorAll('.exp-airline-card').forEach((card, idx) => {
+        card.addEventListener('click', () => {
+            expSelectedAirline = opciones[idx];
+            renderExpAirlines();
+            updateExpCostSummary();
+        });
+    });
+
+    updateExpCostSummary();
+}
+
+function getExpAirlineCosts() {
+    if (!expSelectedAirline) return [];
+    const cw = getExpChargeableWeight();
+    const result = calcAirlineCost(expSelectedAirline.ruta, cw);
+    if (!result || result.total <= 0) return [];
+    const { flete, fsc, ssc, cgc, dgFeeTotal, tipoCalc } = result;
+    const code = expSelectedAirline.aerolinea.codigo;
+    const costs = [];
+    costs.push({ label: `Flete aéreo · ${code} (${tipoCalc})`, value: flete, currency: 'USD' });
+    if (ssc > 0)        costs.push({ label: `SSC · ${code}`, value: ssc, currency: 'USD' });
+    if (fsc > 0)        costs.push({ label: `FSC · ${code}`, value: fsc, currency: 'USD' });
+    if (cgc > 0)        costs.push({ label: `CC (MAWB)`, value: cgc, currency: 'USD' });
+    if (dgFeeTotal > 0) costs.push({ label: `DG Fee · ${expSelectedUNs.length} UN`, value: dgFeeTotal, currency: 'USD' });
+    return costs;
+}
+
+// --- AIO Warehouse Data ---
+let aioData = null;
+async function loadAIOData() {
+    try {
+        const res = await fetch('./data/almacen-aio.json?v=' + Date.now(), { cache: 'no-store' });
+        if (!res.ok) throw new Error('HTTP ' + res.status);
+        aioData = await res.json();
+        renderExpWarehouse();
+    } catch(e) {
+        console.warn('No se pudo cargar AIO:', e);
+    }
+}
+
+let expWarehouseChecks = {};
+let expIngresoProvider = null; // null = auto (cheapest)
+
+function renderExpWarehouse() {
+    renderExpWarehouseAuto();
+    renderExpWarehouseOptional();
+}
+
+function renderExpWarehouseAuto() {
+    const container = document.getElementById('exp-warehouse-auto');
+    if (!container) return;
+    if (!aioData) { container.innerHTML = '<div class="exp-empty-msg">Cargando tarifas…</div>'; return; }
+
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const unidad = getExpUnidadCalculada();
+
+    let html = '';
+
+    // --- Maniobras (auto) ---
+    const maniobra = unidad ? aioData.maniobras[unidad] : null;
+    html += `<div class="aio-section-title">Maniobras</div>`;
+    if (maniobra) {
+        html += `<div class="aio-auto-row">
+            <span class="aio-auto-check">✓</span>
+            <div><div class="aio-auto-name">AIO · ${escapeHtml(maniobra.nombre)}</div>
+            <div class="aio-auto-note">${escapeHtml(maniobra.referencia)}</div></div>
+            <div class="aio-auto-price">$${maniobra.precio.toLocaleString()} MXN</div>
+        </div>`;
+    } else {
+        html += `<div class="exp-empty-msg">Elige la unidad de transporte.</div>`;
+    }
+
+    // --- Ingreso aeropuerto ---
+    const ingresosAp = aeropuerto ? aioData.ingresoAeropuerto[aeropuerto] : null;
+    if (ingresosAp && unidad) {
+        const proveedoresIngreso = Object.keys(ingresosAp);
+        if (!expIngresoProvider || !ingresosAp[expIngresoProvider]) {
+            expIngresoProvider = proveedoresIngreso.reduce((best, p) =>
+                (ingresosAp[p][unidad]?.precio ?? Infinity) < (ingresosAp[best]?.[unidad]?.precio ?? Infinity) ? p : best,
+                proveedoresIngreso[0]);
+        }
+        html += `<div class="aio-section-title" style="margin-top:0.5rem;">Ingreso aeropuerto</div>`;
+        html += `<div class="aio-ingreso-options">`;
+        for (const prov of proveedoresIngreso) {
+            const t = ingresosAp[prov][unidad];
+            if (!t) continue;
+            const sel = expIngresoProvider === prov;
+            html += `<div class="aio-ingreso-option ${sel ? 'selected' : ''}" data-ingreso-prov="${escapeHtml(prov)}">
+                <div class="aio-ingreso-radio">${sel ? '●' : '○'}</div>
+                <div>
+                    <div class="aio-auto-name">${escapeHtml(prov)} · ${escapeHtml(t.nombre)}</div>
+                    <div class="aio-auto-note">+IVA${t.retencion ? ' · Retención' : ''}</div>
+                </div>
+                <div class="aio-auto-price">$${t.precio.toLocaleString()} MXN</div>
+            </div>`;
+        }
+        html += `</div>`;
+    }
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.aio-ingreso-option').forEach(opt => {
+        opt.addEventListener('click', () => {
+            expIngresoProvider = opt.dataset.ingresoProv;
+            renderExpWarehouseAuto();
+            updateExpCostSummary();
+        });
+    });
+}
+
+function _renderOptItem(key, nameHtml, noteHtml, state, priceHtml) {
+    return `<div class="p3-opt-item">
+        <input type="checkbox" class="aio-chk" id="aio-${key}" data-key="${key}" ${state.checked ? 'checked' : ''}>
+        <label for="aio-${key}" class="p3-opt-label">
+            <div class="p3-opt-name">${nameHtml}</div>
+            <div class="p3-opt-note">${noteHtml}</div>
+        </label>
+        <div class="p3-opt-right">
+            ${state.checked ? `<div class="p3-opt-price">${priceHtml}</div>` : ''}
+            <div class="p3-opt-qty-row ${state.checked ? '' : 'hidden'}">
+                <input type="number" class="aio-qty p3-opt-qty" data-key="${key}" min="1" value="${state.qty}" placeholder="1">
+            </div>
+        </div>
+    </div>`;
+}
+
+function renderExpWarehouseOptional() {
+    const container = document.getElementById('exp-warehouse-optional');
+    if (!container) return;
+    if (!aioData) { container.innerHTML = '<div class="exp-empty-msg">Cargando tarifas…</div>'; return; }
+
+    const lineas = getExpPalletLines();
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    const totalM2 = lineas.reduce((s, l) => s + l.qty * (l.largo / 100) * (l.ancho / 100), 0);
+
+    let html = '';
+
+    // --- Almacenaje ---
+    html += `<div class="aio-section-title">Almacenaje</div>`;
+    if (totalM2 > 0) html += `<div class="aio-section-note">${totalM2.toFixed(2)} m²</div>`;
+    aioData.almacenaje.forEach((item, idx) => {
+        const key = `almacenaje_${idx}`;
+        const state = expWarehouseChecks[key] || { checked: false, qty: 1 };
+        const subtotal = totalM2 > 0 ? item.precio * state.qty * totalM2 : item.precio * state.qty;
+        const noteStr = `$${item.precio.toLocaleString()} × m²${totalM2 > 0 ? ' × ' + totalM2.toFixed(1) + ' m²' : ''}`;
+        const priceStr = '$' + Math.round(subtotal).toLocaleString() + ' MXN';
+        html += _renderOptItem(key, `Almacenaje ${escapeHtml(item.periodo)}`, noteStr, state, priceStr);
+    });
+
+    // --- Materiales ---
+    html += `<div class="aio-section-title" style="margin-top:0.5rem;">Materiales</div>`;
+    aioData.materiales.forEach((item, idx) => {
+        const key = `material_${idx}`;
+        const autoQty = item.autoQty === 'pallets' ? Math.max(totalPallets, 1) : 1;
+        const state = expWarehouseChecks[key] || { checked: false, qty: autoQty };
+        const noteStr = `$${item.precio.toLocaleString()} × ${item.unidad}`;
+        const priceStr = '$' + (item.precio * state.qty).toLocaleString() + ' MXN';
+        html += _renderOptItem(key, escapeHtml(item.concepto), noteStr, state, priceStr);
+    });
+
+    // --- Servicio extraordinario ---
+    html += `<div class="aio-section-title" style="margin-top:0.5rem;">Serv. extraordinario</div>`;
+    aioData.servicioExtraordinario.forEach((item, idx) => {
+        const key = `servext_${idx}`;
+        const state = expWarehouseChecks[key] || { checked: false, qty: 1 };
+        const noteStr = `$${item.precio.toLocaleString()} MXN`;
+        const priceStr = '$' + (item.precio * state.qty).toLocaleString() + ' MXN';
+        html += _renderOptItem(key, escapeHtml(item.cobertura), noteStr, state, priceStr);
+    });
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.aio-chk').forEach(chk => {
+        chk.addEventListener('change', () => {
+            const key = chk.dataset.key;
+            if (!expWarehouseChecks[key]) expWarehouseChecks[key] = { checked: false, qty: 1 };
+            expWarehouseChecks[key].checked = chk.checked;
+            renderExpWarehouseOptional();
+            updateExpCostSummary();
+        });
+    });
+    container.querySelectorAll('.aio-qty').forEach(inp => {
+        inp.addEventListener('input', () => {
+            const key = inp.dataset.key;
+            if (!expWarehouseChecks[key]) expWarehouseChecks[key] = { checked: true, qty: 1 };
+            expWarehouseChecks[key].qty = Math.max(1, parseInt(inp.value) || 1);
+            renderExpWarehouseOptional();
+            updateExpCostSummary();
+        });
+    });
+}
+
+function getExpWarehouseCosts() {
+    if (!aioData) return [];
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const unidad = getExpUnidadCalculada();
+    const lineas = getExpPalletLines();
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    const totalM2 = lineas.reduce((s, l) => s + l.qty * (l.largo / 100) * (l.ancho / 100), 0);
+    const costs = [];
+
+    const maniobra = unidad ? aioData.maniobras[unidad] : null;
+    if (maniobra) costs.push({ label: `Maniobras AIO · ${maniobra.nombre}`, value: maniobra.precio, taxType: 'iva' });
+
+    const ingresosAp = aeropuerto ? aioData.ingresoAeropuerto[aeropuerto] : null;
+    if (ingresosAp && unidad && expIngresoProvider) {
+        const ingreso = ingresosAp[expIngresoProvider]?.[unidad];
+        if (ingreso) costs.push({ label: `Ingreso ${aeropuerto} · ${expIngresoProvider}`, value: ingreso.precio, taxType: 'iva-ret' });
+    }
+
+    aioData.almacenaje.forEach((item, idx) => {
+        const key = `almacenaje_${idx}`;
+        const state = expWarehouseChecks[key];
+        if (state?.checked) {
+            const m2 = totalM2 > 0 ? totalM2 : 1;
+            costs.push({ label: `Almacenaje ${item.periodo} × ${state.qty||1} × ${m2.toFixed(2)}m²`, value: Math.round(item.precio * (state.qty||1) * m2), taxType: 'iva' });
+        }
+    });
+
+    aioData.materiales.forEach((item, idx) => {
+        const key = `material_${idx}`;
+        const state = expWarehouseChecks[key];
+        if (state?.checked) costs.push({ label: `${item.concepto} × ${state.qty||1}`, value: item.precio * (state.qty||1), taxType: 'iva' });
+    });
+
+    aioData.servicioExtraordinario.forEach((item, idx) => {
+        const key = `servext_${idx}`;
+        const state = expWarehouseChecks[key];
+        if (state?.checked) costs.push({ label: `Serv. extra · ${item.cobertura} × ${state.qty||1}`, value: item.precio * (state.qty||1), taxType: 'iva' });
+    });
+
+    return costs;
+}
+
+// --- Paso 3 EXW: Proveedores ---
+let expSelectedTransport = null;
+
+function searchExpTransport() {
+    const panel = document.getElementById('exp-providers-panel');
+    const resultsEl = document.getElementById('exp-transport-results');
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+
+    if (!ciudad || !aeropuerto) {
+        panel.style.display = 'none';
+        return;
+    }
+
+    panel.style.display = '';
+
+    const proveedores = JSON.parse(localStorage.getItem('proveedores') || '[]');
+    const unidad = getExpUnidadCalculada();
+
+    // Normalización simple: lowercase + sin acentos + solo la primera parte antes de la coma
+    const simpleNorm = s => String(s).toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .split(',')[0].trim();
+
+    const ciudadSimple = simpleNorm(ciudad);
+
+    const EXP_TRANSPORT_PROVIDERS = ['barajas'];
+
+    const matches = [];
+    for (const p of proveedores) {
+        if (p.aeropuerto !== aeropuerto) continue;
+        if (!EXP_TRANSPORT_PROVIDERS.some(k => p.nombre.toLowerCase().includes(k))) continue;
+        for (const t of p.tarifas) {
+            const tSimple = simpleNorm(t.ciudad);
+            const hit = tSimple === ciudadSimple
+                || tSimple.startsWith(ciudadSimple)
+                || ciudadSimple.startsWith(tSimple);
+            if (!hit) continue;
+            const tarifa = unidad ? (t[unidad] || 0) : 0;
+            if (tarifa > 0) {
+                matches.push({
+                    proveedor: p.nombre,
+                    ciudad: t.ciudad,
+                    aeropuerto: p.aeropuerto,
+                    unidad: unidad || '—',
+                    tarifa: tarifa
+                });
+            }
+        }
+    }
+
+    matches.sort((a, b) => a.tarifa - b.tarifa);
+
+    if (matches.length === 0) {
+        const msg = unidad
+            ? `Sin tarifa para ${escapeHtml(ciudad)} → ${aeropuerto} · ${unidad}.`
+            : `Captura los datos de carga para ver tarifas.`;
+        resultsEl.innerHTML = `<div class="exp-no-transport">${msg}</div>`;
+        expSelectedTransport = null;
+        updateExpCostSummary();
+        return;
+    }
+
+    // Auto-seleccionar mejor precio si ninguno está elegido
+    if (!expSelectedTransport || !matches.find(m => m.proveedor === expSelectedTransport?.proveedor)) {
+        expSelectedTransport = matches[0];
+    }
+
+    resultsEl.innerHTML = matches.map((m, i) => {
+        const isSelected = expSelectedTransport?.proveedor === m.proveedor;
+        return `
+        <div class="exp-transport-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}"
+             data-idx="${i}">
+            <div>
+                <div class="exp-transport-name">${escapeHtml(m.proveedor)}</div>
+                <div class="exp-transport-route">${escapeHtml(m.ciudad)} → ${escapeHtml(m.aeropuerto)} · ${escapeHtml(m.unidad)}</div>
+            </div>
+            <div class="exp-transport-price">$${m.tarifa.toLocaleString()} MXN</div>
+            <button class="exp-transport-btn">${isSelected ? '✓ Elegido' : 'Elegir'}</button>
+        </div>`;
+    }).join('');
+
+    resultsEl.querySelectorAll('.exp-transport-card').forEach((card, idx) => {
+        card.addEventListener('click', () => {
+            expSelectedTransport = matches[idx];
+            searchExpTransport();
+        });
+    });
+
+    renderExpWarehouse();
+    renderExpAirlines();
+    updateExpCostSummary();
+}
+
+function getExpChargeableWeight() {
+    const lineas = getExpPalletLines();
+    const pesoReal = parseFloat(document.getElementById('peso-exp').value) || 0;
+    if (lineas.length === 0 || pesoReal <= 0) return 0;
+    let totalCBM = 0;
+    for (const l of lineas) {
+        totalCBM += l.qty * (l.largo / 100) * (l.ancho / 100) * (l.alto / 100);
+    }
+    return Math.max(pesoReal, totalCBM * 167);
+}
+
+function updateExpCostSummary() {
+    const listEl = document.getElementById('exp-cost-summary-list');
+    const totalEl = document.getElementById('exp-cost-total');
+    if (!listEl) return;
+
+    const tipoCambio = parseFloat(localStorage.getItem('tipoCambio')) || 17;
+    const rows = [];
+    let totalMXN = 0;
+
+    // Transporte terrestre
+    if (expSelectedTransport) {
+        rows.push({ label: `Transporte · ${escapeHtml(expSelectedTransport.proveedor)}`, value: expSelectedTransport.tarifa, currency: 'MXN' });
+        totalMXN += expSelectedTransport.tarifa;
+    }
+
+    // Almacén AIO (maniobras + ingreso + opcionales)
+    for (const c of getExpWarehouseCosts()) {
+        rows.push({ label: escapeHtml(c.label), value: c.value, currency: 'MXN' });
+        totalMXN += c.value;
+    }
+
+    // Flete aéreo
+    for (const c of getExpAirlineCosts()) {
+        rows.push({ label: c.label, value: c.value, currency: c.currency });
+        totalMXN += c.value * tipoCambio;
+    }
+
+    listEl.innerHTML = rows.map(r => `
+        <div class="exp-cost-row">
+            <span class="exp-cost-row-label">${r.label}</span>
+            <span class="exp-cost-row-value">$${r.value.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} ${r.currency}</span>
+        </div>
+    `).join('');
+
+    totalEl.textContent = `$${totalMXN.toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})} MXN`;
+
+    // Auto-open Paso 4 calculator when there are costs
+    if (rows.length > 0) openExpMubPanel();
+}
+
+function openExpMubPanel() {
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const destino = document.getElementById('destino-exp')?.value || '';
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const unidad = getExpUnidadCalculada() || '';
+
+    const lineas = [];
+
+    if (expSelectedTransport) {
+        lineas.push({
+            nombre: `Transporte · ${expSelectedTransport.proveedor} · ${unidad}`,
+            costo: expSelectedTransport.tarifa,
+            monedaCosto: 'MXN',
+            esFlete: true,
+            mub: 15,
+            quoteSection: 'inland',
+            quoteLabel: `Inland Freight (${unidad})`
+        });
+    }
+
+    if (expSelectedAirline) {
+        const cw = getExpChargeableWeight();
+        const result = calcAirlineCost(expSelectedAirline.ruta, cw);
+        if (result && result.total > 0) {
+            const code = expSelectedAirline.aerolinea.codigo;
+            lineas.push({
+                nombre: `Flete aéreo · ${code} (${cw.toFixed(0)} kg × $${(result.total / cw).toFixed(2)})`,
+                costo: result.total,
+                monedaCosto: 'USD',
+                esFlete: false,
+                impuestoRate: 0.04,
+                mub: 15,
+                quoteSection: 'inland',
+                quoteLabel: `Air Freight · ${code}`
+            });
+        }
+    }
+
+    for (const c of getExpWarehouseCosts()) {
+        const rate = c.taxType === 'iva-ret' ? 0.12 : 0.16;
+        lineas.push({
+            nombre: c.label,
+            costo: c.value,
+            monedaCosto: 'MXN',
+            esFlete: false,
+            impuestoRate: rate,
+            mub: 15,
+            quoteSection: 'inland',
+            quoteLabel: c.label
+        });
+    }
+
+    if (lineas.length === 0) {
+        const container = document.getElementById('exp-mub-container');
+        container.style.display = 'none';
+        return;
+    }
+
+    const container = document.getElementById('exp-mub-container');
+    container.style.display = '';
+
+    const expPalletLines = getExpPalletLines();
+    const expPesoTotal = parseFloat(document.getElementById('peso-exp').value) || 0;
+    const expCW = getExpChargeableWeight();
+    const expEstibable = !!document.getElementById('estibable-exp')?.checked;
+    const expAirlineCode = expSelectedAirline?.aerolinea?.codigo || '';
+    const expAirlineName = expSelectedAirline?.aerolinea?.nombre || '';
+    const expRuta = expSelectedAirline?.ruta || {};
+    const expDias = (expRuta.salidasDias || []).map(d => (['','Mon','Tue','Wed','Thu','Fri','Sat','Sun'])[d] || d);
+
+    openMubPanel({
+        proveedor: expSelectedTransport?.proveedor || 'Transporte',
+        tipoUnidad: unidad,
+        tarifaFlete: expSelectedTransport?.tarifa || 0,
+        lineas,
+        quoteMeta: {
+            mode: 'air',
+            isEXW: true,
+            aeropuerto,
+            ciudad: destino ? `${destino}` : ciudad,
+            ciudadOrigen: ciudad,
+            destinoNombre: expRuta.destinoNombre || destino,
+            airlineCode: expAirlineCode,
+            airlineName: expAirlineName,
+            descripcion: expRuta.descripcion || '',
+            salidasDias: expDias,
+            transitoHrs: expRuta.transitoHrs,
+            cutoff: expRuta.cutoff || '',
+            palletLines: expPalletLines,
+            pesoTotal: expPesoTotal,
+            chargeableWeight: expCW,
+            estibable: expEstibable
+        }
+    }, 'exp-mub-container');
+
+    const closeBtn = container.querySelector('.mub-panel-close');
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            container.style.display = 'none';
+            document.querySelectorAll('[data-exp-step]').forEach(el => el.classList.remove('is-active'));
+            document.querySelector('[data-exp-step="providers"]')?.classList.add('is-active');
+            document.getElementById('ws-exp-sale-status').textContent = 'Pendiente';
+        });
+    }
+
+    document.querySelectorAll('[data-exp-step]').forEach(el => el.classList.remove('is-active'));
+    document.querySelector('[data-exp-step="sale"]')?.classList.add('is-active');
+    document.getElementById('ws-exp-sale-status').textContent = 'Abierta';
+}
+
+// Wire destino-exp to update airlines
+document.getElementById('destino-exp')?.addEventListener('change', () => {
+    expSelectedAirline = null;
+    renderExpAirlines();
+    renderExpRouteDiagram();
+});
+
+// --- Workspace summary EXW ---
+function updateExpWorkspace() {
+    const ciudad = document.getElementById('ciudad-origen-exp').value.trim();
+    const ap = document.getElementById('aeropuerto-exp').value;
+    const peso = document.getElementById('peso-exp').value;
+    const lineas = getExpPalletLines();
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    const unidad = getExpUnidadCalculada();
+
+    const destino = document.getElementById('destino-exp')?.value || '';
+    document.getElementById('ws-exp-origin').textContent = ciudad || '—';
+    document.getElementById('ws-exp-airport').textContent = ap || '—';
+    document.getElementById('ws-exp-destino').textContent = destino || '—';
+    document.getElementById('ws-exp-km').textContent = expRouteKm > 0 ? Math.round(expRouteKm).toLocaleString() + ' km' : '—';
+    document.getElementById('ws-exp-pallets').textContent = totalPallets > 0 ? totalPallets : '—';
+    document.getElementById('ws-exp-weight').textContent = peso ? parseFloat(peso).toLocaleString() + ' kg' : '—';
+    document.getElementById('ws-exp-unit').textContent = unidad || '—';
+    const wsTC = document.getElementById('ws-exp-tipocarga');
+    if (wsTC) wsTC.textContent = expTipoCarga === 'dg' ? '⚠ DG' : 'General';
+}
+
+// --- Autocomplete EXW (reusa lógica del aéreo) ---
+const ciudadExpInput = document.getElementById('ciudad-origen-exp');
+
+let acExpIndex = -1;
+const acExpList = document.getElementById('autocomplete-list-exp');
+
+ciudadExpInput.addEventListener('input', () => {
+    delete ciudadExpInput.dataset.variantes;
+    const query = normalizarTexto(ciudadExpInput.value);
+    if (query.length < 2) { acExpList.classList.remove('show'); return; }
+
+    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+    const grupos = getCiudadesDisponibles(aeropuerto);
+    const matches = [];
+
+    for (const [base, data] of grupos) {
+        const baseCiudad = base.includes('|') ? base.split('|')[0] : base;
+        if (fuzzyMatch(baseCiudad, query)) {
+            const variantes = [...data.variantes];
+            const displayCity = baseCiudad.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
+            matches.push({
+                base, baseCiudad, display: displayCity, variantes,
+                airports: data.airports,
+                score: matchScore(baseCiudad, query),
+            });
+        }
+    }
+
+    matches.sort((a, b) => b.score !== a.score ? b.score - a.score : a.base.localeCompare(b.base));
+
+    if (matches.length === 0) {
+        acExpList.innerHTML = '<div class="autocomplete-item" style="color:var(--gray-400);cursor:default;">No se encontraron ciudades</div>';
+        acExpList.classList.add('show');
+        return;
+    }
+
+    acExpIndex = -1;
+    acExpList.innerHTML = matches.slice(0, 20).map((m, i) => {
+        const airportTags = [...m.airports].join(', ');
+        const variantesStr = m.variantes.map(v => escapeHtml(v)).join(' · ');
+        const variantesData = encodeURIComponent(JSON.stringify(m.variantes));
+        return `<div class="autocomplete-item" data-idx="${i}" data-value="${escapeHtml(m.display)}" data-variantes="${variantesData}">
+            ${escapeHtml(m.display)}<span class="ac-airport">${airportTags}</span>
+            <span class="ac-variants">${variantesStr}</span>
+        </div>`;
+    }).join('');
+    acExpList.classList.add('show');
+
+    acExpList.querySelectorAll('.autocomplete-item[data-value]').forEach(item => {
+        item.addEventListener('click', () => {
+            ciudadExpInput.value = item.dataset.value;
+            ciudadExpInput.dataset.variantes = item.dataset.variantes || '';
+            acExpList.classList.remove('show');
+            scheduleExpRouteUpdate();
+            searchExpTransport();
+        });
+    });
+});
+
+ciudadExpInput.addEventListener('keydown', (e) => {
+    const items = acExpList.querySelectorAll('.autocomplete-item');
+    if (!items.length || !acExpList.classList.contains('show')) return;
+
+    if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        acExpIndex = Math.min(acExpIndex + 1, items.length - 1);
+        items.forEach((it, i) => it.classList.toggle('selected', i === acExpIndex));
+    } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        acExpIndex = Math.max(acExpIndex - 1, 0);
+        items.forEach((it, i) => it.classList.toggle('selected', i === acExpIndex));
+    } else if (e.key === 'Enter' && acExpIndex >= 0) {
+        e.preventDefault();
+        ciudadExpInput.value = items[acExpIndex].dataset.value;
+        ciudadExpInput.dataset.variantes = items[acExpIndex].dataset.variantes || '';
+        acExpList.classList.remove('show');
+        scheduleExpRouteUpdate();
+        searchExpTransport();
+    } else if (e.key === 'Escape') {
+        acExpList.classList.remove('show');
+    }
+});
+
+// --- Event listeners EXW ---
+document.getElementById('aeropuerto-exp').addEventListener('change', () => {
+    updateExpMapMarkers();
+    scheduleExpRouteUpdate();
+    searchExpTransport();
+    expSelectedAirline = null;
+    updateExpDestinoOptions();
+    renderExpRouteDiagram();
+});
+ciudadExpInput.addEventListener('blur', () => {
+    setTimeout(() => { acExpList.classList.remove('show'); }, 200);
+    scheduleExpRouteUpdate();
+});
+document.getElementById('peso-exp').addEventListener('input', () => { autoCalcExpUnidad(); updateExpRouteStats(); });
+document.getElementById('estibable-exp').addEventListener('change', function() {
+    document.getElementById('estibable-label-exp').textContent = this.checked ? 'Sí' : 'No';
+    autoCalcExpUnidad();
+    renderExpAirlines(); // recalc non-stackable surcharge
+});
+
+// UN number search
+document.addEventListener('input', function(e) {
+    if (e.target.id !== 'un-search-input') return;
+    const query = e.target.value.toLowerCase().trim();
+    const dropdown = document.getElementById('un-search-dropdown');
+    if (!dropdown) return;
+    if (!unData || query.length < 2) { dropdown.style.display = 'none'; return; }
+    const matches = unData.unNumbers.filter(u =>
+        u.un.toLowerCase().includes(query) || u.nombre.toLowerCase().includes(query)
+    ).slice(0, 15);
+    if (matches.length === 0) { dropdown.style.display = 'none'; return; }
+    dropdown.innerHTML = matches.map(u =>
+        `<div class="un-dropdown-item">
+            <span class="un-dd-number">${escapeHtml(u.un)}</span>
+            <span class="un-dd-clase">Cl ${escapeHtml(u.clase)}</span>
+            <span class="un-dd-name">${escapeHtml(u.nombre)}</span>
+        </div>`
+    ).join('');
+    dropdown.style.display = '';
+    dropdown.querySelectorAll('.un-dropdown-item').forEach((item, idx) => {
+        item.addEventListener('click', () => {
+            addExpUN(matches[idx]);
+            e.target.value = '';
+            dropdown.style.display = 'none';
+        });
+    });
+});
+
+// Close UN dropdown on outside click
+document.addEventListener('click', function(e) {
+    if (!e.target.closest('#dg-un-card')) {
+        const dd = document.getElementById('un-search-dropdown');
+        if (dd) dd.style.display = 'none';
+    }
+});
+document.getElementById('btn-add-pallet-exp').addEventListener('click', () => addExpPalletLine());
+
+// Init primera línea de pallet EXW
+addExpPalletLine();
+
+// Render route diagram on load
+renderExpRouteDiagram();
+
 // ===== INIT =====
 (async function initApp() {
     await Promise.allSettled([
         loadSharedOfficialData(),
         loadSharedExchangeRate(),
-        loadSharedMaritimeDestinationConcepts()
+        loadSharedMaritimeDestinationConcepts(),
+        loadAIOData(),
+        loadAirlineData(),
+        loadUNData()
     ]);
     renderProvidersList();
     updateCotizarBtn();
