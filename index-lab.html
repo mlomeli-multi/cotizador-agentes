@@ -8988,9 +8988,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     </div>`;
 
     function renderQuoteSummary() {
-        const quoteSummary = document.getElementById(quoteSummaryId);
+        const quoteSummary = container.querySelector(`#${quoteSummaryId}`);
         if (!quoteSummary) return;
-        const styleTabsEl = document.getElementById(quoteStyleTabsId);
+        const styleTabsEl = container.querySelector(`#${quoteStyleTabsId}`);
 
         const destinationLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'destination');
         const inlandLines = lineas.filter(l => (l.quoteSection || (l.esFlete ? 'inland' : 'destination')) === 'inland');
@@ -9196,7 +9196,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 es: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeExw.es}</div>`, text: htmlToPlainText(activeExw.es) }
             };
             quoteSummary.innerHTML = quoteSummaryLang === 'es' ? activeExw.es : activeExw.en;
-            document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+            container.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
             });
             return;
@@ -9554,7 +9554,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 es: { html: `<div style="font-family:Calibri, Arial, sans-serif;font-size:16px;line-height:1.6;color:#1f2937;">${activeStylePayload.es}</div>`, text: htmlToPlainText(activeStylePayload.es) }
             };
             quoteSummary.innerHTML = quoteSummaryLang === 'es' ? activeStylePayload.es : activeStylePayload.en;
-            document.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
+            container.querySelectorAll(`#${quoteTabsId} .maritime-quote-tab`).forEach(btn => {
                 btn.classList.toggle('active', btn.dataset.lang === quoteSummaryLang);
             });
             return;
@@ -9879,7 +9879,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         `;
     }
 
-    const quoteTabsEl = document.getElementById(quoteTabsId);
+    const quoteTabsEl = container.querySelector(`#${quoteTabsId}`);
     if (quoteTabsEl) {
         quoteTabsEl.querySelectorAll('.maritime-quote-tab').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -9888,7 +9888,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             });
         });
     }
-    const quoteStyleTabsEl = document.getElementById(quoteStyleTabsId);
+    const quoteStyleTabsEl = container.querySelector(`#${quoteStyleTabsId}`);
     if (quoteStyleTabsEl) {
         quoteStyleTabsEl.querySelectorAll('.maritime-quote-style-tab').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -9898,12 +9898,12 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         });
     }
 
-    const quoteCopyBtn = document.getElementById(quoteCopyBtnId);
+    const quoteCopyBtn = container.querySelector(`#${quoteCopyBtnId}`);
     if (quoteCopyBtn) {
         quoteCopyBtn.addEventListener('click', async () => {
             const payload = quoteClipboardPayload[quoteSummaryLang] || {};
             const htmlToCopy = payload.html || '';
-            const textToCopy = payload.text || document.getElementById(quoteSummaryId)?.innerText?.trim() || '';
+            const textToCopy = payload.text || container.querySelector(`#${quoteSummaryId}`)?.innerText?.trim() || '';
             if (!htmlToCopy && !textToCopy) return;
             try {
                 if (navigator.clipboard?.write && typeof ClipboardItem !== 'undefined' && htmlToCopy) {
@@ -9958,8 +9958,8 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
 
             const mubInput = container.querySelector(`.mub-field[data-idx="${i}"]`);
             const ventaInput = container.querySelector(`.venta-field[data-idx="${i}"]`);
-            const utilEl = document.getElementById(`mub-util-${i}`);
-            const usdEl = document.getElementById(`mub-usd-${i}`);
+            const utilEl = container.querySelector(`#mub-util-${i}`);
+            const usdEl = container.querySelector(`#mub-usd-${i}`);
             const costBtn = container.querySelector(`.mub-cost-btn[data-idx="${i}"]`);
 
             if (l.costMode) {
@@ -9993,16 +9993,16 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const currentAirportCost = currentAirportLines.reduce((sum, l) => sum + costoBaseVenta(l), 0);
             const currentAirportProfit = (airAwbRate + airEntryRate) - currentAirportCost;
 
-            const freightCostEl = document.getElementById('air-summary-freight-cost');
-            const freightSaleEl = document.getElementById('air-summary-freight-sale');
-            const freightProfitEl = document.getElementById('air-summary-freight-profit');
-            const freightMubEl = document.getElementById('air-summary-freight-mub');
-            const airportCostEl = document.getElementById('air-summary-airport-cost');
-            const airportProfitEl = document.getElementById('air-summary-airport-profit');
-            const totalCostEl = document.getElementById('air-summary-total-cost');
-            const totalSaleEl = document.getElementById('air-summary-total-sale');
-            const totalProfitEl = document.getElementById('air-summary-total-profit');
-            const totalMubEl = document.getElementById('air-summary-total-mub');
+            const freightCostEl = container.querySelector('#air-summary-freight-cost');
+            const freightSaleEl = container.querySelector('#air-summary-freight-sale');
+            const freightProfitEl = container.querySelector('#air-summary-freight-profit');
+            const freightMubEl = container.querySelector('#air-summary-freight-mub');
+            const airportCostEl = container.querySelector('#air-summary-airport-cost');
+            const airportProfitEl = container.querySelector('#air-summary-airport-profit');
+            const totalCostEl = container.querySelector('#air-summary-total-cost');
+            const totalSaleEl = container.querySelector('#air-summary-total-sale');
+            const totalProfitEl = container.querySelector('#air-summary-total-profit');
+            const totalMubEl = container.querySelector('#air-summary-total-mub');
 
             if (freightCostEl) freightCostEl.textContent = fmt(currentFreightCost);
             if (freightSaleEl) freightSaleEl.textContent = fmt(currentFreightSale);
@@ -10036,10 +10036,10 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             const allCost = lineas.reduce((s, l) => s + costoBaseVenta(l), 0);
             const allSale = lineas.reduce((s, l) => s + (l.costMode ? costoBaseVenta(l) : (parseFloat(l.venta) || 0)), 0);
             const allProfit = allSale - allCost;
-            const allinCostEl = document.getElementById(`${containerId}-allin-cost`);
-            const allinSaleEl = document.getElementById(`${containerId}-allin-sale`);
-            const allinProfitEl = document.getElementById(`${containerId}-allin-profit`);
-            const allinMubEl = document.getElementById(`${containerId}-allin-mub`);
+            const allinCostEl = container.querySelector(`#${containerId}-allin-cost`);
+            const allinSaleEl = container.querySelector(`#${containerId}-allin-sale`);
+            const allinProfitEl = container.querySelector(`#${containerId}-allin-profit`);
+            const allinMubEl = container.querySelector(`#${containerId}-allin-mub`);
             if (allinCostEl) allinCostEl.textContent = `${simbolo}${fmt(allCost)}`;
             if (allinSaleEl) allinSaleEl.textContent = `${simbolo}${fmt(allSale)}`;
             if (allinProfitEl) {
@@ -10066,7 +10066,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             lineas[idx].editando = input.dataset.field;
             updateValues();
         });
-        input.addEventListener('input', () => {
+        const handleEdit = () => {
             const idx = parseInt(input.dataset.idx);
             const field = input.dataset.field;
             const val = parseFloat(input.value) || 0;
@@ -10082,7 +10082,9 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                 lineas[idx].lastCustomVenta = val;
             }
             updateValues();
-        });
+        };
+        input.addEventListener('input', handleEdit);
+        input.addEventListener('change', handleEdit);
     });
 
     container.querySelectorAll('.mub-cost-btn').forEach(button => {
@@ -10100,7 +10102,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         });
     });
 
-    document.getElementById('mub-close').addEventListener('click', () => {
+    container.querySelector('#mub-close')?.addEventListener('click', () => {
         container.innerHTML = '';
         renderAirWorkspaceSummary();
     });
