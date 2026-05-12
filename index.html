@@ -702,6 +702,22 @@
         .exp-airline-no-routes {
             font-size: 0.72rem; color: var(--gray-400); text-align: center; padding: 0.75rem;
         }
+        .exp-airline-tag.dims { background: #ede9fe; color: #5b21b6; }
+        .exp-airline-tag.dims-warn { background: #fef2f2; color: #991b1b; }
+        .exp-airline-card.excluded {
+            opacity: 0.45; pointer-events: none;
+            border-color: var(--gray-200);
+        }
+        .exp-airline-card.excluded .exp-airline-price { color: var(--gray-400); }
+        .exp-excluded-reason {
+            font-size: 0.58rem; color: #dc2626; font-weight: 600;
+            margin-top: 0.2rem;
+        }
+        .exp-dims-separator {
+            font-size: 0.65rem; font-weight: 600; color: var(--gray-400);
+            margin: 0.6rem 0 0.2rem; padding-top: 0.4rem;
+            border-top: 1px dashed var(--gray-200);
+        }
 
         /* ===== PASO 1 GRID (form + medidas side by side) ===== */
         .paso1-grid {
@@ -11660,6 +11676,27 @@ function calcAirlineCost(ruta, kg, tipoCarga) {
     };
 }
 
+function checkPalletFitsRoute(ruta) {
+    const m = ruta.medidasMaximas;
+    const pMax = ruta.pesoMaxPieza;
+    if (!m && !pMax) return { fits: true, noData: true };
+    const lineas = getExpPalletLines();
+    if (lineas.length === 0) return { fits: true, noData: false, limits: m, pesoMax: pMax };
+    const pesoReal = parseFloat(document.getElementById('peso-exp').value) || 0;
+    const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
+    const pesoPorPieza = totalPallets > 0 ? pesoReal / totalPallets : pesoReal;
+    const reasons = [];
+    for (const l of lineas) {
+        if (m) {
+            if (l.largo > m.largo) reasons.push(`Largo ${l.largo} cm > máx ${m.largo} cm`);
+            if (l.ancho > m.ancho) reasons.push(`Ancho ${l.ancho} cm > máx ${m.ancho} cm`);
+            if (l.alto > m.alto) reasons.push(`Alto ${l.alto} cm > máx ${m.alto} cm`);
+        }
+    }
+    if (pMax && pesoPorPieza > pMax) reasons.push(`Peso/pieza ${Math.round(pesoPorPieza)} kg > máx ${pMax} kg`);
+    return { fits: reasons.length === 0, reasons, limits: m, pesoMax: pMax, noData: false };
+}
+
 function renderExpAirlines() {
     const container = document.getElementById('exp-airline-results');
     const note = document.getElementById('exp-airline-block-note');
@@ -11681,7 +11718,6 @@ function renderExpAirlines() {
     const opciones = getExpRutasDisponibles(aeropuerto).filter(o => {
         if (o.ruta.destino !== destino) return false;
         if (o.ruta.tarifas) return o.ruta.tarifas[expTipoCarga] != null;
-        // Legacy: check tipoCarga array; if no array, allow 'general' only
         if (expTipoCarga === 'dg') return o.ruta.tipoCarga?.includes('dg') ?? false;
         return true;
     });
@@ -11691,37 +11727,56 @@ function renderExpAirlines() {
         return;
     }
 
-    // Sort by total cost (cheapest first); null result = type unsupported → push to bottom
-    opciones.sort((a, b) => {
+    // Check dimension/weight limits per route
+    const palletLines = getExpPalletLines();
+    const hasPalletData = palletLines.length > 0;
+    const compatible = [];
+    const excluded = [];
+    for (const o of opciones) {
+        const check = checkPalletFitsRoute(o.ruta);
+        o._dimCheck = check;
+        if (!hasPalletData || check.fits) compatible.push(o);
+        else excluded.push(o);
+    }
+
+    // Sort compatible by cost
+    compatible.sort((a, b) => {
+        const ca = calcAirlineCost(a.ruta, cw);
+        const cb = calcAirlineCost(b.ruta, cw);
+        return (ca?.total ?? Infinity) - (cb?.total ?? Infinity);
+    });
+    excluded.sort((a, b) => {
         const ca = calcAirlineCost(a.ruta, cw);
         const cb = calcAirlineCost(b.ruta, cw);
         return (ca?.total ?? Infinity) - (cb?.total ?? Infinity);
     });
 
-    // Auto-select cheapest using reference equality (handles multiple routes per airline)
-    if (!expSelectedAirline || !opciones.find(o => o.ruta === expSelectedAirline.ruta)) {
-        expSelectedAirline = opciones[0];
+    const sorted = [...compatible, ...excluded];
+
+    // Auto-select cheapest compatible
+    if (!expSelectedAirline || !compatible.find(o => o.ruta === expSelectedAirline.ruta)) {
+        expSelectedAirline = compatible.length > 0 ? compatible[0] : null;
     }
 
-    container.innerHTML = opciones.map((o, i) => {
+    let separatorInserted = false;
+    container.innerHTML = sorted.map((o, i) => {
         const result = calcAirlineCost(o.ruta, cw);
         if (!result) return '';
         const { total, flete, fsc, fscRate, ssc, sscRate, cgc, dgFeeTotal, rate, usedMinimo, minimo } = result;
         const dias = o.ruta.salidasDias.map(d => DAY_NAMES_EXP[d] || d).join(' · ');
         const isSelected = expSelectedAirline?.ruta === o.ruta;
+        const isExcluded = hasPalletData && o._dimCheck && !o._dimCheck.fits;
         const priceStr = cw > 0 ? `$${total.toFixed(2)} USD` : '—';
         const isDG = expTipoCarga === 'dg';
 
         let breakdownHtml = '';
         if (cw > 0) {
-            // Per-kg rate pills
             let pills = [`<span class="bk-pill">Rate $${rate.toFixed(2)}</span>`];
             if (sscRate > 0) pills.push(`<span class="bk-pill ssc">SSC $${sscRate.toFixed(2)}</span>`);
             if (fscRate > 0) pills.push(`<span class="bk-pill fsc">FSC $${fscRate.toFixed(2)}</span>`);
             const allInRate = rate + sscRate + fscRate;
             const allInLabel = pills.length > 1 ? `= <strong>$${allInRate.toFixed(2)}/kg</strong>` : `<strong>$${rate.toFixed(2)}/kg</strong>`;
 
-            // Flete line
             let fleteLine;
             if (usedMinimo) {
                 fleteLine = `Mínimo <strong>$${minimo.toFixed(2)}</strong>`;
@@ -11729,7 +11784,6 @@ function renderExpAirlines() {
                 fleteLine = `${cw.toFixed(0)} kg × $${allInRate.toFixed(2)} = <strong>$${flete + fsc + ssc > 0 ? (flete + fsc + ssc).toFixed(2) : flete.toFixed(2)}</strong>`;
             }
 
-            // Flat charges
             let flatParts = [];
             if (cgc > 0) flatParts.push(`CC $${cgc.toFixed(2)}`);
             if (dgFeeTotal > 0) flatParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
@@ -11744,7 +11798,29 @@ function renderExpAirlines() {
         const routingLabel = o.ruta.descripcion ? `<div class="exp-airline-routing">${escapeHtml(o.ruta.descripcion)}</div>` : '';
         const dgBadge = isDG ? `<span class="exp-airline-dg-badge">DG</span>` : '';
 
-        return `<div class="exp-airline-card ${i === 0 ? 'best' : ''} ${isSelected ? 'selected' : ''}" data-idx="${i}">
+        // Dimension/weight limit tag
+        const dc = o._dimCheck;
+        let dimsTag = '';
+        if (dc && dc.limits) {
+            const tagClass = isExcluded ? 'dims-warn' : 'dims';
+            dimsTag = `<span class="exp-airline-tag ${tagClass}">${dc.limits.largo}×${dc.limits.ancho}×${dc.limits.alto} cm · ${(dc.pesoMax/1000).toFixed(1)}t</span>`;
+        } else if (dc && dc.noData) {
+            dimsTag = `<span class="exp-airline-tag">Sin datos de medidas</span>`;
+        }
+
+        const excludedReason = isExcluded && dc.reasons
+            ? `<div class="exp-excluded-reason">⛔ ${dc.reasons.join(' · ')}</div>` : '';
+
+        // Insert separator before first excluded card
+        let separator = '';
+        if (isExcluded && !separatorInserted) {
+            separatorInserted = true;
+            separator = `<div class="exp-dims-separator">No compatibles con tu carga (${excluded.length})</div>`;
+        }
+
+        const bestClass = !isExcluded && i === 0 ? 'best' : '';
+
+        return `${separator}<div class="exp-airline-card ${bestClass} ${isSelected ? 'selected' : ''} ${isExcluded ? 'excluded' : ''}" data-idx="${i}">
             <div class="exp-airline-head">
                 <div>
                     <div class="exp-airline-code">${escapeHtml(o.aerolinea.codigo)}${dgBadge}</div>
@@ -11761,17 +11837,21 @@ function renderExpAirlines() {
                 <span class="exp-airline-tag dias">${dias}</span>
                 ${o.ruta.cutoff ? `<span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>` : ''}
                 <span class="exp-airline-tag vigencia">${escapeHtml(o.ruta.vigencia)}</span>
+                ${dimsTag}
             </div>
+            ${excludedReason}
             <div class="exp-airline-breakdown">
                 ${breakdownHtml}
-                <button class="exp-airline-btn">${isSelected ? '✓ Elegida' : 'Elegir'}</button>
+                <button class="exp-airline-btn">${isExcluded ? '⛔' : isSelected ? '✓ Elegida' : 'Elegir'}</button>
             </div>
         </div>`;
     }).join('');
 
-    container.querySelectorAll('.exp-airline-card').forEach((card, idx) => {
+    // Only allow clicks on non-excluded cards
+    container.querySelectorAll('.exp-airline-card:not(.excluded)').forEach(card => {
+        const idx = parseInt(card.dataset.idx);
         card.addEventListener('click', () => {
-            expSelectedAirline = opciones[idx];
+            expSelectedAirline = sorted[idx];
             renderExpAirlines();
             updateExpCostSummary();
         });
