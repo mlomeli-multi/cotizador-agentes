@@ -11635,9 +11635,10 @@ function calcAirlineCost(ruta, kg, tipoCarga) {
     const surcharge = (!estibable && ruta.noEstibable) ? (1 + ruta.noEstibable) : 1;
     const fletefinal = Math.max(rate * kg * surcharge, minimo * surcharge);
 
-    // FSC per kg
+    // FSC per kg with optional minimum
     const fscRate = ruta.fsc || 0;
-    const fsc = fscRate * kg;
+    const fscMin = ruta.fscMin || 0;
+    const fsc = fscRate > 0 ? Math.max(fscRate * kg, fscMin) : 0;
 
     // SSC per kg (ANA Cargo)
     const sscRate = ruta.ssc || 0;

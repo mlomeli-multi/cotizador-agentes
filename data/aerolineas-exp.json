@@ -4540,13 +4540,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4596,13 +4597,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4653,13 +4655,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4710,13 +4713,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4767,13 +4771,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4824,13 +4829,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4881,13 +4887,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4938,13 +4945,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -4995,13 +5003,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5052,13 +5061,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5109,13 +5119,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5166,13 +5177,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5223,13 +5235,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5280,13 +5293,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5337,13 +5351,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5394,13 +5409,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5451,13 +5467,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5508,13 +5525,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5565,13 +5583,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5622,13 +5641,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5675,13 +5695,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5732,13 +5753,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5789,13 +5811,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5846,13 +5869,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5903,13 +5927,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -5960,13 +5985,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6017,13 +6043,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6074,13 +6101,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6131,13 +6159,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6188,13 +6217,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6245,13 +6275,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6303,13 +6334,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía EZE",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6360,13 +6392,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6415,13 +6448,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MEX",
@@ -6472,13 +6506,14 @@
           "tipoVuelo": "PAX",
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6530,13 +6565,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6588,13 +6624,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6646,13 +6683,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6704,13 +6742,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6761,13 +6800,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "Directo",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6819,13 +6859,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6877,13 +6918,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6935,13 +6977,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -6993,13 +7036,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7051,13 +7095,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7109,13 +7154,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7167,13 +7213,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "Directo",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7225,13 +7272,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7281,13 +7329,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "Directo",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7339,13 +7388,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7397,13 +7447,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7455,13 +7506,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7513,13 +7565,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7571,13 +7624,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7629,13 +7683,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7683,13 +7738,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7741,13 +7797,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7799,13 +7856,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7857,13 +7915,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7915,13 +7974,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -7973,13 +8033,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8031,13 +8092,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8089,13 +8151,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8147,13 +8210,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8205,13 +8269,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8263,13 +8328,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8321,13 +8387,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX · vía EZE",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8379,13 +8446,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "GDL",
@@ -8435,13 +8503,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8491,13 +8560,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8545,13 +8615,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "Directo",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8601,13 +8672,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8657,13 +8729,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8714,13 +8787,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "Directo",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8770,13 +8844,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8826,13 +8901,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8882,13 +8958,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8938,13 +9015,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -8994,13 +9072,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9050,13 +9129,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9106,13 +9186,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9162,13 +9243,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9218,13 +9300,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9274,13 +9357,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9330,13 +9414,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9386,13 +9471,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9442,13 +9528,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9498,13 +9585,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9554,13 +9642,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9607,13 +9696,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9663,13 +9753,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9719,13 +9810,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9775,13 +9867,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9831,13 +9924,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9887,13 +9981,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9943,13 +10038,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -9999,13 +10095,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -10055,13 +10152,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -10111,13 +10209,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -10167,13 +10266,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -10223,13 +10323,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX · vía EZE",
-          "fsc": 0.15,
+          "fsc": 0.2,
           "medidasMaximas": {
             "largo": 308,
             "ancho": 214,
             "alto": 160
           },
-          "pesoMaxPieza": 2500
+          "pesoMaxPieza": 2500,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -10279,13 +10380,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         },
         {
           "origen": "MTY",
@@ -10335,13 +10437,14 @@
           "transitoHrs": null,
           "vigencia": "Abril-Julio 2026",
           "descripcion": "vía MEX",
-          "fsc": 0.15,
+          "fsc": 0.12,
           "medidasMaximas": {
             "largo": 109,
             "ancho": 121,
             "alto": 78
           },
-          "pesoMaxPieza": 180
+          "pesoMaxPieza": 180,
+          "fscMin": 15
         }
       ]
     }
