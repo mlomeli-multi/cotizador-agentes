@@ -11685,16 +11685,17 @@ function checkPalletFitsRoute(ruta) {
     const pesoReal = parseFloat(document.getElementById('peso-exp').value) || 0;
     const totalPallets = lineas.reduce((s, l) => s + l.qty, 0);
     const pesoPorPieza = totalPallets > 0 ? pesoReal / totalPallets : pesoReal;
-    const reasons = [];
+    const reasons = new Set();
     for (const l of lineas) {
         if (m) {
-            if (l.largo > m.largo) reasons.push(`Largo ${l.largo} cm > máx ${m.largo} cm`);
-            if (l.ancho > m.ancho) reasons.push(`Ancho ${l.ancho} cm > máx ${m.ancho} cm`);
-            if (l.alto > m.alto) reasons.push(`Alto ${l.alto} cm > máx ${m.alto} cm`);
+            if (l.largo > m.largo) reasons.add(`Largo ${l.largo} cm > máx ${m.largo} cm`);
+            if (l.ancho > m.ancho) reasons.add(`Ancho ${l.ancho} cm > máx ${m.ancho} cm`);
+            if (l.alto > m.alto) reasons.add(`Alto ${l.alto} cm > máx ${m.alto} cm`);
         }
     }
-    if (pMax && pesoPorPieza > pMax) reasons.push(`Peso/pieza ${Math.round(pesoPorPieza)} kg > máx ${pMax} kg`);
-    return { fits: reasons.length === 0, reasons, limits: m, pesoMax: pMax, noData: false };
+    if (pMax && pesoPorPieza > pMax) reasons.add(`Peso/pieza ${Math.round(pesoPorPieza)} kg > máx ${pMax} kg`);
+    const reasonArr = [...reasons];
+    return { fits: reasonArr.length === 0, reasons: reasonArr, limits: m, pesoMax: pMax, noData: false };
 }
 
 function renderExpAirlines() {
