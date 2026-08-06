@@ -4774,6 +4774,7 @@ const CIUDADES_MX = {
     'escobedo': 'NL', 'general escobedo': 'NL', 'garcia': 'NL', 'juarez nl': 'NL',
     'cadereyta': 'NL', 'cadereyta jimenez': 'NL', 'linares': 'NL', 'montemorelos': 'NL',
     'santiago': 'NL', 'cienega de flores': 'NL', 'pesqueria': 'NL', 'zuazua': 'NL', 'salinas victoria': 'NL',
+    'el carmen': 'NL', 'ciudad benito juarez': 'NL', 'benito juarez nl': 'NL',
     // Oaxaca
     'oaxaca': 'OAX', 'oaxaca de juarez': 'OAX', 'juchitan': 'OAX', 'salina cruz': 'OAX',
     'huatulco': 'OAX', 'puerto escondido': 'OAX', 'tuxtepec': 'OAX', 'san juan bautista tuxtepec': 'OAX',
@@ -4861,6 +4862,7 @@ const ESTADOS_MX = {
 // Alias/abreviaturas de ciudades → nombre canónico
 // Para que "SLP" y "SAN LUIS POTOSI" se agrupen igual
 const CIUDAD_ALIAS = {
+    // Códigos IATA / abreviaturas comunes
     'slp': 'san luis potosi',
     'mty': 'monterrey',
     'gdl': 'guadalajara',
@@ -4887,6 +4889,42 @@ const CIUDAD_ALIAS = {
     'vsa': 'villahermosa',
     'oax': 'oaxaca',
     'pch': 'pachuca',
+    // Más abreviaturas IATA / cortas
+    'nld': 'nuevo laredo',
+    'cel': 'celaya',
+    'irp': 'irapuato',
+    'slm': 'salamanca',
+    'sal': 'saltillo',
+    'obr': 'ciudad obregon',
+    'lap': 'la paz',
+    'tlc': 'toluca',
+    'dgo': 'durango',
+    'zam': 'zamora',
+    'mor': 'morelia',
+    'aca': 'acapulco',
+    'zlo': 'manzanillo',
+    'pzo': 'poza rica',
+    'tap': 'tapachula',
+    'vil': 'villahermosa',
+    // "CD." abreviado que podría resultar ambiguo al strip de prefijo
+    'cd. de mexico': 'ciudad de mexico',
+    'cd de mexico': 'ciudad de mexico',
+    // Formas cortas que se unifican con el nombre canónico largo
+    // Evita duplicados en autocomplete cuando distintos proveedores usan distintas variantes
+    'juarez': 'ciudad juarez',
+    'obregon': 'ciudad obregon',
+    'carmen': 'ciudad del carmen',
+    'victoria': 'ciudad victoria',
+    'valles': 'ciudad valles',
+    'mante': 'ciudad mante',
+    // Rio Verde / Rioverde unificados
+    'rio verde': 'rioverde',
+    // Errores ortográficos comunes
+    'monterey': 'monterrey',
+    'guadaljara': 'guadalajara',
+    'queretero': 'queretaro',
+    'moncloba': 'monclova',
+    'saltilo': 'saltillo',
 };
 
 // Normaliza el nombre de una ciudad del proveedor a clave única: "ciudad|ESTADO"
@@ -4894,6 +4932,8 @@ const CIUDAD_ALIAS = {
 //     "LEON" → "leon|GTO"
 //     "SAN LUIS POTOSI" → "san luis potosi|SLP"
 //     "SLP" → "san luis potosi|SLP"
+//     "MONTERREY NL" → "monterrey|NL"  (sin coma)
+//     "CIUDAD DE MEXICO" → "ciudad de mexico|CDMX"  (no "mexico|MEX")
 function normalizarCiudadMX(str) {
     const norm = normalizarTexto(str);
 
@@ -4903,27 +4943,53 @@ function normalizarCiudadMX(str) {
     let ciudad = partes[0] || '';
     let estadoPart = partes[1] || '';
 
-    // Quitar prefijos comunes de ciudad
-    ciudad = ciudad.replace(/^(ciudad de |cd\.\s*|cd |ciudad del )/i, '').trim();
-
-    // Resolver alias: "SLP" → "san luis potosi"
+    // 1. Intentar alias/abreviatura ANTES de cualquier modificación
+    //    Ej: "SLP" → "san luis potosi", "mty" → "monterrey", "cd. de mexico" → "ciudad de mexico"
     if (CIUDAD_ALIAS[ciudad]) {
         ciudad = CIUDAD_ALIAS[ciudad];
+    } else if (!CIUDADES_MX[ciudad]) {
+        // 2. Quitar prefijos "cd." SOLO si la ciudad no se reconoce directamente en el catálogo
+        //    Esto evita que "ciudad de mexico" se convierta en "mexico" (Estado de Mexico)
+        const stripped = ciudad.replace(/^(cd\.\s*|cd )/i, '').trim();
+        if (stripped && stripped !== ciudad) {
+            const resolvedStripped = CIUDAD_ALIAS[stripped] || stripped;
+            if (CIUDAD_ALIAS[stripped] || CIUDADES_MX[resolvedStripped] || CIUDADES_MX[stripped]) {
+                ciudad = resolvedStripped;
+            }
+        }
     }
 
-    // Intentar resolver estado de la parte después de la coma
+    // 3. Intentar resolver estado de la parte después de la coma
     let estadoCode = null;
     if (estadoPart) {
         estadoCode = ESTADOS_MX[estadoPart] || null;
     }
 
-    // Si no hay estado por coma, ver si la ciudad está en el catálogo
+    // 4. Si no hay estado por coma, ver si la ciudad está en el catálogo
     if (!estadoCode && CIUDADES_MX[ciudad]) {
         estadoCode = CIUDADES_MX[ciudad];
     }
 
-    // Caso especial: el texto completo sin coma podría ser una ciudad conocida
-    // Ej: "SAN LUIS POTOSI" (sin coma, pero es tanto ciudad como estado)
+    // 5. Sin coma: intentar extraer abreviatura de estado al final del nombre
+    //    Ej: "monterrey nl" → ciudad="monterrey", estado="NL"
+    //    Ej: "leon gto" → ciudad="leon", estado="GTO"
+    //    Ej: "mty nl" → alias "mty"→"monterrey", luego "monterrey|NL"
+    if (!estadoCode && !estadoPart) {
+        const tokens = ciudad.split(' ');
+        if (tokens.length >= 2) {
+            const lastToken = tokens[tokens.length - 1];
+            const possibleState = ESTADOS_MX[lastToken];
+            if (possibleState) {
+                const ciudadSinSufijo = tokens.slice(0, -1).join(' ');
+                const resolvedCity = CIUDAD_ALIAS[ciudadSinSufijo] || ciudadSinSufijo;
+                ciudad = resolvedCity;
+                estadoCode = possibleState;
+            }
+        }
+    }
+
+    // 6. Caso especial: el texto completo sin coma podría ser una ciudad conocida compuesta
+    //    Ej: "san luis potosi" sin coma
     if (!estadoCode) {
         const fullNorm = partes.join(' ');
         const fullResolved = CIUDAD_ALIAS[fullNorm] || fullNorm;
@@ -6046,6 +6112,7 @@ function normalizeImportedCityName(value) {
 
     const aliases = {
         'cdmx': 'Ciudad de Mexico',
+        'df': 'Ciudad de Mexico',
         'slp': 'San Luis Potosi',
         'aifa nlu': 'AIFA, Estado de Mexico',
         'aifa': 'AIFA, Estado de Mexico',
@@ -6054,9 +6121,17 @@ function normalizeImportedCityName(value) {
         'salinas victoria, n.l.': 'Salinas Victoria, Nuevo Leon',
         'linares, n.l.': 'Linares, Nuevo Leon',
         'nuevo laredo': 'Nuevo Laredo, Tamaulipas',
+        'nuevo laredo,tamps': 'Nuevo Laredo, Tamaulipas',
         'durango,dgo': 'Durango, Durango',
         'cd juarez': 'Ciudad Juarez, Chihuahua',
+        'cd. juarez': 'Ciudad Juarez, Chihuahua',
         'cd victoria': 'Ciudad Victoria, Tamaulipas',
+        'cd. victoria': 'Ciudad Victoria, Tamaulipas',
+        'cd. obregon': 'Ciudad Obregon, Sonora',
+        'cd obregon': 'Ciudad Obregon, Sonora',
+        'monterey': 'Monterrey, Nuevo Leon',
+        'rioverde': 'Rioverde, San Luis Potosi',
+        'rio verde': 'Rioverde, San Luis Potosi',
     };
 
     return aliases[lower] || raw;
