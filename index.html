@@ -7308,6 +7308,7 @@ function buildMaritimeProviders(entries) {
                 tarifas: [],
                 totalRutas: 0,
                 fechaCarga: new Date().toLocaleDateString('es-MX'),
+                vigenciaHasta: '',
             });
         }
         groups.get(groupKey).tarifas.push({
@@ -7328,9 +7329,45 @@ function buildMaritimeProviders(entries) {
         .map((provider) => {
             provider.tarifas.sort((a, b) => a.ciudad.localeCompare(b.ciudad, 'es-MX'));
             provider.totalRutas = provider.tarifas.length;
+            // Auto-detectar vigencia limitada: Mundiales vence en octubre
+            if (!provider.vigenciaHasta) {
+                const isMundiales = /mundiales/i.test(provider.nombre);
+                const hasOctubreNote = provider.tarifas.some(t =>
+                    /oct(ubre)?/i.test(t.comentarios || '') || /oct(ubre)?/i.test(t.vigencia || ''));
+                if (isMundiales || hasOctubreNote) {
+                    provider.vigenciaHasta = '2026-10-31';
+                }
+            }
             return provider;
         })
         .sort((a, b) => a.puerto.localeCompare(b.puerto, 'es-MX') || a.nombre.localeCompare(b.nombre, 'es-MX'));
+}
+
+// Retorna true si el proveedor marítimo está vigente hoy
+function isMaritimeProviderVigente(provider) {
+    if (!provider.vigenciaHasta) return true;
+    return new Date(provider.vigenciaHasta + 'T23:59:59') >= new Date();
+}
+
+// Permite editar la vigencia de un proveedor marítimo desde la lista
+function editMaritimeProviderVigencia(id) {
+    const providers = getMaritimeProviders();
+    const p = providers.find(x => x.id === id);
+    if (!p) return;
+    const current = p.vigenciaHasta || '';
+    const val = prompt(
+        `Vigencia hasta para "${p.nombre}" (${p.puerto})\nFormato: YYYY-MM-DD · Dejar vacío = sin vencimiento`,
+        current
+    );
+    if (val === null) return;
+    const cleaned = val.trim();
+    if (cleaned && !/^\d{4}-\d{2}-\d{2}$/.test(cleaned)) {
+        alert('Formato inválido. Usa YYYY-MM-DD  (ej: 2026-10-31)');
+        return;
+    }
+    p.vigenciaHasta = cleaned;
+    saveMaritimeProviders(providers);
+    renderMaritimeProvidersList();
 }
 
 function renderMaritimeProvidersList() {
@@ -7342,18 +7379,27 @@ function renderMaritimeProvidersList() {
         return;
     }
 
-    container.innerHTML = providers.map(p => `
-        <div class="provider-item">
-            <div>
-                <div class="provider-name">${escapeHtml(p.nombre)}</div>
+    container.innerHTML = providers.map(p => {
+        const vigente = isMaritimeProviderVigente(p);
+        const vigBadge = !vigente
+            ? '<span style="margin-left:6px;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.7rem;font-weight:600;">Vencido</span>'
+            : p.vigenciaHasta
+                ? `<span style="margin-left:6px;background:#d1fae5;color:#065f46;border-radius:4px;padding:1px 6px;font-size:0.7rem;">Vigencia: ${escapeHtml(p.vigenciaHasta)}</span>`
+                : '';
+        return `
+        <div class="provider-item" style="${!vigente ? 'opacity:0.45;' : ''}">
+            <div style="flex:1;min-width:0;">
+                <div class="provider-name">${escapeHtml(p.nombre)}${vigBadge}</div>
                 <div class="provider-meta">${escapeHtml(p.puerto)} · ${p.totalRutas} rutas · Cargado: ${escapeHtml(p.fechaCarga)}</div>
             </div>
             <div class="provider-actions">
+                <button class="btn btn-secondary btn-sm" onclick="editMaritimeProviderVigencia('${p.id}')" title="Editar vigencia">&#x1F4C5;</button>
                 <button class="btn btn-secondary btn-sm" onclick="viewMaritimeProvider('${p.id}')">Ver</button>
                 <button class="btn btn-secondary btn-sm" style="color:var(--red);" onclick="deleteMaritimeProvider('${p.id}')">Eliminar</button>
             </div>
         </div>
-    `).join('');
+    `;
+    }).join('');
 }
 
 function deleteMaritimeProvider(id) {
@@ -7416,6 +7462,7 @@ function getMaritimeCitiesDisponibles(puerto) {
 
     getMaritimeProviders().forEach((provider) => {
         if (puerto && provider.puerto !== puerto) return;
+        if (!isMaritimeProviderVigente(provider)) return;
         provider.tarifas.forEach((tarifa) => {
             const ciudadOriginal = normalizeWhitespace(tarifa.ciudad);
             const ciudadKey = tarifa.ciudadKey || normalizarCiudadMX(ciudadOriginal);
@@ -8530,6 +8577,7 @@ document.getElementById('btn-cotizar-maritimo')?.addEventListener('click', () =>
 
     getMaritimeProviders().forEach((provider) => {
         if (provider.puerto !== puerto) return;
+        if (!isMaritimeProviderVigente(provider)) return;
         provider.tarifas.forEach((tarifa) => {
             const tarifaKey = tarifa.ciudadKey || normalizarCiudadMX(tarifa.ciudad);
             const matchPorKey = tarifaKey === ciudadKey;
