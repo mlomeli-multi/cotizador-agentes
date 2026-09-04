@@ -967,8 +967,8 @@
                     "ciudad": "Monterrey",
                     "ciudadKey": "monterrey|NL",
                     "unidad": "Portacontenedor",
-                    "single": 26,
-                    "full": 38,
+                    "single": 26000,
+                    "full": 38000,
                     "moneda": "Pesos Mexicanos",
                     "vigencia": "31/12/2026",
                     "vigenciaTs": 1798696800000,
@@ -977,7 +977,7 @@
                 },
                 {
                     "ciudad": "Parras",
-                    "ciudadKey": "parras",
+                    "ciudadKey": "parras|COAH",
                     "unidad": "Portacontenedor",
                     "single": 38000,
                     "full": 64000,
@@ -1165,7 +1165,7 @@
                 },
                 {
                     "ciudad": "Parras",
-                    "ciudadKey": "parras",
+                    "ciudadKey": "parras|COAH",
                     "unidad": "Portacontenedor",
                     "single": 38000,
                     "full": 64000,
@@ -1687,7 +1687,7 @@
                 },
                 {
                     "ciudad": "Mexicali",
-                    "ciudadKey": "mexicali",
+                    "ciudadKey": "mexicali|BC",
                     "unidad": "Portacontenedor",
                     "single": 182000,
                     "full": 233000,
@@ -1711,7 +1711,7 @@
                 },
                 {
                     "ciudad": "Pesquería",
-                    "ciudadKey": "pesqueria",
+                    "ciudadKey": "pesqueria|NL",
                     "unidad": "Portacontenedor",
                     "single": 31500,
                     "full": 44100,
@@ -1853,8 +1853,8 @@
                     "ciudad": "Monterrey",
                     "ciudadKey": "monterrey|NL",
                     "unidad": "Portacontenedor",
-                    "single": 26,
-                    "full": 38,
+                    "single": 26000,
+                    "full": 38000,
                     "moneda": "Pesos Mexicanos",
                     "vigencia": "31/12/2026",
                     "vigenciaTs": 1798696800000,
@@ -1887,8 +1887,8 @@
                     "ciudad": "Monterrey",
                     "ciudadKey": "monterrey|NL",
                     "unidad": "Portacontenedor",
-                    "single": 26,
-                    "full": 38,
+                    "single": 26000,
+                    "full": 38000,
                     "moneda": "Pesos Mexicanos",
                     "vigencia": "31/12/2026",
                     "vigenciaTs": 1798696800000,
@@ -2193,7 +2193,7 @@
                 },
                 {
                     "ciudad": "Pesqueria",
-                    "ciudadKey": "pesqueria",
+                    "ciudadKey": "pesqueria|NL",
                     "unidad": "Portacontenedor",
                     "single": 97000,
                     "full": 116000,
@@ -4543,7 +4543,7 @@
                 },
                 {
                     "ciudad": "Guanajuato",
-                    "ciudadKey": "guanajuato|GTO",
+                    "ciudadKey": "guanajuato",
                     "unidad": "Portacontenedor",
                     "single": 62200,
                     "full": 86500,
@@ -5734,5 +5734,5 @@
         }
     ],
     "conceptosFijos": {},
-    "exportDate": "2026-09-03T12:00:00.000Z"
+    "exportDate": "2026-09-03T13:00:00.000Z"
 }
