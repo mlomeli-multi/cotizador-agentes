@@ -11750,9 +11750,18 @@ function calcAirlineTierRate(tiers, kg) {
     return rate;
 }
 
+function formatTT(ruta) {
+    if (ruta.tt) {
+        const { valor, unidad } = ruta.tt;
+        return unidad === 'horas' ? `TT ${valor}h` : `TT ${valor}d`;
+    }
+    if (ruta.transitoHrs != null) return `TT ${ruta.transitoHrs}h`;
+    return null;
+}
+
 function calcAirlineCost(ruta, kg, tipoCarga) {
     if (tipoCarga === undefined) tipoCarga = expTipoCarga;
-    if (kg <= 0) return { total: 0, flete: 0, fsc: 0, fscRate: 0, ssc: 0, sscRate: 0, sscMinApplied: false, cgc: 0, dgFeeTotal: 0, transferHouse: 0, rate: 0, usedMinimo: false, minimo: 0, tipoCalc: '' };
+    if (kg <= 0) return { total: 0, flete: 0, fsc: 0, fscRate: 0, ssc: 0, sscRate: 0, sscMinApplied: false, cgc: 0, myc: 0, mycRate: 0, dgFeeTotal: 0, transferHouse: 0, rate: 0, usedMinimo: false, minimo: 0, tipoCalc: '' };
 
     let tiers, minimo, dgFeeUN = 0;
 
@@ -11795,6 +11804,10 @@ function calcAirlineCost(ruta, kg, tipoCarga) {
     // CGC flat charges
     const cgc = (ruta.cgcMawb || 0) + (ruta.cgcHawb || 0);
 
+    // MYC per-kg charge (e.g. Cathay Management/Yield Charge)
+    const mycRate = ruta.myc || 0;
+    const myc = mycRate > 0 ? mycRate * kg : 0;
+
     // DG Fee per UN (class-based for CAO, flat for PAX)
     let dgFeeTotal = 0;
     if (tipoCarga === 'dg' && dgFeeUN && expSelectedUNs.length > 0) {
@@ -11812,11 +11825,12 @@ function calcAirlineCost(ruta, kg, tipoCarga) {
 
     const usedMinimo = (rate * kg * surcharge) < (minimo * surcharge);
     return {
-        total: fletefinal + fsc + ssc + cgc + dgFeeTotal + transferHouse,
+        total: fletefinal + fsc + ssc + cgc + myc + dgFeeTotal + transferHouse,
         flete: fletefinal,
         fsc, fscRate,
         ssc, sscRate, sscMinApplied,
         cgc,
+        myc, mycRate,
         dgFeeTotal,
         transferHouse,
         rate,
@@ -11913,8 +11927,8 @@ function renderExpAirlines() {
     container.innerHTML = sorted.map((o, i) => {
         const result = calcAirlineCost(o.ruta, cw);
         if (!result) return '';
-        const { total, flete, fsc, fscRate, ssc, sscRate, sscMinApplied, cgc, dgFeeTotal, transferHouse, rate, usedMinimo, minimo } = result;
-        const dias = o.ruta.salidasDias.map(d => DAY_NAMES_EXP[d] || d).join(' · ');
+        const { total, flete, fsc, fscRate, ssc, sscRate, sscMinApplied, cgc, myc, mycRate, dgFeeTotal, transferHouse, rate, usedMinimo, minimo } = result;
+        const dias = (o.ruta.salidasDias || []).map(d => DAY_NAMES_EXP[d] || d).join(' · ');
         const isSelected = expSelectedAirline?.ruta === o.ruta;
         const isExcluded = hasPalletData && o._dimCheck && !o._dimCheck.fits;
         const priceStr = cw > 0 ? `$${total.toFixed(2)} USD` : '—';
@@ -11926,20 +11940,22 @@ function renderExpAirlines() {
             // SSC: show per-kg in pills only when minimum is NOT active
             if (sscRate > 0 && !sscMinApplied) pills.push(`<span class="bk-pill ssc">SSC $${sscRate.toFixed(2)}</span>`);
             if (fscRate > 0) pills.push(`<span class="bk-pill fsc">FSC $${fscRate.toFixed(2)}</span>`);
+            if (mycRate > 0) pills.push(`<span class="bk-pill myc">MYC $${mycRate.toFixed(2)}</span>`);
             const perKgSsc = sscMinApplied ? 0 : sscRate;
-            const allInRate = rate + perKgSsc + fscRate;
+            const allInRate = rate + perKgSsc + fscRate + mycRate;
             const allInLabel = pills.length > 1 ? `= <strong>$${allInRate.toFixed(2)}/kg</strong>` : `<strong>$${rate.toFixed(2)}/kg</strong>`;
 
             let fleteLine;
             if (usedMinimo) {
                 fleteLine = `Mínimo <strong>$${minimo.toFixed(2)}</strong>`;
             } else {
-                const baseAmt = flete + fsc + (sscMinApplied ? 0 : ssc);
+                const baseAmt = flete + fsc + (sscMinApplied ? 0 : ssc) + myc;
                 fleteLine = `${cw.toFixed(0)} kg × $${allInRate.toFixed(2)} = <strong>$${baseAmt.toFixed(2)}</strong>`;
             }
 
             let flatParts = [];
             if (sscMinApplied) flatParts.push(`Screening mín $${ssc.toFixed(2)}`);
+            if (usedMinimo && myc > 0) flatParts.push(`MYC $${myc.toFixed(2)}`);
             if (cgc > 0) flatParts.push(`CC $${cgc.toFixed(2)}`);
             if (transferHouse > 0) flatParts.push(`TH $${transferHouse.toFixed(2)}`);
             if (dgFeeTotal > 0) flatParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
@@ -11989,8 +12005,9 @@ function renderExpAirlines() {
                 </div>
             </div>
             <div class="exp-airline-meta">
-                ${o.ruta.transitoHrs != null ? `<span class="exp-airline-tag tt">TT ${o.ruta.transitoHrs}h</span>` : ''}
-                <span class="exp-airline-tag dias">${dias}</span>
+                ${formatTT(o.ruta) ? `<span class="exp-airline-tag tt">${formatTT(o.ruta)}</span>` : ''}
+                ${dias ? `<span class="exp-airline-tag dias">${dias}</span>` : ''}
+                ${o.ruta.servicio ? `<span class="exp-airline-tag servicio">${escapeHtml(o.ruta.servicio)}</span>` : ''}
                 ${o.ruta.cutoff ? `<span class="exp-airline-tag">Cut: ${escapeHtml(o.ruta.cutoff)}</span>` : ''}
                 <span class="exp-airline-tag vigencia">${escapeHtml(o.ruta.vigencia)}</span>
                 ${dimsTag}
@@ -12027,12 +12044,13 @@ function getExpAirlineCosts() {
     const cw = getExpChargeableWeight();
     const result = calcAirlineCost(expSelectedAirline.ruta, cw);
     if (!result || result.total <= 0) return [];
-    const { flete, fsc, ssc, cgc, dgFeeTotal, transferHouse, tipoCalc } = result;
+    const { flete, fsc, ssc, cgc, myc, dgFeeTotal, transferHouse, tipoCalc } = result;
     const code = expSelectedAirline.aerolinea.codigo;
     const costs = [];
     costs.push({ label: `Flete aéreo · ${code} (${tipoCalc})`, value: flete, currency: 'USD' });
     if (ssc > 0)           costs.push({ label: `Screening · ${code}`, value: ssc, currency: 'USD' });
     if (fsc > 0)           costs.push({ label: `FSC · ${code}`, value: fsc, currency: 'USD' });
+    if (myc > 0)           costs.push({ label: `MYC · ${code}`, value: myc, currency: 'USD' });
     if (cgc > 0)           costs.push({ label: `CC (MAWB)`, value: cgc, currency: 'USD' });
     if (transferHouse > 0) costs.push({ label: `Transfer House · ${code}`, value: transferHouse, currency: 'USD' });
     if (dgFeeTotal > 0)    costs.push({ label: `DG Fee · ${expSelectedUNs.length} UN`, value: dgFeeTotal, currency: 'USD' });
