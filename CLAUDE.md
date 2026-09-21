@@ -5,6 +5,7 @@ Cotizador de transporte para operación de freight forwarding en México.
 
 Modos activos:
 - `Aéreo Importación (DAP)`
+- `Aéreo Exportación (EXW)`
 - `Marítimo Importación (DAP)`
 
 Stack actual:
@@ -20,7 +21,8 @@ Stack actual:
 - `index.html` — app principal con HTML, CSS y JS embebidos
 - `index-lab.html` — copia de laboratorio para pruebas y futuras mejoras sin tocar el flujo estable
 - `google-apps-script.js` — referencia del Apps Script desplegado
-- `data/cotizador-base.json` — base compartida de tarifas
+- `data/cotizador-base.json` — base compartida de tarifas DAP (aéreo y marítimo)
+- `data/aerolineas-exp.json` — tarifas de aerolineas para EXW aéreo
 - `data/tipo-cambio.json` — respaldo compartido de tipo de cambio
 - `data/conceptos-destino-maritimos.json` — conceptos destino marítimos por naviera
 - `netlify.toml` — legado de deploy; el sitio vigente se valida en GitHub Pages
@@ -69,13 +71,15 @@ Stack actual:
 
 ## Estado actual del cotizador
 
-### Aéreo
+### DAP Aéreo
 - Flujo DAP aéreo funcional de punta a punta
-- Nuevos proveedores integrados en la base compartida:
-  - `Birlesti Express`
-  - `Sandoval`
-  - `Ramce`
-  - `Raymon Pack`
+- Proveedores activos en `cotizador-base.json` (tarifas 2026 Final):
+  - MEX y NLU: `63 destinos` por proveedor (TRAPOL, BARAJAS, Birlesti Express, Sandoval, Ramce, Raymon Pack)
+  - MTY: proveedores existentes + `DLS Trucking` (7 destinos)
+- Normalización de nombres de ciudad:
+  - CDMX → `CIUDAD DE MEXICO, CIUDAD DE MEXICO`
+  - EDO MEX → `ESTADO DE MEXICO`
+  - Ciudades MTY con nombre de estado completo
 - Resumen de costos por aeropuerto ya integrado
 - Calculadora aérea ya contempla:
   - flete terrestre aeroportuario
@@ -101,6 +105,30 @@ Stack actual:
   - `Proveedor`
   - `Venta`
 - `Resumen operativo` lateral sticky en desktop
+
+### EXW Aéreo
+- Flujo EXW aéreo activo (pestaña separada)
+- Tarifas en `data/aerolineas-exp.json` — vigencia: `Septiembre 2026` (926 rutas)
+- Aerolineas activas:
+  - `CZ` Aerocharter/China Southern
+  - `MA` MAS AIR
+  - `CX` Cathay Pacific
+  - `NH` All Nippon Airways
+  - `AM` Aeromexico
+  - `LA` LATAM
+  - `AV` Avianca
+  - `DL` Delta
+- LUFTHANSA excluida del tarifario; rutas con origen CUN excluidas
+- Estructura por ruta: `tiers` de precio por kg, `minimo`, `servicio`, `fsc`, `cgcMawb`, `cgcHawb`, `ssc`, `sscMin`, `myc`, `tt {valor, unidad}`, `salidasDias`, `cutoff`, `medidasMaximas`, `tipoCarga`
+- Reglas de FSC: `0` = ALL IN ya incluido en tarifa; `> 0` = suma por kg
+- Cargo MYC (Management/Yield Charge) por kg — aplica principalmente Cathay
+- El usuario selecciona nivel de servicio al cotizar (ej. PR1/PR2/PR3 Cathay; Estándar/Prioritario NH)
+- Funciones clave:
+  - `calcAirlineCost(ruta, kg)` — flete + fsc + ssc + cgc + myc + transferHouse
+  - `renderExpAirlines()` — cards con badge de servicio, TT via `formatTT`, días de salida
+  - `getExpAirlineCosts()` — líneas itemizadas para resumen de cotización
+  - `formatTT(ruta)` — soporta `tt.{valor, unidad}` y legacy `transitoHrs`
+- Zonas Delta (US-ALASKA, US-ATL, etc.) pendientes de mapeo; se conservan tal cual por ahora
 
 ### Marítimo
 - Flujo `DAP Marítimo` activo y funcional
@@ -197,9 +225,15 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 ## Archivos / datos clave para futuras iteraciones
 - `index.html` concentra casi toda la lógica y sigue siendo la versión estable publicada para el equipo
 - `index-lab.html` se usa como entorno de pruebas para iterar cambios grandes antes de llevarlos a `index.html`
-- `data/cotizador-base.json` es crítico y estable
+- `data/cotizador-base.json` es crítico y estable (tarifas DAP aéreo y marítimo)
+- `data/aerolineas-exp.json` se actualiza por vigencia (actualmente Septiembre 2026); no mezclar con cotizador-base.json
 - `data/tipo-cambio.json` es respaldo, no fuente primaria cuando Apps Script responde
 - `data/conceptos-destino-maritimos.json` seguirá creciendo por naviera
+
+## Pendientes conocidos
+- **Zonas Delta EXW**: destinos tipo `US-ALASKA`, `US-ATL`, etc. pendientes de mapeo a ciudades reales; el usuario proveerá la tabla
+- **DV53 / FB para DAP aéreo**: Caja Seca 53' y Plataforma — pendiente UI y datos
+- **DAP Marítimo Sección 2** (desde almacén): datos disponibles del Excel marítimo; pendiente de implementar como tab separado
 
 ## Riesgos / recordatorios técnicos
 - No hay suite automatizada de pruebas UI; después de cambios grandes conviene smoke test manual en navegador
