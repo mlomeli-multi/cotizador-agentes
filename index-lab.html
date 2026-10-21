@@ -4758,7 +4758,7 @@
                                     </select>
                                 </div>
                                 <div class="form-group" id="mexp-equipo-field" style="display:none;">
-                                    <label>Equipo y contenedores</label>
+                                    <label>Equipo y contenedores <span id="mexp-equipo-hint" style="font-size:0.72rem;font-weight:400;color:#f59e0b;display:none;">— selecciona al menos uno</span></label>
                                     <div id="mexp-equipo-wrap" style="display:flex;flex-wrap:wrap;gap:0.35rem;padding-top:0.25rem;"></div>
                                 </div>
                             </div>
@@ -4797,7 +4797,8 @@
                                 </div>
                             </div>
 
-                            <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;">
+                            <div style="margin-top:1.5rem;display:flex;align-items:center;justify-content:flex-end;gap:0.75rem;">
+                                <span id="mexp-step1-blocker" style="display:none;font-size:0.78rem;color:#f59e0b;">↑ Selecciona tipo de equipo</span>
                                 <button class="btn btn-primary" id="mexp-btn-step1" onclick="mexpGoStep(2)" disabled>
                                     Ver cargos en destino →
                                 </button>
@@ -11709,7 +11710,7 @@ function mexpOnPODChange() {
     document.getElementById('mexp-equipo-field').style.display = 'block';
     mexpUpdateRouteInfo();
     document.getElementById('mexp-recoleccion-wrap').style.display = 'block';
-    document.getElementById('mexp-btn-step1').disabled = !ruta || Object.keys(mexpEquiposSeleccionados).length === 0;
+    mexpSyncStepBtn();
     mexpSetRecoleccion(true);
 }
 
@@ -11747,6 +11748,17 @@ function mexpRenderEquipoButtons() {
     }).join('');
 }
 
+function mexpSyncStepBtn() {
+    const hasEq = Object.keys(mexpEquiposSeleccionados).length > 0;
+    const ready  = !!mexpRuta && hasEq;
+    const showHint = !!mexpRuta && !hasEq;
+    document.getElementById('mexp-btn-step1').disabled = !ready;
+    const blocker = document.getElementById('mexp-step1-blocker');
+    const hint    = document.getElementById('mexp-equipo-hint');
+    if (blocker) blocker.style.display = showHint ? 'inline' : 'none';
+    if (hint)    hint.style.display    = showHint ? 'inline' : 'none';
+}
+
 function mexpToggleEquipo(eq) {
     if (mexpEquiposSeleccionados[eq] !== undefined) {
         delete mexpEquiposSeleccionados[eq];
@@ -11754,8 +11766,7 @@ function mexpToggleEquipo(eq) {
         mexpEquiposSeleccionados[eq] = 1;
     }
     mexpRenderEquipoButtons();
-    const hasEq = Object.keys(mexpEquiposSeleccionados).length > 0;
-    document.getElementById('mexp-btn-step1').disabled = !mexpRuta || !hasEq;
+    mexpSyncStepBtn();
 }
 
 function mexpSetEquipoQty(eq, val) {
