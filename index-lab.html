@@ -11798,7 +11798,8 @@ function mexpPolKey() {
 }
 
 function mexpGetProveedoresMaritimos() {
-    return (window.cotizadorBase && window.cotizadorBase.proveedoresMaritimos) || [];
+    try { return JSON.parse(localStorage.getItem(MARITIME_STORAGE_KEY) || '[]'); }
+    catch(e) { return []; }
 }
 
 function mexpPopulateCiudadOrigen() {
