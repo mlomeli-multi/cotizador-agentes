@@ -3611,6 +3611,19 @@
         .mexp-venta-table tr.total-row td { font-weight: 700; border-top: 2px solid var(--gray-300); }
         .mexp-venta-input { width: 90px; padding: 0.3rem 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.82rem; text-align: right; }
         .mexp-resumen { background: var(--gray-50); border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.83rem; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--gray-200); }
+        .mexp-equipo-btn {
+            display: inline-flex; align-items: center; gap: 0.35rem;
+            padding: 0.28rem 0.65rem; border-radius: 8px; border: 1.5px solid var(--gray-300);
+            background: white; color: var(--gray-600); font-size: 0.78rem; font-weight: 600;
+            cursor: pointer; transition: all .15s; user-select: none;
+        }
+        .mexp-equipo-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .mexp-equipo-btn.active { border-color: var(--blue); background: #eff6ff; color: #1d4ed8; }
+        .mexp-equipo-qty {
+            width: 36px; padding: 0.18rem 0.3rem; border: 1px solid var(--gray-300);
+            border-radius: 4px; font-size: 0.75rem; text-align: center; background: white;
+        }
+        .mexp-equipo-btn.active .mexp-equipo-qty { border-color: #93c5fd; }
         /* ===== ADMIN MODE ===== */
         .admin-only { display: none; }
         body.admin-mode .admin-only { display: block; }
@@ -4736,15 +4749,9 @@
                                         <option value="">— Elige país primero —</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label>Equipo</label>
-                                    <select id="mexp-equipo" disabled>
-                                        <option value="">— Elige ruta —</option>
-                                    </select>
-                                </div>
-                                <div class="form-group">
-                                    <label>Contenedores</label>
-                                    <input type="number" id="mexp-numcont" value="1" min="1" max="20" disabled>
+                                <div class="form-group" id="mexp-equipo-field" style="display:none;">
+                                    <label>Equipo y contenedores</label>
+                                    <div id="mexp-equipo-wrap" style="display:flex;flex-wrap:wrap;gap:0.35rem;padding-top:0.25rem;"></div>
                                 </div>
                             </div>
 
@@ -11556,8 +11563,7 @@ document.getElementById('import-file').addEventListener('change', (e) => {
 
 let mexpData = null;          // { naviera, vigencia, rutas }
 let mexpRuta = null;          // ruta seleccionada
-let mexpEquipo = '40HDRY';    // equipo seleccionado
-let mexpNumCont = 1;
+let mexpEquiposSeleccionados = {};  // { '40HDRY': 1, '20DRY': 2 }
 let mexpConRecoleccion = true;
 let mexpDestinoSeleccionados = new Set();   // códigos de cargo destino activos
 let mexpOpcionalesActivos = new Set();      // CP1/CP3 activos
@@ -11641,30 +11647,67 @@ function mexpOnPaisChange() {
 function mexpOnPODChange() {
     const pol = document.getElementById('mexp-pol').value;
     const pod = document.getElementById('mexp-pod').value;
-    const eqSel   = document.getElementById('mexp-equipo');
-    const numCont = document.getElementById('mexp-numcont');
-    if (!pod) { eqSel.disabled = true; numCont.disabled = true; return; }
+    if (!pod) {
+        document.getElementById('mexp-equipo-field').style.display = 'none';
+        return;
+    }
 
     const ruta = mexpData.rutas.find(r => r.pol === pol && r.pod === pod);
     mexpRuta = ruta || null;
+    mexpEquiposSeleccionados = {};
 
-    const eqs = ['20DRY','40DRY','40HDRY'].filter(eq =>
-        ruta && ruta.totales[eq] && ruta.totales[eq].flete > 0
-    );
-    eqSel.innerHTML = eqs.map(eq => `<option value="${eq}">${eq}</option>`).join('');
-    eqSel.disabled  = eqs.length === 0;
-    numCont.disabled = eqs.length === 0;
-    mexpEquipo = eqs.includes('40HDRY') ? '40HDRY' : eqs[0] || '40HDRY';
-    eqSel.value = mexpEquipo;
-    eqSel.onchange = () => { mexpEquipo = eqSel.value; mexpUpdateRouteInfo(); };
-    document.getElementById('mexp-numcont').onchange = () => {
-        mexpNumCont = parseInt(document.getElementById('mexp-numcont').value) || 1;
-    };
-
+    mexpRenderEquipoButtons();
+    document.getElementById('mexp-equipo-field').style.display = 'block';
     mexpUpdateRouteInfo();
     document.getElementById('mexp-recoleccion-wrap').style.display = 'block';
-    document.getElementById('mexp-btn-step1').disabled = !ruta;
+    document.getElementById('mexp-btn-step1').disabled = !ruta || Object.keys(mexpEquiposSeleccionados).length === 0;
     mexpSetRecoleccion(true);
+}
+
+function mexpPrimaryEquipo() {
+    const keys = Object.keys(mexpEquiposSeleccionados);
+    if (keys.length) return keys[0];
+    if (mexpRuta) {
+        for (const eq of ['40HDRY','40DRY','20DRY']) {
+            if (mexpRuta.totales[eq] && mexpRuta.totales[eq].flete > 0) return eq;
+        }
+    }
+    return '40HDRY';
+}
+
+function mexpRenderEquipoButtons() {
+    const wrap = document.getElementById('mexp-equipo-wrap');
+    if (!wrap || !mexpRuta) return;
+    const eqs = ['20DRY','40DRY','40HDRY'].filter(eq =>
+        mexpRuta.totales[eq] && mexpRuta.totales[eq].flete > 0
+    );
+    wrap.innerHTML = eqs.map(eq => {
+        const active = mexpEquiposSeleccionados[eq] !== undefined;
+        const qty = mexpEquiposSeleccionados[eq] || 1;
+        return `<span class="mexp-equipo-btn${active ? ' active' : ''}" onclick="mexpToggleEquipo('${eq}')">
+            ${eq}
+            ${active ? `<input class="mexp-equipo-qty" type="number" value="${qty}" min="1" max="20"
+                onclick="event.stopPropagation()" onchange="mexpSetEquipoQty('${eq}',this.value)">` : ''}
+        </span>`;
+    }).join('');
+}
+
+function mexpToggleEquipo(eq) {
+    if (mexpEquiposSeleccionados[eq] !== undefined) {
+        delete mexpEquiposSeleccionados[eq];
+    } else {
+        mexpEquiposSeleccionados[eq] = 1;
+    }
+    mexpRenderEquipoButtons();
+    const hasEq = Object.keys(mexpEquiposSeleccionados).length > 0;
+    document.getElementById('mexp-btn-step1').disabled = !mexpRuta || !hasEq;
+}
+
+function mexpSetEquipoQty(eq, val) {
+    const n = Math.max(1, Math.min(20, parseInt(val) || 1));
+    if (mexpEquiposSeleccionados[eq] !== undefined) {
+        mexpEquiposSeleccionados[eq] = n;
+    }
 }
 
 function mexpUpdateRouteInfo() {
@@ -11779,6 +11822,10 @@ function mexpRenderTariffSummary() {
     mexpRenderPolGrid(null);
 }
 
+function mexpSanitizeId(s) {
+    return s.replace(/[^a-zA-Z0-9]/g, '_');
+}
+
 function mexpRenderPolGrid(activePol) {
     if (!mexpData) return;
     const gridEl = document.getElementById('mexp-pol-grid');
@@ -11791,53 +11838,91 @@ function mexpRenderPolGrid(activePol) {
         const code    = label.split(' ')[0].toUpperCase();
         const rutas   = mexpData.rutas.filter(r => r.pol === pol);
         const isActive = pol === activePol;
+        const polId   = mexpSanitizeId(pol);
 
-        // Group by region
+        // Group by region → country → ports
         const regionMap = {};
         rutas.forEach(r => {
-            if (!regionMap[r.region]) regionMap[r.region] = [];
-            regionMap[r.region].push(r);
+            if (!regionMap[r.region]) regionMap[r.region] = {};
+            if (!regionMap[r.region][r.pais]) regionMap[r.region][r.pais] = [];
+            regionMap[r.region][r.pais].push(r);
         });
 
-        const regionChips = Object.entries(regionMap).map(([region, rts]) => {
-            return `<span class="exp-region-chip" onclick="mexpChipClick(this,'${pol}','${region}')">${region}<span class="region-count">${rts.length}</span></span>`;
+        const chipsAndBadges = Object.entries(regionMap).map(([region, paisMap]) => {
+            const rts = Object.values(paisMap).flat();
+            const chipId   = `mchip_${polId}_${mexpSanitizeId(region)}`;
+            const badgesId = `mbadges_${polId}_${mexpSanitizeId(region)}`;
+
+            // Badge per country group
+            const countryBadges = Object.entries(paisMap).map(([pais, prts]) => {
+                const podBadges = prts.map(r =>
+                    `<span class="exp-dest-badge" onclick="event.stopPropagation();mexpSelectFromChip('${pol}','${pais}','${r.pod.replace(/'/g,"\\'")}')">${r.pod}</span>`
+                ).join('');
+                return `<span style="display:flex;flex-wrap:wrap;align-items:center;gap:0.2rem 0.3rem;">
+                    <span style="font-size:0.6rem;color:rgba(255,255,255,0.4);font-weight:700;white-space:nowrap;">${pais}</span>
+                    ${podBadges}
+                </span>`;
+            }).join('');
+
+            return `<span class="exp-region-chip" id="${chipId}"
+                onclick="mexpToggleChip('${pol}','${region}',this,'${badgesId}')"
+                >${region}<span class="region-count">${rts.length}</span></span>
+                <div class="exp-region-badges" id="${badgesId}" style="flex-direction:column;gap:0.3rem;">${countryBadges}</div>`;
         }).join('');
 
         return `<div class="exp-origin-block">
             <div class="exp-origin-header">
                 <span class="exp-origin-label" style="${isActive ? 'color:#93c5fd;' : ''}">${code}</span>
-                ${regionChips}
+                ${chipsAndBadges}
             </div>
         </div>`;
     }).join('');
 }
 
-function mexpChipClick(el, pol, region) {
-    // Set POL and country filter, populate selects
-    const polSel = document.getElementById('mexp-pol');
+function mexpToggleChip(pol, region, chipEl, badgesId) {
+    const badgesEl = document.getElementById(badgesId);
+    if (!badgesEl) return;
+    const isOpen = chipEl.classList.toggle('open');
+    if (isOpen) {
+        badgesEl.classList.add('open');
+        // Also set POL select to this POL
+        const polSel = document.getElementById('mexp-pol');
+        if (polSel && polSel.value !== pol) {
+            polSel.value = pol;
+            mexpOnPOLChange();
+        }
+    } else {
+        badgesEl.classList.remove('open');
+    }
+}
+
+function mexpSelectFromChip(pol, pais, pod) {
+    const polSel  = document.getElementById('mexp-pol');
+    const paisSel = document.getElementById('mexp-pais');
+    const podSel  = document.getElementById('mexp-pod');
+    if (!polSel || !paisSel || !podSel) return;
+
+    const doSelect = () => {
+        paisSel.value = pais;
+        mexpOnPaisChange();
+        setTimeout(() => {
+            podSel.value = pod;
+            mexpOnPODChange();
+        }, 50);
+    };
+
     if (polSel.value !== pol) {
         polSel.value = pol;
         mexpOnPOLChange();
+        setTimeout(doSelect, 80);
+    } else {
+        doSelect();
     }
-    // Find country that matches first route in region
-    const ruta = mexpData.rutas.find(r => r.pol === pol && r.region === region);
-    if (!ruta) return;
-    // Select the country (first one in this region) — populate pais
-    const paisSel = document.getElementById('mexp-pais');
-    // Wait a tick for the select to populate
-    setTimeout(() => {
-        const paises = [...new Set(mexpData.rutas.filter(r => r.pol === pol && r.region === region).map(r => r.pais))];
-        // If only 1 country in region, auto-select it
-        if (paises.length === 1) {
-            paisSel.value = paises[0];
-            mexpOnPaisChange();
-        }
-    }, 50);
 }
 
 function mexpRenderDestinoCharges() {
     if (!mexpRuta) return;
-    const eq = mexpEquipo;
+    const eq = mexpPrimaryEquipo();
     const container = document.getElementById('mexp-destino-charges');
 
     // Initialize selection: select all destino charges by default
@@ -11901,42 +11986,64 @@ function mexpToggleOpcional(codigo) {
 
 function mexpGetCostItems() {
     if (!mexpRuta) return [];
-    const eq = mexpEquipo;
-    const nc = mexpNumCont;
+    const equipos = Object.entries(mexpEquiposSeleccionados); // [[eq, nc], ...]
+    if (!equipos.length) return [];
     const items = [];
+    const odfAdded = new Set();
+    const ddfAdded = new Set();
 
-    // Flete (sum of all flete charges × num contenedores)
-    let fleteTotal = 0;
-    for (const c of mexpRuta.fleteCargos) {
-        fleteTotal += (c[eq] || 0) * nc;
+    for (const [eq, nc] of equipos) {
+        const tag = equipos.length > 1 ? ` (${eq}×${nc})` : '';
+
+        // Flete per equipo
+        let fleteTotal = 0;
+        for (const c of mexpRuta.fleteCargos) {
+            fleteTotal += (c[eq] || 0) * nc;
+        }
+        items.push({ grupo: 'Flete', codigo: `FLETE_${eq}`, concepto: `Flete marítimo${tag}`, monto: fleteTotal, moneda: 'USD' });
+
+        // Origen charges
+        for (const c of mexpRuta.origenCargos) {
+            if (c.cobroPor === 'BL') {
+                if (!odfAdded.has(c.codigo)) {
+                    odfAdded.add(c.codigo);
+                    const amt = c.porBL || 0;
+                    if (amt > 0) items.push({ grupo: 'Origen', codigo: c.codigo, concepto: c.concepto + ' (por BL)', monto: amt, moneda: c.moneda || 'USD' });
+                }
+            } else {
+                const amt = (c[eq] || 0) * nc;
+                if (amt > 0) items.push({ grupo: 'Origen', codigo: `${c.codigo}_${eq}`, concepto: c.concepto + tag, monto: amt, moneda: c.moneda || 'USD' });
+            }
+        }
+
+        // Destino charges (solo seleccionados)
+        for (const c of mexpRuta.destinoCargos) {
+            if (!mexpDestinoSeleccionados.has(c.codigo)) continue;
+            if (c.cobroPor === 'BL') {
+                if (!ddfAdded.has(c.codigo)) {
+                    ddfAdded.add(c.codigo);
+                    const amt = c.porBL || 0;
+                    if (amt > 0) items.push({ grupo: 'Destino', codigo: c.codigo, concepto: c.concepto + ' (por BL)', monto: amt, moneda: c.moneda || 'USD' });
+                }
+            } else {
+                const amt = (c[eq] || 0) * nc;
+                if (amt > 0) items.push({ grupo: 'Destino', codigo: `${c.codigo}_${eq}`, concepto: c.concepto + tag, monto: amt, moneda: c.moneda || 'USD' });
+            }
+        }
+
+        // Opcionales activos
+        for (const c of mexpRuta.opcionalCargos || []) {
+            if (!mexpOpcionalesActivos.has(c.codigo)) continue;
+            const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
+            if (amt > 0) items.push({ grupo: 'Opcional', codigo: `${c.codigo}_${eq}`, concepto: c.concepto + tag, monto: amt, moneda: c.moneda || 'USD' });
+        }
     }
-    items.push({ grupo: 'Flete', codigo: 'FLETE', concepto: 'Flete marítimo (BAS + surcharges)', monto: fleteTotal, moneda: 'USD' });
 
-    // Origen charges
-    for (const c of mexpRuta.origenCargos) {
-        const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
-        if (amt > 0) items.push({ grupo: 'Origen', codigo: c.codigo, concepto: c.concepto, monto: amt, moneda: c.moneda || 'USD' });
-    }
-
-    // Destino charges (solo seleccionados)
-    for (const c of mexpRuta.destinoCargos) {
-        if (!mexpDestinoSeleccionados.has(c.codigo)) continue;
-        const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
-        if (amt > 0) items.push({ grupo: 'Destino', codigo: c.codigo, concepto: c.concepto, monto: amt, moneda: c.moneda || 'USD' });
-    }
-
-    // Opcionales activos
-    for (const c of mexpRuta.opcionalCargos || []) {
-        if (!mexpOpcionalesActivos.has(c.codigo)) continue;
-        const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
-        if (amt > 0) items.push({ grupo: 'Opcional', codigo: c.codigo, concepto: c.concepto, monto: amt, moneda: c.moneda || 'USD' });
-    }
-
-    // Inland (recolección)
+    // Inland (recolección) — once, using total number of containers
     if (mexpConRecoleccion && mexpInlandProvider) {
-        // Find provider price
+        const totalCont = equipos.reduce((s, [, nc]) => s + nc, 0);
         const inland = mexpGetInlandPrice();
-        if (inland > 0) items.push({ grupo: 'Inland', codigo: 'INLAND', concepto: `Flete terrestre · ${mexpInlandProvider}`, monto: inland * nc, moneda: 'USD' });
+        if (inland > 0) items.push({ grupo: 'Inland', codigo: 'INLAND', concepto: `Flete terrestre · ${mexpInlandProvider}`, monto: inland * totalCont, moneda: 'USD' });
     }
 
     return items;
@@ -12048,12 +12155,11 @@ function mexpRenderResumen() {
         return;
     }
     const r = mexpRuta;
-    const eq = mexpEquipo;
-    const nc = mexpNumCont;
+    const equiposStr = Object.entries(mexpEquiposSeleccionados).map(([eq, nc]) => `${eq}×${nc}`).join(', ') || '—';
     const lines = [];
     lines.push(`📦 MARÍTIMO EXPORTACIÓN · MAERSK`);
     lines.push(`${r.pol} → ${r.pod}`);
-    lines.push(`Equipo: ${eq} × ${nc}   |   Tránsito: ${r.transitoDias || '—'} días`);
+    lines.push(`Equipo: ${equiposStr}   |   Tránsito: ${r.transitoDias || '—'} días`);
     lines.push(`Vigencia: ${r.vigencia}`);
     lines.push('');
     lines.push('COSTOS (USD):');
