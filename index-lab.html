@@ -4704,7 +4704,7 @@
                         <div class="exp-route-diagram-title">Tarifario disponible para cotizar</div>
                         <div class="exp-route-diagram-note">Maersk · Q4 2026 · CY/CY · FAK · Vigencia 01-oct a 31-dic-2026</div>
                         <div id="mexp-tariff-summary"></div>
-                        <div id="mexp-pol-grid" class="exp-origin-grid"></div>
+                        <div id="mexp-pol-grid" class="exp-origin-grid" style="margin-top:0.4rem;"></div>
                     </div>
 
                     <!-- ── STEP 1: Ruta ── -->
@@ -4725,9 +4725,15 @@
                                     </select>
                                 </div>
                                 <div class="form-group">
+                                    <label>País de destino</label>
+                                    <select id="mexp-pais" disabled>
+                                        <option value="">— Elige POL primero —</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
                                     <label>Puerto de destino (POD)</label>
                                     <select id="mexp-pod" disabled>
-                                        <option value="">— Primero elige POL —</option>
+                                        <option value="">— Elige país primero —</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -11582,20 +11588,52 @@ function mexpPopulatePOL() {
 
 function mexpOnPOLChange() {
     const pol = document.getElementById('mexp-pol').value;
-    const podSel = document.getElementById('mexp-pod');
-    const eqSel  = document.getElementById('mexp-equipo');
+    const paisSel = document.getElementById('mexp-pais');
+    const podSel  = document.getElementById('mexp-pod');
+    const eqSel   = document.getElementById('mexp-equipo');
     const numCont = document.getElementById('mexp-numcont');
-    podSel.disabled = !pol;
-    eqSel.disabled  = true;
+
+    paisSel.disabled = !pol;
+    podSel.disabled  = true;
+    eqSel.disabled   = true;
     numCont.disabled = true;
     document.getElementById('mexp-route-info').style.display = 'none';
     document.getElementById('mexp-recoleccion-wrap').style.display = 'none';
     document.getElementById('mexp-btn-step1').disabled = true;
     mexpRuta = null;
 
-    if (!pol) { podSel.innerHTML = '<option value="">— Primero elige POL —</option>'; return; }
-    const pods = mexpData.rutas.filter(r => r.pol === pol).map(r => r.pod).sort();
-    podSel.innerHTML = '<option value="">— Selecciona destino —</option>' +
+    podSel.innerHTML  = '<option value="">— Elige país primero —</option>';
+    if (!pol) { paisSel.innerHTML = '<option value="">— Elige POL primero —</option>'; return; }
+
+    // Populate countries for this POL, sorted
+    const paises = [...new Set(
+        mexpData.rutas.filter(r => r.pol === pol).map(r => r.pais)
+    )].sort();
+    paisSel.innerHTML = '<option value="">— Selecciona país —</option>' +
+        paises.map(p => `<option value="${p}">${p}</option>`).join('');
+    paisSel.onchange = mexpOnPaisChange;
+
+    // Highlight active POL in diagram
+    mexpRenderPolGrid(pol);
+}
+
+function mexpOnPaisChange() {
+    const pol  = document.getElementById('mexp-pol').value;
+    const pais = document.getElementById('mexp-pais').value;
+    const podSel = document.getElementById('mexp-pod');
+
+    podSel.disabled = !pais;
+    document.getElementById('mexp-equipo').disabled = true;
+    document.getElementById('mexp-numcont').disabled = true;
+    document.getElementById('mexp-btn-step1').disabled = true;
+    mexpRuta = null;
+
+    if (!pais) { podSel.innerHTML = '<option value="">— Elige país primero —</option>'; return; }
+
+    const pods = mexpData.rutas
+        .filter(r => r.pol === pol && r.pais === pais)
+        .map(r => r.pod).sort();
+    podSel.innerHTML = '<option value="">— Selecciona puerto —</option>' +
         pods.map(p => `<option value="${p}">${p}</option>`).join('');
     podSel.onchange = mexpOnPODChange;
 }
@@ -11603,14 +11641,13 @@ function mexpOnPOLChange() {
 function mexpOnPODChange() {
     const pol = document.getElementById('mexp-pol').value;
     const pod = document.getElementById('mexp-pod').value;
-    const eqSel  = document.getElementById('mexp-equipo');
+    const eqSel   = document.getElementById('mexp-equipo');
     const numCont = document.getElementById('mexp-numcont');
     if (!pod) { eqSel.disabled = true; numCont.disabled = true; return; }
 
     const ruta = mexpData.rutas.find(r => r.pol === pol && r.pod === pod);
     mexpRuta = ruta || null;
 
-    // Available equipos: those where flete > 0
     const eqs = ['20DRY','40DRY','40HDRY'].filter(eq =>
         ruta && ruta.totales[eq] && ruta.totales[eq].flete > 0
     );
@@ -11719,39 +11756,83 @@ function mexpGoStep(n) {
 
 function mexpRenderTariffSummary() {
     if (!mexpData) return;
-    const pols = [...new Set(mexpData.rutas.map(r => r.pol))].sort();
-    const total = mexpData.rutas.length;
-    const vigencia = mexpData.vigencia;
+    const pols   = [...new Set(mexpData.rutas.map(r => r.pol))].sort();
+    const total  = mexpData.rutas.length;
 
-    // Summary table like exp-airline-summary
+    // Header summary table — same style as exp-airline-summary-table
     const summaryEl = document.getElementById('mexp-tariff-summary');
     if (summaryEl) {
+        const polNames = pols.map(p => p.replace(', MX','')).join(' · ');
         summaryEl.innerHTML = `
-        <table class="exp-airline-table" style="margin-bottom:0.75rem;">
-            <thead><tr>
-                <th>Naviera</th><th>Puertos de origen (POL)</th><th>Rutas</th><th>Vigencia</th>
-            </tr></thead>
+        <table class="exp-airline-summary-table">
+            <thead><tr><th>Naviera</th><th>Puertos de origen (POL)</th><th>Equipos</th><th>Rutas</th><th>Vigencia</th></tr></thead>
             <tbody><tr>
-                <td><span style="font-weight:700;color:#60a5fa;">Maersk</span></td>
-                <td>${pols.map(p => p.replace(', MX','')).join(' · ')}</td>
+                <td class="code-cell">Maersk</td>
+                <td>${polNames}</td>
+                <td>20DRY · 40DRY · 40HDRY</td>
                 <td>${total}</td>
-                <td>${vigencia}</td>
+                <td>Q4 2026</td>
             </tr></tbody>
         </table>`;
     }
 
-    // POL origin grid like exp-origin-grid
+    mexpRenderPolGrid(null);
+}
+
+function mexpRenderPolGrid(activePol) {
+    if (!mexpData) return;
     const gridEl = document.getElementById('mexp-pol-grid');
-    if (gridEl) {
-        gridEl.innerHTML = pols.map(pol => {
-            const count = mexpData.rutas.filter(r => r.pol === pol).length;
-            const label = pol.replace(', MX','');
-            return `<div class="exp-origin-cell">
-                <span class="exp-origin-code">${label.split(' ')[0].toUpperCase()}</span>
-                <span class="exp-origin-routes">${count} rutas</span>
-            </div>`;
+    if (!gridEl) return;
+
+    const pols = [...new Set(mexpData.rutas.map(r => r.pol))].sort();
+
+    gridEl.innerHTML = pols.map(pol => {
+        const label   = pol.replace(', MX','');
+        const code    = label.split(' ')[0].toUpperCase();
+        const rutas   = mexpData.rutas.filter(r => r.pol === pol);
+        const isActive = pol === activePol;
+
+        // Group by region
+        const regionMap = {};
+        rutas.forEach(r => {
+            if (!regionMap[r.region]) regionMap[r.region] = [];
+            regionMap[r.region].push(r);
+        });
+
+        const regionChips = Object.entries(regionMap).map(([region, rts]) => {
+            return `<span class="exp-region-chip" onclick="mexpChipClick(this,'${pol}','${region}')">${region}<span class="region-count">${rts.length}</span></span>`;
         }).join('');
+
+        return `<div class="exp-origin-block">
+            <div class="exp-origin-header">
+                <span class="exp-origin-label" style="${isActive ? 'color:#93c5fd;' : ''}">${code}</span>
+                ${regionChips}
+            </div>
+        </div>`;
+    }).join('');
+}
+
+function mexpChipClick(el, pol, region) {
+    // Set POL and country filter, populate selects
+    const polSel = document.getElementById('mexp-pol');
+    if (polSel.value !== pol) {
+        polSel.value = pol;
+        mexpOnPOLChange();
     }
+    // Find country that matches first route in region
+    const ruta = mexpData.rutas.find(r => r.pol === pol && r.region === region);
+    if (!ruta) return;
+    // Select the country (first one in this region) — populate pais
+    const paisSel = document.getElementById('mexp-pais');
+    // Wait a tick for the select to populate
+    setTimeout(() => {
+        const paises = [...new Set(mexpData.rutas.filter(r => r.pol === pol && r.region === region).map(r => r.pais))];
+        // If only 1 country in region, auto-select it
+        if (paises.length === 1) {
+            paisSel.value = paises[0];
+            mexpOnPaisChange();
+        }
+    }, 50);
 }
 
 function mexpRenderDestinoCharges() {
