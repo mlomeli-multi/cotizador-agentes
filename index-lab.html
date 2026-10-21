@@ -3576,6 +3576,41 @@
             .tabs-container { overflow-x: auto; }
             .tab-btn { padding: 0.75rem 1rem; font-size: 0.8rem; white-space: nowrap; }
         }
+        /* ===== MARÍTIMO EXP ===== */
+        .mexp-step-panel { animation: fadeIn .2s ease; }
+        .mexp-toggle-btn {
+            padding: 0.5rem 1rem; border-radius: 6px; border: 1.5px solid var(--gray-300);
+            background: white; font-size: 0.82rem; cursor: pointer; color: var(--gray-600);
+            transition: all .15s;
+        }
+        .mexp-toggle-btn.active {
+            border-color: var(--blue); background: var(--blue-light, #eff6ff); color: var(--blue); font-weight: 600;
+        }
+        .mexp-charge-row {
+            display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem;
+            border-radius: 6px; border: 1px solid var(--gray-200); background: white;
+            font-size: 0.82rem; cursor: pointer; transition: border-color .15s;
+        }
+        .mexp-charge-row:hover { border-color: var(--blue); }
+        .mexp-charge-row.selected { border-color: var(--blue); background: var(--blue-light, #eff6ff); }
+        .mexp-charge-row .mexp-charge-code {
+            font-weight: 700; color: var(--gray-700); min-width: 3rem;
+        }
+        .mexp-charge-row .mexp-charge-name { flex: 1; color: var(--gray-600); }
+        .mexp-charge-row .mexp-charge-amount { font-weight: 600; color: var(--gray-800); white-space: nowrap; }
+        .mexp-charge-row .mexp-charge-note { font-size: 0.72rem; color: var(--gray-400); }
+        .mexp-opcional-pill {
+            padding: 0.35rem 0.75rem; border-radius: 20px; border: 1.5px solid var(--gray-200);
+            font-size: 0.78rem; cursor: pointer; background: white; color: var(--gray-500); transition: all .15s;
+        }
+        .mexp-opcional-pill.active { border-color: #f59e0b; background: #fffbeb; color: #92400e; font-weight: 600; }
+        .mexp-venta-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+        .mexp-venta-table th { background: var(--gray-50); padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; color: var(--gray-600); border-bottom: 1px solid var(--gray-200); }
+        .mexp-venta-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+        .mexp-venta-table tr.group-header td { font-weight: 700; color: var(--gray-700); background: var(--gray-50); font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
+        .mexp-venta-table tr.total-row td { font-weight: 700; border-top: 2px solid var(--gray-300); }
+        .mexp-venta-input { width: 90px; padding: 0.3rem 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.82rem; text-align: right; }
+        .mexp-resumen { background: var(--gray-50); border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.83rem; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--gray-200); }
         /* ===== ADMIN MODE ===== */
         .admin-only { display: none; }
         body.admin-mode .admin-only { display: block; }
@@ -3827,6 +3862,10 @@
     <button class="tab-btn" data-tab="maritimo">
         <span class="tab-icon">&#x1F6A2;</span>
         Marítimo Importación (DAP)
+    </button>
+    <button class="tab-btn" data-tab="maritimo-exp">
+        <span class="tab-icon">&#x1F6A2;</span>
+        Marítimo Exportación (EXW/FOB)
     </button>
 </nav>
 
@@ -4611,6 +4650,143 @@
         </div>
     </section>
 
+    <!-- TAB: MARÍTIMO EXPORTACIÓN (EXW/FOB) -->
+    <section class="tab-content" id="tab-maritimo-exp">
+        <div class="card air-dap-card">
+            <div class="card-header">
+                <span class="card-icon">&#x1F6A2;</span>
+                <div>
+                    <h2 class="card-title">Marítimo Exportación</h2>
+                    <p class="card-subtitle">Maersk · Q4 2026 · CY/CY · FAK</p>
+                </div>
+            </div>
+
+            <!-- Step indicator -->
+            <div class="exp-steps" id="mexp-steps">
+                <div class="exp-step active" data-step="1">
+                    <span class="exp-step-num">1</span><span class="exp-step-label">Ruta</span>
+                </div>
+                <div class="exp-step" data-step="2">
+                    <span class="exp-step-num">2</span><span class="exp-step-label">Cargos destino</span>
+                </div>
+                <div class="exp-step" data-step="3">
+                    <span class="exp-step-num">3</span><span class="exp-step-label">Venta</span>
+                </div>
+                <div class="exp-step" data-step="4">
+                    <span class="exp-step-num">4</span><span class="exp-step-label">Resumen</span>
+                </div>
+            </div>
+
+            <!-- ── STEP 1: Ruta ── -->
+            <div class="mexp-step-panel" id="mexp-panel-1">
+                <div class="exp-section-title">Ruta y equipo</div>
+                <div class="form-row" style="gap:1rem;flex-wrap:wrap;">
+                    <div class="form-group" style="flex:1;min-width:180px;">
+                        <label class="form-label">Puerto de origen (POL)</label>
+                        <select id="mexp-pol" class="input-field">
+                            <option value="">— Selecciona —</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="flex:1;min-width:180px;">
+                        <label class="form-label">Puerto de destino (POD)</label>
+                        <select id="mexp-pod" class="input-field" disabled>
+                            <option value="">— Primero elige POL —</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="min-width:140px;">
+                        <label class="form-label">Equipo</label>
+                        <select id="mexp-equipo" class="input-field" disabled>
+                            <option value="">— Elige ruta —</option>
+                        </select>
+                    </div>
+                    <div class="form-group" style="min-width:110px;">
+                        <label class="form-label">Contenedores</label>
+                        <input type="number" id="mexp-numcont" class="input-field" value="1" min="1" max="20" disabled>
+                    </div>
+                </div>
+
+                <!-- Route info card -->
+                <div id="mexp-route-info" class="route-info-card" style="display:none;margin-top:1rem;padding:0.75rem 1rem;background:var(--gray-50);border-radius:8px;border:1px solid var(--gray-200);">
+                    <div style="display:flex;gap:2rem;flex-wrap:wrap;font-size:0.82rem;color:var(--gray-600);">
+                        <span id="mexp-ri-tt"></span>
+                        <span id="mexp-ri-region"></span>
+                        <span id="mexp-ri-libres-origen"></span>
+                        <span id="mexp-ri-libres-destino"></span>
+                        <span id="mexp-ri-vigencia" style="color:var(--green);font-weight:600;"></span>
+                    </div>
+                </div>
+
+                <!-- Recolección toggle -->
+                <div style="margin-top:1.25rem;" id="mexp-recoleccion-wrap" style="display:none;">
+                    <div class="exp-section-title">Recolección en origen</div>
+                    <div style="display:flex;gap:0.75rem;align-items:center;flex-wrap:wrap;">
+                        <button class="mexp-toggle-btn active" id="mexp-btn-con-recol" onclick="mexpSetRecoleccion(true)">
+                            Con recolección (vacío a planta)
+                        </button>
+                        <button class="mexp-toggle-btn" id="mexp-btn-sin-recol" onclick="mexpSetRecoleccion(false)">
+                            Sin recolección (cliente lleva al puerto)
+                        </button>
+                    </div>
+                    <!-- Proveedor flete terrestre (si lleva recolección) -->
+                    <div id="mexp-inland-wrap" style="margin-top:1rem;display:none;">
+                        <div style="font-size:0.8rem;color:var(--gray-500);margin-bottom:0.5rem;">Selecciona proveedor de flete terrestre al puerto</div>
+                        <div id="mexp-inland-providers" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top:1.5rem;display:flex;justify-content:flex-end;">
+                    <button class="btn btn-primary" id="mexp-btn-step1" onclick="mexpGoStep(2)" disabled>
+                        Ver cargos en destino →
+                    </button>
+                </div>
+            </div>
+
+            <!-- ── STEP 2: Cargos en destino ── -->
+            <div class="mexp-step-panel" id="mexp-panel-2" style="display:none;">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;flex-wrap:wrap;gap:0.5rem;">
+                    <div class="exp-section-title" style="margin-bottom:0;">Cargos en destino por naviera</div>
+                    <div style="display:flex;gap:0.5rem;">
+                        <button class="btn btn-sm btn-outline" onclick="mexpToggleAllDestino(true)">Seleccionar todo</button>
+                        <button class="btn btn-sm btn-outline" onclick="mexpToggleAllDestino(false)">Limpiar</button>
+                    </div>
+                </div>
+                <div id="mexp-destino-charges" style="display:flex;flex-direction:column;gap:0.5rem;"></div>
+
+                <!-- Opcionales (CP1/CP3) -->
+                <div id="mexp-opcional-wrap" style="margin-top:1.25rem;display:none;">
+                    <div style="font-size:0.75rem;font-weight:600;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.5rem;">Opcionales</div>
+                    <div id="mexp-opcional-charges" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                </div>
+
+                <div style="margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:space-between;">
+                    <button class="btn btn-outline" onclick="mexpGoStep(1)">← Ruta</button>
+                    <button class="btn btn-primary" onclick="mexpGoStep(3)">Ver venta →</button>
+                </div>
+            </div>
+
+            <!-- ── STEP 3: Venta ── -->
+            <div class="mexp-step-panel" id="mexp-panel-3" style="display:none;">
+                <div class="exp-section-title">Armado comercial</div>
+                <div id="mexp-venta-tabla-wrap"></div>
+                <div style="margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:space-between;">
+                    <button class="btn btn-outline" onclick="mexpGoStep(2)">← Cargos destino</button>
+                    <button class="btn btn-primary" onclick="mexpGoStep(4)">Ver resumen →</button>
+                </div>
+            </div>
+
+            <!-- ── STEP 4: Resumen ── -->
+            <div class="mexp-step-panel" id="mexp-panel-4" style="display:none;">
+                <div class="exp-section-title">Resumen de cotización</div>
+                <div id="mexp-resumen-wrap"></div>
+                <div style="margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:space-between;">
+                    <button class="btn btn-outline" onclick="mexpGoStep(3)">← Venta</button>
+                    <button class="btn btn-primary" onclick="mexpCopiarCorreo()">&#128203; Copiar correo</button>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
 </main>
 
 <!-- ===== MODAL: MAPEO DE COLUMNAS ===== -->
@@ -4702,6 +4878,9 @@ document.querySelectorAll('.tab-btn').forEach(btn => {
         if (btn.dataset.tab === 'maritimo' && maritimeMap) {
             setTimeout(() => maritimeMap.invalidateSize(), 120);
             setTimeout(updateMaritimeRoute, 150);
+        }
+        if (btn.dataset.tab === 'maritimo-exp' && !mexpData) {
+            initMexp();
         }
     });
 });
@@ -11306,6 +11485,424 @@ document.getElementById('import-file').addEventListener('change', (e) => {
     reader.readAsText(file);
     e.target.value = '';
 });
+
+// ===== MARÍTIMO EXPORTACIÓN (EXW/FOB) =====
+
+let mexpData = null;          // { naviera, vigencia, rutas }
+let mexpRuta = null;          // ruta seleccionada
+let mexpEquipo = '40HDRY';    // equipo seleccionado
+let mexpNumCont = 1;
+let mexpConRecoleccion = true;
+let mexpDestinoSeleccionados = new Set();   // códigos de cargo destino activos
+let mexpOpcionalesActivos = new Set();      // CP1/CP3 activos
+let mexpInlandProvider = null;             // proveedor flete terrestre origen
+let mexpVentaState = {};       // { codigo: { mub, venta, esCosto } }
+let mexpCurrentStep = 1;
+
+async function initMexp() {
+    try {
+        const res = await fetch('data/maersk-exp.json');
+        mexpData = await res.json();
+    } catch(e) {
+        console.error('mexp: no se pudo cargar maersk-exp.json', e);
+        return;
+    }
+    mexpPopulatePOL();
+}
+
+function mexpPopulatePOL() {
+    const sel = document.getElementById('mexp-pol');
+    if (!sel || !mexpData) return;
+    const pols = [...new Set(mexpData.rutas.map(r => r.pol))].sort();
+    sel.innerHTML = '<option value="">— Selecciona —</option>' +
+        pols.map(p => `<option value="${p}">${p}</option>`).join('');
+    sel.onchange = mexpOnPOLChange;
+}
+
+function mexpOnPOLChange() {
+    const pol = document.getElementById('mexp-pol').value;
+    const podSel = document.getElementById('mexp-pod');
+    const eqSel  = document.getElementById('mexp-equipo');
+    const numCont = document.getElementById('mexp-numcont');
+    podSel.disabled = !pol;
+    eqSel.disabled  = true;
+    numCont.disabled = true;
+    document.getElementById('mexp-route-info').style.display = 'none';
+    document.getElementById('mexp-recoleccion-wrap').style.display = 'none';
+    document.getElementById('mexp-btn-step1').disabled = true;
+    mexpRuta = null;
+
+    if (!pol) { podSel.innerHTML = '<option value="">— Primero elige POL —</option>'; return; }
+    const pods = mexpData.rutas.filter(r => r.pol === pol).map(r => r.pod).sort();
+    podSel.innerHTML = '<option value="">— Selecciona destino —</option>' +
+        pods.map(p => `<option value="${p}">${p}</option>`).join('');
+    podSel.onchange = mexpOnPODChange;
+}
+
+function mexpOnPODChange() {
+    const pol = document.getElementById('mexp-pol').value;
+    const pod = document.getElementById('mexp-pod').value;
+    const eqSel  = document.getElementById('mexp-equipo');
+    const numCont = document.getElementById('mexp-numcont');
+    if (!pod) { eqSel.disabled = true; numCont.disabled = true; return; }
+
+    const ruta = mexpData.rutas.find(r => r.pol === pol && r.pod === pod);
+    mexpRuta = ruta || null;
+
+    // Available equipos: those where flete > 0
+    const eqs = ['20DRY','40DRY','40HDRY'].filter(eq =>
+        ruta && ruta.totales[eq] && ruta.totales[eq].flete > 0
+    );
+    eqSel.innerHTML = eqs.map(eq => `<option value="${eq}">${eq}</option>`).join('');
+    eqSel.disabled  = eqs.length === 0;
+    numCont.disabled = eqs.length === 0;
+    mexpEquipo = eqs.includes('40HDRY') ? '40HDRY' : eqs[0] || '40HDRY';
+    eqSel.value = mexpEquipo;
+    eqSel.onchange = () => { mexpEquipo = eqSel.value; mexpUpdateRouteInfo(); };
+    document.getElementById('mexp-numcont').onchange = () => {
+        mexpNumCont = parseInt(document.getElementById('mexp-numcont').value) || 1;
+    };
+
+    mexpUpdateRouteInfo();
+    document.getElementById('mexp-recoleccion-wrap').style.display = 'block';
+    document.getElementById('mexp-btn-step1').disabled = !ruta;
+    mexpSetRecoleccion(true);
+}
+
+function mexpUpdateRouteInfo() {
+    if (!mexpRuta) return;
+    const r = mexpRuta;
+    const info = document.getElementById('mexp-route-info');
+    info.style.display = 'block';
+    document.getElementById('mexp-ri-tt').textContent       = r.transitoDias ? `⏱ ${r.transitoDias} días tránsito` : '';
+    document.getElementById('mexp-ri-region').textContent   = r.region ? `🌍 ${r.pais} · ${r.region}` : '';
+    document.getElementById('mexp-ri-libres-origen').textContent  = `📦 ${r.diasLibresOrigen} días libres origen`;
+    const destLibres = r.diasLibresDestinoCombinado
+        ? `${r.diasLibresDestinoCombinado} días libres destino (combinado)`
+        : r.diasLibresDestinoDemoras
+            ? `${r.diasLibresDestinoDemoras} dem + ${r.diasLibresDestinoDetencion || '?'} det destino`
+            : '';
+    document.getElementById('mexp-ri-libres-destino').textContent = destLibres ? `🏁 ${destLibres}` : '';
+    document.getElementById('mexp-ri-vigencia').textContent  = r.vigencia || '';
+}
+
+function mexpSetRecoleccion(val) {
+    mexpConRecoleccion = val;
+    document.getElementById('mexp-btn-con-recol').classList.toggle('active', val);
+    document.getElementById('mexp-btn-sin-recol').classList.toggle('active', !val);
+    const wrap = document.getElementById('mexp-inland-wrap');
+    wrap.style.display = val ? 'block' : 'none';
+    if (val) mexpRenderInlandProviders();
+}
+
+function mexpRenderInlandProviders() {
+    const wrap = document.getElementById('mexp-inland-providers');
+    if (!wrap || !mexpRuta) return;
+    // Use same terrestrial providers from DAP maritime data
+    const pol = mexpRuta.pol;
+    // Map POL to city key used in cotizador-base
+    const polMap = {
+        'Altamira, MX':        'ALTAMIRA',
+        'Lazaro Cardenas, MX': 'LAZARO CARDENAS',
+        'Manzanillo, MX':      'MANZANILLO',
+        'Progreso, MX':        'PROGRESO',
+        'Veracruz, MX':        'VERACRUZ',
+    };
+    const puertoKey = polMap[pol] || pol;
+    // Get providers for this puerto from cotizadorBase maritime data
+    const provs = [];
+    if (window.cotizadorBase && window.cotizadorBase.maritimo) {
+        for (const prov of window.cotizadorBase.maritimo) {
+            if (prov.nombrePuerto && prov.nombrePuerto.toUpperCase().includes(puertoKey.split(' ')[0])) {
+                for (const entry of (prov.tarifas || [])) {
+                    if (!provs.find(p => p.proveedor === entry.proveedor)) {
+                        provs.push({ proveedor: entry.proveedor, precio: entry.vacio || entry.precio || 0 });
+                    }
+                }
+            }
+        }
+    }
+    if (!provs.length) {
+        wrap.innerHTML = '<span style="font-size:0.8rem;color:var(--gray-400);">Sin proveedores cargados para este puerto</span>';
+        return;
+    }
+    wrap.innerHTML = provs.map(p =>
+        `<button class="mexp-toggle-btn${mexpInlandProvider === p.proveedor ? ' active' : ''}"
+            onclick="mexpSelectInland('${p.proveedor}', ${p.precio})">${p.proveedor} · $${p.precio} USD</button>`
+    ).join('');
+}
+
+function mexpSelectInland(proveedor, precio) {
+    mexpInlandProvider = proveedor;
+    mexpRenderInlandProviders();
+}
+
+function mexpGoStep(n) {
+    if (n === 2) mexpRenderDestinoCharges();
+    if (n === 3) mexpRenderVenta();
+    if (n === 4) mexpRenderResumen();
+
+    document.querySelectorAll('.mexp-step-panel').forEach((p, i) => {
+        p.style.display = (i + 1 === n) ? 'block' : 'none';
+    });
+    document.querySelectorAll('#mexp-steps .exp-step').forEach((s, i) => {
+        s.classList.toggle('active', i + 1 === n);
+        s.classList.toggle('done', i + 1 < n);
+    });
+    mexpCurrentStep = n;
+}
+
+function mexpRenderDestinoCharges() {
+    if (!mexpRuta) return;
+    const eq = mexpEquipo;
+    const container = document.getElementById('mexp-destino-charges');
+
+    // Initialize selection: select all destino charges by default
+    if (mexpDestinoSeleccionados.size === 0) {
+        mexpRuta.destinoCargos.forEach(c => mexpDestinoSeleccionados.add(c.codigo));
+    }
+
+    container.innerHTML = mexpRuta.destinoCargos.map(c => {
+        const amt = c.cobroPor === 'BL' ? c.porBL : (c[eq] || 0);
+        const moneda = c.moneda || 'USD';
+        const sel = mexpDestinoSeleccionados.has(c.codigo);
+        const noteStr = c.cobroPor === 'BL' ? 'por BL' : `por contenedor`;
+        return `<div class="mexp-charge-row${sel ? ' selected' : ''}" onclick="mexpToggleDestino('${c.codigo}')">
+            <input type="checkbox" ${sel ? 'checked' : ''} onclick="event.stopPropagation();mexpToggleDestino('${c.codigo}')">
+            <span class="mexp-charge-code">${c.codigo}</span>
+            <span class="mexp-charge-name">${c.concepto}</span>
+            <span class="mexp-charge-note">${noteStr}</span>
+            <span class="mexp-charge-amount">${moneda} ${amt.toFixed(0)}</span>
+        </div>`;
+    }).join('');
+
+    // Opcionales
+    const opcWrap = document.getElementById('mexp-opcional-wrap');
+    const opcContainer = document.getElementById('mexp-opcional-charges');
+    if (mexpRuta.opcionalCargos && mexpRuta.opcionalCargos.length) {
+        opcWrap.style.display = 'block';
+        opcContainer.innerHTML = mexpRuta.opcionalCargos.map(c => {
+            const amt = c.cobroPor === 'BL' ? c.porBL : (c[eq] || 0);
+            const moneda = c.moneda || 'USD';
+            const active = mexpOpcionalesActivos.has(c.codigo);
+            return `<button class="mexp-opcional-pill${active ? ' active' : ''}" onclick="mexpToggleOpcional('${c.codigo}')">
+                ${c.codigo} · ${c.concepto} · ${moneda} ${amt.toFixed(0)}
+            </button>`;
+        }).join('');
+    } else {
+        opcWrap.style.display = 'none';
+    }
+}
+
+function mexpToggleDestino(codigo) {
+    if (mexpDestinoSeleccionados.has(codigo)) {
+        mexpDestinoSeleccionados.delete(codigo);
+    } else {
+        mexpDestinoSeleccionados.add(codigo);
+    }
+    mexpRenderDestinoCharges();
+}
+
+function mexpToggleAllDestino(sel) {
+    if (!mexpRuta) return;
+    mexpDestinoSeleccionados.clear();
+    if (sel) mexpRuta.destinoCargos.forEach(c => mexpDestinoSeleccionados.add(c.codigo));
+    mexpRenderDestinoCharges();
+}
+
+function mexpToggleOpcional(codigo) {
+    if (mexpOpcionalesActivos.has(codigo)) mexpOpcionalesActivos.delete(codigo);
+    else mexpOpcionalesActivos.add(codigo);
+    mexpRenderDestinoCharges();
+}
+
+function mexpGetCostItems() {
+    if (!mexpRuta) return [];
+    const eq = mexpEquipo;
+    const nc = mexpNumCont;
+    const items = [];
+
+    // Flete (sum of all flete charges × num contenedores)
+    let fleteTotal = 0;
+    for (const c of mexpRuta.fleteCargos) {
+        fleteTotal += (c[eq] || 0) * nc;
+    }
+    items.push({ grupo: 'Flete', codigo: 'FLETE', concepto: 'Flete marítimo (BAS + surcharges)', monto: fleteTotal, moneda: 'USD' });
+
+    // Origen charges
+    for (const c of mexpRuta.origenCargos) {
+        const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
+        if (amt > 0) items.push({ grupo: 'Origen', codigo: c.codigo, concepto: c.concepto, monto: amt, moneda: c.moneda || 'USD' });
+    }
+
+    // Destino charges (solo seleccionados)
+    for (const c of mexpRuta.destinoCargos) {
+        if (!mexpDestinoSeleccionados.has(c.codigo)) continue;
+        const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
+        if (amt > 0) items.push({ grupo: 'Destino', codigo: c.codigo, concepto: c.concepto, monto: amt, moneda: c.moneda || 'USD' });
+    }
+
+    // Opcionales activos
+    for (const c of mexpRuta.opcionalCargos || []) {
+        if (!mexpOpcionalesActivos.has(c.codigo)) continue;
+        const amt = c.cobroPor === 'BL' ? (c.porBL || 0) : (c[eq] || 0) * nc;
+        if (amt > 0) items.push({ grupo: 'Opcional', codigo: c.codigo, concepto: c.concepto, monto: amt, moneda: c.moneda || 'USD' });
+    }
+
+    // Inland (recolección)
+    if (mexpConRecoleccion && mexpInlandProvider) {
+        // Find provider price
+        const inland = mexpGetInlandPrice();
+        if (inland > 0) items.push({ grupo: 'Inland', codigo: 'INLAND', concepto: `Flete terrestre · ${mexpInlandProvider}`, monto: inland * nc, moneda: 'USD' });
+    }
+
+    return items;
+}
+
+function mexpGetInlandPrice() {
+    if (!mexpInlandProvider || !mexpRuta) return 0;
+    const pol = mexpRuta.pol;
+    const polMap = { 'Altamira, MX':'ALTAMIRA','Lazaro Cardenas, MX':'LAZARO CARDENAS','Manzanillo, MX':'MANZANILLO','Progreso, MX':'PROGRESO','Veracruz, MX':'VERACRUZ' };
+    const key = polMap[pol] || pol;
+    if (!window.cotizadorBase || !window.cotizadorBase.maritimo) return 0;
+    for (const prov of window.cotizadorBase.maritimo) {
+        if (prov.nombrePuerto && prov.nombrePuerto.toUpperCase().includes(key.split(' ')[0])) {
+            for (const entry of (prov.tarifas || [])) {
+                if (entry.proveedor === mexpInlandProvider) return entry.vacio || entry.precio || 0;
+            }
+        }
+    }
+    return 0;
+}
+
+function mexpRenderVenta() {
+    const items = mexpGetCostItems();
+    const wrap = document.getElementById('mexp-venta-tabla-wrap');
+    if (!items.length) { wrap.innerHTML = '<p style="color:var(--gray-400)">Sin datos de costo.</p>'; return; }
+
+    // Initialize venta state
+    items.forEach(it => {
+        if (!mexpVentaState[it.codigo]) {
+            const mub = 15;
+            mexpVentaState[it.codigo] = { mub, venta: +(it.monto * (1 + mub / 100)).toFixed(2), esCosto: false };
+        }
+    });
+
+    const grupos = [...new Set(items.map(i => i.grupo))];
+    let html = '<table class="mexp-venta-table"><thead><tr>'
+        + '<th>Código</th><th>Concepto</th><th>Moneda</th><th style="text-align:right">Costo</th>'
+        + '<th style="text-align:right">MUB %</th><th style="text-align:right">Venta</th><th style="text-align:right">Utilidad</th>'
+        + '</tr></thead><tbody>';
+
+    for (const grupo of grupos) {
+        const gItems = items.filter(i => i.grupo === grupo);
+        html += `<tr class="group-header"><td colspan="7">${grupo}</td></tr>`;
+        for (const it of gItems) {
+            const st = mexpVentaState[it.codigo];
+            const util = st.esCosto ? 0 : +(st.venta - it.monto).toFixed(2);
+            html += `<tr>
+                <td>${it.codigo}</td>
+                <td>${it.concepto}</td>
+                <td>${it.moneda}</td>
+                <td style="text-align:right">$${it.monto.toFixed(2)}</td>
+                <td style="text-align:right">
+                    <input class="mexp-venta-input" type="number" value="${st.esCosto ? 0 : st.mub}"
+                        ${st.esCosto ? 'disabled' : ''}
+                        onchange="mexpVentaMubChange('${it.codigo}',${it.monto},this.value)">
+                </td>
+                <td style="text-align:right">
+                    <input class="mexp-venta-input" type="number" value="${st.esCosto ? 0 : st.venta}"
+                        ${st.esCosto ? 'disabled' : ''}
+                        onchange="mexpVentaManualChange('${it.codigo}',${it.monto},this.value)">
+                </td>
+                <td style="text-align:right;color:${util > 0 ? 'var(--green)' : 'var(--gray-400)'}">
+                    $${util.toFixed(2)}
+                    <button title="Pasar a costo" style="border:none;background:none;cursor:pointer;font-size:0.7rem;padding:0 0.25rem;color:${st.esCosto ? 'var(--green)' : 'var(--red)'}"
+                        onclick="mexpToggleCosto('${it.codigo}',${it.monto})">${st.esCosto ? '✓' : 'C'}</button>
+                </td>
+            </tr>`;
+        }
+    }
+
+    // Totals
+    const totalCosto = items.reduce((s, i) => s + i.monto, 0);
+    const totalVenta = items.reduce((s, i) => {
+        const st = mexpVentaState[i.codigo];
+        return s + (st.esCosto ? i.monto : st.venta);
+    }, 0);
+    html += `<tr class="total-row">
+        <td colspan="3">TOTAL</td>
+        <td style="text-align:right">$${totalCosto.toFixed(2)} USD</td>
+        <td></td>
+        <td style="text-align:right">$${totalVenta.toFixed(2)} USD</td>
+        <td style="text-align:right;color:var(--green)">$${(totalVenta - totalCosto).toFixed(2)}</td>
+    </tr>`;
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+}
+
+function mexpVentaMubChange(codigo, costo, mubStr) {
+    const mub = parseFloat(mubStr) || 0;
+    mexpVentaState[codigo] = { mub, venta: +(costo * (1 + mub / 100)).toFixed(2), esCosto: false };
+    mexpRenderVenta();
+}
+function mexpVentaManualChange(codigo, costo, ventaStr) {
+    const venta = parseFloat(ventaStr) || costo;
+    const mub = +((venta / costo - 1) * 100).toFixed(1);
+    mexpVentaState[codigo] = { mub, venta, esCosto: false };
+    mexpRenderVenta();
+}
+function mexpToggleCosto(codigo, costo) {
+    const st = mexpVentaState[codigo] || {};
+    mexpVentaState[codigo] = { ...st, esCosto: !st.esCosto };
+    mexpRenderVenta();
+}
+
+function mexpRenderResumen() {
+    const items = mexpGetCostItems();
+    if (!items.length || !mexpRuta) {
+        document.getElementById('mexp-resumen-wrap').innerHTML = '';
+        return;
+    }
+    const r = mexpRuta;
+    const eq = mexpEquipo;
+    const nc = mexpNumCont;
+    const lines = [];
+    lines.push(`📦 MARÍTIMO EXPORTACIÓN · MAERSK`);
+    lines.push(`${r.pol} → ${r.pod}`);
+    lines.push(`Equipo: ${eq} × ${nc}   |   Tránsito: ${r.transitoDias || '—'} días`);
+    lines.push(`Vigencia: ${r.vigencia}`);
+    lines.push('');
+    lines.push('COSTOS (USD):');
+    let grupo = '';
+    for (const it of items) {
+        if (it.grupo !== grupo) { grupo = it.grupo; lines.push(`  [${grupo}]`); }
+        const st = mexpVentaState[it.codigo];
+        const venta = st ? (st.esCosto ? it.monto : st.venta) : it.monto;
+        lines.push(`  ${it.codigo.padEnd(8)} ${it.concepto.padEnd(40)} ${it.moneda} ${it.monto.toFixed(2).padStart(8)}  →  Venta $${venta.toFixed(2)}`);
+    }
+    const totalCosto = items.reduce((s, i) => s + i.monto, 0);
+    const totalVenta = items.reduce((s, i) => {
+        const st = mexpVentaState[i.codigo];
+        return s + (st ? (st.esCosto ? i.monto : st.venta) : i.monto);
+    }, 0);
+    lines.push('');
+    lines.push(`TOTAL COSTO:  USD ${totalCosto.toFixed(2)}`);
+    lines.push(`TOTAL VENTA:  USD ${totalVenta.toFixed(2)}`);
+    lines.push(`UTILIDAD:     USD ${(totalVenta - totalCosto).toFixed(2)}`);
+
+    document.getElementById('mexp-resumen-wrap').innerHTML =
+        `<div class="mexp-resumen">${lines.join('\n')}</div>`;
+}
+
+function mexpCopiarCorreo() {
+    const el = document.querySelector('#mexp-resumen-wrap .mexp-resumen');
+    if (!el) return;
+    navigator.clipboard.writeText(el.textContent).then(() => {
+        const btn = document.querySelector('#mexp-panel-4 .btn-primary');
+        if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = orig, 2000); }
+    });
+}
 
 // ===== AÉREO EXPORTACIÓN (EXW) =====
 
