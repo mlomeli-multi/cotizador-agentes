@@ -3578,14 +3578,25 @@
         }
         /* ===== MARÍTIMO EXP ===== */
         .mexp-step-panel { animation: fadeIn .2s ease; }
+        .mexp-step-panel + .mexp-step-panel { margin-top: 1rem; }
         .mexp-toggle-btn {
-            padding: 0.5rem 1rem; border-radius: 6px; border: 1.5px solid var(--gray-300);
-            background: white; font-size: 0.82rem; cursor: pointer; color: var(--gray-600);
+            padding: 0.42rem 1rem; border-radius: 20px; border: 1.5px solid var(--gray-300);
+            background: white; font-size: 0.78rem; font-weight: 500; cursor: pointer; color: var(--gray-500);
             transition: all .15s;
         }
+        .mexp-toggle-btn:hover { border-color: var(--blue); color: var(--blue); }
         .mexp-toggle-btn.active {
-            border-color: var(--blue); background: var(--blue-light, #eff6ff); color: var(--blue); font-weight: 600;
+            border-color: var(--blue); background: var(--blue-light, #eff6ff); color: var(--blue); font-weight: 700;
         }
+        .mexp-section-sep {
+            margin: 1.1rem 0 0.9rem; border: none; border-top: 1px solid var(--gray-200);
+        }
+        .mexp-route-info {
+            display: flex; gap: 1.5rem; flex-wrap: wrap; font-size: 0.8rem; color: var(--gray-600);
+            margin-top: 0.75rem; padding: 0.6rem 0.75rem;
+            background: var(--gray-50); border-radius: 8px; border: 1px solid var(--gray-200);
+        }
+        .mexp-route-info .ri-vigencia { color: var(--green); font-weight: 600; }
         .mexp-charge-row {
             display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem;
             border-radius: 6px; border: 1px solid var(--gray-200); background: white;
@@ -3610,7 +3621,6 @@
         .mexp-venta-table tr.group-header td { font-weight: 700; color: var(--gray-700); background: var(--gray-50); font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
         .mexp-venta-table tr.total-row td { font-weight: 700; border-top: 2px solid var(--gray-300); }
         .mexp-venta-input { width: 90px; padding: 0.3rem 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.82rem; text-align: right; }
-        .mexp-resumen { background: var(--gray-50); border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.83rem; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--gray-200); }
         .mexp-equipo-row {
             display: flex; align-items: center; gap: 0.5rem;
             padding: 0.3rem 0.7rem; border-radius: 8px; border: 1.5px solid var(--gray-300);
@@ -4764,20 +4774,19 @@
                             </div>
 
                             <!-- Route info strip -->
-                            <div id="mexp-route-info" style="display:none;margin-top:0.75rem;padding:0.6rem 0.75rem;background:var(--gray-50);border-radius:6px;border:1px solid var(--gray-200);">
-                                <div style="display:flex;gap:1.5rem;flex-wrap:wrap;font-size:0.8rem;color:var(--gray-600);">
-                                    <span id="mexp-ri-tt"></span>
-                                    <span id="mexp-ri-region"></span>
-                                    <span id="mexp-ri-libres-origen"></span>
-                                    <span id="mexp-ri-libres-destino"></span>
-                                    <span id="mexp-ri-vigencia" style="color:var(--green);font-weight:600;"></span>
-                                </div>
+                            <div id="mexp-route-info" class="mexp-route-info" style="display:none;">
+                                <span id="mexp-ri-tt"></span>
+                                <span id="mexp-ri-region"></span>
+                                <span id="mexp-ri-libres-origen"></span>
+                                <span id="mexp-ri-libres-destino"></span>
+                                <span id="mexp-ri-vigencia" class="ri-vigencia"></span>
                             </div>
 
                             <!-- Recolección -->
-                            <div id="mexp-recoleccion-wrap" style="display:none;margin-top:1.25rem;">
-                                <div class="form-section-title" style="margin-bottom:0.5rem;">Recolección en origen</div>
-                                <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                            <div id="mexp-recoleccion-wrap" style="display:none;">
+                                <hr class="mexp-section-sep">
+                                <div class="form-section-title" style="margin-bottom:0.6rem;">Recolección en origen</div>
+                                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
                                     <button class="mexp-toggle-btn active" id="mexp-btn-con-recol" onclick="mexpSetRecoleccion(true)">
                                         Con recolección (vacío a planta)
                                     </button>
@@ -4785,14 +4794,20 @@
                                         Sin recolección (cliente lleva al puerto)
                                     </button>
                                 </div>
-                                <div id="mexp-inland-wrap" style="margin-top:0.75rem;display:none;">
-                                    <div style="font-size:0.78rem;color:var(--gray-500);margin-bottom:0.3rem;">Ciudad de origen (donde está la carga)</div>
-                                    <select id="mexp-ciudad-origen" style="margin-bottom:0.8rem;">
-                                        <option value="">— Selecciona ciudad —</option>
-                                    </select>
-                                    <div id="mexp-inland-providers-wrap" style="display:none;">
-                                        <div style="font-size:0.78rem;color:var(--gray-500);margin-bottom:0.4rem;">Proveedor de flete terrestre al puerto</div>
-                                        <div id="mexp-inland-providers" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                                <div id="mexp-inland-wrap" style="margin-top:0.9rem;display:none;">
+                                    <div class="air-route-grid" style="grid-template-columns:1fr 1fr;">
+                                        <div class="form-group">
+                                            <label>Ciudad de origen</label>
+                                            <select id="mexp-ciudad-origen">
+                                                <option value="">— Selecciona ciudad —</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div id="mexp-inland-providers-wrap" style="display:none;margin-top:0.75rem;">
+                                        <div class="form-group">
+                                            <label>Proveedor de flete terrestre al puerto</label>
+                                            <div id="mexp-inland-providers" style="display:flex;gap:0.5rem;flex-wrap:wrap;padding-top:0.2rem;"></div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -4822,8 +4837,9 @@
                             </div>
                             <div id="mexp-destino-charges" style="display:flex;flex-direction:column;gap:0.4rem;margin-top:0.5rem;"></div>
 
-                            <div id="mexp-opcional-wrap" style="margin-top:1.25rem;display:none;">
-                                <div style="font-size:0.72rem;font-weight:700;color:var(--gray-400);text-transform:uppercase;letter-spacing:.05em;margin-bottom:0.5rem;">Opcionales</div>
+                            <div id="mexp-opcional-wrap" style="display:none;">
+                                <hr class="mexp-section-sep">
+                                <div style="font-size:0.65rem;font-weight:800;color:var(--gray-400);text-transform:uppercase;letter-spacing:.06em;margin-bottom:0.5rem;">Opcionales</div>
                                 <div id="mexp-opcional-charges" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
                             </div>
 
