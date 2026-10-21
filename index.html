@@ -3611,19 +3611,27 @@
         .mexp-venta-table tr.total-row td { font-weight: 700; border-top: 2px solid var(--gray-300); }
         .mexp-venta-input { width: 90px; padding: 0.3rem 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.82rem; text-align: right; }
         .mexp-resumen { background: var(--gray-50); border-radius: 8px; padding: 1rem 1.25rem; font-size: 0.83rem; white-space: pre-wrap; font-family: monospace; border: 1px solid var(--gray-200); }
-        .mexp-equipo-btn {
-            display: inline-flex; align-items: center; gap: 0.35rem;
-            padding: 0.28rem 0.65rem; border-radius: 8px; border: 1.5px solid var(--gray-300);
-            background: white; color: var(--gray-600); font-size: 0.78rem; font-weight: 600;
-            cursor: pointer; transition: all .15s; user-select: none;
+        .mexp-equipo-row {
+            display: flex; align-items: center; gap: 0.5rem;
+            padding: 0.3rem 0.7rem; border-radius: 8px; border: 1.5px solid var(--gray-300);
+            background: white; cursor: pointer; user-select: none; min-width: 130px;
+            transition: all .15s;
         }
-        .mexp-equipo-btn:hover { border-color: var(--blue); color: var(--blue); }
-        .mexp-equipo-btn.active { border-color: var(--blue); background: #eff6ff; color: #1d4ed8; }
-        .mexp-equipo-qty {
-            width: 36px; padding: 0.18rem 0.3rem; border: 1px solid var(--gray-300);
-            border-radius: 4px; font-size: 0.75rem; text-align: center; background: white;
+        .mexp-equipo-row:hover { border-color: var(--blue); }
+        .mexp-equipo-row.active { border-color: var(--blue); background: #eff6ff; }
+        .mexp-equipo-row .eq-check { font-size: 0.85rem; color: var(--gray-300); width: 14px; }
+        .mexp-equipo-row.active .eq-check { color: #1d4ed8; }
+        .mexp-equipo-row .eq-name { font-size: 0.78rem; font-weight: 700; color: var(--gray-600); flex: 1; }
+        .mexp-equipo-row.active .eq-name { color: #1d4ed8; }
+        .mexp-eq-qty-ctrl { display: flex; align-items: center; gap: 0.2rem; }
+        .mexp-eq-qty-ctrl .eq-btn {
+            width: 22px; height: 22px; border: 1px solid #93c5fd; border-radius: 5px;
+            background: white; color: #1d4ed8; font-size: 1rem; font-weight: 700;
+            cursor: pointer; line-height: 1; padding: 0;
+            display: flex; align-items: center; justify-content: center;
         }
-        .mexp-equipo-btn.active .mexp-equipo-qty { border-color: #93c5fd; }
+        .mexp-eq-qty-ctrl .eq-btn:hover { background: #dbeafe; }
+        .mexp-eq-qty-num { width: 28px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #1d4ed8; }
         /* ===== ADMIN MODE ===== */
         .admin-only { display: none; }
         body.admin-mode .admin-only { display: block; }
@@ -11684,11 +11692,17 @@ function mexpRenderEquipoButtons() {
     wrap.innerHTML = eqs.map(eq => {
         const active = mexpEquiposSeleccionados[eq] !== undefined;
         const qty = mexpEquiposSeleccionados[eq] || 1;
-        return `<span class="mexp-equipo-btn${active ? ' active' : ''}" onclick="mexpToggleEquipo('${eq}')">
-            ${eq}
-            ${active ? `<input class="mexp-equipo-qty" type="number" value="${qty}" min="1" max="20"
-                onclick="event.stopPropagation()" onchange="mexpSetEquipoQty('${eq}',this.value)">` : ''}
-        </span>`;
+        const qtyCtrl = active ? `
+            <div class="mexp-eq-qty-ctrl" onclick="event.stopPropagation()">
+                <button class="eq-btn" onclick="mexpSetEquipoQty('${eq}',${qty - 1})">−</button>
+                <span class="mexp-eq-qty-num">${qty}</span>
+                <button class="eq-btn" onclick="mexpSetEquipoQty('${eq}',${qty + 1})">+</button>
+            </div>` : '';
+        return `<div class="mexp-equipo-row${active ? ' active' : ''}" onclick="mexpToggleEquipo('${eq}')">
+            <span class="eq-check">${active ? '✓' : '○'}</span>
+            <span class="eq-name">${eq}</span>
+            ${qtyCtrl}
+        </div>`;
     }).join('');
 }
 
@@ -11707,6 +11721,7 @@ function mexpSetEquipoQty(eq, val) {
     const n = Math.max(1, Math.min(20, parseInt(val) || 1));
     if (mexpEquiposSeleccionados[eq] !== undefined) {
         mexpEquiposSeleccionados[eq] = n;
+        mexpRenderEquipoButtons();
     }
 }
 
