@@ -11705,6 +11705,9 @@ function mexpOnPODChange() {
     mexpEquiposSeleccionados = {};
     mexpInlandProvider = null;
     mexpCiudadOrigen = null;
+    // Pre-select all destino/opcionales when route changes
+    mexpDestinoSeleccionados = new Set(ruta ? ruta.destinoCargos.map(c => c.codigo) : []);
+    mexpOpcionalesActivos = new Set();
 
     mexpRenderEquipoButtons();
     document.getElementById('mexp-equipo-field').style.display = 'block';
@@ -12073,11 +12076,6 @@ function mexpRenderDestinoCharges() {
     if (!mexpRuta) return;
     const eq = mexpPrimaryEquipo();
     const container = document.getElementById('mexp-destino-charges');
-
-    // Initialize selection: select all destino charges by default
-    if (mexpDestinoSeleccionados.size === 0) {
-        mexpRuta.destinoCargos.forEach(c => mexpDestinoSeleccionados.add(c.codigo));
-    }
 
     container.innerHTML = mexpRuta.destinoCargos.map(c => {
         const amt = c.cobroPor === 'BL' ? c.porBL : (c[eq] || 0);
