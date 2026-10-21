@@ -11585,6 +11585,8 @@ let mexpOpcionalesActivos = new Set();      // CP1/CP3 activos
 let mexpInlandProvider = null;
 let mexpCiudadOrigen   = null;
 let mexpVentaState = {};       // { codigo: { mub, venta, esCosto } }
+let mexpResMode = 'exw';       // 'exw' | 'fob'
+let mexpResLang = 'en';        // 'en' | 'es'
 let mexpCurrentStep = 1;
 
 async function initMexp() {
@@ -12292,48 +12294,458 @@ function mexpToggleCosto(codigo, costo) {
 }
 
 function mexpRenderResumen() {
-    const items = mexpGetCostItems();
-    if (!items.length || !mexpRuta) {
-        document.getElementById('mexp-resumen-wrap').innerHTML = '';
-        return;
-    }
-    const r = mexpRuta;
-    const equiposStr = Object.entries(mexpEquiposSeleccionados).map(([eq, nc]) => `${eq}×${nc}`).join(', ') || '—';
-    const lines = [];
-    lines.push(`📦 MARÍTIMO EXPORTACIÓN · MAERSK`);
-    lines.push(`${r.pol} → ${r.pod}`);
-    lines.push(`Equipo: ${equiposStr}   |   Tránsito: ${r.transitoDias || '—'} días`);
-    lines.push(`Vigencia: ${r.vigencia}`);
-    lines.push('');
-    lines.push('COSTOS (USD):');
-    let grupo = '';
-    for (const it of items) {
-        if (it.grupo !== grupo) { grupo = it.grupo; lines.push(`  [${grupo}]`); }
-        const st = mexpVentaState[it.codigo];
-        const venta = st ? (st.esCosto ? it.monto : st.venta) : it.monto;
-        lines.push(`  ${it.codigo.padEnd(8)} ${it.concepto.padEnd(40)} ${it.moneda} ${it.monto.toFixed(2).padStart(8)}  →  Venta $${venta.toFixed(2)}`);
-    }
-    const totalCosto = items.reduce((s, i) => s + i.monto, 0);
-    const totalVenta = items.reduce((s, i) => {
-        const st = mexpVentaState[i.codigo];
-        return s + (st ? (st.esCosto ? i.monto : st.venta) : i.monto);
-    }, 0);
-    lines.push('');
-    lines.push(`TOTAL COSTO:  USD ${totalCosto.toFixed(2)}`);
-    lines.push(`TOTAL VENTA:  USD ${totalVenta.toFixed(2)}`);
-    lines.push(`UTILIDAD:     USD ${(totalVenta - totalCosto).toFixed(2)}`);
+    const wrap = document.getElementById('mexp-resumen-wrap');
+    if (!mexpRuta) { wrap.innerHTML = ''; return; }
+    mexpResMode = mexpConRecoleccion ? 'exw' : 'fob';
+    wrap.innerHTML = `
+        <div class="maritime-quote-header" style="margin-bottom:0.75rem;">
+            <div class="maritime-quote-header-actions">
+                <div class="maritime-quote-tabs" id="mexp-res-mode-tabs">
+                    <button class="maritime-quote-tab${mexpResMode==='exw'?' active':''}" onclick="mexpSetResMode('exw',this)">EXW</button>
+                    <button class="maritime-quote-tab${mexpResMode==='fob'?' active':''}" onclick="mexpSetResMode('fob',this)">FOB</button>
+                </div>
+                <div class="maritime-quote-tabs" id="mexp-res-lang-tabs">
+                    <button class="maritime-quote-tab${mexpResLang==='en'?' active':''}" onclick="mexpSetResLang('en',this)">EN</button>
+                    <button class="maritime-quote-tab${mexpResLang==='es'?' active':''}" onclick="mexpSetResLang('es',this)">ES</button>
+                </div>
+            </div>
+            <button class="maritime-quote-copy-btn" onclick="mexpCopiarCorreo()">📋 Copiar correo</button>
+        </div>
+        <div id="mexp-res-body" class="maritime-quote-body"></div>`;
+    mexpRefreshResBody();
+}
 
-    document.getElementById('mexp-resumen-wrap').innerHTML =
-        `<div class="mexp-resumen">${lines.join('\n')}</div>`;
+function mexpSetResMode(mode, btn) {
+    mexpResMode = mode;
+    btn.closest('.maritime-quote-tabs').querySelectorAll('.maritime-quote-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mexpRefreshResBody();
+}
+
+function mexpSetResLang(lang, btn) {
+    mexpResLang = lang;
+    btn.closest('.maritime-quote-tabs').querySelectorAll('.maritime-quote-tab').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mexpRefreshResBody();
+}
+
+function mexpRefreshResBody() {
+    const body = document.getElementById('mexp-res-body');
+    if (!body) return;
+    const { html, text } = mexpBuildEmail(mexpResMode, mexpResLang);
+    body.innerHTML = html;
+    body._plainText = text;
 }
 
 function mexpCopiarCorreo() {
-    const el = document.querySelector('#mexp-resumen-wrap .mexp-resumen');
-    if (!el) return;
-    navigator.clipboard.writeText(el.textContent).then(() => {
-        const btn = document.querySelector('#mexp-panel-4 .btn-primary');
-        if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = orig, 2000); }
+    const body = document.getElementById('mexp-res-body');
+    if (!body || !body._plainText) return;
+    navigator.clipboard.writeText(body._plainText).then(() => {
+        const btn = document.querySelector('.maritime-quote-copy-btn');
+        if (btn) { const orig = btn.textContent; btn.textContent = '✓ Copiado'; setTimeout(() => btn.textContent = orig, 2200); }
     });
+}
+
+function mexpBuildEmail(mode, lang) {
+    const r = mexpRuta;
+    const items = mexpGetCostItems();
+    if (!r || !items.length) return { html: '', text: '' };
+    const isEN = lang === 'en';
+    const isEXW = mode === 'exw';
+
+    const getVenta = (item) => {
+        const st = mexpVentaState[item.codigo];
+        if (!st) return item.monto;
+        return st.esCosto ? item.monto : (st.venta || item.monto);
+    };
+    const fmtAmt = (n, cur) => `${cur || 'USD'} ${Math.round(n).toLocaleString('en-US')}`;
+    const esc = s => String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const li  = (label, val) => `<li><strong>${esc(label)}:</strong> ${esc(val)}</li>`;
+
+    const origenItems = items.filter(i => i.grupo === 'Origen');
+    const fleteItems  = items.filter(i => i.grupo === 'Flete');
+    const destinoItems= items.filter(i => i.grupo === 'Destino');
+    const inlandItem  = items.find(i => i.codigo === 'INLAND');
+    const numConts = Object.values(mexpEquiposSeleccionados).reduce((s, n) => s + n, 0) || 1;
+    const fleteTotal = fleteItems.reduce((s, i) => s + getVenta(i), 0);
+    const fletePerCont = Math.round(fleteTotal / numConts);
+
+    const polLabel = r.pol.replace(', MX', '');
+    const podLabel = r.pod;
+    const ftPol = r.diasLibresOrigen ? `${r.diasLibresOrigen} ${isEN?'days':'días'}` : '—';
+    const ftPod = r.diasLibresDestinoCombinado
+        ? `${r.diasLibresDestinoCombinado} ${isEN?'days (combined)':'días (combinado)'}`
+        : r.diasLibresDestinoDemoras
+            ? `${r.diasLibresDestinoDemoras} dem + ${r.diasLibresDestinoDetencion||'?'} det`
+            : '—';
+    const equiposMap = { '20DRY':"20'", '40DRY':"40'", '40HDRY':"40'HC" };
+    const equiposList = Object.entries(mexpEquiposSeleccionados)
+        .map(([eq, nc]) => `${nc} × ${equiposMap[eq]||eq}`)
+        .join(', ');
+    const validity = r.vigencia || '—';
+    const naviera = (mexpData && mexpData.naviera) || 'Maersk';
+    const tt = r.transitoDias ? `${isEN?'Approx.':'Aprox.'} ${r.transitoDias} ${isEN?'days':'días'}` : '—';
+
+    if (isEN) {
+        const greeting = isEXW
+            ? `Dear [Client Name],<br><br>Hope you are doing well.<br><br>Please find below our <strong>EXW FCL quotation</strong>, based on the information provided. This proposal includes inland transportation from origin to port and ocean freight.`
+            : `Dear [Client Name],<br><br>Hope you are doing well.<br><br>Please find below our <strong>FOB FCL quotation</strong>, based on the information provided.`;
+
+        const serviceRows = [
+            isEXW ? li('Pick-up Address (EXW)', '[Full shipper address]') : '',
+            `<li><strong>POL:</strong> ${esc(polLabel)}<br>&nbsp;&nbsp;&nbsp;Free time at POL: ${esc(ftPol)}</li>`,
+            `<li><strong>POD:</strong> ${esc(podLabel)}<br>&nbsp;&nbsp;&nbsp;Free time at POD: ${esc(ftPod)}</li>`,
+            li('Shipping Line', naviera),
+            li('Estimated Transit Time', tt),
+            li('Sailing Dates', '—'),
+        ].filter(Boolean).join('');
+
+        const originRows = [
+            ...origenItems.map(it => {
+                const v = getVenta(it);
+                const note = it.cobroPor === 'BL' ? 'per BL' : 'per container';
+                const concept = it.codigo === 'ODF' ? 'Booking & Documentation'
+                              : it.codigo === 'EHE' ? 'Export Handling'
+                              : it.concepto;
+                return li(concept, `${fmtAmt(v, it.moneda)} ${note}`);
+            }),
+            isEXW && inlandItem ? li('Inland Freight (origin to port)', `${fmtAmt(getVenta(inlandItem), 'USD')}`) : '',
+        ].filter(Boolean).join('');
+
+        const destRows = destinoItems.map(it => {
+            const v = getVenta(it);
+            const note = it.cobroPor === 'BL' ? 'per BL' : 'per container';
+            return li(it.concepto || it.codigo, `${fmtAmt(v, it.moneda)} ${note}`);
+        }).join('');
+
+        const html = `
+        <div class="maritime-quote-greeting">${greeting}</div>
+
+        <div class="maritime-quote-section">
+            <h4>Shipment Details</h4>
+            <ul class="maritime-quote-list">
+                <li><strong>Commodity:</strong> General Cargo</li>
+                <li><strong>Container Type:</strong> ${esc(equiposList)}</li>
+                <li><strong>Weight / Dimensions:</strong> Subject to legal weight and dimensions</li>
+            </ul>
+        </div>
+
+        <div class="maritime-quote-section">
+            <h4>Service Details</h4>
+            <ul class="maritime-quote-list">${serviceRows}</ul>
+        </div>
+
+        <div class="maritime-quote-section">
+            <h4>Rate Breakdown (USD)</h4>
+            ${originRows ? `<p class="maritime-quote-subsection-title">Origin Charges</p><ul class="maritime-quote-list">${originRows}</ul>` : ''}
+            <p class="maritime-quote-subsection-title" style="margin-top:0.5rem;">Ocean Freight</p>
+            <ul class="maritime-quote-list">
+                <li><strong>Ocean Freight:</strong> ${fmtAmt(fletePerCont,'USD')} per container</li>
+            </ul>
+            ${destRows ? `<p class="maritime-quote-subsection-title" style="margin-top:0.5rem;">Destination Charges</p><ul class="maritime-quote-list">${destRows}</ul>` : ''}
+            <ul class="maritime-quote-list">
+                <li><strong>Other charges:</strong> At cost, if applicable</li>
+            </ul>
+        </div>
+
+        <div class="maritime-quote-section">
+            <h4>Customs &amp; Compliance (Important)</h4>
+            <ul class="maritime-quote-list">
+                <li>Export customs clearance and THC is under shipper's responsibility.</li>
+                <li>Shipper must have a registered customs broker at origin.</li>
+                <li>Customs clearance, THC, taxes, and duties are not included.</li>
+                <li>Any customs inspection, rehandling, or government hold may generate additional charges.</li>
+            </ul>
+        </div>
+
+        <div class="maritime-quote-section">
+            <h4>Remarks &amp; Conditions</h4>
+            <ul class="maritime-quote-list">
+                <li><strong>Validity:</strong> ${esc(validity)}</li>
+                <li>Rates are subject to final cargo weight and dimensions.</li>
+                <li>Subject to equipment and space availability at time of booking.</li>
+                ${isEXW ? '<li>Shipping line confirms pick-up availability 1 day prior to scheduled pick-up.</li>' : ''}
+                <li>Overweight containers may incur an extra charge.</li>
+                <li>Rates may change without prior notice, as they are spot-based.</li>
+                <li>Shipper must provide seals.</li>
+                ${isEXW ? '<li>Delivery at destination is not included (EXW to Port only).</li>' : ''}
+                <li>Customs clearance, import/export duties, and taxes are not included.</li>
+            </ul>
+        </div>
+
+        <div class="maritime-quote-section">
+            <p style="font-size:0.8rem;color:var(--gray-600);line-height:1.6;">
+                If you have any questions, require adjustments, or would like us to proceed with booking, please let us know.<br>
+                We will be happy to support you.
+            </p>
+        </div>`;
+
+        const textLines = [
+            'Dear [Client Name],',
+            '',
+            'Hope you are doing well.',
+            '',
+            isEXW
+                ? 'Please find below our EXW FCL quotation, based on the information provided. This proposal includes inland transportation from origin to port and ocean freight.'
+                : 'Please find below our FOB FCL quotation, based on the information provided.',
+            '',
+            '',
+            'Shipment Details',
+            '',
+            '• Commodity: General Cargo',
+            `• Container Type: ${equiposList}`,
+            '• Weight / Dimensions: Subject to legal weight and dimensions',
+            '',
+            '',
+            'Service Details',
+            '',
+            ...(isEXW ? ['• Pick-up Address (EXW): [Full shipper address]'] : []),
+            `• POL: ${polLabel}`,
+            `  Free time at POL: ${ftPol}`,
+            `• POD: ${podLabel}`,
+            `  Free time at POD: ${ftPod}`,
+            `• Shipping Line: ${naviera}`,
+            `• Estimated Transit Time: ${tt}`,
+            '• Sailing Dates: —',
+            '',
+            '',
+            'Rate Breakdown (USD)',
+            '',
+            ...(originRows ? [
+                'Origin Charges',
+                '',
+                ...origenItems.map(it => {
+                    const v = getVenta(it);
+                    const note = it.cobroPor === 'BL' ? 'per BL' : 'per container';
+                    const concept = it.codigo==='ODF' ? 'Booking & Documentation' : it.codigo==='EHE' ? 'Export Handling' : it.concepto;
+                    return `• ${concept}: ${fmtAmt(v,it.moneda)} ${note}`;
+                }),
+                ...(isEXW && inlandItem ? [`• Inland Freight (origin to port): ${fmtAmt(getVenta(inlandItem),'USD')}`] : []),
+                '',
+            ] : []),
+            'Ocean Freight',
+            '',
+            `• Ocean Freight: ${fmtAmt(fletePerCont,'USD')} per container`,
+            '',
+            ...(destinoItems.length ? [
+                'Destination Charges',
+                '',
+                ...destinoItems.map(it => {
+                    const v = getVenta(it);
+                    const note = it.cobroPor==='BL' ? 'per BL' : 'per container';
+                    return `• ${it.concepto||it.codigo}: ${fmtAmt(v,it.moneda)} ${note}`;
+                }),
+                '',
+            ] : []),
+            '• Other charges: At cost, if applicable',
+            '',
+            '',
+            'Customs & Compliance (Important)',
+            '',
+            "• Export customs clearance and THC is under shipper's responsibility.",
+            '• Shipper must have a registered customs broker at origin.',
+            '• Customs clearance, THC, taxes, and duties are not included.',
+            '• Any customs inspection, rehandling, or government hold may generate additional charges.',
+            '',
+            '',
+            'Remarks & Conditions',
+            '',
+            `• Validity: ${validity}`,
+            '• Rates are subject to final cargo weight and dimensions.',
+            '• Subject to equipment and space availability at time of booking.',
+            ...(isEXW ? ['• Shipping line confirms pick-up availability 1 day prior to scheduled pick-up.'] : []),
+            '• Overweight containers may incur an extra charge.',
+            '• Rates may change without prior notice, as they are spot-based.',
+            '• Shipper must provide seals.',
+            ...(isEXW ? ['• Delivery at destination is not included (EXW to Port only).'] : []),
+            '• Customs clearance, import/export duties, and taxes are not included.',
+            '',
+            '',
+            'If you have any questions, require adjustments, or would like us to proceed with booking, please let us know.',
+            'We will be happy to support you.',
+        ];
+        return { html, text: textLines.join('\n') };
+    }
+
+    // ── SPANISH ───────────────────────────────────────────────────────────────
+    const greeting = isEXW
+        ? `Estimado/a [Nombre del Cliente],<br><br>Espero que se encuentre bien.<br><br>A continuación le enviamos nuestra <strong>cotización EXW FCL</strong>, basada en la información proporcionada. Esta propuesta incluye el transporte terrestre desde origen hasta puerto y el flete marítimo.`
+        : `Estimado/a [Nombre del Cliente],<br><br>Espero que se encuentre bien.<br><br>A continuación le enviamos nuestra <strong>cotización FOB FCL</strong>, basada en la información proporcionada.`;
+
+    const serviceRowsES = [
+        isEXW ? li('Dirección de recolección (EXW)', '[Dirección completa del exportador]') : '',
+        `<li><strong>POL:</strong> ${esc(polLabel)}<br>&nbsp;&nbsp;&nbsp;Días libres en POL: ${esc(ftPol.replace('days','días').replace('combined','combinado'))}</li>`,
+        `<li><strong>POD:</strong> ${esc(podLabel)}<br>&nbsp;&nbsp;&nbsp;Días libres en POD: ${esc(ftPod.replace('days','días').replace('combined','combinado'))}</li>`,
+        li('Línea marítima', naviera),
+        li('Tiempo de tránsito estimado', tt.replace('Approx.','Aprox.').replace('days','días')),
+        li('Salidas', '—'),
+    ].filter(Boolean).join('');
+
+    const originRowsES = [
+        ...origenItems.map(it => {
+            const v = getVenta(it);
+            const note = it.cobroPor === 'BL' ? 'por BL' : 'por contenedor';
+            const concept = it.codigo==='ODF' ? 'Gestión documental'
+                          : it.codigo==='EHE' ? 'Manejo en origen'
+                          : it.concepto;
+            return li(concept, `${fmtAmt(v,it.moneda)} ${note}`);
+        }),
+        isEXW && inlandItem ? li('Flete terrestre (origen a puerto)', `${fmtAmt(getVenta(inlandItem),'USD')}`) : '',
+    ].filter(Boolean).join('');
+
+    const destRowsES = destinoItems.map(it => {
+        const v = getVenta(it);
+        const note = it.cobroPor==='BL' ? 'por BL' : 'por contenedor';
+        return li(it.concepto||it.codigo, `${fmtAmt(v,it.moneda)} ${note}`);
+    }).join('');
+
+    const htmlES = `
+    <div class="maritime-quote-greeting">${greeting}</div>
+
+    <div class="maritime-quote-section">
+        <h4>Detalles del embarque</h4>
+        <ul class="maritime-quote-list">
+            <li><strong>Mercancía:</strong> Carga general</li>
+            <li><strong>Tipo de contenedor:</strong> ${esc(equiposList)}</li>
+            <li><strong>Peso / Dimensiones:</strong> Sujeto a peso y dimensiones legales</li>
+        </ul>
+    </div>
+
+    <div class="maritime-quote-section">
+        <h4>Detalles del servicio</h4>
+        <ul class="maritime-quote-list">${serviceRowsES}</ul>
+    </div>
+
+    <div class="maritime-quote-section">
+        <h4>Desglose de tarifas (USD)</h4>
+        ${originRowsES ? `<p class="maritime-quote-subsection-title">Cargos en origen</p><ul class="maritime-quote-list">${originRowsES}</ul>` : ''}
+        <p class="maritime-quote-subsection-title" style="margin-top:0.5rem;">Flete marítimo</p>
+        <ul class="maritime-quote-list">
+            <li><strong>Flete marítimo:</strong> ${fmtAmt(fletePerCont,'USD')} por contenedor</li>
+        </ul>
+        ${destRowsES ? `<p class="maritime-quote-subsection-title" style="margin-top:0.5rem;">Cargos en destino</p><ul class="maritime-quote-list">${destRowsES}</ul>` : ''}
+        <ul class="maritime-quote-list">
+            <li><strong>Otros cargos:</strong> Al costo, si aplican</li>
+        </ul>
+    </div>
+
+    <div class="maritime-quote-section">
+        <h4>Aduanas y cumplimiento normativo (Importante)</h4>
+        <ul class="maritime-quote-list">
+            <li>El despacho de exportación y THC están bajo responsabilidad del exportador.</li>
+            <li>El exportador debe contar con un agente aduanal registrado en origen.</li>
+            <li>Despacho aduanal, THC, impuestos y aranceles no están incluidos.</li>
+            <li>Cualquier inspección, manejo adicional o retención gubernamental podrá generar cargos adicionales.</li>
+        </ul>
+    </div>
+
+    <div class="maritime-quote-section">
+        <h4>Condiciones y observaciones</h4>
+        <ul class="maritime-quote-list">
+            <li><strong>Vigencia:</strong> ${esc(validity)}</li>
+            <li>Las tarifas están sujetas a peso y dimensiones finales de la carga.</li>
+            <li>Sujeto a disponibilidad de equipo y espacio al momento de la reservación.</li>
+            ${isEXW ? '<li>La línea confirma disponibilidad de recolección 1 día antes de la fecha programada.</li>' : ''}
+            <li>Los contenedores con sobrepeso pueden generar un cargo adicional.</li>
+            <li>Las tarifas pueden cambiar sin previo aviso, ya que son tarifas spot.</li>
+            <li>El exportador debe proporcionar precintos.</li>
+            ${isEXW ? '<li>La entrega en destino no está incluida (EXW hasta puerto únicamente).</li>' : ''}
+            <li>Despacho aduanal, aranceles de importación/exportación e impuestos no están incluidos.</li>
+        </ul>
+    </div>
+
+    <div class="maritime-quote-section">
+        <p style="font-size:0.8rem;color:var(--gray-600);line-height:1.6;">
+            Si tiene alguna pregunta, requiere ajustes o desea proceder con la reservación, no dude en contactarnos.<br>
+            Será un gusto apoyarle.
+        </p>
+    </div>`;
+
+    const textLinesES = [
+        'Estimado/a [Nombre del Cliente],',
+        '',
+        'Espero que se encuentre bien.',
+        '',
+        isEXW
+            ? 'A continuación le enviamos nuestra cotización EXW FCL, basada en la información proporcionada. Esta propuesta incluye el transporte terrestre desde origen hasta puerto y el flete marítimo.'
+            : 'A continuación le enviamos nuestra cotización FOB FCL, basada en la información proporcionada.',
+        '',
+        '',
+        'Detalles del embarque',
+        '',
+        '• Mercancía: Carga general',
+        `• Tipo de contenedor: ${equiposList}`,
+        '• Peso / Dimensiones: Sujeto a peso y dimensiones legales',
+        '',
+        '',
+        'Detalles del servicio',
+        '',
+        ...(isEXW ? ['• Dirección de recolección (EXW): [Dirección completa del exportador]'] : []),
+        `• POL: ${polLabel}`,
+        `  Días libres en POL: ${ftPol.replace('days','días').replace('combined','combinado')}`,
+        `• POD: ${podLabel}`,
+        `  Días libres en POD: ${ftPod.replace('days','días').replace('combined','combinado')}`,
+        `• Línea marítima: ${naviera}`,
+        `• Tiempo de tránsito estimado: ${tt.replace('Approx.','Aprox.').replace('days','días')}`,
+        '• Salidas: —',
+        '',
+        '',
+        'Desglose de tarifas (USD)',
+        '',
+        ...(originRowsES ? [
+            'Cargos en origen',
+            '',
+            ...origenItems.map(it => {
+                const v = getVenta(it);
+                const note = it.cobroPor==='BL'?'por BL':'por contenedor';
+                const concept = it.codigo==='ODF'?'Gestión documental':it.codigo==='EHE'?'Manejo en origen':it.concepto;
+                return `• ${concept}: ${fmtAmt(v,it.moneda)} ${note}`;
+            }),
+            ...(isEXW && inlandItem ? [`• Flete terrestre (origen a puerto): ${fmtAmt(getVenta(inlandItem),'USD')}`] : []),
+            '',
+        ] : []),
+        'Flete marítimo',
+        '',
+        `• Flete marítimo: ${fmtAmt(fletePerCont,'USD')} por contenedor`,
+        '',
+        ...(destinoItems.length ? [
+            'Cargos en destino',
+            '',
+            ...destinoItems.map(it => {
+                const v = getVenta(it);
+                const note = it.cobroPor==='BL'?'por BL':'por contenedor';
+                return `• ${it.concepto||it.codigo}: ${fmtAmt(v,it.moneda)} ${note}`;
+            }),
+            '',
+        ] : []),
+        '• Otros cargos: Al costo, si aplican',
+        '',
+        '',
+        'Aduanas y cumplimiento normativo (Importante)',
+        '',
+        '• El despacho de exportación y THC están bajo responsabilidad del exportador.',
+        '• El exportador debe contar con un agente aduanal registrado en origen.',
+        '• Despacho aduanal, THC, impuestos y aranceles no están incluidos.',
+        '• Cualquier inspección, manejo adicional o retención gubernamental podrá generar cargos adicionales.',
+        '',
+        '',
+        'Condiciones y observaciones',
+        '',
+        `• Vigencia: ${validity}`,
+        '• Las tarifas están sujetas a peso y dimensiones finales de la carga.',
+        '• Sujeto a disponibilidad de equipo y espacio al momento de la reservación.',
+        ...(isEXW ? ['• La línea confirma disponibilidad de recolección 1 día antes de la fecha programada.'] : []),
+        '• Los contenedores con sobrepeso pueden generar un cargo adicional.',
+        '• Las tarifas pueden cambiar sin previo aviso, ya que son tarifas spot.',
+        '• El exportador debe proporcionar precintos.',
+        ...(isEXW ? ['• La entrega en destino no está incluida (EXW hasta puerto únicamente).'] : []),
+        '• Despacho aduanal, aranceles de importación/exportación e impuestos no están incluidos.',
+        '',
+        '',
+        'Si tiene alguna pregunta, requiere ajustes o desea proceder con la reservación, no dude en contactarnos.',
+        'Será un gusto apoyarle.',
+    ];
+    return { html: htmlES, text: textLinesES.join('\n') };
 }
 
 // ===== AÉREO EXPORTACIÓN (EXW) =====
