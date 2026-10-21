@@ -4786,8 +4786,14 @@
                                     </button>
                                 </div>
                                 <div id="mexp-inland-wrap" style="margin-top:0.75rem;display:none;">
-                                    <div style="font-size:0.78rem;color:var(--gray-500);margin-bottom:0.4rem;">Proveedor de flete terrestre al puerto</div>
-                                    <div id="mexp-inland-providers" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                                    <div style="font-size:0.78rem;color:var(--gray-500);margin-bottom:0.3rem;">Ciudad de origen (donde está la carga)</div>
+                                    <select id="mexp-ciudad-origen" style="margin-bottom:0.8rem;">
+                                        <option value="">— Selecciona ciudad —</option>
+                                    </select>
+                                    <div id="mexp-inland-providers-wrap" style="display:none;">
+                                        <div style="font-size:0.78rem;color:var(--gray-500);margin-bottom:0.4rem;">Proveedor de flete terrestre al puerto</div>
+                                        <div id="mexp-inland-providers" style="display:flex;gap:0.5rem;flex-wrap:wrap;"></div>
+                                    </div>
                                 </div>
                             </div>
 
@@ -11575,7 +11581,8 @@ let mexpEquiposSeleccionados = {};  // { '40HDRY': 1, '20DRY': 2 }
 let mexpConRecoleccion = true;
 let mexpDestinoSeleccionados = new Set();   // códigos de cargo destino activos
 let mexpOpcionalesActivos = new Set();      // CP1/CP3 activos
-let mexpInlandProvider = null;             // proveedor flete terrestre origen
+let mexpInlandProvider = null;
+let mexpCiudadOrigen   = null;
 let mexpVentaState = {};       // { codigo: { mub, venta, esCosto } }
 let mexpCurrentStep = 1;
 
@@ -11695,6 +11702,8 @@ function mexpOnPODChange() {
     const ruta = mexpData.rutas.find(r => r.pol === pol && r.pod === pod);
     mexpRuta = ruta || null;
     mexpEquiposSeleccionados = {};
+    mexpInlandProvider = null;
+    mexpCiudadOrigen = null;
 
     mexpRenderEquipoButtons();
     document.getElementById('mexp-equipo-field').style.display = 'block';
@@ -11780,47 +11789,82 @@ function mexpSetRecoleccion(val) {
     document.getElementById('mexp-btn-sin-recol').classList.toggle('active', !val);
     const wrap = document.getElementById('mexp-inland-wrap');
     wrap.style.display = val ? 'block' : 'none';
-    if (val) mexpRenderInlandProviders();
+    if (val) mexpPopulateCiudadOrigen();
+}
+
+function mexpPolKey() {
+    if (!mexpRuta) return null;
+    return mexpRuta.pol.replace(', MX', '');
+}
+
+function mexpGetProveedoresMaritimos() {
+    return (window.cotizadorBase && window.cotizadorBase.proveedoresMaritimos) || [];
+}
+
+function mexpPopulateCiudadOrigen() {
+    const sel = document.getElementById('mexp-ciudad-origen');
+    if (!sel || !mexpRuta) return;
+    const polKey = mexpPolKey();
+    const provs = mexpGetProveedoresMaritimos().filter(p => p.puerto === polKey);
+    const ciudades = [...new Set(provs.flatMap(p => (p.tarifas || []).map(t => t.ciudad)))].sort();
+    sel.innerHTML = '<option value="">— Selecciona ciudad —</option>' +
+        ciudades.map(c => `<option value="${c}">${c}</option>`).join('');
+    sel.disabled = ciudades.length === 0;
+    sel.onchange = () => {
+        mexpCiudadOrigen = sel.value || null;
+        mexpInlandProvider = null;
+        mexpRenderInlandProviders();
+    };
+    if (!ciudades.length) {
+        sel.innerHTML = '<option value="">Sin tarifa disponible para este puerto</option>';
+        document.getElementById('mexp-inland-providers-wrap').style.display = 'none';
+        return;
+    }
+    // Restore previous city if still valid
+    if (mexpCiudadOrigen && ciudades.includes(mexpCiudadOrigen)) {
+        sel.value = mexpCiudadOrigen;
+        mexpRenderInlandProviders();
+    }
 }
 
 function mexpRenderInlandProviders() {
-    const wrap = document.getElementById('mexp-inland-providers');
-    if (!wrap || !mexpRuta) return;
-    // Use same terrestrial providers from DAP maritime data
-    const pol = mexpRuta.pol;
-    // Map POL to city key used in cotizador-base
-    const polMap = {
-        'Altamira, MX':        'ALTAMIRA',
-        'Lazaro Cardenas, MX': 'LAZARO CARDENAS',
-        'Manzanillo, MX':      'MANZANILLO',
-        'Progreso, MX':        'PROGRESO',
-        'Veracruz, MX':        'VERACRUZ',
-    };
-    const puertoKey = polMap[pol] || pol;
-    // Get providers for this puerto from cotizadorBase maritime data
-    const provs = [];
-    if (window.cotizadorBase && window.cotizadorBase.maritimo) {
-        for (const prov of window.cotizadorBase.maritimo) {
-            if (prov.nombrePuerto && prov.nombrePuerto.toUpperCase().includes(puertoKey.split(' ')[0])) {
-                for (const entry of (prov.tarifas || [])) {
-                    if (!provs.find(p => p.proveedor === entry.proveedor)) {
-                        provs.push({ proveedor: entry.proveedor, precio: entry.vacio || entry.precio || 0 });
-                    }
-                }
-            }
-        }
-    }
-    if (!provs.length) {
-        wrap.innerHTML = '<span style="font-size:0.8rem;color:var(--gray-400);">Sin proveedores cargados para este puerto</span>';
+    const providersWrap = document.getElementById('mexp-inland-providers-wrap');
+    const list = document.getElementById('mexp-inland-providers');
+    if (!list || !mexpRuta) return;
+    if (!mexpCiudadOrigen) {
+        providersWrap.style.display = 'none';
         return;
     }
-    wrap.innerHTML = provs.map(p =>
-        `<button class="mexp-toggle-btn${mexpInlandProvider === p.proveedor ? ' active' : ''}"
-            onclick="mexpSelectInland('${p.proveedor}', ${p.precio})">${p.proveedor} · $${p.precio} USD</button>`
+    providersWrap.style.display = 'block';
+
+    const polKey = mexpPolKey();
+    const totalCont = Object.values(mexpEquiposSeleccionados).reduce((s, n) => s + n, 0);
+    const tc = getTipoCambio();
+    const toUSD = (mxn) => tc > 0 ? (mxn / tc) : mxn;
+
+    const options = [];
+    for (const prov of mexpGetProveedoresMaritimos().filter(p => p.puerto === polKey)) {
+        const tarifa = (prov.tarifas || []).find(t => t.ciudad === mexpCiudadOrigen);
+        if (!tarifa) continue;
+        // single = 1 truck, full = 2-cont truck; pick based on total containers
+        const mxn = totalCont >= 2 ? (tarifa.full || tarifa.single || 0) : (tarifa.single || 0);
+        if (!mxn) continue;
+        const usd = toUSD(mxn);
+        options.push({ proveedor: prov.nombre, mxn, usd });
+    }
+
+    if (!options.length) {
+        list.innerHTML = '<span style="font-size:0.8rem;color:var(--gray-400);">Sin tarifa para esta ciudad.</span>';
+        return;
+    }
+    list.innerHTML = options.map(o =>
+        `<button class="mexp-toggle-btn${mexpInlandProvider === o.proveedor ? ' active' : ''}"
+            onclick="mexpSelectInland('${o.proveedor}')"
+            >${o.proveedor}<br><span style="font-size:0.73rem;opacity:0.75;">$${o.mxn.toLocaleString('es-MX')} MXN · US$${o.usd.toFixed(0)}</span></button>`
     ).join('');
 }
 
-function mexpSelectInland(proveedor, precio) {
+function mexpSelectInland(proveedor) {
     mexpInlandProvider = proveedor;
     mexpRenderInlandProviders();
 }
@@ -11832,16 +11876,21 @@ function mexpGoStep(n) {
     if (n === 3) mexpRenderVenta();
     if (n === 4) mexpRenderResumen();
 
+    // Progressive reveal: show all panels up to n, hide the rest
     document.querySelectorAll('.mexp-step-panel').forEach((p, i) => {
-        p.style.display = (i + 1 === n) ? 'block' : 'none';
+        p.style.display = (i + 1 <= n) ? 'block' : 'none';
     });
-    // Left stepper
     document.querySelectorAll('[data-mexp-step]').forEach((s, i) => {
         s.classList.remove('is-active', 'is-done');
         if (i + 1 === n) s.classList.add('is-active');
         else if (i + 1 < n) s.classList.add('is-done');
     });
     mexpCurrentStep = n;
+    // Scroll the new panel into view
+    setTimeout(() => {
+        const panel = document.getElementById(`mexp-panel-${n}`);
+        if (panel) panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 60);
 }
 
 function mexpRenderTariffSummary() {
@@ -12128,29 +12177,25 @@ function mexpGetCostItems() {
     }
 
     // Inland (recolección) — once, using total number of containers
-    if (mexpConRecoleccion && mexpInlandProvider) {
-        const totalCont = equipos.reduce((s, [, nc]) => s + nc, 0);
+    if (mexpConRecoleccion && mexpInlandProvider && mexpCiudadOrigen) {
         const inland = mexpGetInlandPrice();
-        if (inland > 0) items.push({ grupo: 'Inland', codigo: 'INLAND', concepto: `Flete terrestre · ${mexpInlandProvider}`, monto: inland * totalCont, moneda: 'USD' });
+        if (inland > 0) items.push({ grupo: 'Inland', codigo: 'INLAND', concepto: `Flete terrestre · ${mexpInlandProvider} (${mexpCiudadOrigen} → Puerto)`, monto: inland, moneda: 'USD' });
     }
 
     return items;
 }
 
 function mexpGetInlandPrice() {
-    if (!mexpInlandProvider || !mexpRuta) return 0;
-    const pol = mexpRuta.pol;
-    const polMap = { 'Altamira, MX':'ALTAMIRA','Lazaro Cardenas, MX':'LAZARO CARDENAS','Manzanillo, MX':'MANZANILLO','Progreso, MX':'PROGRESO','Veracruz, MX':'VERACRUZ' };
-    const key = polMap[pol] || pol;
-    if (!window.cotizadorBase || !window.cotizadorBase.maritimo) return 0;
-    for (const prov of window.cotizadorBase.maritimo) {
-        if (prov.nombrePuerto && prov.nombrePuerto.toUpperCase().includes(key.split(' ')[0])) {
-            for (const entry of (prov.tarifas || [])) {
-                if (entry.proveedor === mexpInlandProvider) return entry.vacio || entry.precio || 0;
-            }
-        }
-    }
-    return 0;
+    if (!mexpConRecoleccion || !mexpInlandProvider || !mexpRuta || !mexpCiudadOrigen) return 0;
+    const polKey = mexpPolKey();
+    const prov = mexpGetProveedoresMaritimos().find(p => p.puerto === polKey && p.nombre === mexpInlandProvider);
+    if (!prov) return 0;
+    const tarifa = (prov.tarifas || []).find(t => t.ciudad === mexpCiudadOrigen);
+    if (!tarifa) return 0;
+    const totalCont = Object.values(mexpEquiposSeleccionados).reduce((s, n) => s + n, 0);
+    const mxn = totalCont >= 2 ? (tarifa.full || tarifa.single || 0) : (tarifa.single || 0);
+    const tc = getTipoCambio();
+    return tc > 0 ? mxn / tc : mxn;
 }
 
 function mexpRenderVenta() {
