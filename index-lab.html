@@ -4747,8 +4747,8 @@
                                 </div>
                                 <div class="form-group">
                                     <label>País de destino</label>
-                                    <select id="mexp-pais" disabled>
-                                        <option value="">— Elige POL primero —</option>
+                                    <select id="mexp-pais">
+                                        <option value="">— Selecciona país —</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -11588,46 +11588,66 @@ async function initMexp() {
         return;
     }
     mexpPopulatePOL();
+    mexpPopulatePais();
     mexpRenderTariffSummary();
 }
 
-function mexpPopulatePOL() {
+function mexpPopulatePOL(filterPais) {
     const sel = document.getElementById('mexp-pol');
     if (!sel || !mexpData) return;
-    const pols = [...new Set(mexpData.rutas.map(r => r.pol))].sort();
+    const rutas = filterPais
+        ? mexpData.rutas.filter(r => r.pais === filterPais)
+        : mexpData.rutas;
+    const pols = [...new Set(rutas.map(r => r.pol))].sort();
     sel.innerHTML = '<option value="">— Selecciona —</option>' +
         pols.map(p => `<option value="${p}">${p}</option>`).join('');
     sel.onchange = mexpOnPOLChange;
+}
+
+function mexpPopulatePais(filterPol) {
+    const sel = document.getElementById('mexp-pais');
+    if (!sel || !mexpData) return;
+    const rutas = filterPol
+        ? mexpData.rutas.filter(r => r.pol === filterPol)
+        : mexpData.rutas;
+    const paises = [...new Set(rutas.map(r => r.pais))].sort();
+    sel.innerHTML = '<option value="">— Selecciona país —</option>' +
+        paises.map(p => `<option value="${p}">${p}</option>`).join('');
+    sel.disabled = false;
+    sel.onchange = mexpOnPaisChange;
 }
 
 function mexpOnPOLChange() {
     const pol = document.getElementById('mexp-pol').value;
     const paisSel = document.getElementById('mexp-pais');
     const podSel  = document.getElementById('mexp-pod');
-    const eqSel   = document.getElementById('mexp-equipo');
-    const numCont = document.getElementById('mexp-numcont');
 
-    paisSel.disabled = !pol;
-    podSel.disabled  = true;
-    eqSel.disabled   = true;
-    numCont.disabled = true;
+    podSel.disabled = true;
+    podSel.innerHTML = '<option value="">— Elige país primero —</option>';
     document.getElementById('mexp-route-info').style.display = 'none';
     document.getElementById('mexp-recoleccion-wrap').style.display = 'none';
     document.getElementById('mexp-btn-step1').disabled = true;
     mexpRuta = null;
 
-    podSel.innerHTML  = '<option value="">— Elige país primero —</option>';
-    if (!pol) { paisSel.innerHTML = '<option value="">— Elige POL primero —</option>'; return; }
+    const prevPais = paisSel.value;
 
-    // Populate countries for this POL, sorted
-    const paises = [...new Set(
-        mexpData.rutas.filter(r => r.pol === pol).map(r => r.pais)
-    )].sort();
-    paisSel.innerHTML = '<option value="">— Selecciona país —</option>' +
-        paises.map(p => `<option value="${p}">${p}</option>`).join('');
-    paisSel.onchange = mexpOnPaisChange;
+    if (!pol) {
+        // Restore all countries
+        mexpPopulatePais();
+        mexpRenderPolGrid(null);
+        return;
+    }
 
-    // Highlight active POL in diagram
+    // Filter países to those served by this POL, preserving current selection if valid
+    mexpPopulatePais(pol);
+    if (prevPais) {
+        const stillValid = [...paisSel.options].some(o => o.value === prevPais);
+        if (stillValid) {
+            paisSel.value = prevPais;
+            mexpOnPaisChange();
+        }
+    }
+
     mexpRenderPolGrid(pol);
 }
 
@@ -11636,20 +11656,32 @@ function mexpOnPaisChange() {
     const pais = document.getElementById('mexp-pais').value;
     const podSel = document.getElementById('mexp-pod');
 
-    podSel.disabled = !pais;
-    document.getElementById('mexp-equipo').disabled = true;
-    document.getElementById('mexp-numcont').disabled = true;
+    podSel.disabled = true;
+    podSel.innerHTML = '<option value="">— Elige país primero —</option>';
     document.getElementById('mexp-btn-step1').disabled = true;
+    document.getElementById('mexp-equipo-field').style.display = 'none';
     mexpRuta = null;
 
-    if (!pais) { podSel.innerHTML = '<option value="">— Elige país primero —</option>'; return; }
+    if (!pais) {
+        // Country cleared: restore full POL list
+        if (!pol) mexpPopulatePOL();
+        return;
+    }
 
-    const pods = mexpData.rutas
-        .filter(r => r.pol === pol && r.pais === pais)
-        .map(r => r.pod).sort();
-    podSel.innerHTML = '<option value="">— Selecciona puerto —</option>' +
-        pods.map(p => `<option value="${p}">${p}</option>`).join('');
-    podSel.onchange = mexpOnPODChange;
+    if (pol) {
+        // POL already selected → populate PODs for POL+País
+        const pods = mexpData.rutas
+            .filter(r => r.pol === pol && r.pais === pais)
+            .map(r => r.pod).sort();
+        podSel.innerHTML = '<option value="">— Selecciona puerto —</option>' +
+            pods.map(p => `<option value="${p}">${p}</option>`).join('');
+        podSel.disabled = false;
+        podSel.onchange = mexpOnPODChange;
+    } else {
+        // No POL yet → filter POL to ports that serve this country
+        mexpPopulatePOL(pais);
+        podSel.innerHTML = '<option value="">— Elige POL primero —</option>';
+    }
 }
 
 function mexpOnPODChange() {
