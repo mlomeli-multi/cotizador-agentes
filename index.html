@@ -11848,33 +11848,37 @@ function mexpRenderPolGrid(activePol) {
             regionMap[r.region][r.pais].push(r);
         });
 
-        const chipsAndBadges = Object.entries(regionMap).map(([region, paisMap]) => {
+        // chips go in the header row; badges go OUTSIDE the header (below it)
+        const chips = Object.entries(regionMap).map(([region, paisMap]) => {
             const rts = Object.values(paisMap).flat();
             const chipId   = `mchip_${polId}_${mexpSanitizeId(region)}`;
             const badgesId = `mbadges_${polId}_${mexpSanitizeId(region)}`;
+            return `<span class="exp-region-chip" id="${chipId}"
+                data-badges-id="${badgesId}"
+                onclick="mexpToggleChip('${pol}','${region}',this,'${badgesId}')"
+                >${region}<span class="region-count">${rts.length}</span></span>`;
+        }).join('');
 
-            // Badge per country group
+        const badgeDivs = Object.entries(regionMap).map(([region, paisMap]) => {
+            const badgesId = `mbadges_${polId}_${mexpSanitizeId(region)}`;
             const countryBadges = Object.entries(paisMap).map(([pais, prts]) => {
                 const podBadges = prts.map(r =>
                     `<span class="exp-dest-badge" onclick="event.stopPropagation();mexpSelectFromChip('${pol}','${pais}','${r.pod.replace(/'/g,"\\'")}')">${r.pod}</span>`
                 ).join('');
-                return `<span style="display:flex;flex-wrap:wrap;align-items:center;gap:0.2rem 0.3rem;">
-                    <span style="font-size:0.6rem;color:rgba(255,255,255,0.4);font-weight:700;white-space:nowrap;">${pais}</span>
+                return `<span style="display:flex;flex-wrap:wrap;align-items:center;gap:0.2rem 0.4rem;padding:0.1rem 0;">
+                    <span style="font-size:0.6rem;color:rgba(255,255,255,0.4);font-weight:700;white-space:nowrap;min-width:4rem;">${pais}</span>
                     ${podBadges}
                 </span>`;
             }).join('');
-
-            return `<span class="exp-region-chip" id="${chipId}"
-                onclick="mexpToggleChip('${pol}','${region}',this,'${badgesId}')"
-                >${region}<span class="region-count">${rts.length}</span></span>
-                <div class="exp-region-badges" id="${badgesId}" style="flex-direction:column;gap:0.3rem;">${countryBadges}</div>`;
+            return `<div class="exp-region-badges" id="${badgesId}" style="flex-direction:column;gap:0.25rem;padding:0.3rem 0.5rem;">${countryBadges}</div>`;
         }).join('');
 
         return `<div class="exp-origin-block">
             <div class="exp-origin-header">
-                <span class="exp-origin-label" style="${isActive ? 'color:#93c5fd;' : ''}">${code}</span>
-                ${chipsAndBadges}
+                <span class="exp-origin-label" id="mexp-pol-label-${polId}" style="${isActive ? 'color:#93c5fd;' : ''}">${code}</span>
+                ${chips}
             </div>
+            ${badgeDivs}
         </div>`;
     }).join('');
 }
@@ -11882,42 +11886,79 @@ function mexpRenderPolGrid(activePol) {
 function mexpToggleChip(pol, region, chipEl, badgesId) {
     const badgesEl = document.getElementById(badgesId);
     if (!badgesEl) return;
-    const isOpen = chipEl.classList.toggle('open');
-    if (isOpen) {
+
+    const willOpen = !chipEl.classList.contains('open');
+
+    // Accordion: close every other open chip across ALL POLs first
+    document.querySelectorAll('.exp-region-chip.open').forEach(chip => {
+        chip.classList.remove('open');
+        const otherId = chip.getAttribute('data-badges-id');
+        if (otherId) {
+            const other = document.getElementById(otherId);
+            if (other) other.classList.remove('open');
+        }
+    });
+
+    if (willOpen) {
+        chipEl.classList.add('open');
         badgesEl.classList.add('open');
-        // Also set POL select to this POL
+        // Silently prime the POL select so mexpSelectFromChip works synchronously
         const polSel = document.getElementById('mexp-pol');
         if (polSel && polSel.value !== pol) {
             polSel.value = pol;
-            mexpOnPOLChange();
+            // Populate países WITHOUT re-rendering the grid
+            const paisSel = document.getElementById('mexp-pais');
+            if (paisSel && mexpData) {
+                const paises = [...new Set(
+                    mexpData.rutas.filter(r => r.pol === pol).map(r => r.pais)
+                )].sort();
+                paisSel.innerHTML = '<option value="">— Selecciona país —</option>' +
+                    paises.map(p => `<option value="${p}">${p}</option>`).join('');
+                paisSel.disabled = false;
+                paisSel.onchange = mexpOnPaisChange;
+            }
         }
-    } else {
-        badgesEl.classList.remove('open');
     }
 }
 
 function mexpSelectFromChip(pol, pais, pod) {
+    if (!mexpData) return;
     const polSel  = document.getElementById('mexp-pol');
     const paisSel = document.getElementById('mexp-pais');
     const podSel  = document.getElementById('mexp-pod');
     if (!polSel || !paisSel || !podSel) return;
 
-    const doSelect = () => {
-        paisSel.value = pais;
-        mexpOnPaisChange();
-        setTimeout(() => {
-            podSel.value = pod;
-            mexpOnPODChange();
-        }, 50);
-    };
+    // Step 1: set POL + populate países (synchronous, no re-render)
+    polSel.value = pol;
+    const paises = [...new Set(
+        mexpData.rutas.filter(r => r.pol === pol).map(r => r.pais)
+    )].sort();
+    paisSel.innerHTML = '<option value="">— Selecciona país —</option>' +
+        paises.map(p => `<option value="${p}">${p}</option>`).join('');
+    paisSel.disabled = false;
+    paisSel.onchange = mexpOnPaisChange;
 
-    if (polSel.value !== pol) {
-        polSel.value = pol;
-        mexpOnPOLChange();
-        setTimeout(doSelect, 80);
-    } else {
-        doSelect();
-    }
+    // Step 2: set País + populate PODs
+    paisSel.value = pais;
+    const pods = mexpData.rutas
+        .filter(r => r.pol === pol && r.pais === pais)
+        .map(r => r.pod).sort();
+    podSel.innerHTML = '<option value="">— Selecciona puerto —</option>' +
+        pods.map(p => `<option value="${p}">${p}</option>`).join('');
+    podSel.disabled = false;
+    podSel.onchange = mexpOnPODChange;
+
+    // Step 3: set POD + trigger route resolution
+    podSel.value = pod;
+    mexpOnPODChange();
+
+    // Highlight active POL label in the grid without full re-render
+    document.querySelectorAll('#mexp-pol-grid .exp-origin-label').forEach(el => {
+        el.style.color = '';
+    });
+    const polId = mexpSanitizeId(pol);
+    const activeLabel = document.getElementById(`mexp-pol-label-${polId}`);
+    if (activeLabel) activeLabel.style.color = '#93c5fd';
 }
 
 function mexpRenderDestinoCharges() {
