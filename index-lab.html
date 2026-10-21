@@ -12720,7 +12720,9 @@ function renderExpAirlines() {
             // SSC: show per-kg in pills only when minimum is NOT active
             if (sscRate > 0 && !sscMinApplied) pills.push(`<span class="bk-pill ssc">SSC $${sscRate.toFixed(2)}</span>`);
             if (fscRate > 0) pills.push(`<span class="bk-pill fsc">FSC $${fscRate.toFixed(2)}</span>`);
-            if (mycRate > 0) pills.push(`<span class="bk-pill myc">MYC $${mycRate.toFixed(2)}</span>`);
+            const isCX = o.aerolinea.codigo === 'CX';
+            const mycLabel = isCX ? 'FSC' : 'MYC';
+            if (mycRate > 0) pills.push(`<span class="bk-pill myc">${mycLabel} $${mycRate.toFixed(2)}</span>`);
             const perKgSsc = sscMinApplied ? 0 : sscRate;
             const allInRate = rate + perKgSsc + fscRate + mycRate;
             const allInLabel = pills.length > 1 ? `= <strong>$${allInRate.toFixed(2)}/kg</strong>` : `<strong>$${rate.toFixed(2)}/kg</strong>`;
@@ -12735,7 +12737,7 @@ function renderExpAirlines() {
 
             let flatParts = [];
             if (sscMinApplied) flatParts.push(`Screening mín $${ssc.toFixed(2)}`);
-            if (usedMinimo && myc > 0) flatParts.push(`MYC $${myc.toFixed(2)}`);
+            if (usedMinimo && myc > 0) flatParts.push(`${mycLabel} $${myc.toFixed(2)}`);
             if (cgc > 0) flatParts.push(`CC $${cgc.toFixed(2)}`);
             if (transferHouse > 0) flatParts.push(`TH $${transferHouse.toFixed(2)}`);
             if (dgFeeTotal > 0) flatParts.push(`<span class="exp-dg-fee-note">DG Fee $${dgFeeTotal.toFixed(2)}</span>`);
@@ -12793,6 +12795,7 @@ function renderExpAirlines() {
                 ${dimsTag}
             </div>
             ${excludedReason}
+            ${o.aerolinea.codigo === 'AM' ? `<div class="exp-excluded-reason" style="color:#d97706;">⚠️ Solo flete por kg — cargos adicionales no incluidos (pendiente)</div>` : ''}
             <div class="exp-airline-breakdown">
                 ${breakdownHtml}
                 <button class="exp-airline-btn">${isExcluded ? '⛔' : isSelected ? '✓ Elegida' : 'Elegir'}</button>
@@ -12830,8 +12833,9 @@ function getExpAirlineCosts() {
     costs.push({ label: `Flete aéreo · ${code} (${tipoCalc})`, value: flete, currency: 'USD' });
     if (ssc > 0)           costs.push({ label: `Screening · ${code}`, value: ssc, currency: 'USD' });
     if (fsc > 0)           costs.push({ label: `FSC · ${code}`, value: fsc, currency: 'USD' });
-    if (myc > 0)           costs.push({ label: `MYC · ${code}`, value: myc, currency: 'USD' });
+    if (myc > 0)           costs.push({ label: `${code === 'CX' ? 'FSC' : 'MYC'} · ${code}`, value: myc, currency: 'USD' });
     if (cgc > 0)           costs.push({ label: `CC (MAWB)`, value: cgc, currency: 'USD' });
+    if (code === 'AM')     costs.push({ label: `⚠️ AM: cargos adicionales no incluidos (pendiente)`, value: 0, currency: 'USD', nota: true });
     if (transferHouse > 0) costs.push({ label: `Transfer House · ${code}`, value: transferHouse, currency: 'USD' });
     if (dgFeeTotal > 0)    costs.push({ label: `DG Fee · ${expSelectedUNs.length} UN`, value: dgFeeTotal, currency: 'USD' });
     return costs;
