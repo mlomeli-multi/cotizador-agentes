@@ -4333,28 +4333,35 @@
                                 </div>
                                 <div class="air-route-step-badge">Paso 1</div>
                             </div>
-                            <div class="air-route-grid">
-                                <div class="form-group autocomplete-wrap">
-                                    <label>Ciudad de origen</label>
-                                    <input type="text" id="ciudad-origen-exp" placeholder="Ej: Querétaro" autocomplete="off">
-                                    <div class="autocomplete-list" id="autocomplete-list-exp"></div>
-                                </div>
+                            <div class="air-route-grid" style="grid-template-columns:1fr 1fr 1fr;">
                                 <div class="form-group">
                                     <label>Aeropuerto de salida</label>
-                                    <select id="aeropuerto-exp">
+                                    <select id="aeropuerto-exp" onchange="expOnAeropuertoChange()">
                                         <option value="">Seleccionar...</option>
                                         <option value="NLU">NLU — AIFA</option>
                                         <option value="MEX">MEX — Ciudad de México</option>
                                         <option value="MTY">MTY — Monterrey</option>
                                         <option value="GDL">GDL — Guadalajara</option>
+                                        <option value="MID">MID — Mérida</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label>Región de destino</label>
+                                    <select id="region-exp" onchange="expOnRegionChange()" disabled>
+                                        <option value="">— Elige aeropuerto primero —</option>
                                     </select>
                                 </div>
                                 <div class="form-group" id="destino-exp-group" style="display:none;">
-                                    <label>Destino</label>
-                                    <select id="destino-exp">
-                                        <option value="">Seleccionar destino...</option>
+                                    <label>Aeropuerto de destino</label>
+                                    <select id="destino-exp" onchange="expOnDestinoChange()">
+                                        <option value="">— Seleccionar destino —</option>
                                     </select>
                                 </div>
+                            </div>
+                            <div class="form-group autocomplete-wrap" style="margin-top:0.75rem;">
+                                <label>Ciudad de origen (recolección)</label>
+                                <input type="text" id="ciudad-origen-exp" placeholder="Ej: Querétaro" autocomplete="off">
+                                <div class="autocomplete-list" id="autocomplete-list-exp"></div>
                             </div>
                         </div>
 
@@ -13004,6 +13011,7 @@ async function loadAirlineData() {
         updateExpDestinoOptions();
         renderExpAirlineSummary();
         renderExpRouteDiagram();
+        expPopulateRegiones('');
     } catch(e) { console.warn('No se pudo cargar aerolíneas:', e); }
 }
 
@@ -13063,7 +13071,7 @@ function getExpRutasDisponibles(origen) {
 }
 
 const EXP_AIRPORTS_META = {
-    NLU: 'AIFA', MEX: 'CDMX', MTY: 'Monterrey', GDL: 'Guadalajara'
+    NLU: 'AIFA', MEX: 'CDMX', MTY: 'Monterrey', GDL: 'Guadalajara', MID: 'Mérida'
 };
 const DAY_LABELS = ['L','M','X','J','V','S','D']; // index 0=Mon(1)..6=Sun(7)
 
@@ -13102,22 +13110,19 @@ let expOpenRegions = {};
 
 function renderExpRouteDiagram() {
     const grid = document.getElementById('exp-origin-grid');
-    if (!grid) return;
-    const activeOrigin = document.getElementById('aeropuerto-exp').value;
-    const activeDestino = document.getElementById('destino-exp')?.value || '';
-    const airports = Object.keys(EXP_AIRPORTS_META);
+    if (!grid || !airlineData) return;
 
+    const airports = Object.keys(EXP_AIRPORTS_META);
     grid.innerHTML = airports.map(ap => {
-        const rutas = airlineData ? getExpRutasDisponibles(ap) : [];
+        const rutas = getExpRutasDisponibles(ap);
         const destMap = new Map();
         for (const o of rutas) {
             const key = o.ruta.destino;
-            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [], count: 0, hasDG: false });
+            if (!destMap.has(key)) destMap.set(key, { ruta: o.ruta, airlines: [], count: 0 });
             const entry = destMap.get(key);
             if (!entry.airlines.find(a => a.code === o.aerolinea.codigo))
                 entry.airlines.push({ code: o.aerolinea.codigo, name: o.aerolinea.nombre });
             entry.count++;
-            if (o.ruta.tipoCarga?.includes('dg') || o.ruta.tarifas?.dg) entry.hasDG = true;
         }
         if (destMap.size === 0) return `<div class="exp-origin-block"><div class="exp-origin-header"><span class="exp-origin-label">${ap}</span><span class="exp-no-routes-msg">Sin rutas</span></div></div>`;
 
@@ -13128,78 +13133,135 @@ function renderExpRouteDiagram() {
             regionGroups.get(reg).push([dest, info]);
         }
 
-        const activeRegion = expOpenRegions[ap] || (activeDestino && ap === activeOrigin ? EXP_REGION_MAP[activeDestino] : null);
-
+        const apId = ap.toLowerCase();
         const chips = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
-            const isOpen = activeRegion === reg;
             const cnt = regionGroups.get(reg).length;
-            return `<span class="exp-region-chip ${isOpen ? 'open' : ''}" data-origin="${ap}" data-region="${reg}">${EXP_REGION_LABELS[reg]}<span class="region-count">${cnt}</span></span>`;
+            const badgesId = `exp-badges-${apId}-${reg.toLowerCase()}`;
+            return `<span class="exp-region-chip" data-badges-id="${badgesId}"
+                onclick="expToggleChip('${ap}','${reg}',this,'${badgesId}')"
+                >${EXP_REGION_LABELS[reg]}<span class="region-count">${cnt}</span></span>`;
         }).join('');
 
-        const panels = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
-            const isOpen = activeRegion === reg;
+        const badgeDivs = EXP_REGION_ORDER.filter(r => regionGroups.has(r)).map(reg => {
+            const badgesId = `exp-badges-${apId}-${reg.toLowerCase()}`;
             const badges = regionGroups.get(reg).map(([dest, info]) => {
-                const isActive = ap === activeOrigin && dest === activeDestino;
                 const tipLines = info.airlines.map(a => `<div class="badge-tip-airline">${escapeHtml(a.code)} ${escapeHtml(a.name)}</div>`).join('');
                 const countTxt = info.count > 1 ? ` · ${info.count} opc` : '';
-                const dgTxt = info.hasDG ? ' · DG' : '';
-                return `<span class="exp-dest-badge ${isActive ? 'active' : ''}" data-origin="${ap}" data-dest="${dest}">
-                    ${dest}
-                    <span class="badge-tip">
-                        <div class="badge-tip-name">${escapeHtml(info.ruta.destinoNombre)}${countTxt}${dgTxt}</div>
-                        ${tipLines}
-                    </span>
-                </span>`;
+                return `<span class="exp-dest-badge" data-origin="${ap}" data-dest="${dest}" data-region="${reg}"
+                    onclick="expSelectFromBadge('${ap}','${dest}','${reg}')"
+                    >${dest}<span class="badge-tip"><div class="badge-tip-name">${escapeHtml(dest)}${countTxt}</div>${tipLines}</span></span>`;
             }).join('');
-            return `<div class="exp-region-badges ${isOpen ? 'open' : ''}" data-origin="${ap}" data-region="${reg}">${badges}</div>`;
+            return `<div class="exp-region-badges" id="${badgesId}">${badges}</div>`;
         }).join('');
 
         return `<div class="exp-origin-block">
-            <div class="exp-origin-header"><span class="exp-origin-label">${ap}</span>${chips}</div>
-            ${panels}
+            <div class="exp-origin-header">
+                <span class="exp-origin-label" id="exp-ap-label-${apId}">${ap}</span>
+                ${chips}
+            </div>
+            ${badgeDivs}
         </div>`;
     }).join('');
-
-    grid.querySelectorAll('.exp-region-chip').forEach(chip => {
-        chip.addEventListener('click', () => {
-            const ap = chip.dataset.origin;
-            const reg = chip.dataset.region;
-            expOpenRegions[ap] = expOpenRegions[ap] === reg ? null : reg;
-            renderExpRouteDiagram();
-        });
-    });
-
-    grid.querySelectorAll('.exp-dest-badge[data-dest]').forEach(item => {
-        item.addEventListener('click', () => {
-            const apSelect = document.getElementById('aeropuerto-exp');
-            const destSelect = document.getElementById('destino-exp');
-            if (apSelect) { apSelect.value = item.dataset.origin; apSelect.dispatchEvent(new Event('change')); }
-            setTimeout(() => {
-                if (destSelect) { destSelect.value = item.dataset.dest; destSelect.dispatchEvent(new Event('change')); }
-                renderExpRouteDiagram();
-            }, 50);
-        });
-    });
 }
 
-function updateExpDestinoOptions() {
-    const aeropuerto = document.getElementById('aeropuerto-exp').value;
+function expToggleChip(ap, reg, chipEl, badgesId) {
+    const willOpen = !chipEl.classList.contains('open');
+    document.querySelectorAll('#exp-origin-grid .exp-region-chip.open').forEach(chip => {
+        chip.classList.remove('open');
+        const oid = chip.getAttribute('data-badges-id');
+        if (oid) { const el = document.getElementById(oid); if (el) el.classList.remove('open'); }
+    });
+    if (willOpen) {
+        chipEl.classList.add('open');
+        const badgesEl = document.getElementById(badgesId);
+        if (badgesEl) badgesEl.classList.add('open');
+        const apSel = document.getElementById('aeropuerto-exp');
+        if (apSel && apSel.value !== ap) {
+            apSel.value = ap;
+            expPopulateRegiones(ap);
+        }
+        const regSel = document.getElementById('region-exp');
+        if (regSel && regSel.value !== reg) {
+            regSel.value = reg;
+            expPopulateDestinos(ap, reg);
+        }
+    }
+}
+
+function expSelectFromBadge(ap, dest, reg) {
+    const apSel = document.getElementById('aeropuerto-exp');
+    if (apSel) apSel.value = ap;
+    expPopulateRegiones(ap);
+    const regSel = document.getElementById('region-exp');
+    if (regSel) regSel.value = reg;
+    expPopulateDestinos(ap, reg);
+    const destSel = document.getElementById('destino-exp');
+    if (destSel) destSel.value = dest;
+    document.querySelectorAll('#exp-origin-grid .exp-origin-label').forEach(el => el.style.color = '');
+    const lbl = document.getElementById(`exp-ap-label-${ap.toLowerCase()}`);
+    if (lbl) lbl.style.color = '#93c5fd';
+    const group = document.getElementById('destino-exp-group');
+    if (group) group.style.display = '';
+    expOnDestinoChange();
+}
+
+function expPopulateRegiones(ap) {
+    const sel = document.getElementById('region-exp');
+    if (!sel) return;
+    const rutas = ap ? getExpRutasDisponibles(ap) : (airlineData ? airlineData.aerolineas.flatMap(a => a.rutas.map(r => ({ aerolinea: a, ruta: r }))) : []);
+    const regiones = [...new Set(rutas.map(o => EXP_REGION_MAP[o.ruta.destino]).filter(Boolean))];
+    const prev = sel.value;
+    sel.innerHTML = '<option value="">— Región de destino —</option>' +
+        EXP_REGION_ORDER.filter(r => regiones.includes(r))
+            .map(r => `<option value="${r}">${EXP_REGION_LABELS[r]}</option>`).join('');
+    if (prev && regiones.includes(prev)) sel.value = prev;
+    sel.disabled = false;
+}
+
+function expPopulateDestinos(ap, reg) {
     const sel = document.getElementById('destino-exp');
     const group = document.getElementById('destino-exp-group');
-    if (!sel || !group) return;
-
-    const rutas = getExpRutasDisponibles(aeropuerto);
-    const destinos = [...new Map(rutas.map(r => [r.ruta.destino, r.ruta])).values()];
-
-    if (destinos.length === 0) { group.style.display = 'none'; sel.value = ''; return; }
-
+    if (!sel) return;
+    const rutas = getExpRutasDisponibles(ap);
+    const filtered = rutas.filter(o => !reg || EXP_REGION_MAP[o.ruta.destino] === reg);
+    const destinos = [...new Map(filtered.map(o => [o.ruta.destino, o.ruta])).values()];
+    if (!destinos.length) { if (group) group.style.display = 'none'; sel.value = ''; return; }
     const prev = sel.value;
-    sel.innerHTML = '<option value="">Seleccionar destino...</option>' +
-        destinos.map(r => `<option value="${r.destino}">${r.destino} — ${escapeHtml(r.destinoNombre)}</option>`).join('');
+    sel.innerHTML = '<option value="">— Seleccionar destino —</option>' +
+        destinos.map(r => `<option value="${r.destino}">${r.destino}</option>`).join('');
     if (prev && destinos.find(r => r.destino === prev)) sel.value = prev;
-    group.style.display = '';
+    if (group) group.style.display = '';
+}
+
+function expOnAeropuertoChange() {
+    const ap = document.getElementById('aeropuerto-exp').value;
+    expPopulateRegiones(ap);
+    const reg = document.getElementById('region-exp')?.value || '';
+    expPopulateDestinos(ap, reg);
+    const destSel = document.getElementById('destino-exp');
+    if (destSel) destSel.value = '';
+    renderExpAirlines();
+    document.querySelectorAll('#exp-origin-grid .exp-origin-label').forEach(el => el.style.color = '');
+    if (ap) {
+        const lbl = document.getElementById(`exp-ap-label-${ap.toLowerCase()}`);
+        if (lbl) lbl.style.color = '#93c5fd';
+    }
+}
+
+function expOnRegionChange() {
+    const ap = document.getElementById('aeropuerto-exp').value;
+    const reg = document.getElementById('region-exp').value;
+    expPopulateDestinos(ap, reg);
+    const destSel = document.getElementById('destino-exp');
+    if (destSel) destSel.value = '';
     renderExpAirlines();
 }
+
+function expOnDestinoChange() {
+    renderExpAirlines();
+}
+
+function updateExpDestinoOptions() { expOnAeropuertoChange(); }
 
 function calcAirlineTierRate(tiers, kg) {
     let rate = tiers[0].precio;
@@ -13997,7 +14059,6 @@ function openExpMubPanel() {
 document.getElementById('destino-exp')?.addEventListener('change', () => {
     expSelectedAirline = null;
     renderExpAirlines();
-    renderExpRouteDiagram();
 });
 
 // --- Workspace summary EXW ---
