@@ -399,18 +399,6 @@
             color: var(--gray-500);
             line-height: 1.3;
         }
-        .air-cargo-step-badge {
-            flex: 0 0 auto;
-            padding: 0.2rem 0.45rem;
-            border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            font-size: 0.58rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
         /* === 3-column cargo layout === */
         .cargo-3col {
             display: grid;
@@ -2512,35 +2500,6 @@
         .mub-air-sales-row-value.negative {
             color: #dc2626;
         }
-        .mub-stage-head {
-            display: flex;
-            align-items: flex-start;
-            justify-content: space-between;
-            gap: 0.9rem;
-            margin-bottom: 0.75rem;
-        }
-        .mub-stage-copy {
-            font-size: 0.72rem;
-            color: var(--gray-500);
-            line-height: 1.45;
-            margin-top: 0.18rem;
-            max-width: 36rem;
-        }
-        .mub-step-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.35rem 0.6rem;
-            border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            font-size: 0.66rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            white-space: nowrap;
-        }
         .air-route-panel .mub-panel {
             border: none;
             box-shadow: none;
@@ -2862,41 +2821,6 @@
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             padding: 1rem;
         }
-        .air-provider-stage-head {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 0.75rem;
-            align-items: start;
-            margin-bottom: 0.85rem;
-        }
-        .air-provider-stage-title {
-            font-size: 0.82rem;
-            font-weight: 900;
-            color: #1e3a8a;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .air-provider-stage-note {
-            font-size: 0.7rem;
-            color: var(--gray-500);
-            line-height: 1.4;
-            margin-top: 0.18rem;
-            max-width: 34rem;
-        }
-        .air-provider-stage-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.35rem 0.6rem;
-            border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            font-size: 0.66rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
         .air-provider-list {
             display: grid;
             gap: 0.55rem;
@@ -3035,41 +2959,6 @@
         }
         .air-cost-summary.is-selected {
             box-shadow: 0 14px 30px rgba(37, 99, 235, 0.08);
-        }
-        .air-cost-summary-head {
-            display: grid;
-            grid-template-columns: minmax(0, 1fr) auto;
-            gap: 0.75rem;
-            align-items: start;
-            margin-bottom: 0.85rem;
-        }
-        .air-cost-summary-title {
-            font-size: 0.82rem;
-            font-weight: 900;
-            color: #1e3a8a;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
-        .air-cost-summary-note {
-            font-size: 0.7rem;
-            color: var(--gray-500);
-            line-height: 1.4;
-            margin-top: 0.18rem;
-            max-width: 16rem;
-        }
-        .air-cost-summary-badge {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.35rem 0.6rem;
-            border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
-            font-size: 0.66rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
         }
         .air-cost-summary-provider {
             padding: 0.8rem;
@@ -3501,18 +3390,13 @@
             .air-workspace-summary { position: static; }
             .air-stepper-list { grid-template-columns: 1fr; }
             .air-provider-layout { grid-template-columns: 1fr; }
-            .air-provider-stage-head {
-                flex-direction: column;
-                align-items: flex-start;
-            }
             .air-provider-card { grid-template-columns: 1fr; grid-template-areas: "main" "price" "action"; }
             .air-provider-price-block,
             .air-provider-price,
             .air-provider-price-label { text-align: left; }
             .air-provider-price-block { justify-items: start; }
             .air-provider-actions { justify-content: stretch; }
-            .air-provider-stage-badge,
-            .air-cost-summary-badge { align-self: flex-start; }
+            .air-route-step-badge { align-self: flex-start; }
             .air-provider-meta { flex-direction: column; align-items: flex-start; }
             .air-provider-card .btn-venta { width: 100%; }
             .carga-header { flex-direction: column; align-items: stretch; }
@@ -4023,7 +3907,7 @@
                                 <div class="form-section-title">&#x1F4E6; Carga</div>
                                 <div class="air-cargo-copy">Captura el peso total y las medidas reales de cada pallet para sugerir la unidad y buscar proveedores compatibles.</div>
                             </div>
-                            <div class="air-cargo-step-badge">Paso 2</div>
+                            <div class="air-route-step-badge">Paso 2</div>
                         </div>
                         <div class="carga-global">
                             <div class="form-group">
@@ -4377,7 +4261,7 @@
                             <div class="form-section-title">&#x1F4E6; Carga</div>
                             <div class="air-cargo-copy">Captura peso, medidas y tipo de carga.</div>
                         </div>
-                        <div class="air-cargo-step-badge">Paso 2</div>
+                        <div class="air-route-step-badge">Paso 2</div>
                     </div>
                     <!-- 3 columns -->
                     <div class="cargo-3col">
@@ -4467,12 +4351,12 @@
 
                     <!-- ====== PASO 3: PROVEEDORES EXW ====== -->
                     <div class="air-provider-stage" id="exp-providers-panel" style="display:none;">
-                        <div class="air-provider-stage-head">
+                        <div class="air-route-head">
                             <div>
-                                <div class="air-provider-stage-title">Proveedores EXW</div>
-                                <div class="air-provider-stage-note">Arma el costo completo: transporte + almacén + flete aéreo.</div>
+                                <div class="form-section-title">&#x1F69A; Proveedores EXW</div>
+                                <div class="air-route-copy">Arma el costo completo: transporte + almacén + flete aéreo.</div>
                             </div>
-                            <div class="air-provider-stage-badge">Paso 3</div>
+                            <div class="air-route-step-badge">Paso 3</div>
                         </div>
 
                         <!-- 3 columnas: transporte | almacén auto | opcionales -->
@@ -8058,12 +7942,12 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
     const rankLabels = ['&#x1F947; Mejor precio', '&#x1F948; 2da opción', '&#x1F949; 3ra opción'];
     const buildAirCostSummaryHtml = (selected) => `
         <div class="air-cost-summary ${selected?.proveedor ? 'is-selected' : ''}">
-            <div class="air-cost-summary-head">
+            <div class="air-route-head">
                 <div>
-                    <div class="air-cost-summary-title">Resumen de costos</div>
-                    <div class="air-cost-summary-note">Vista rápida de flete terrestre y costos aeroportuarios antes de pasar a venta.</div>
+                    <div class="form-section-title">&#x1F4CA; Resumen de costos</div>
+                    <div class="air-route-copy">Vista rápida de flete terrestre y costos aeroportuarios antes de pasar a venta.</div>
                 </div>
-                <div class="air-cost-summary-badge">Paso 3</div>
+                <div class="air-route-step-badge">Paso 3</div>
             </div>
             <div class="air-cost-summary-provider ${selected?.proveedor ? 'selected' : ''}">
                 <strong>${escapeHtml(selected?.proveedor || top[0]?.proveedor || '')}</strong>
@@ -8103,12 +7987,12 @@ document.getElementById('btn-cotizar').addEventListener('click', () => {
         </div>
         <div class="air-provider-layout">
         <div class="air-provider-stage">
-        <div class="air-provider-stage-head">
+        <div class="air-route-head">
             <div>
-                <div class="air-provider-stage-title">Selección de proveedor</div>
-                <div class="air-provider-stage-note">Compara opciones de flete terrestre y manda la elegida directo a calculadora.</div>
+                <div class="form-section-title">&#x1F69A; Selección de proveedor</div>
+                <div class="air-route-copy">Compara opciones de flete terrestre y manda la elegida directo a calculadora.</div>
             </div>
-            <div class="air-provider-stage-badge">Paso 3</div>
+            <div class="air-route-step-badge">Paso 3</div>
         </div>
         <div class="air-provider-meta">
             <span><strong>${aeropuerto}</strong> → <strong>${escapeHtml(ciudad)}</strong></span>
