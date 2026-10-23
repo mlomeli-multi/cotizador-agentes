@@ -6260,44 +6260,34 @@ function saveConceptosFijos(data) {
 
 function getAirAirportFixedCharges(aeropuerto) {
     const airport = String(aeropuerto || '').toUpperCase().trim();
+    if (airportChargesConfig?.conceptosFijos?.[airport]) {
+        return airportChargesConfig.conceptosFijos[airport];
+    }
+    // fallback hardcoded defaults
     if (airport === 'NLU' || airport === 'MEX') {
         return [
-            {
-                nombre: 'Revalidacion',
-                monto: 1300,
-                impuestoRate: 0.16,
-                quoteSection: 'airport',
-                quoteLabel: 'Revalidacion'
-            },
-            {
-                nombre: 'Desconsolidacion',
-                monto: 500,
-                impuestoRate: 0.16,
-                quoteSection: 'airport',
-                quoteLabel: 'Desconsolidacion'
-            }
+            { nombre: 'Revalidacion', monto: 1300, impuestoRate: 0.16, quoteSection: 'airport', quoteLabel: 'Revalidacion' },
+            { nombre: 'Desconsolidacion', monto: 500, impuestoRate: 0.16, quoteSection: 'airport', quoteLabel: 'Desconsolidacion' }
         ];
     }
     if (airport === 'GDL' || airport === 'MTY') {
         return [
-            {
-                nombre: 'Revalidacion',
-                monto: 1100,
-                impuestoRate: 0.16,
-                quoteSection: 'airport',
-                quoteLabel: 'Revalidacion'
-            }
+            { nombre: 'Revalidacion', monto: 1100, impuestoRate: 0.16, quoteSection: 'airport', quoteLabel: 'Revalidacion' }
         ];
     }
     return [];
 }
 
 function getAirAwbReleaseRate(aeropuerto) {
-    return ({ NLU: 100, MEX: 100, MTY: 130, GDL: 160 }[String(aeropuerto || '').toUpperCase().trim()]) || 100;
+    const airport = String(aeropuerto || '').toUpperCase().trim();
+    if (airportChargesConfig?.awbRelease) {
+        return airportChargesConfig.awbRelease[airport] ?? airportChargesConfig.awbRelease.default ?? 100;
+    }
+    return ({ NLU: 100, MEX: 100, MTY: 130, GDL: 160 }[airport]) || 100;
 }
 
 function getAirEntryToAirportRate() {
-    return 45;
+    return airportChargesConfig?.entryToAirport ?? 45;
 }
 
 function renderConceptosTable() {
@@ -10342,12 +10332,14 @@ const LAST_LOGIN_USER_KEY = 'lastLoginUser';
 const SHARED_DATA_URL = './data/cotizador-base.json';
 const SHARED_EXCHANGE_RATE_URL = './data/tipo-cambio.json';
 const SHARED_MARITIME_DESTINATION_CONCEPTS_URL = './data/conceptos-destino-maritimos.json';
+const AIRPORT_CHARGES_URL = './data/cargos-aeropuerto.json';
 const TARIFF_MANAGER_USERS = new Set(['miguel', 'miguel lomeli']);
 const MARITIME_DESTINATION_CONCEPTS_STORAGE_KEY = 'conceptosDestinoMaritimos';
 const USERS_FRONTEND_CACHE_TTL_MS = 30000;
 let usuariosCache = null;
 let usuariosCacheAt = 0;
 let usuariosPendingRequest = null;
+let airportChargesConfig = null;
 
 function getLoginHelpEl() {
     return document.getElementById('login-help');
@@ -10434,6 +10426,18 @@ async function loadSharedOfficialData() {
         return true;
     } catch (err) {
         console.warn('No se pudo cargar la base oficial compartida:', err);
+        return false;
+    }
+}
+
+async function loadAirportChargesData() {
+    try {
+        const res = await fetch(`${AIRPORT_CHARGES_URL}?v=${Date.now()}`, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        airportChargesConfig = await res.json();
+        return true;
+    } catch (err) {
+        console.warn('No se pudo cargar cargos-aeropuerto.json, usando defaults hardcoded:', err);
         return false;
     }
 }
@@ -13624,6 +13628,7 @@ renderExpRouteDiagram();
         loadSharedOfficialData(),
         loadSharedExchangeRate(),
         loadSharedMaritimeDestinationConcepts(),
+        loadAirportChargesData(),
         loadAIOData(),
         loadAirlineData(),
         loadUNData()

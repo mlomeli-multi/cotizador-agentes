@@ -1,0 +1,26 @@
+{
+  "awbRelease": {
+    "NLU": 100,
+    "MEX": 100,
+    "MTY": 130,
+    "GDL": 160,
+    "default": 100
+  },
+  "entryToAirport": 45,
+  "conceptosFijos": {
+    "NLU": [
+      { "nombre": "Revalidacion", "monto": 1300, "impuestoRate": 0.16, "quoteSection": "airport", "quoteLabel": "Revalidacion" },
+      { "nombre": "Desconsolidacion", "monto": 500, "impuestoRate": 0.16, "quoteSection": "airport", "quoteLabel": "Desconsolidacion" }
+    ],
+    "MEX": [
+      { "nombre": "Revalidacion", "monto": 1300, "impuestoRate": 0.16, "quoteSection": "airport", "quoteLabel": "Revalidacion" },
+      { "nombre": "Desconsolidacion", "monto": 500, "impuestoRate": 0.16, "quoteSection": "airport", "quoteLabel": "Desconsolidacion" }
+    ],
+    "GDL": [
+      { "nombre": "Revalidacion", "monto": 1100, "impuestoRate": 0.16, "quoteSection": "airport", "quoteLabel": "Revalidacion" }
+    ],
+    "MTY": [
+      { "nombre": "Revalidacion", "monto": 1100, "impuestoRate": 0.16, "quoteSection": "airport", "quoteLabel": "Revalidacion" }
+    ]
+  }
+}
