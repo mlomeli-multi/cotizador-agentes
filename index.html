@@ -32,10 +32,18 @@
             --blue-light: #eff6ff;
             --green: #10b981;
             --green-light: #34d399;
+            --green-50: #f0fdf4;
+            --green-100: #dcfce7;
+            --green-300: #86efac;
+            --green-800: #166534;
             --amber: #f59e0b;
             --red: #ef4444;
             --red-600: #dc2626;
             --red-100: #fee2e2;
+            --red-50: #fef2f2;
+            --red-200: #fecaca;
+            --red-300: #fca5a5;
+            --red-700: #b91c1c;
             --gray-950: #0f172a;
             --gray-50: #f8fafc;
             --gray-100: #f1f5f9;
@@ -355,8 +363,8 @@
             line-height: 1.35;
         }
         .unit-result.error {
-            background: #fef2f2;
-            border-color: #fecaca;
+            background: var(--red-50);
+            border-color: var(--red-200);
         }
         .unit-result.error .unit-name {
             color: var(--red);
@@ -561,7 +569,7 @@
         .air-cargo-unit-card .unit-result:not(.show) {
             display: block;
             border-style: dashed;
-            background: #f8fafc;
+            background: var(--gray-50);
         }
         .air-cargo-unit-card .unit-result:not(.show) .unit-name::before {
             content: 'Sin calcular';
@@ -633,7 +641,7 @@
         .aio-auto-row {
             display: grid; grid-template-columns: 18px 1fr auto;
             gap: 0.4rem; align-items: center;
-            background: #f0fdf4; border: 1px solid #86efac;
+            background: var(--green-50); border: 1px solid var(--green-300);
             border-radius: 6px; padding: 0.4rem 0.6rem; margin-bottom: 0.25rem;
         }
         .aio-auto-check { color: var(--green); font-weight: 700; font-size: 0.8rem; }
@@ -2172,6 +2180,7 @@
             color: var(--gray-500);
             text-transform: uppercase;
             letter-spacing: 0.03em;
+            background: var(--gray-50);
             border-bottom: 1px solid var(--gray-200);
             white-space: nowrap;
         }
@@ -2215,7 +2224,7 @@
             letter-spacing: 0.05em;
             text-transform: uppercase;
             color: var(--gray-500);
-            background: #f8fafc;
+            background: var(--gray-50);
         }
         .mub-table .section-row td:not(:first-child) {
             text-align: left;
@@ -2236,9 +2245,9 @@
             margin-left: 0.4rem;
         }
         .mub-cost-btn {
-            border: 1px solid #fca5a5;
-            background: #fef2f2;
-            color: #b91c1c;
+            border: 1px solid var(--red-300);
+            background: var(--red-50);
+            color: var(--red-700);
             border-radius: 999px;
             padding: 0.15rem 0.5rem;
             font-size: 0.65rem;
@@ -2246,9 +2255,9 @@
             cursor: pointer;
         }
         .mub-cost-btn.active {
-            background: #dcfce7;
-            border-color: #86efac;
-            color: #166534;
+            background: var(--green-100);
+            border-color: var(--green-300);
+            color: var(--green-800);
         }
         .mub-calc-sections {
             display: flex;
@@ -3241,9 +3250,9 @@
             font-size: 0.78rem; cursor: pointer; background: white; color: var(--gray-500); transition: all .15s;
         }
         .mexp-opcional-pill.active { border-color: #f59e0b; background: #fffbeb; color: #92400e; font-weight: 600; }
-        .mexp-venta-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
-        .mexp-venta-table th { background: var(--gray-50); padding: 0.5rem 0.75rem; text-align: left; font-weight: 600; color: var(--gray-600); border-bottom: 1px solid var(--gray-200); }
-        .mexp-venta-table td { padding: 0.5rem 0.75rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+        .mexp-venta-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
+        .mexp-venta-table th { background: var(--gray-50); padding: 0.4rem 0.6rem; text-align: left; font-weight: 600; color: var(--gray-600); border-bottom: 1px solid var(--gray-200); }
+        .mexp-venta-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
         .mexp-venta-table tr.group-header td { font-weight: 700; color: var(--gray-700); background: var(--gray-50); font-size: 0.75rem; text-transform: uppercase; letter-spacing: .04em; }
         .mexp-venta-table tr.total-row td { font-weight: 700; border-top: 2px solid var(--gray-300); }
         .mexp-venta-input { width: 90px; padding: 0.3rem 0.5rem; border: 1px solid var(--gray-300); border-radius: 4px; font-size: 0.82rem; text-align: right; }
