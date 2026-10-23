@@ -2050,33 +2050,6 @@
             gap: 1.05rem;
             align-items: start;
         }
-        .maritime-shell-legacy {
-            grid-template-columns: minmax(300px, 350px) minmax(0, 1fr);
-            gap: 1.05rem;
-            align-items: start;
-        }
-        .maritime-sidebar {
-            position: sticky;
-            top: 1rem;
-        }
-        .maritime-shell-legacy .maritime-sidebar .map-container {
-            height: 400px;
-            border-radius: 18px 18px 0 0;
-            overflow: hidden;
-        }
-        .maritime-shell-legacy .maritime-sidebar .route-info {
-            display: block;
-            margin-top: 0;
-            border-radius: 0 0 18px 18px;
-            border: 1px solid #bfdbfe;
-            border-top: none;
-            background: linear-gradient(180deg, #f8fbff 0%, #f5fbf8 100%);
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-        }
-        .maritime-shell-legacy .maritime-sidebar .route-info:not(.show) {
-            display: block;
-            opacity: 0.88;
-        }
         .maritime-map-frame {
             border: 1px solid var(--gray-200);
             border-radius: 18px;
@@ -2173,17 +2146,6 @@
         }
         .maritime-main .quote-card {
             padding: 0.8rem;
-        }
-        .maritime-route-card .maritime-shell-legacy {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-        }
-        .maritime-route-card .maritime-sidebar {
-            position: static;
-        }
-        .maritime-route-card .maritime-sidebar .map-container {
-            height: 360px;
-            border-radius: 18px 18px 0 0;
         }
         .maritime-route-card .maritime-main {
             border: none;
@@ -3510,12 +3472,9 @@
                 border-top: 1px solid #bfdbfe;
             }
             .maritime-body { grid-template-columns: 1fr; }
-            .maritime-sidebar { position: static; }
             .maritime-map-frame .map-container { height: 280px; }
             .maritime-search-grid { grid-template-columns: 1fr; }
             .maritime-toolbar .btn-lg { width: 100%; min-width: 0; }
-            .maritime-shell-legacy { grid-template-columns: 1fr; }
-            .maritime-shell-legacy .maritime-sidebar .map-container { height: 280px; }
             .maritime-route-card .maritime-search-grid { grid-template-columns: 1fr; }
             .maritime-route-card .btn-lg { width: 100%; min-width: 0; }
         }
@@ -3947,30 +3906,6 @@
                     </div>
                 </aside>
                 <div class="air-dap-main">
-            <div class="layout-split">
-                <!-- Izquierda: Mapa + Info ruta -->
-                <div class="layout-left">
-                    <div class="map-container" id="map"></div>
-                    <!-- Info de ruta: km y tiempo (debajo del mapa) -->
-                    <div class="route-info" id="route-info">
-                        <div class="route-info-grid">
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-km">—</div>
-                                <div class="stat-label">Kilómetros aprox.</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-time">—</div>
-                                <div class="stat-label" id="route-time-label">Tiempo tránsito</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-unit-type">—</div>
-                                <div class="stat-label">Tipo unidad</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <!-- Derecha: Formularios + Resultado -->
-                <div class="layout-right">
                     <div class="air-dap-top-panel">
                         <div class="air-route-panel">
                             <div class="air-route-head">
@@ -3995,6 +3930,22 @@
                                     <label>Ciudad destino final</label>
                                     <input type="text" id="ciudad-destino" placeholder="Ej: Lagos de Moreno" autocomplete="off">
                                     <div class="autocomplete-list" id="autocomplete-list"></div>
+                                </div>
+                            </div>
+                            <div class="route-info" id="route-info">
+                                <div class="route-info-grid">
+                                    <div class="route-stat">
+                                        <div class="stat-value" id="route-km">—</div>
+                                        <div class="stat-label">Kilómetros aprox.</div>
+                                    </div>
+                                    <div class="route-stat">
+                                        <div class="stat-value" id="route-time">—</div>
+                                        <div class="stat-label" id="route-time-label">Tiempo tránsito</div>
+                                    </div>
+                                    <div class="route-stat">
+                                        <div class="stat-value" id="route-unit-type">—</div>
+                                        <div class="stat-label">Tipo unidad</div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -4115,7 +4066,6 @@
                         Sube tarifas de proveedores abajo para cotizar
                     </div>
             </div>
-                </div>
                 <aside class="air-dap-side">
                     <div class="air-workspace-summary" id="air-workspace-summary">
                         <div class="air-workspace-summary-head">
@@ -4147,7 +4097,6 @@
                         </div>
                     </div>
                 </aside>
-            </div>
         </div>
 
         <!-- Card: Proveedores / Tarifas (ADMIN ONLY) -->
@@ -4601,62 +4550,55 @@
                 <div class="card-icon blue">&#x1F6A2;</div>
                 <h2>Cotizador DAP Maritimo</h2>
             </div>
-            <div class="layout-split maritime-shell-legacy">
-                <div class="layout-left maritime-sidebar">
-                    <div class="map-container" id="map-maritimo"></div>
-                    <div class="route-info" id="route-info-maritimo">
-                        <div class="route-info-grid">
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-km-maritimo">—</div>
-                                <div class="stat-label">Kilómetros aprox.</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-time-maritimo">—</div>
-                                <div class="stat-label">Tiempo tránsito</div>
-                            </div>
-                            <div class="route-stat">
-                                <div class="stat-value" id="route-unit-type-maritimo">Portacontenedor</div>
-                                <div class="stat-label">Equipo</div>
-                            </div>
+            <div class="air-route-panel">
+                <div class="air-route-head">
+                    <div>
+                        <div class="form-section-title">&#x1F6A2; Ruta</div>
+                        <div class="air-route-copy">Selecciona puerto y ciudad destino para comparar las mejores opciones Single y Full antes de armar la venta final.</div>
+                    </div>
+                    <div class="air-route-step-badge">Paso 1</div>
+                </div>
+                <div class="form-grid maritime-search-grid">
+                    <div class="form-group">
+                        <label>Puerto origen</label>
+                        <select id="maritimo-puerto">
+                            <option value="">Seleccionar...</option>
+                        </select>
+                    </div>
+                    <div class="form-group autocomplete-wrap">
+                        <label>Ciudad destino final</label>
+                        <input type="text" id="maritimo-ciudad" placeholder="Ej: Chihuahua" autocomplete="off">
+                        <div class="autocomplete-list" id="autocomplete-list-maritimo"></div>
+                    </div>
+                </div>
+                <div class="route-info" id="route-info-maritimo">
+                    <div class="route-info-grid">
+                        <div class="route-stat">
+                            <div class="stat-value" id="route-km-maritimo">—</div>
+                            <div class="stat-label">Kilómetros aprox.</div>
+                        </div>
+                        <div class="route-stat">
+                            <div class="stat-value" id="route-time-maritimo">—</div>
+                            <div class="stat-label">Tiempo tránsito</div>
+                        </div>
+                        <div class="route-stat">
+                            <div class="stat-value" id="route-unit-type-maritimo">Portacontenedor</div>
+                            <div class="stat-label">Equipo</div>
                         </div>
                     </div>
                 </div>
-                <div class="layout-right maritime-main">
-                    <div class="maritime-route-panel">
-                        <div class="maritime-stage-head">
-                            <div>
-                                <div class="form-section-title">&#x1F6A2; Ruta</div>
-                                <div class="maritime-stage-copy">Selecciona puerto y ciudad destino para comparar las mejores opciones Single y Full antes de armar la venta final.</div>
-                            </div>
-                            <div class="maritime-step-badge">Paso 1</div>
-                        </div>
-                        <div class="form-grid maritime-search-grid">
-                            <div class="form-group">
-                                <label>Puerto origen</label>
-                                <select id="maritimo-puerto">
-                                    <option value="">Seleccionar...</option>
-                                </select>
-                            </div>
-                            <div class="form-group autocomplete-wrap">
-                                <label>Ciudad destino final</label>
-                                <input type="text" id="maritimo-ciudad" placeholder="Ej: Chihuahua" autocomplete="off">
-                                <div class="autocomplete-list" id="autocomplete-list-maritimo"></div>
-                            </div>
-                        </div>
-                        <p id="maritime-help-text" class="maritime-help-text">
-                            Veras dos rankings: mejores opciones Single y mejores opciones Full. Luego eliges una de cada lado para mandar ambas a la calculadora.
-                        </p>
-                        <div class="cotizar-actions">
-                            <button class="btn btn-success btn-lg" id="btn-cotizar-maritimo" disabled>
-                                &#x1F50D; Buscar mejores tarifas
-                            </button>
-                        </div>
-                    </div>
-                    <div class="quote-results maritime-results-stage" id="quote-results-maritimo"></div>
-                    <div class="empty-state-mini maritime-empty-panel" id="empty-cotizacion-maritimo">
-                        Importa el tarifario maritimo o busca una ruta para empezar a cotizar.
-                    </div>
+                <p id="maritime-help-text" class="maritime-help-text">
+                    Veras dos rankings: mejores opciones Single y mejores opciones Full. Luego eliges una de cada lado para mandar ambas a la calculadora.
+                </p>
+                <div class="cotizar-actions">
+                    <button class="btn btn-success btn-lg" id="btn-cotizar-maritimo" disabled>
+                        &#x1F50D; Buscar mejores tarifas
+                    </button>
                 </div>
+            </div>
+            <div class="quote-results maritime-results-stage" id="quote-results-maritimo"></div>
+            <div class="empty-state-mini maritime-empty-panel" id="empty-cotizacion-maritimo">
+                Importa el tarifario maritimo o busca una ruta para empezar a cotizar.
             </div>
         </div>
 
@@ -10555,48 +10497,55 @@ const AIRPORTS = {
     GDL: { name: 'GDL — Guadalajara', lat: 20.5218, lng: -103.3111, label: 'GDL' },
 };
 
-const map = L.map('map', {
-    center: [23.5, -102],
-    zoom: 5,
-    scrollWheelZoom: false,
-    zoomControl: true,
-});
+const map = document.getElementById('map')
+    ? L.map('map', {
+        center: [23.5, -102],
+        zoom: 5,
+        scrollWheelZoom: false,
+        zoomControl: true,
+    })
+    : null;
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; OpenStreetMap',
-    maxZoom: 18,
-}).addTo(map);
+if (map) {
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; OpenStreetMap',
+        maxZoom: 18,
+    }).addTo(map);
+}
 
 const markers = {};
 const airportSelect = document.getElementById('aeropuerto');
 
-Object.entries(AIRPORTS).forEach(([code, ap]) => {
-    const isActive = airportSelect.value === code;
-    const marker = L.circleMarker([ap.lat, ap.lng], {
-        radius: 8,
-        fillColor: isActive ? '#2563eb' : '#1e3a5f',
-        color: '#fff',
-        weight: 2,
-        fillOpacity: 0.9,
-    }).addTo(map);
+if (map) {
+    Object.entries(AIRPORTS).forEach(([code, ap]) => {
+        const isActive = airportSelect.value === code;
+        const marker = L.circleMarker([ap.lat, ap.lng], {
+            radius: 8,
+            fillColor: isActive ? '#2563eb' : '#1e3a5f',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.9,
+        }).addTo(map);
 
-    marker.bindTooltip(ap.label, {
-        permanent: true,
-        direction: 'top',
-        offset: [0, -10],
-        className: 'airport-tooltip',
+        marker.bindTooltip(ap.label, {
+            permanent: true,
+            direction: 'top',
+            offset: [0, -10],
+            className: 'airport-tooltip',
+        });
+
+        marker.on('click', () => {
+            airportSelect.value = code;
+            airportSelect.dispatchEvent(new Event('change'));
+            updateMapMarkers();
+        });
+
+        markers[code] = marker;
     });
-
-    marker.on('click', () => {
-        airportSelect.value = code;
-        airportSelect.dispatchEvent(new Event('change'));
-        updateMapMarkers();
-    });
-
-    markers[code] = marker;
-});
+}
 
 function updateMapMarkers() {
+    if (!map) return;
     const selected = airportSelect.value;
     Object.entries(markers).forEach(([code, marker]) => {
         marker.setStyle({
@@ -10607,12 +10556,11 @@ function updateMapMarkers() {
 }
 
 airportSelect.addEventListener('change', () => {
-    updateMapMarkers();
+    if (map) updateMapMarkers();
     updateRoute();
 });
 
-// Fix mapa que no renderiza bien al cargar (contenedor oculto)
-setTimeout(() => map.invalidateSize(), 200);
+if (map) setTimeout(() => map.invalidateSize(), 200);
 
 // ===== RUTA EN MAPA: GEOCODING + LÍNEA + DISTANCIA =====
 let routeLine = null;
@@ -10675,8 +10623,10 @@ async function geocodeCity(cityName) {
 }
 
 function clearRoute() {
-    if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
-    if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
+    if (map) {
+        if (routeLine) { map.removeLayer(routeLine); routeLine = null; }
+        if (destMarker) { map.removeLayer(destMarker); destMarker = null; }
+    }
     document.getElementById('route-info').classList.remove('show');
     currentRouteKm = 0;
     clearAirSelectedProviderSummary();
@@ -10711,51 +10661,49 @@ async function updateRoute() {
     const geo = await geocodeCity(ciudad);
     if (!geo) return; // No borrar ruta si falla geocoding, mantener la anterior
 
-    // Limpiar ruta anterior
-    if (routeLine) map.removeLayer(routeLine);
-    if (destMarker) map.removeLayer(destMarker);
+    if (map) {
+        if (routeLine) map.removeLayer(routeLine);
+        if (destMarker) map.removeLayer(destMarker);
 
-    // Marcador destino
-    destMarker = L.circleMarker([geo.lat, geo.lng], {
-        radius: 7,
-        fillColor: '#ef4444',
-        color: '#fff',
-        weight: 2,
-        fillOpacity: 0.9,
-    }).addTo(map);
+        destMarker = L.circleMarker([geo.lat, geo.lng], {
+            radius: 7,
+            fillColor: '#ef4444',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.9,
+        }).addTo(map);
 
-    destMarker.bindTooltip(ciudad, {
-        permanent: true,
-        direction: 'bottom',
-        offset: [0, 10],
-        className: 'airport-tooltip',
-    });
+        destMarker.bindTooltip(ciudad, {
+            permanent: true,
+            direction: 'bottom',
+            offset: [0, 10],
+            className: 'airport-tooltip',
+        });
 
-    // Línea de ruta (curva bezier)
-    const midLat = (ap.lat + geo.lat) / 2;
-    const midLng = (ap.lng + geo.lng) / 2;
-    const dx = geo.lng - ap.lng;
-    const dy = geo.lat - ap.lat;
-    const curveLat = midLat + dx * 0.1;
-    const curveLng = midLng - dy * 0.1;
+        const midLat = (ap.lat + geo.lat) / 2;
+        const midLng = (ap.lng + geo.lng) / 2;
+        const dx = geo.lng - ap.lng;
+        const dy = geo.lat - ap.lat;
+        const curveLat = midLat + dx * 0.1;
+        const curveLng = midLng - dy * 0.1;
 
-    const points = [];
-    for (let t = 0; t <= 1; t += 0.05) {
-        const lat = (1-t)**2 * ap.lat + 2*(1-t)*t * curveLat + t**2 * geo.lat;
-        const lng = (1-t)**2 * ap.lng + 2*(1-t)*t * curveLng + t**2 * geo.lng;
-        points.push([lat, lng]);
+        const points = [];
+        for (let t = 0; t <= 1; t += 0.05) {
+            const lat = (1-t)**2 * ap.lat + 2*(1-t)*t * curveLat + t**2 * geo.lat;
+            const lng = (1-t)**2 * ap.lng + 2*(1-t)*t * curveLng + t**2 * geo.lng;
+            points.push([lat, lng]);
+        }
+
+        routeLine = L.polyline(points, {
+            color: '#2563eb',
+            weight: 3,
+            opacity: 0.7,
+            dashArray: '8, 6',
+        }).addTo(map);
+
+        const bounds = L.latLngBounds([[ap.lat, ap.lng], [geo.lat, geo.lng]]);
+        map.fitBounds(bounds, { padding: [30, 30] });
     }
-
-    routeLine = L.polyline(points, {
-        color: '#2563eb',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '8, 6',
-    }).addTo(map);
-
-    // Ajustar vista
-    const bounds = L.latLngBounds([[ap.lat, ap.lng], [geo.lat, geo.lng]]);
-    map.fitBounds(bounds, { padding: [30, 30] });
 
     // Calcular distancia
     const straightKm = haversineKm(ap.lat, ap.lng, geo.lat, geo.lng);
@@ -10837,9 +10785,10 @@ function updateMaritimeMapMarkers() {
 }
 
 function clearMaritimeRoute() {
-    if (!maritimeMap) return;
-    if (maritimeRouteLine) { maritimeMap.removeLayer(maritimeRouteLine); maritimeRouteLine = null; }
-    if (maritimeDestMarker) { maritimeMap.removeLayer(maritimeDestMarker); maritimeDestMarker = null; }
+    if (maritimeMap) {
+        if (maritimeRouteLine) { maritimeMap.removeLayer(maritimeRouteLine); maritimeRouteLine = null; }
+        if (maritimeDestMarker) { maritimeMap.removeLayer(maritimeDestMarker); maritimeDestMarker = null; }
+    }
     document.getElementById('route-info-maritimo')?.classList.remove('show');
     const kmEl = document.getElementById('route-km-maritimo');
     const timeEl = document.getElementById('route-time-maritimo');
@@ -10868,7 +10817,7 @@ async function updateMaritimeRoute() {
 
     updateMaritimeMapMarkers();
 
-    if (!maritimeMap || !puerto || !ciudad) {
+    if (!puerto || !ciudad) {
         clearMaritimeRoute();
         return;
     }
@@ -10890,47 +10839,49 @@ async function updateMaritimeRoute() {
     const geo = await geocodeCity(ciudadGeoLabel);
     if (!geo) return;
 
-    if (maritimeRouteLine) maritimeMap.removeLayer(maritimeRouteLine);
-    if (maritimeDestMarker) maritimeMap.removeLayer(maritimeDestMarker);
+    if (maritimeMap) {
+        if (maritimeRouteLine) maritimeMap.removeLayer(maritimeRouteLine);
+        if (maritimeDestMarker) maritimeMap.removeLayer(maritimeDestMarker);
 
-    maritimeDestMarker = L.circleMarker([geo.lat, geo.lng], {
-        radius: 7,
-        fillColor: '#ef4444',
-        color: '#fff',
-        weight: 2,
-        fillOpacity: 0.9,
-    }).addTo(maritimeMap);
+        maritimeDestMarker = L.circleMarker([geo.lat, geo.lng], {
+            radius: 7,
+            fillColor: '#ef4444',
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 0.9,
+        }).addTo(maritimeMap);
 
-    maritimeDestMarker.bindTooltip(ciudadGeoLabel, {
-        permanent: true,
-        direction: 'bottom',
-        offset: [0, 10],
-        className: 'airport-tooltip',
-    });
+        maritimeDestMarker.bindTooltip(ciudadGeoLabel, {
+            permanent: true,
+            direction: 'bottom',
+            offset: [0, 10],
+            className: 'airport-tooltip',
+        });
 
-    const midLat = (port.lat + geo.lat) / 2;
-    const midLng = (port.lng + geo.lng) / 2;
-    const dx = geo.lng - port.lng;
-    const dy = geo.lat - port.lat;
-    const curveLat = midLat + dx * 0.1;
-    const curveLng = midLng - dy * 0.1;
+        const midLat = (port.lat + geo.lat) / 2;
+        const midLng = (port.lng + geo.lng) / 2;
+        const dx = geo.lng - port.lng;
+        const dy = geo.lat - port.lat;
+        const curveLat = midLat + dx * 0.1;
+        const curveLng = midLng - dy * 0.1;
 
-    const points = [];
-    for (let t = 0; t <= 1; t += 0.05) {
-        const lat = (1 - t) ** 2 * port.lat + 2 * (1 - t) * t * curveLat + t ** 2 * geo.lat;
-        const lng = (1 - t) ** 2 * port.lng + 2 * (1 - t) * t * curveLng + t ** 2 * geo.lng;
-        points.push([lat, lng]);
+        const points = [];
+        for (let t = 0; t <= 1; t += 0.05) {
+            const lat = (1 - t) ** 2 * port.lat + 2 * (1 - t) * t * curveLat + t ** 2 * geo.lat;
+            const lng = (1 - t) ** 2 * port.lng + 2 * (1 - t) * t * curveLng + t ** 2 * geo.lng;
+            points.push([lat, lng]);
+        }
+
+        maritimeRouteLine = L.polyline(points, {
+            color: '#2563eb',
+            weight: 3,
+            opacity: 0.7,
+            dashArray: '8, 6',
+        }).addTo(maritimeMap);
+
+        const bounds = L.latLngBounds([[port.lat, port.lng], [geo.lat, geo.lng]]);
+        maritimeMap.fitBounds(bounds, { padding: [30, 30] });
     }
-
-    maritimeRouteLine = L.polyline(points, {
-        color: '#2563eb',
-        weight: 3,
-        opacity: 0.7,
-        dashArray: '8, 6',
-    }).addTo(maritimeMap);
-
-    const bounds = L.latLngBounds([[port.lat, port.lng], [geo.lat, geo.lng]]);
-    maritimeMap.fitBounds(bounds, { padding: [30, 30] });
 
     const straightKm = haversineKm(port.lat, port.lng, geo.lat, geo.lng);
     maritimeCurrentRouteKm = Math.round(straightKm * 1.35);
