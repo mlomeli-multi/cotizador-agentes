@@ -2541,21 +2541,14 @@
             text-transform: uppercase;
             white-space: nowrap;
         }
-        .mub-panel-air {
-            border: 1px solid rgba(148,163,184,0.18);
-            border-radius: 16px;
-            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-            padding: 1rem;
-            margin-top: 1.25rem;
-        }
-        .mub-panel-air .mub-panel {
+        .air-route-panel .mub-panel {
             border: none;
             box-shadow: none;
             padding: 0;
             background: transparent;
+            margin-top: 0;
         }
-        .mub-panel-air .mub-panel-header {
+        .air-route-panel .mub-panel-header {
             margin-bottom: 0;
         }
 
@@ -3531,7 +3524,6 @@
             .mub-air-bottom-grid { grid-template-columns: 1fr; }
             .mub-air-sales-summary-grid,
             .mub-air-sales-totals { grid-template-columns: 1fr; }
-            .mub-stage-head { flex-direction: column; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
             .maritime-combined-head { flex-direction: column; }
@@ -9128,14 +9120,14 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
     const showSecondaryBlock = !isAirQuote || !!destinationRowsHtml;
 
     container.innerHTML = `
-    <div class="${isAirQuote ? 'mub-panel-air' : ''}">
+    <div class="${isAirQuote ? 'air-route-panel' : ''}"${isAirQuote ? ' style="margin-top:1.25rem;"' : ''}>
     ${isAirQuote ? `
-    <div class="mub-stage-head">
+    <div class="air-route-head">
         <div>
-            <div class="air-provider-stage-title">Venta</div>
-            <div class="mub-stage-copy">Ajusta la venta final del flete terrestre, valida los costos aeroportuarios y deja listo el correo comercial.</div>
+            <div class="form-section-title">&#x1F4B0; Venta</div>
+            <div class="air-route-copy">Ajusta la venta final del flete terrestre, valida los costos aeroportuarios y deja listo el correo comercial.</div>
         </div>
-        <div class="mub-step-badge">Paso 4</div>
+        <div class="air-route-step-badge">Paso 4</div>
     </div>` : ''}
     <div class="mub-panel">
         <div class="mub-panel-header">
@@ -9172,142 +9164,24 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             ${showSecondaryBlock ? (
                 isAirQuote
                     ? `
-                <div class="mub-air-bottom-grid">
-                    <div class="mub-calc-block destination">
-                        <div class="mub-calc-block-header">
-                            <div class="mub-calc-block-title">${secondaryBlockTitle}</div>
-                            <div class="mub-calc-block-subtitle">Costo real con IVA 16% aplicado.</div>
-                        </div>
-                        <div class="mub-calc-table-wrap">
-                            <table class="mub-table airport-table">
-                                <thead><tr>
-                                    <th>Concepto</th>
-                                    <th>Costo MXN</th>
-                                    <th>Impuestos</th>
-                                    <th>Costo c/imp</th>
-                                    ${usdTh}
-                                </tr></thead>
-                                <tbody>
-                                    ${airportCostRowsHtml || `<tr><td colspan="${hayTC ? 5 : 4}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">${secondaryEmptyState}</td></tr>`}
-                                </tbody>
-                            </table>
-                        </div>
+                <div class="mub-calc-block destination">
+                    <div class="mub-calc-block-header">
+                        <div class="mub-calc-block-title">${secondaryBlockTitle}</div>
+                        <div class="mub-calc-block-subtitle">Costo real con IVA 16% aplicado.</div>
                     </div>
-                    <div class="mub-air-sales-card">
-                        <div class="mub-calc-block-header">
-                            <div class="mub-calc-block-title">Resumen de venta</div>
-                            <div class="mub-calc-block-subtitle">Cruza costo vs venta comercial sin espacios muertos.</div>
-                        </div>
-                        <div class="mub-air-sales-body">
-                            <div class="mub-air-sales-group">
-                                <div class="mub-air-sales-group-title">Resumen operativo</div>
-                                <div class="mub-air-sales-summary-grid">
-                                    <div class="mub-air-sales-summary-item">
-                                        <label>Ruta</label>
-                                        <strong>${escapeHtml((data.quoteMeta?.aeropuerto || 'AOD'))} → ${escapeHtml((data.quoteMeta?.ciudad || 'Destino final'))}</strong>
-                                    </div>
-                                    <div class="mub-air-sales-summary-item">
-                                        <label>Proveedor</label>
-                                        <strong>${escapeHtml(data.proveedor || 'Pendiente')}</strong>
-                                    </div>
-                                    <div class="mub-air-sales-summary-item">
-                                        <label>Unidad</label>
-                                        <strong>${escapeHtml(data.tipoUnidad || 'Pendiente')}</strong>
-                                    </div>
-                                    <div class="mub-air-sales-summary-item">
-                                        <label>Cargos aeropuerto</label>
-                                        <strong>${airportRows.length} concepto${airportRows.length === 1 ? '' : 's'}</strong>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mub-air-sales-group">
-                                <div class="mub-air-sales-group-title">Flete terrestre aeroportuario</div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>${escapeHtml(data.tipoUnidad || 'Flete terrestre')}</strong>
-                                        <span>Costo y venta final del traslado terrestre.</span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value">
-                                        Costo ${simbolo}<span id="air-summary-freight-cost">${fmt(freightCostVenta)}</span>
-                                    </div>
-                                </div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>Venta flete</strong>
-                                        <span class="inline-note">MUB final: <strong id="air-summary-freight-mub">${fmtShort(freightMubFinal)}%</strong></span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value positive">
-                                        ${simbolo}<span id="air-summary-freight-sale">${fmt(freightSaleVenta)}</span>
-                                    </div>
-                                </div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>Utilidad flete</strong>
-                                        <span>Diferencia entre costo y venta del proveedor elegido.</span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value ${freightUtilityVenta >= 0 ? 'positive' : 'negative'}">
-                                        ${simbolo}<span id="air-summary-freight-profit">${fmt(freightUtilityVenta)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mub-air-sales-group">
-                                <div class="mub-air-sales-group-title">Cobro aeroportuario comercial</div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>Costos aeroportuarios</strong>
-                                        <span>Revalidación y desconsolidación con IVA 16%.</span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value">
-                                        ${simbolo}<span id="air-summary-airport-cost">${fmt(airportCostTotalVenta)}</span>
-                                    </div>
-                                </div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>AWB Release</strong>
-                                        <span>Cobro comercial fijo según aeropuerto.</span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value">
-                                        USD ${fmt(airAwbRate)}
-                                    </div>
-                                </div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>Entry to Airport</strong>
-                                        <span>Cobro comercial fijo por viaje.</span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value">
-                                        USD ${fmt(airEntryRate)}
-                                    </div>
-                                </div>
-                                <div class="mub-air-sales-row">
-                                    <div class="mub-air-sales-row-label">
-                                        <strong>Resultado aeroportuario</strong>
-                                        <span>AWB Release + Entry vs costo total aeroportuario.</span>
-                                    </div>
-                                    <div class="mub-air-sales-row-value ${airAirportUtility >= 0 ? 'positive' : 'negative'}">
-                                        ${simbolo}<span id="air-summary-airport-profit">${fmt(airAirportUtility)}</span>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mub-air-sales-totals">
-                                <div class="mub-air-total-pill">
-                                    <label>Total costo</label>
-                                    <strong id="air-summary-total-cost">${simbolo}${fmt(freightCostVenta + airportCostTotalVenta)}</strong>
-                                </div>
-                                <div class="mub-air-total-pill">
-                                    <label>Total venta</label>
-                                    <strong id="air-summary-total-sale">${simbolo}${fmt(freightSaleVenta + airAirportSalesTotal)}</strong>
-                                </div>
-                                <div class="mub-air-total-pill">
-                                    <label>Total utilidad</label>
-                                    <strong id="air-summary-total-profit" class="${(freightUtilityVenta + airAirportUtility) >= 0 ? 'positive' : 'negative'}">${simbolo}${fmt(freightUtilityVenta + airAirportUtility)}</strong>
-                                </div>
-                                <div class="mub-air-total-pill">
-                                    <label>Total MUB %</label>
-                                    <strong id="air-summary-total-mub">${fmtShort((freightSaleVenta + airAirportSalesTotal) > 0 ? ((freightUtilityVenta + airAirportUtility) / (freightSaleVenta + airAirportSalesTotal) * 100) : 0)}%</strong>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="mub-calc-table-wrap">
+                        <table class="mub-table airport-table">
+                            <thead><tr>
+                                <th>Concepto</th>
+                                <th>Costo MXN</th>
+                                <th>Impuestos</th>
+                                <th>Costo c/imp</th>
+                                ${usdTh}
+                            </tr></thead>
+                            <tbody>
+                                ${airportCostRowsHtml || `<tr><td colspan="${hayTC ? 5 : 4}" style="text-align:left;color:var(--gray-500);padding:0.9rem;">${secondaryEmptyState}</td></tr>`}
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             `
