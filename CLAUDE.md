@@ -10,7 +10,6 @@ Modos activos:
 
 Stack actual:
 - `HTML / CSS / JS` vanilla en un solo archivo principal
-- `Leaflet.js`
 - `Chart.js`
 - `XLSX.js`
 - `localStorage` para persistencia local
@@ -99,12 +98,13 @@ Stack actual:
   - TT:
     - más de `900 km` = `1-2 days transit`
     - hasta `900 km` = `1 day transit`
-- UX/UI aérea ya migrada a flujo por pasos:
-  - `Ruta`
-  - `Carga`
-  - `Proveedor`
-  - `Venta`
+- UX/UI aérea migrada a flujo por pasos con sistema unificado `air-route-panel`:
+  - `Ruta` — `air-route-panel` + `air-route-head` + `air-route-step-badge`
+  - `Carga` — mismas clases, badge inline en header
+  - `Proveedor` — `air-provider-stage` (wrapper) + `air-route-head` dentro
+  - `Venta` — `air-route-panel` envuelve toda la calculadora MUB
 - `Resumen operativo` lateral sticky en desktop
+- Mapas Leaflet removidos de DAP Aéreo y DAP Marítimo; `route-info` (km/tiempo/tipo unidad) se muestra inline dentro del panel de Ruta
 
 ### EXW Aéreo
 - Flujo EXW aéreo activo (pestaña separada)
@@ -134,7 +134,7 @@ Stack actual:
 - Flujo `DAP Marítimo` activo y funcional
 - Ranking `Top 3 Single` y `Top 3 Full`
 - Selección independiente de `Single` y `Full`
-- Mapa y calculadora marítima funcionando
+- Calculadora marítima funcionando (mapa Leaflet removido)
 - Importación de tarifarios por Excel ya integrada
 - Corrección aplicada a vigencias raras de Excel tipo:
   - `1/1/46387`
@@ -220,7 +220,8 @@ Meter los `destination charges` de naviera al flujo marítimo sin mezclarlos con
 - Errores de login más claros
 - Modo admin y modo tariff manager separados
 - Publicación de tipo de cambio compartido desde la app
-- DAP aéreo y DAP marítimo ya usan un lenguaje visual más consistente por pasos
+- DAP Aéreo, EXW Aéreo y DAP Marítimo usan sistema de headers unificado: `air-route-panel` + `air-route-head` + `form-section-title` + `air-route-step-badge`
+- Leaflet.js removido por completo (imports, CSS, JS de inicialización)
 
 ## Archivos / datos clave para futuras iteraciones
 - `index.html` concentra casi toda la lógica y sigue siendo la versión estable publicada para el equipo

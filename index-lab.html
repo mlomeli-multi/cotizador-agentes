@@ -6,8 +6,6 @@
     <title>Cotizador de Transporte | Agentes</title>
     <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
         /* ===== RESET & BASE ===== */
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -2058,31 +2056,6 @@
             gap: 1.05rem;
             align-items: start;
         }
-        .maritime-map-frame {
-            border: 1px solid var(--gray-200);
-            border-radius: 18px;
-            overflow: hidden;
-            background: #fff;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-        }
-        .maritime-map-frame .map-container {
-            height: 400px;
-            border-radius: 0;
-        }
-        .maritime-map-frame .route-info {
-            display: block;
-            margin-top: 0;
-            border-radius: 0;
-            border-left: none;
-            border-right: none;
-            border-bottom: none;
-            border-top: 1px solid #bfdbfe;
-            background: linear-gradient(180deg, #f8fbff 0%, #f5fbf8 100%);
-        }
-        .maritime-map-frame .route-info:not(.show) {
-            display: block;
-            opacity: 0.88;
-        }
         .maritime-main {
             min-width: 0;
             border: 1px solid var(--gray-200);
@@ -2525,22 +2498,6 @@
             font-size: 0.9rem;
         }
 
-        /* ===== LAYOUT SPLIT (mapa + formularios) ===== */
-        .layout-split {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-            align-items: start;
-        }
-        .layout-left {
-            position: sticky;
-            top: 80px;
-        }
-        .air-dap-card .layout-split {
-            grid-template-columns: minmax(580px, 1.2fr) minmax(400px, 0.92fr);
-            gap: 1rem;
-            align-items: stretch;
-        }
         .air-dap-shell {
             display: grid;
             grid-template-columns: minmax(0, 1fr) 300px;
@@ -2698,17 +2655,6 @@
         .air-workspace-row span {
             color: var(--gray-500);
             text-align: right;
-        }
-        .air-dap-card .layout-left {
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
-        }
-        .air-dap-card .layout-right {
-            min-width: 0;
-            display: flex;
-            flex-direction: column;
-            min-height: 100%;
         }
         .air-dap-top-panel {
             display: flex;
@@ -3101,25 +3047,6 @@
             border-bottom: 1px solid var(--gray-100);
         }
 
-        /* ===== MAP CONTAINER ===== */
-        .map-container {
-            height: 400px;
-            border-radius: var(--radius);
-            overflow: hidden;
-            border: 1px solid var(--gray-200);
-            position: relative;
-            z-index: 1;
-        }
-        .map-container .leaflet-container,
-        .map-container .leaflet-pane,
-        .map-container .leaflet-top,
-        .map-container .leaflet-bottom,
-        .map-container .leaflet-control,
-        .map-container .leaflet-tooltip,
-        .map-container .leaflet-popup {
-            z-index: 1 !important;
-        }
-
         /* ===== MODAL ===== */
         .modal-overlay {
             display: none;
@@ -3360,20 +3287,10 @@
 
         /* ===== RESPONSIVE ===== */
         @media (max-width: 900px) {
-            .layout-split { grid-template-columns: 1fr; }
-            .layout-left { position: static; }
-            .map-container { height: 250px; }
-            .air-dap-card .layout-split { grid-template-columns: 1fr; }
-            .air-dap-card .map-container {
-                height: 300px;
-                border-radius: var(--radius);
-                min-height: 300px;
-            }
             .air-route-grid { grid-template-columns: 1fr; }
             .air-route-head { flex-direction: column; }
             .air-dap-top-panel { flex-direction: column; }
             .maritime-body { grid-template-columns: 1fr; }
-            .maritime-map-frame .map-container { height: 280px; }
             .maritime-search-grid { grid-template-columns: 1fr; }
             .maritime-toolbar .btn-lg { width: 100%; min-width: 0; }
             .maritime-route-card .maritime-search-grid { grid-template-columns: 1fr; }
@@ -10274,66 +10191,11 @@ const AIRPORTS = {
     GDL: { name: 'GDL — Guadalajara', lat: 20.5218, lng: -103.3111, label: 'GDL' },
 };
 
-const map = document.getElementById('map')
-    ? L.map('map', {
-        center: [23.5, -102],
-        zoom: 5,
-        scrollWheelZoom: false,
-        zoomControl: true,
-    })
-    : null;
-
-if (map) {
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
-        maxZoom: 18,
-    }).addTo(map);
-}
-
+const map = null;
 const markers = {};
 const airportSelect = document.getElementById('aeropuerto');
 
-if (map) {
-    Object.entries(AIRPORTS).forEach(([code, ap]) => {
-        const isActive = airportSelect.value === code;
-        const marker = L.circleMarker([ap.lat, ap.lng], {
-            radius: 8,
-            fillColor: isActive ? '#2563eb' : '#1e3a5f',
-            color: '#fff',
-            weight: 2,
-            fillOpacity: 0.9,
-        }).addTo(map);
-
-        marker.bindTooltip(ap.label, {
-            permanent: true,
-            direction: 'top',
-            offset: [0, -10],
-            className: 'airport-tooltip',
-        });
-
-        marker.on('click', () => {
-            airportSelect.value = code;
-            airportSelect.dispatchEvent(new Event('change'));
-            updateMapMarkers();
-        });
-
-        markers[code] = marker;
-    });
-}
-
-function updateMapMarkers() {
-    if (!map) return;
-    const selected = airportSelect.value;
-    Object.entries(markers).forEach(([code, marker]) => {
-        marker.setStyle({
-            fillColor: code === selected ? '#2563eb' : '#1e3a5f',
-            radius: code === selected ? 10 : 8,
-        });
-    });
-}
-
 airportSelect.addEventListener('change', () => {
-    if (map) updateMapMarkers();
     updateRoute();
 });
 
@@ -10504,62 +10366,10 @@ let maritimeRouteDebounce = null;
 let maritimeQuoteDebounce = null;
 let maritimeCurrentRouteKm = 0;
 
-const maritimeMap = document.getElementById('map-maritimo')
-    ? L.map('map-maritimo', {
-        center: [23.5, -102],
-        zoom: 5,
-        scrollWheelZoom: false,
-        zoomControl: true,
-    })
-    : null;
-
+const maritimeMap = null;
 const maritimeMarkers = {};
 
-if (maritimeMap) {
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        attribution: '&copy; OpenStreetMap',
-        maxZoom: 18,
-    }).addTo(maritimeMap);
-
-    Object.entries(MARITIME_PORTS).forEach(([name, port]) => {
-        const marker = L.circleMarker([port.lat, port.lng], {
-            radius: 8,
-            fillColor: '#1e3a5f',
-            color: '#fff',
-            weight: 2,
-            fillOpacity: 0.9,
-        }).addTo(maritimeMap);
-
-        marker.bindTooltip(port.label, {
-            permanent: true,
-            direction: 'top',
-            offset: [0, -10],
-            className: 'airport-tooltip',
-        });
-
-        marker.on('click', () => {
-            const puertoEl = document.getElementById('maritimo-puerto');
-            if (!puertoEl) return;
-            puertoEl.value = name;
-            puertoEl.dispatchEvent(new Event('change'));
-            updateMaritimeMapMarkers();
-        });
-
-        maritimeMarkers[name] = marker;
-    });
-
-    setTimeout(() => maritimeMap.invalidateSize(), 200);
-}
-
-function updateMaritimeMapMarkers() {
-    const selected = document.getElementById('maritimo-puerto')?.value || '';
-    Object.entries(maritimeMarkers).forEach(([name, marker]) => {
-        marker.setStyle({
-            fillColor: name === selected ? '#2563eb' : '#1e3a5f',
-            radius: name === selected ? 10 : 8,
-        });
-    });
-}
+function updateMaritimeMapMarkers() {}
 
 function clearMaritimeRoute() {
     if (maritimeMap) {
