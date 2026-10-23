@@ -2050,12 +2050,6 @@
             color: var(--gray-500);
             max-width: 860px;
         }
-        .maritime-body {
-            display: grid;
-            grid-template-columns: minmax(300px, 350px) minmax(0, 1fr);
-            gap: 1.05rem;
-            align-items: start;
-        }
         .maritime-main {
             min-width: 0;
             border: 1px solid var(--gray-200);
@@ -2336,54 +2330,8 @@
         .mub-table.destination-table td {
             vertical-align: middle;
         }
-        .mub-air-bottom-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1rem;
-            align-items: start;
-        }
         .mub-table.airport-table {
             min-width: 100%;
-        }
-        .mub-air-sales-card {
-            border: 1px solid rgba(148,163,184,0.18);
-            border-radius: 14px;
-            background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
-            overflow: hidden;
-        }
-        .mub-air-sales-body {
-            padding: 0.9rem 0.95rem;
-            display: grid;
-            gap: 0.8rem;
-        }
-        .mub-air-sales-group {
-            display: grid;
-            gap: 0.45rem;
-        }
-        .mub-air-sales-summary-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 0.5rem;
-        }
-        .mub-air-sales-summary-item {
-            border: 1px solid var(--gray-100);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.92);
-            padding: 0.55rem 0.65rem;
-            display: grid;
-            gap: 0.14rem;
-        }
-        .mub-air-sales-summary-item label {
-            font-size: 0.62rem;
-            font-weight: 800;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            color: var(--gray-500);
-        }
-        .mub-air-sales-summary-item strong {
-            font-size: 0.8rem;
-            color: var(--navy);
-            line-height: 1.2;
         }
         .mub-air-sales-totals {
             display: grid;
@@ -2415,62 +2363,6 @@
             color: var(--green);
         }
         .mub-air-total-pill strong.negative {
-            color: #dc2626;
-        }
-        .mub-air-sales-group-title {
-            font-size: 0.7rem;
-            font-weight: 800;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-            color: var(--gray-500);
-        }
-        .mub-air-sales-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.75rem;
-            padding: 0.55rem 0.7rem;
-            border: 1px solid var(--gray-100);
-            border-radius: 10px;
-            background: rgba(255,255,255,0.92);
-        }
-        .mub-air-sales-row-label {
-            min-width: 0;
-        }
-        .mub-air-sales-row-label strong {
-            display: block;
-            font-size: 0.78rem;
-            color: var(--gray-800);
-        }
-        .mub-air-sales-row-label span {
-            display: block;
-            margin-top: 0.16rem;
-            font-size: 0.68rem;
-            color: var(--gray-500);
-            line-height: 1.35;
-        }
-        .mub-air-sales-row-label span.inline-note {
-            display: inline;
-            white-space: nowrap;
-            margin-top: 0;
-        }
-        .mub-air-sales-row-label span.inline-note strong {
-            display: inline;
-            font-size: inherit;
-            color: var(--gray-700);
-            font-weight: 800;
-        }
-        .mub-air-sales-row-value {
-            font-size: 0.86rem;
-            font-weight: 800;
-            color: var(--navy);
-            white-space: nowrap;
-            text-align: right;
-        }
-        .mub-air-sales-row-value.positive {
-            color: var(--green);
-        }
-        .mub-air-sales-row-value.negative {
             color: #dc2626;
         }
         .air-route-panel .mub-panel {
@@ -3290,7 +3182,6 @@
             .air-route-grid { grid-template-columns: 1fr; }
             .air-route-head { flex-direction: column; }
             .air-dap-top-panel { flex-direction: column; }
-            .maritime-body { grid-template-columns: 1fr; }
             .maritime-search-grid { grid-template-columns: 1fr; }
             .maritime-toolbar .btn-lg { width: 100%; min-width: 0; }
             .maritime-route-card .maritime-search-grid { grid-template-columns: 1fr; }
@@ -3322,8 +3213,6 @@
             .pallet-line { grid-template-columns: 26px 1fr 1fr; }
             .pallet-line .btn-remove-line,
             .pallet-line span[style="width:22px;"] { grid-column: 3; justify-self: end; }
-            .mub-air-bottom-grid { grid-template-columns: 1fr; }
-            .mub-air-sales-summary-grid,
             .mub-air-sales-totals { grid-template-columns: 1fr; }
             .maritime-rankings { grid-template-columns: 1fr; }
             .maritime-selection-summary { grid-template-columns: 1fr; }
