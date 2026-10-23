@@ -22,11 +22,21 @@
             --navy: #1e3a5f;
             --navy-light: #2a4a73;
             --blue: #2563eb;
-            --blue-light: #3b82f6;
+            --blue-500: #3b82f6;
+            --blue-400: #60a5fa;
+            --blue-200: #bfdbfe;
+            --blue-100: #dbeafe;
+            --blue-50: #eff6ff;
+            --blue-50-alt: #f0f7ff;
+            --blue-700: #1d4ed8;
+            --blue-light: #eff6ff;
             --green: #10b981;
             --green-light: #34d399;
             --amber: #f59e0b;
             --red: #ef4444;
+            --red-600: #dc2626;
+            --red-100: #fee2e2;
+            --gray-950: #0f172a;
             --gray-50: #f8fafc;
             --gray-100: #f1f5f9;
             --gray-200: #e2e8f0;
@@ -176,10 +186,10 @@
             font-size: 1rem;
             flex-shrink: 0;
         }
-        .card-icon.blue { background: #dbeafe; color: var(--blue); }
+        .card-icon.blue { background: var(--blue-100); color: var(--blue); }
         .card-icon.green { background: #d1fae5; color: var(--green); }
         .card-icon.amber { background: #fef3c7; color: var(--amber); }
-        .card-icon.red { background: #fee2e2; color: var(--red); }
+        .card-icon.red { background: var(--red-100); color: var(--red); }
         .card-icon.navy { background: #e0e7ef; color: var(--navy); }
 
         /* ===== FORM ELEMENTS ===== */
@@ -290,7 +300,7 @@
             color: white;
         }
         .btn-primary:hover {
-            background: var(--blue-light);
+            background: var(--blue-500);
             box-shadow: var(--shadow-md);
         }
         .btn-secondary {
@@ -329,7 +339,7 @@
             padding: 0.45rem 0.6rem;
             background: linear-gradient(180deg, #eef6ff 0%, #f8fbff 100%);
             border-radius: 8px;
-            border: 1px solid #bfdbfe;
+            border: 1px solid var(--blue-200);
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
         }
         .unit-result.show { display: block; }
@@ -354,7 +364,7 @@
 
         /* ===== CARGA MULTI-PALLET ===== */
         .air-cargo-panel {
-            border: 1px solid #bfdbfe;
+            border: 1px solid var(--blue-200);
             border-radius: 14px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
             padding: 0.6rem 0.7rem;
@@ -381,8 +391,8 @@
             padding: 0.25rem 0.55rem;
             border: none;
             border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: var(--blue-100);
+            color: var(--blue-700);
             font-size: 0.64rem;
             letter-spacing: 0.05em;
         }
@@ -414,7 +424,7 @@
             align-items: stretch;
         }
         .cargo-col {
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 10px;
             background: rgba(255,255,255,0.92);
             padding: 0.5rem 0.55rem;
@@ -471,13 +481,13 @@
             gap: 0.35rem;
             padding: 0.4rem 0.5rem;
             background: rgba(255,255,255,0.96);
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 8px;
         }
         .pallet-line .pl-num {
             font-size: 0.6rem;
             font-weight: 700;
-            color: #1d4ed8;
+            color: var(--blue-700);
             min-width: 20px;
             padding-top: 1.1rem;
         }
@@ -520,9 +530,9 @@
             cursor: pointer;
             margin-top: 0;
         }
-        .btn-add-pallet:hover { border-color: var(--blue); background: #f0f7ff; }
+        .btn-add-pallet:hover { border-color: var(--blue); background: var(--blue-50-alt); }
         .air-cargo-unit-card {
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 10px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             padding: 0.5rem 0.6rem;
@@ -593,7 +603,7 @@
         .cw-result {
             grid-column: 1 / -1;
             background: #eef6ff;
-            border-color: #bfdbfe;
+            border-color: var(--blue-200);
             position: relative;
         }
         .cw-highlight {
@@ -661,7 +671,7 @@
             transition: border-color 0.15s;
         }
         .aio-ingreso-option:hover { border-color: var(--blue); }
-        .aio-ingreso-option.selected { background: #f0f7ff; border-color: var(--blue); }
+        .aio-ingreso-option.selected { background: var(--blue-50-alt); border-color: var(--blue); }
         .aio-ingreso-radio { font-size: 0.8rem; color: var(--blue); }
 
         /* ===== AIRLINE CARDS ===== */
@@ -673,7 +683,7 @@
         }
         .exp-airline-card:hover { border-color: var(--blue); }
         .exp-airline-card.selected {
-            border-color: var(--blue); background: #f0f7ff;
+            border-color: var(--blue); background: var(--blue-50-alt);
             box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
         }
         .exp-airline-card.best:not(.selected)::before {
@@ -697,7 +707,7 @@
             font-size: 0.58rem; font-weight: 600; padding: 0.1rem 0.4rem;
             border-radius: 3px; background: var(--gray-100); color: var(--gray-600);
         }
-        .exp-airline-tag.tt { background: #dbeafe; color: var(--blue); }
+        .exp-airline-tag.tt { background: var(--blue-100); color: var(--blue); }
         .exp-airline-tag.dias { background: #d1fae5; color: #065f46; }
         .exp-airline-tag.type { background: #fef3c7; color: #92400e; }
         .exp-airline-tag.vigencia { background: #fce7f3; color: #9d174d; }
@@ -725,7 +735,7 @@
         }
         .exp-airline-card.excluded .exp-airline-price { color: var(--gray-400); }
         .exp-excluded-reason {
-            font-size: 0.58rem; color: #dc2626; font-weight: 600;
+            font-size: 0.58rem; color: var(--red-600); font-weight: 600;
             margin-top: 0.2rem;
         }
         .exp-dims-separator {
@@ -770,7 +780,7 @@
         .exp-airline-summary-table td {
             padding: 0.18rem 0.4rem; color: rgba(255,255,255,0.75);
         }
-        .exp-airline-summary-table .code-cell { font-weight: 700; color: #60a5fa; }
+        .exp-airline-summary-table .code-cell { font-weight: 700; color: var(--blue-400); }
         .exp-origin-grid {
             display: flex;
             flex-direction: column;
@@ -783,7 +793,7 @@
             display: flex; align-items: center; flex-wrap: wrap; gap: 0.3rem;
         }
         .exp-origin-label {
-            font-size: 0.72rem; font-weight: 800; color: #60a5fa;
+            font-size: 0.72rem; font-weight: 800; color: var(--blue-400);
             min-width: 38px; margin-right: 0.15rem;
         }
         .exp-region-chip {
@@ -796,7 +806,7 @@
             background: rgba(96,165,250,0.2); border-color: rgba(96,165,250,0.5);
         }
         .exp-region-chip.open {
-            background: rgba(59,130,246,0.3); border-color: #60a5fa; color: white;
+            background: rgba(59,130,246,0.3); border-color: var(--blue-400); color: white;
         }
         .exp-region-chip .region-count {
             font-weight: 400; opacity: 0.55; margin-left: 0.2rem; font-size: 0.56rem;
@@ -817,7 +827,7 @@
             background: rgba(96,165,250,0.25); border-color: rgba(96,165,250,0.6);
         }
         .exp-dest-badge.active {
-            background: rgba(59,130,246,0.35); border-color: #60a5fa; color: white;
+            background: rgba(59,130,246,0.35); border-color: var(--blue-400); color: white;
         }
         .exp-dest-badge .badge-tip {
             display: none; position: absolute; bottom: calc(100% + 6px); left: 50%;
@@ -845,7 +855,7 @@
         .cargo-type-btn.active .dg-label-inline { background: rgba(255,255,255,0.2); color: white; }
         .dg-label-inline {
             display: inline-block; padding: 0.05rem 0.3rem; border-radius: 3px; font-size: 0.6rem;
-            font-weight: 800; background: #dc2626; color: white; letter-spacing: 0.03em;
+            font-weight: 800; background: var(--red-600); color: white; letter-spacing: 0.03em;
         }
         /* UN search */
         .un-search-wrap { position: relative; margin-bottom: 0.5rem; }
@@ -865,11 +875,11 @@
             cursor: pointer; border-bottom: 1px solid var(--gray-100); font-size: 0.68rem;
         }
         .un-dropdown-item:last-child { border-bottom: none; }
-        .un-dropdown-item:hover { background: #f0f7ff; }
+        .un-dropdown-item:hover { background: var(--blue-50-alt); }
         .un-dd-number { font-weight: 700; color: var(--navy); font-size: 0.7rem; white-space: nowrap; }
         .un-dd-clase {
             font-size: 0.58rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
-            background: #fee2e2; color: #dc2626; white-space: nowrap;
+            background: var(--red-100); color: var(--red-600); white-space: nowrap;
         }
         .un-dd-name { color: var(--gray-600); flex: 1; }
         /* UN chips */
@@ -880,19 +890,19 @@
         }
         .un-chip-badge {
             font-size: 0.55rem; font-weight: 700; padding: 0.05rem 0.3rem; border-radius: 3px;
-            background: #dc2626; color: white; white-space: nowrap;
+            background: var(--red-600); color: white; white-space: nowrap;
         }
         .un-chip-name { flex: 1; color: var(--gray-700); }
         .un-chip-remove {
             background: none; border: none; cursor: pointer; color: var(--gray-400);
             font-size: 0.8rem; line-height: 1; padding: 0; margin-left: auto;
         }
-        .un-chip-remove:hover { color: #dc2626; }
+        .un-chip-remove:hover { color: var(--red-600); }
         .un-empty-hint { font-size: 0.62rem; color: var(--gray-400); font-style: italic; }
         /* DG badge in airline card */
         .exp-airline-dg-badge {
             display: inline-block; padding: 0.05rem 0.3rem; border-radius: 3px;
-            font-size: 0.55rem; font-weight: 800; background: #dc2626; color: white;
+            font-size: 0.55rem; font-weight: 800; background: var(--red-600); color: white;
             vertical-align: middle; margin-left: 0.2rem;
         }
         /* tipo badge in route diagram */
@@ -909,7 +919,7 @@
             background: var(--gray-100); color: var(--gray-500);
         }
         .exp-fsc-note { font-size: 0.62rem; color: #7c3aed; font-weight: 600; }
-        .exp-dg-fee-note { font-size: 0.62rem; color: #dc2626; font-weight: 600; }
+        .exp-dg-fee-note { font-size: 0.62rem; color: var(--red-600); font-weight: 600; }
 
         /* Breakdown pills */
         .bk-pills {
@@ -1013,7 +1023,7 @@
         .exp-transport-card.selected {
             border-color: var(--blue);
             box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
-            background: #f0f7ff;
+            background: var(--blue-50-alt);
         }
         .exp-transport-card.best:not(.selected)::before {
             content: '★ Mejor precio';
@@ -1130,9 +1140,9 @@
             display: none;
             margin-top: 0.75rem;
             padding: 0.75rem;
-            background: linear-gradient(135deg, #f0f7ff 0%, #f0fdf9 100%);
+            background: linear-gradient(135deg, var(--blue-50-alt) 0%, #f0fdf9 100%);
             border-radius: 0 0 var(--radius) var(--radius);
-            border: 1px solid #bfdbfe;
+            border: 1px solid var(--blue-200);
             border-top: none;
         }
         .route-info.show { display: block; }
@@ -1176,7 +1186,7 @@
         }
         .upload-zone:hover {
             border-color: var(--blue);
-            background: #f0f7ff;
+            background: var(--blue-50-alt);
         }
         .upload-zone .upload-icon {
             font-size: 2rem;
@@ -1334,7 +1344,7 @@
         }
         .maritime-ranking-panel.single {
             background: #f8fbff;
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
         }
         .maritime-ranking-panel.full {
             background: #fffaf2;
@@ -1428,15 +1438,15 @@
             justify-content: center;
             padding: 0.2rem 0.5rem;
             border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: var(--blue-100);
+            color: var(--blue-700);
             font-size: 0.62rem;
             font-weight: 800;
             letter-spacing: 0.04em;
             text-transform: uppercase;
         }
         .maritime-option-row.selected .maritime-option-price {
-            color: #1d4ed8;
+            color: var(--blue-700);
         }
         .maritime-option-actions {
             display: flex;
@@ -1465,8 +1475,8 @@
             white-space: nowrap;
         }
         .maritime-option-row.selected .btn-venta {
-            background: linear-gradient(180deg, #2563eb 0%, #1d4ed8 100%);
-            border-color: #1d4ed8;
+            background: linear-gradient(180deg, #2563eb 0%, var(--blue-700) 100%);
+            border-color: var(--blue-700);
             box-shadow: 0 8px 18px rgba(37,99,235,0.18);
         }
         .maritime-option-detail {
@@ -1510,7 +1520,7 @@
         }
         .maritime-combined-shell {
             margin-top: 1.1rem;
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 16px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
             padding: 1.05rem;
@@ -1518,7 +1528,7 @@
         .maritime-combined-shell .air-route-head {
             margin-bottom: 1rem;
             padding-bottom: 0.85rem;
-            border-bottom: 1px solid #dbeafe;
+            border-bottom: 1px solid var(--blue-100);
         }
         .maritime-combined-badges {
             display: flex;
@@ -1536,8 +1546,8 @@
             letter-spacing: 0.02em;
         }
         .maritime-combined-badge.single {
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: var(--blue-100);
+            color: var(--blue-700);
         }
         .maritime-combined-badge.full {
             background: #fef3c7;
@@ -1636,10 +1646,10 @@
         .maritime-concept-rate {
             flex: 0 0 auto;
             font-weight: 800;
-            color: #1d4ed8;
+            color: var(--blue-700);
             white-space: nowrap;
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
+            background: var(--blue-50);
+            border: 1px solid var(--blue-200);
             border-radius: 999px;
             padding: 0.22rem 0.6rem;
         }
@@ -1677,7 +1687,7 @@
         .maritime-commercial-title {
             font-size: 0.9rem;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--gray-950);
         }
         .maritime-commercial-subtitle {
             margin-top: 0.28rem;
@@ -1731,7 +1741,7 @@
         .maritime-commercial-value {
             flex: 0 0 auto;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--gray-950);
             white-space: nowrap;
         }
         .maritime-commercial-empty {
@@ -1789,7 +1799,7 @@
         .maritime-quote-panel h3 {
             font-size: 0.95rem;
             font-weight: 800;
-            color: #0f172a;
+            color: var(--gray-950);
             margin-bottom: 0.25rem;
         }
         .maritime-quote-header {
@@ -1811,13 +1821,13 @@
             gap: 0.3rem;
             padding: 0.2rem;
             border-radius: 999px;
-            background: #eff6ff;
-            border: 1px solid #dbeafe;
+            background: var(--blue-50);
+            border: 1px solid var(--blue-100);
         }
         .maritime-quote-tab {
             border: none;
             background: transparent;
-            color: #1d4ed8;
+            color: var(--blue-700);
             font-size: 0.72rem;
             font-weight: 800;
             padding: 0.35rem 0.7rem;
@@ -1826,7 +1836,7 @@
         }
         .maritime-quote-tab.active {
             background: white;
-            color: #0f172a;
+            color: var(--gray-950);
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
         }
         .maritime-quote-style-tabs {
@@ -1850,7 +1860,7 @@
         }
         .maritime-quote-style-tab.active {
             background: white;
-            color: #0f172a;
+            color: var(--gray-950);
             box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
         }
         .maritime-quote-copy-btn {
@@ -1921,7 +1931,7 @@
             padding-top: 0.8rem;
             border-top: 1px solid rgba(148,163,184,0.2);
             font-size: 0.78rem;
-            color: #0f172a;
+            color: var(--gray-950);
             font-weight: 700;
         }
         .maritime-quote-paragraph {
@@ -1949,8 +1959,8 @@
             background: #fff;
         }
         .maritime-combined-pick.single {
-            border-color: #bfdbfe;
-            background: #eff6ff;
+            border-color: var(--blue-200);
+            background: var(--blue-50);
         }
         .maritime-combined-pick.full {
             border-color: #fde7c2;
@@ -1964,7 +1974,7 @@
             margin-bottom: 0.25rem;
         }
         .maritime-combined-pick.single .maritime-combined-pick-label {
-            color: #1d4ed8;
+            color: var(--blue-700);
         }
         .maritime-combined-pick.full .maritime-combined-pick-label {
             color: #b45309;
@@ -2021,7 +2031,7 @@
             margin-bottom: 0.75rem;
         }
         .maritime-route-panel {
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 18px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             padding: 1.05rem;
@@ -2072,7 +2082,7 @@
         }
         .maritime-ranking-panel {
             border-radius: 16px;
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
         }
@@ -2300,7 +2310,7 @@
             padding-top: 0.15rem;
         }
         .mub-air-total-pill {
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 12px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
             padding: 0.65rem 0.75rem;
@@ -2323,7 +2333,7 @@
             color: var(--green);
         }
         .mub-air-total-pill strong.negative {
-            color: #dc2626;
+            color: var(--red-600);
         }
         .air-route-panel .mub-panel {
             border: none;
@@ -2372,7 +2382,7 @@
         }
         .air-stepper {
             position: static;
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             padding: 0.8rem;
@@ -2432,12 +2442,12 @@
         }
         .air-step.is-active {
             border-color: #93c5fd;
-            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            background: linear-gradient(180deg, var(--blue-50) 0%, #ffffff 100%);
         }
         .air-step.is-active .air-step-index {
-            border-color: #60a5fa;
-            background: #dbeafe;
-            color: #1d4ed8;
+            border-color: var(--blue-400);
+            background: var(--blue-100);
+            color: var(--blue-700);
         }
         .air-step.is-complete {
             border-color: #86efac;
@@ -2450,7 +2460,7 @@
         }
         .air-workspace-summary {
             position: static;
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             padding: 1rem;
@@ -2475,7 +2485,7 @@
             color: var(--gray-500);
         }
         .air-workspace-group {
-            border-top: 1px dashed #dbeafe;
+            border-top: 1px dashed var(--blue-100);
             padding-top: 0.7rem;
             margin-top: 0.7rem;
             display: grid;
@@ -2525,10 +2535,10 @@
         .air-route-panel .route-info {
             margin-top: 0.8rem;
             border-radius: 10px;
-            border-top: 1px solid #bfdbfe;
+            border-top: 1px solid var(--blue-200);
         }
         .air-route-panel {
-            border: 1px solid #bfdbfe;
+            border: 1px solid var(--blue-200);
             border-radius: 16px;
             background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
             padding: 1rem;
@@ -2549,8 +2559,8 @@
             padding: 0.42rem 0.7rem;
             border: none;
             border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: var(--blue-100);
+            color: var(--blue-700);
             font-size: 0.72rem;
             letter-spacing: 0.06em;
         }
@@ -2567,9 +2577,9 @@
             justify-content: center;
             padding: 0.35rem 0.6rem;
             border-radius: 999px;
-            background: #eff6ff;
-            color: #1d4ed8;
-            border: 1px solid #bfdbfe;
+            background: var(--blue-50);
+            color: var(--blue-700);
+            border: 1px solid var(--blue-200);
             font-size: 0.66rem;
             font-weight: 800;
             letter-spacing: 0.05em;
@@ -2614,7 +2624,7 @@
             align-items: start;
         }
         .air-provider-stage {
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #ffffff 100%);
             padding: 1rem;
@@ -2669,8 +2679,8 @@
             background: linear-gradient(180deg, #22c55e 0%, #16a34a 100%);
         }
         .air-provider-card.selected {
-            border-color: #60a5fa;
-            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            border-color: var(--blue-400);
+            background: linear-gradient(180deg, var(--blue-50) 0%, #ffffff 100%);
             box-shadow: 0 10px 24px rgba(37, 99, 235, 0.12);
         }
         .air-provider-main {
@@ -2711,8 +2721,8 @@
             align-items: center;
             padding: 0.18rem 0.45rem;
             border-radius: 999px;
-            background: #dbeafe;
-            color: #1d4ed8;
+            background: var(--blue-100);
+            color: var(--blue-700);
             font-size: 0.6rem;
             font-weight: 800;
             letter-spacing: 0.04em;
@@ -2744,12 +2754,12 @@
             font-size: 0.72rem;
         }
         .air-provider-card.selected .btn-venta {
-            background: #1d4ed8;
+            background: var(--blue-700);
             color: white;
-            border-color: #1d4ed8;
+            border-color: var(--blue-700);
         }
         .air-cost-summary {
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
             padding: 1rem;
@@ -2762,11 +2772,11 @@
             padding: 0.8rem;
             border-radius: 12px;
             background: rgba(255,255,255,0.9);
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             margin-bottom: 0.85rem;
         }
         .air-cost-summary-provider.selected {
-            background: linear-gradient(180deg, #eff6ff 0%, #ffffff 100%);
+            background: linear-gradient(180deg, var(--blue-50) 0%, #ffffff 100%);
             border-color: #93c5fd;
         }
         .air-cost-summary-provider strong {
@@ -2825,7 +2835,7 @@
         .unit-reference-card {
             margin-top: 0;
             margin-bottom: 0;
-            border: 1px solid #dbeafe;
+            border: 1px solid var(--blue-100);
             border-radius: 16px;
             background: linear-gradient(180deg, #fbfdff 0%, #f8fbff 100%);
             overflow: hidden;
@@ -2839,8 +2849,8 @@
             justify-content: space-between;
             gap: 0.75rem;
             padding: 0.8rem 0.95rem;
-            background: #eff6ff;
-            border-bottom: 1px solid #dbeafe;
+            background: var(--blue-50);
+            border-bottom: 1px solid var(--blue-100);
         }
         .unit-reference-title {
             font-size: 0.74rem;
@@ -3055,7 +3065,7 @@
             transition: background 0.15s;
         }
         .btn-delete-row:hover {
-            background: #fee2e2;
+            background: var(--red-100);
         }
         .conceptos-total {
             display: flex;
@@ -3202,7 +3212,7 @@
         }
         .mexp-toggle-btn:hover { border-color: var(--blue); color: var(--blue); }
         .mexp-toggle-btn.active {
-            border-color: var(--blue); background: var(--blue-light, #eff6ff); color: var(--blue); font-weight: 700;
+            border-color: var(--blue); background: var(--blue-light); color: var(--blue); font-weight: 700;
         }
         .mexp-section-sep {
             margin: 1.1rem 0 0.9rem; border: none; border-top: 1px solid var(--gray-200);
@@ -3219,7 +3229,7 @@
             font-size: 0.82rem; cursor: pointer; transition: border-color .15s;
         }
         .mexp-charge-row:hover { border-color: var(--blue); }
-        .mexp-charge-row.selected { border-color: var(--blue); background: var(--blue-light, #eff6ff); }
+        .mexp-charge-row.selected { border-color: var(--blue); background: var(--blue-light); }
         .mexp-charge-row .mexp-charge-code {
             font-weight: 700; color: var(--gray-700); min-width: 3rem;
         }
@@ -3244,20 +3254,20 @@
             transition: all .15s;
         }
         .mexp-equipo-row:hover { border-color: var(--blue); }
-        .mexp-equipo-row.active { border-color: var(--blue); background: #eff6ff; }
+        .mexp-equipo-row.active { border-color: var(--blue); background: var(--blue-50); }
         .mexp-equipo-row .eq-check { font-size: 0.85rem; color: var(--gray-300); width: 14px; }
-        .mexp-equipo-row.active .eq-check { color: #1d4ed8; }
+        .mexp-equipo-row.active .eq-check { color: var(--blue-700); }
         .mexp-equipo-row .eq-name { font-size: 0.78rem; font-weight: 700; color: var(--gray-600); flex: 1; }
-        .mexp-equipo-row.active .eq-name { color: #1d4ed8; }
+        .mexp-equipo-row.active .eq-name { color: var(--blue-700); }
         .mexp-eq-qty-ctrl { display: flex; align-items: center; gap: 0.2rem; }
         .mexp-eq-qty-ctrl .eq-btn {
             width: 22px; height: 22px; border: 1px solid #93c5fd; border-radius: 5px;
-            background: white; color: #1d4ed8; font-size: 1rem; font-weight: 700;
+            background: white; color: var(--blue-700); font-size: 1rem; font-weight: 700;
             cursor: pointer; line-height: 1; padding: 0;
             display: flex; align-items: center; justify-content: center;
         }
-        .mexp-eq-qty-ctrl .eq-btn:hover { background: #dbeafe; }
-        .mexp-eq-qty-num { width: 28px; text-align: center; font-size: 0.82rem; font-weight: 700; color: #1d4ed8; }
+        .mexp-eq-qty-ctrl .eq-btn:hover { background: var(--blue-100); }
+        .mexp-eq-qty-num { width: 28px; text-align: center; font-size: 0.82rem; font-weight: 700; color: var(--blue-700); }
         /* ===== ADMIN MODE ===== */
         .admin-only { display: none; }
         body.admin-mode .admin-only { display: block; }
@@ -5215,7 +5225,7 @@ uploadZone.addEventListener('click', () => fileInput.click());
 uploadZone.addEventListener('dragover', (e) => {
     e.preventDefault();
     uploadZone.style.borderColor = 'var(--blue)';
-    uploadZone.style.background = '#f0f7ff';
+    uploadZone.style.background = 'var(--blue-50-alt)';
 });
 uploadZone.addEventListener('dragleave', () => {
     uploadZone.style.borderColor = '';
@@ -5243,7 +5253,7 @@ if (uploadZoneMaritimo && fileInputMaritimo) {
     uploadZoneMaritimo.addEventListener('dragover', (e) => {
         e.preventDefault();
         uploadZoneMaritimo.style.borderColor = 'var(--blue)';
-        uploadZoneMaritimo.style.background = '#f0f7ff';
+        uploadZoneMaritimo.style.background = 'var(--blue-50-alt)';
     });
     uploadZoneMaritimo.addEventListener('dragleave', () => {
         uploadZoneMaritimo.style.borderColor = '';
@@ -7262,7 +7272,7 @@ function renderMaritimeProvidersList() {
     container.innerHTML = providers.map(p => {
         const vigente = isMaritimeProviderVigente(p);
         const vigBadge = !vigente
-            ? '<span style="margin-left:6px;background:#fee2e2;color:#dc2626;border-radius:4px;padding:1px 6px;font-size:0.7rem;font-weight:600;">Vencido</span>'
+            ? '<span style="margin-left:6px;background:var(--red-100);color:var(--red-600);border-radius:4px;padding:1px 6px;font-size:0.7rem;font-weight:600;">Vencido</span>'
             : p.vigenciaHasta
                 ? `<span style="margin-left:6px;background:#d1fae5;color:#065f46;border-radius:4px;padding:1px 6px;font-size:0.7rem;">Vigencia: ${escapeHtml(p.vigenciaHasta)}</span>`
                 : '';
@@ -8193,7 +8203,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
                     <div class="maritime-selectable-box">
                         <div class="maritime-selectable-head">
                             <div class="maritime-selectable-title">Cargos a seleccionar</div>
-                            <button type="button" onclick="toggleAllMaritimeDestinationConcepts()" class="maritime-select-all-btn" style="border:1px solid ${allSelected ? 'rgba(239,68,68,0.25)' : 'rgba(37,99,235,0.18)'};background:${allSelected ? '#fef2f2' : '#eff6ff'};color:${allSelected ? '#b91c1c' : '#1d4ed8'};">
+                            <button type="button" onclick="toggleAllMaritimeDestinationConcepts()" class="maritime-select-all-btn" style="border:1px solid ${allSelected ? 'rgba(239,68,68,0.25)' : 'rgba(37,99,235,0.18)'};background:${allSelected ? '#fef2f2' : 'var(--blue-50)'};color:${allSelected ? '#b91c1c' : 'var(--blue-700)'};">
                                 ${allSelected ? 'Limpiar selección' : 'Seleccionar todo'}
                             </button>
                         </div>
