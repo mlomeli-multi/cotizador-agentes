@@ -37,6 +37,13 @@
             --green-300: #86efac;
             --green-800: #166534;
             --amber: #f59e0b;
+            --amber-50: #fff7ed;
+            --amber-100: #ffedd5;
+            --yellow-100: #fef3c7;
+            --amber-200: #fff3e0;
+            --amber-700: #b45309;
+            --amber-800: #9a3412;
+            --amber-900: #7c2d12;
             --red: #ef4444;
             --red-600: #dc2626;
             --red-100: #fee2e2;
@@ -1558,8 +1565,8 @@
             color: var(--blue-700);
         }
         .maritime-combined-badge.full {
-            background: #fef3c7;
-            color: #b45309;
+            background: var(--yellow-100);
+            color: var(--amber-700);
         }
         .maritime-combined-picks {
             display: grid;
@@ -1796,6 +1803,86 @@
             color: var(--gray-500);
             line-height: 1.5;
         }
+
+        /* ===== DEPÓSITOS Y GARANTÍAS ===== */
+        .deposit-block {
+            padding: 0.8rem 0.9rem;
+            border-radius: 12px;
+            background: var(--amber-50);
+            border: 1px solid rgba(245,158,11,0.25);
+        }
+        .deposit-block-title {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--amber-800);
+            margin-bottom: 0.45rem;
+        }
+        .deposit-block-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+        }
+        .deposit-item {
+            padding: 0.45rem 0.1rem;
+            border-bottom: 1px solid rgba(245,158,11,0.12);
+            font-size: 0.76rem;
+            color: var(--amber-900);
+        }
+        .deposit-item-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 0.75rem;
+        }
+        .deposit-item-name { line-height: 1.35; }
+        .deposit-item-rate {
+            flex: 0 0 auto;
+            font-weight: 800;
+            color: var(--amber-700);
+            white-space: nowrap;
+            background: var(--amber-200);
+            border: 1px solid rgba(245,158,11,0.25);
+            border-radius: 999px;
+            padding: 0.22rem 0.6rem;
+        }
+        .deposit-charge-row {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+            margin-top: 0.24rem;
+        }
+        .deposit-charge-label {
+            font-size: 0.69rem;
+            font-weight: 700;
+            color: var(--amber-800);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+        .deposit-charge-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.16rem 0.5rem;
+            border-radius: 999px;
+            background: var(--amber-100);
+            color: var(--amber-800);
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
+        .deposit-comment {
+            margin-top: 0.22rem;
+            color: var(--amber-800);
+            font-size: 0.72rem;
+            line-height: 1.35;
+        }
+        .destination-empty {
+            padding: 0.8rem 0.9rem;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid rgba(148,163,184,0.16);
+            font-size: 0.76rem;
+            color: var(--gray-500);
+        }
         .maritime-quote-panel {
             margin-top: 1.05rem;
             padding: 1.05rem;
@@ -1985,7 +2072,7 @@
             color: var(--blue-700);
         }
         .maritime-combined-pick.full .maritime-combined-pick-label {
-            color: #b45309;
+            color: var(--amber-700);
         }
         .maritime-combined-pick-provider {
             font-size: 0.84rem;
@@ -8239,7 +8326,7 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
 
             } else {
                 destinationConcepts.innerHTML = `
-                    <div style="padding:0.8rem 0.9rem;border-radius:12px;background:white;border:1px solid rgba(148,163,184,0.16);font-size:0.76rem;color:var(--gray-500);">
+                    <div class="destination-empty">
                         No hay cargos configurados para seleccionar con esta naviera piloto y el puerto actual.
                     </div>
                 `;
@@ -8249,20 +8336,20 @@ function renderMaritimeCombinedCalculator(containerId = 'mub-panel-container-mar
         if (destinationExtras) {
             if (destinationData.extras.length) {
                 destinationExtras.innerHTML = `
-                    <div style="padding:0.8rem 0.9rem;border-radius:12px;background:#fff7ed;border:1px solid rgba(245,158,11,0.25);">
-                        <div style="font-size:0.78rem;font-weight:700;color:#9a3412;margin-bottom:0.45rem;">Depósitos y garantías</div>
-                        <div style="display:flex;flex-direction:column;gap:0.35rem;">
+                    <div class="deposit-block">
+                        <div class="deposit-block-title">Depósitos y garantías</div>
+                        <div class="deposit-block-list">
                             ${destinationData.extras.map(item => `
-                                <div style="padding:0.45rem 0.1rem;border-bottom:1px solid rgba(245,158,11,0.12);font-size:0.76rem;color:#7c2d12;">
-                                    <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:0.75rem;">
-                                        <strong style="line-height:1.35;">${escapeHtml(item.nombre)}</strong>
-                                        <span style="flex:0 0 auto;font-weight:800;color:#b45309;white-space:nowrap;background:#fff3e0;border:1px solid rgba(245,158,11,0.25);border-radius:999px;padding:0.22rem 0.6rem;">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
+                                <div class="deposit-item">
+                                    <div class="deposit-item-row">
+                                        <strong class="deposit-item-name">${escapeHtml(item.nombre)}</strong>
+                                        <span class="deposit-item-rate">${escapeHtml(formatMaritimeConceptRate(item, fmt))}</span>
                                     </div>
-                                    <div style="display:flex;align-items:center;gap:0.4rem;flex-wrap:wrap;margin-top:0.24rem;">
-                                        <span style="font-size:0.69rem;font-weight:700;color:#9a3412;text-transform:uppercase;letter-spacing:0.04em;">Charge by:</span>
-                                        <span style="display:inline-flex;align-items:center;padding:0.16rem 0.5rem;border-radius:999px;background:#ffedd5;color:#9a3412;font-size:0.7rem;font-weight:700;">${escapeHtml(item.baseCobro || 'N/A')}</span>
+                                    <div class="deposit-charge-row">
+                                        <span class="deposit-charge-label">Charge by:</span>
+                                        <span class="deposit-charge-badge">${escapeHtml(item.baseCobro || 'N/A')}</span>
                                     </div>
-                                    ${getMaritimeConceptComment(item) ? `<div style="margin-top:0.22rem;color:#9a3412;font-size:0.72rem;line-height:1.35;">${escapeHtml(getMaritimeConceptComment(item))}</div>` : ''}
+                                    ${getMaritimeConceptComment(item) ? `<div class="deposit-comment">${escapeHtml(getMaritimeConceptComment(item))}</div>` : ''}
                                 </div>
                             `).join('')}
                         </div>
