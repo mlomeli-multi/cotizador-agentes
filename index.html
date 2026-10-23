@@ -9398,13 +9398,13 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
         </div>
     ` : ''}
     </div>
-    <div class="maritime-quote-panel">
-        <div class="mub-stage-head" style="margin-bottom:0.95rem;">
+    <div class="air-route-panel" style="margin-top:1.05rem;">
+        <div class="air-route-head">
             <div>
-                <h3>Resumen de cotización</h3>
-                <div class="maritime-quote-subtitle">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
+                <div class="form-section-title">&#x1F4E7; Resumen de cotización</div>
+                <div class="air-route-copy">Listo para copiar y pegar al correo, usando la venta actual de la calculadora.</div>
             </div>
-            ${isAirQuote ? '<div class="mub-step-badge">Paso 4</div>' : '<div class="maritime-step-badge">Paso 4</div>'}
+            <div class="air-route-step-badge">Paso 4</div>
         </div>
         <div class="maritime-quote-header">
             <div class="maritime-quote-header-actions">
@@ -9418,7 +9418,7 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
                     <button type="button" class="maritime-quote-style-tab" data-style="rodrigo">Rodrigo</button>
                 </div>
             </div>
-            <button type="button" id="${quoteCopyBtnId}" class="maritime-quote-copy-btn">📋 Copiar correo</button>
+            <button type="button" id="${quoteCopyBtnId}" class="maritime-quote-copy-btn">&#x1F4CB; Copiar correo</button>
         </div>
         <div id="${quoteSummaryId}" class="maritime-quote-body"></div>
     </div>`;
