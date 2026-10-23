@@ -1780,9 +1780,9 @@
         .maritime-quote-panel {
             margin-top: 1.05rem;
             padding: 1.05rem;
-            border: 1px solid rgba(15,23,42,0.1);
+            border: 1px solid rgba(148,163,184,0.18);
             border-radius: 16px;
-            background: #ffffff;
+            background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
         }
         .maritime-quote-panel h3 {
@@ -1836,8 +1836,6 @@
             border-radius: 999px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
-            margin: 0 0 0.8rem auto;
-            width: max-content;
         }
         .maritime-quote-style-tab {
             border: none;
@@ -4886,9 +4884,8 @@
                                 <div class="air-route-step-badge">Paso 4</div>
                             </div>
                             <div id="mexp-resumen-wrap" style="margin-top:0.75rem;"></div>
-                            <div style="margin-top:1.5rem;display:flex;gap:0.75rem;justify-content:space-between;">
+                            <div style="margin-top:1.25rem;">
                                 <button class="btn btn-outline" onclick="mexpGoStep(3)">← Venta</button>
-                                <button class="btn btn-primary" onclick="mexpCopiarCorreo()">&#128203; Copiar correo</button>
                             </div>
                         </div>
                     </div>
@@ -9409,16 +9406,20 @@ function openMubPanel(data, containerId = 'mub-panel-container') {
             </div>
             ${isAirQuote ? '<div class="mub-step-badge">Paso 4</div>' : '<div class="maritime-step-badge">Paso 4</div>'}
         </div>
-        <div id="${quoteTabsId}" class="maritime-quote-tabs" style="margin:0 0 0.8rem auto;width:max-content;">
-            <button type="button" class="maritime-quote-tab active" data-lang="en">EN</button>
-            <button type="button" class="maritime-quote-tab" data-lang="es">ES</button>
+        <div class="maritime-quote-header">
+            <div class="maritime-quote-header-actions">
+                <div id="${quoteTabsId}" class="maritime-quote-tabs">
+                    <button type="button" class="maritime-quote-tab active" data-lang="en">EN</button>
+                    <button type="button" class="maritime-quote-tab" data-lang="es">ES</button>
+                </div>
+                <div id="${quoteStyleTabsId}" class="maritime-quote-style-tabs" style="display:none;">
+                    <button type="button" class="maritime-quote-style-tab active" data-style="official">Oficial</button>
+                    <button type="button" class="maritime-quote-style-tab" data-style="brenda">Brenda</button>
+                    <button type="button" class="maritime-quote-style-tab" data-style="rodrigo">Rodrigo</button>
+                </div>
+            </div>
+            <button type="button" id="${quoteCopyBtnId}" class="maritime-quote-copy-btn">📋 Copiar correo</button>
         </div>
-        <div id="${quoteStyleTabsId}" class="maritime-quote-style-tabs" style="display:none;">
-            <button type="button" class="maritime-quote-style-tab active" data-style="official">Oficial</button>
-            <button type="button" class="maritime-quote-style-tab" data-style="brenda">Brenda</button>
-            <button type="button" class="maritime-quote-style-tab" data-style="rodrigo">Rodrigo</button>
-        </div>
-        <button type="button" id="${quoteCopyBtnId}" class="maritime-quote-copy-btn" style="margin:0 0 0.8rem auto;display:block;">Copiar correo</button>
         <div id="${quoteSummaryId}" class="maritime-quote-body"></div>
     </div>`;
 
