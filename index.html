@@ -40,6 +40,7 @@
             --amber-50: #fff7ed;
             --amber-100: #ffedd5;
             --yellow-100: #fef3c7;
+            --yellow-800: #92400e;
             --amber-200: #fff3e0;
             --amber-700: #b45309;
             --amber-800: #9a3412;
@@ -203,7 +204,7 @@
         }
         .card-icon.blue { background: var(--blue-100); color: var(--blue); }
         .card-icon.green { background: #d1fae5; color: var(--green); }
-        .card-icon.amber { background: #fef3c7; color: var(--amber); }
+        .card-icon.amber { background: var(--yellow-100); color: var(--amber); }
         .card-icon.red { background: var(--red-100); color: var(--red); }
         .card-icon.navy { background: #e0e7ef; color: var(--navy); }
 
@@ -448,7 +449,7 @@
             gap: 0.4rem;
         }
         .cargo-col-title {
-            font-size: 0.52rem;
+            font-size: 0.6rem;
             font-weight: 800;
             text-transform: uppercase;
             letter-spacing: 0.06em;
@@ -458,7 +459,7 @@
         }
         .cargo-col .form-group { margin-bottom: 0; }
         .cargo-col .form-group label {
-            font-size: 0.52rem;
+            font-size: 0.6rem;
             font-weight: 800;
             letter-spacing: 0.04em;
             text-transform: uppercase;
@@ -603,7 +604,7 @@
             border: 1px solid var(--gray-200);
         }
         .cw-label {
-            font-size: 0.5rem;
+            font-size: 0.6rem;
             font-weight: 700;
             color: var(--gray-400);
             text-transform: uppercase;
@@ -629,7 +630,7 @@
             position: absolute;
             top: 0.25rem;
             right: 0.35rem;
-            font-size: 0.48rem;
+            font-size: 0.6rem;
             font-weight: 700;
             padding: 0.08rem 0.3rem;
             border-radius: 3px;
@@ -724,7 +725,7 @@
         }
         .exp-airline-tag.tt { background: var(--blue-100); color: var(--blue); }
         .exp-airline-tag.dias { background: #d1fae5; color: #065f46; }
-        .exp-airline-tag.type { background: #fef3c7; color: #92400e; }
+        .exp-airline-tag.type { background: var(--yellow-100); color: var(--yellow-800); }
         .exp-airline-tag.vigencia { background: #fce7f3; color: #9d174d; }
         .exp-airline-breakdown {
             font-size: 0.62rem; color: var(--gray-500);
@@ -922,7 +923,7 @@
         }
         /* tipo badge in route diagram */
         .exp-tipo-badge {
-            font-size: 0.5rem; font-weight: 700; padding: 0.05rem 0.25rem; border-radius: 3px;
+            font-size: 0.6rem; font-weight: 700; padding: 0.05rem 0.25rem; border-radius: 3px;
         }
         .exp-tipo-badge.gen { background: rgba(52,211,153,0.2); color: #34d399; }
         .exp-tipo-badge.dg  { background: rgba(220,38,38,0.35); color: #fca5a5; }
@@ -946,7 +947,7 @@
             font-weight: 700; font-size: 0.65rem;
             background: #e0f2fe; color: #0369a1;
         }
-        .bk-pill.ssc { background: #fef3c7; color: #92400e; }
+        .bk-pill.ssc { background: var(--yellow-100); color: var(--yellow-800); }
         .bk-pill.fsc { background: #ede9fe; color: #6d28d9; }
         .bk-plus { font-size: 0.6rem; color: var(--gray-400); font-weight: 600; }
         .bk-calc {
@@ -1353,7 +1354,7 @@
         }
         .maritime-ranking-panel {
             margin: 0;
-            padding: 1.05rem;
+            padding: 1rem;
             border-radius: 16px;
             box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
         }
@@ -3336,7 +3337,7 @@
             padding: 0.35rem 0.75rem; border-radius: 20px; border: 1.5px solid var(--gray-200);
             font-size: 0.78rem; cursor: pointer; background: white; color: var(--gray-500); transition: all .15s;
         }
-        .mexp-opcional-pill.active { border-color: #f59e0b; background: #fffbeb; color: #92400e; font-weight: 600; }
+        .mexp-opcional-pill.active { border-color: var(--amber); background: var(--amber-50); color: var(--yellow-800); font-weight: 600; }
         .mexp-venta-table { width: 100%; border-collapse: collapse; font-size: 0.8rem; }
         .mexp-venta-table th { background: var(--gray-50); padding: 0.4rem 0.6rem; text-align: left; font-weight: 600; color: var(--gray-600); border-bottom: 1px solid var(--gray-200); }
         .mexp-venta-table td { padding: 0.4rem 0.6rem; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
