@@ -353,6 +353,13 @@
             padding: 0.6rem 0.7rem;
             box-shadow: 0 4px 14px rgba(15, 23, 42, 0.04);
         }
+        .air-cargo-body {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 220px;
+            gap: 0.7rem;
+            align-items: start;
+            margin-top: 0.45rem;
+        }
         .carga-header {
             display: flex;
             justify-content: space-between;
@@ -372,7 +379,20 @@
             font-size: 0.64rem;
             letter-spacing: 0.05em;
         }
+        .air-cargo-head-main {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.5rem;
+            flex: 1;
+            min-width: 0;
+        }
         .air-cargo-head-copy { min-width: 0; flex: 1; }
+        .carga-global {
+            display: flex;
+            gap: 0.6rem;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
         .air-cargo-copy {
             margin-top: 0.1rem;
             font-size: 0.58rem;
@@ -2587,6 +2607,7 @@
         }
         .air-dap-main {
             min-width: 0;
+            grid-column: 1 / -1;
         }
         .air-stepper {
             position: static;
@@ -2737,22 +2758,24 @@
             flex-direction: column;
             min-height: 100%;
         }
-        .air-dap-card .map-container {
-            height: clamp(390px, 48vh, 470px);
-            min-height: 390px;
-            border-radius: 18px 18px 0 0;
-        }
-        .air-dap-card .route-info {
-            margin-top: 0;
-            border-radius: 0 0 18px 18px;
-            border-top: none;
-            box-shadow: 0 12px 28px rgba(15, 23, 42, 0.05);
-        }
         .air-dap-top-panel {
-            display: grid;
-            grid-template-rows: auto minmax(0, 1fr);
+            display: flex;
             gap: 0.9rem;
-            min-height: 100%;
+            align-items: start;
+            flex-wrap: wrap;
+        }
+        .air-dap-top-panel .air-route-panel {
+            flex: 1 1 300px;
+            min-width: 0;
+        }
+        .air-dap-top-panel .unit-reference-card {
+            flex: 1 1 300px;
+            min-width: 0;
+        }
+        .air-route-panel .route-info {
+            margin-top: 0.8rem;
+            border-radius: 10px;
+            border-top: 1px solid #bfdbfe;
         }
         .air-route-panel {
             border: 1px solid #bfdbfe;
@@ -3466,11 +3489,7 @@
             }
             .air-route-grid { grid-template-columns: 1fr; }
             .air-route-head { flex-direction: column; }
-            .air-dap-card .route-info {
-                margin-top: 0.75rem;
-                border-radius: var(--radius);
-                border-top: 1px solid #bfdbfe;
-            }
+            .air-dap-top-panel { flex-direction: column; }
             .maritime-body { grid-template-columns: 1fr; }
             .maritime-map-frame .map-container { height: 280px; }
             .maritime-search-grid { grid-template-columns: 1fr; }
