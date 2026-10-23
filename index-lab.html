@@ -12239,7 +12239,6 @@ function mexpRenderVenta() {
     const wrap = document.getElementById('mexp-venta-tabla-wrap');
     if (!items.length) { wrap.innerHTML = '<p style="color:var(--gray-400)">Sin datos de costo.</p>'; return; }
 
-    // Initialize venta state
     items.forEach(it => {
         if (!mexpVentaState[it.codigo]) {
             const mub = 15;
@@ -12248,56 +12247,73 @@ function mexpRenderVenta() {
     });
 
     const grupos = [...new Set(items.map(i => i.grupo))];
-    let html = '<table class="mexp-venta-table"><thead><tr>'
-        + '<th>Código</th><th>Concepto</th><th>Moneda</th><th style="text-align:right">Costo</th>'
-        + '<th style="text-align:right">MUB %</th><th style="text-align:right">Venta</th><th style="text-align:right">Utilidad</th>'
-        + '</tr></thead><tbody>';
-
+    let rows = '';
     for (const grupo of grupos) {
         const gItems = items.filter(i => i.grupo === grupo);
-        html += `<tr class="group-header"><td colspan="7">${grupo}</td></tr>`;
+        rows += `<tr class="section-row"><td colspan="7">${grupo}</td></tr>`;
         for (const it of gItems) {
             const st = mexpVentaState[it.codigo];
             const util = st.esCosto ? 0 : +(st.venta - it.monto).toFixed(2);
-            html += `<tr>
+            rows += `<tr>
                 <td>${it.codigo}</td>
-                <td>${it.concepto}</td>
-                <td>${it.moneda}</td>
-                <td style="text-align:right">$${it.monto.toFixed(2)}</td>
-                <td style="text-align:right">
-                    <input class="mexp-venta-input" type="number" value="${st.esCosto ? 0 : st.mub}"
-                        ${st.esCosto ? 'disabled' : ''}
-                        onchange="mexpVentaMubChange('${it.codigo}',${it.monto},this.value)">
-                </td>
-                <td style="text-align:right">
-                    <input class="mexp-venta-input" type="number" value="${st.esCosto ? 0 : st.venta}"
-                        ${st.esCosto ? 'disabled' : ''}
-                        onchange="mexpVentaManualChange('${it.codigo}',${it.monto},this.value)">
-                </td>
-                <td style="text-align:right;color:${util > 0 ? 'var(--green)' : 'var(--gray-400)'}">
+                <td style="text-align:left;white-space:normal;">${it.concepto}</td>
+                <td style="text-align:left;">${it.moneda}</td>
+                <td>$${it.monto.toFixed(2)}</td>
+                <td><input class="mub-input${st.esCosto ? '' : ' active-input'}" type="number" value="${st.esCosto ? 0 : st.mub}"
+                    ${st.esCosto ? 'disabled' : ''}
+                    onchange="mexpVentaMubChange('${it.codigo}',${it.monto},this.value)"></td>
+                <td><input class="mub-input venta-col${st.esCosto ? '' : ' active-input'}" type="number" value="${st.esCosto ? 0 : st.venta}"
+                    ${st.esCosto ? 'disabled' : ''}
+                    onchange="mexpVentaManualChange('${it.codigo}',${it.monto},this.value)"></td>
+                <td class="utilidad-col">
                     $${util.toFixed(2)}
-                    <button title="Pasar a costo" style="border:none;background:none;cursor:pointer;font-size:0.7rem;padding:0 0.25rem;color:${st.esCosto ? 'var(--green)' : 'var(--red)'}"
-                        onclick="mexpToggleCosto('${it.codigo}',${it.monto})">${st.esCosto ? '✓' : 'C'}</button>
+                    <button class="mub-cost-btn${st.esCosto ? ' active' : ''}"
+                        onclick="mexpToggleCosto('${it.codigo}',${it.monto})">${st.esCosto ? '✓ Costo' : 'Costo'}</button>
                 </td>
             </tr>`;
         }
     }
 
-    // Totals
     const totalCosto = items.reduce((s, i) => s + i.monto, 0);
     const totalVenta = items.reduce((s, i) => {
         const st = mexpVentaState[i.codigo];
         return s + (st.esCosto ? i.monto : st.venta);
     }, 0);
-    html += `<tr class="total-row">
-        <td colspan="3">TOTAL</td>
-        <td style="text-align:right">$${totalCosto.toFixed(2)} USD</td>
-        <td></td>
-        <td style="text-align:right">$${totalVenta.toFixed(2)} USD</td>
-        <td style="text-align:right;color:var(--green)">$${(totalVenta - totalCosto).toFixed(2)}</td>
-    </tr>`;
-    html += '</tbody></table>';
-    wrap.innerHTML = html;
+    const totalUtil = totalVenta - totalCosto;
+    const totalMub = totalCosto > 0 ? +((totalVenta / totalCosto - 1) * 100).toFixed(1) : 0;
+    const pillClass = totalUtil > 0 ? 'positive' : totalUtil < 0 ? 'negative' : '';
+
+    wrap.innerHTML = `
+        <div class="mub-calc-block inland">
+            <div class="mub-calc-block-header">
+                <div>
+                    <div class="mub-calc-block-title">Armado comercial</div>
+                    <div class="mub-calc-block-subtitle">Ajusta el markup por concepto y revisa la utilidad.</div>
+                </div>
+            </div>
+            <div class="mub-calc-table-wrap">
+                <table class="mub-table">
+                    <thead><tr>
+                        <th>Código</th>
+                        <th style="text-align:left;">Concepto</th>
+                        <th style="text-align:left;">Moneda</th>
+                        <th>Costo USD</th>
+                        <th>MUB %</th>
+                        <th>Venta</th>
+                        <th>Utilidad</th>
+                    </tr></thead>
+                    <tbody>${rows}</tbody>
+                </table>
+            </div>
+            <div style="padding:0.9rem 0.95rem;border-top:1px solid rgba(148,163,184,0.16);">
+                <div class="mub-air-sales-totals">
+                    <div class="mub-air-total-pill"><label>Total Costo</label><strong>$${totalCosto.toFixed(2)} USD</strong></div>
+                    <div class="mub-air-total-pill"><label>Total Venta</label><strong>$${totalVenta.toFixed(2)} USD</strong></div>
+                    <div class="mub-air-total-pill"><label>Utilidad</label><strong class="${pillClass}">$${totalUtil.toFixed(2)} USD</strong></div>
+                    <div class="mub-air-total-pill"><label>MUB %</label><strong class="${pillClass}">${totalMub}%</strong></div>
+                </div>
+            </div>
+        </div>`;
 }
 
 function mexpVentaMubChange(codigo, costo, mubStr) {
